@@ -1,10 +1,4 @@
-!files/
-!files/.htaccess
-!files/data.sql
-!files/structure.sql
 error_log
-files/*
 scripts/*.pyc
-tmp/*
 variables.json
 vendor/*
