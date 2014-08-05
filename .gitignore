@@ -1,0 +1,7 @@
+!files/.htaccess
+error_log
+files/*
+scripts/*.pyc
+tmp/*
+variables.json
+vendor/*
