@@ -1,0 +1,267 @@
+{% extends 'layout.twig' %}
+
+{% set module = 'Kindle Niche Sidekick - View' %}
+
+{% block content %}
+{% include 'slots/back-to-dashboard.twig' %}
+<div class="btn btn-primary pull-right qsg" data-target="#kns-qsg" data-toggle="modal">
+    <span class="icon-info-sign"></span>
+    Information
+</div>
+<div
+    data-email-top="Email"
+    data-email-middle="<p>The email has been queued for delivery successfully.</p>"
+    data-pdf-top="PDF"
+    data-pdf-middle="<p>Your PDF report is being generated. This process could take up to 15 minutes depending on the size of your report. When ready, a download dialogue will appear.</p><p>NOTE: This report is limited to 100 pages. We'll display the top 100 keywords with 25 products in each keyword on your PDF. For the complete report please click &quot;View Detailed Report&quot;.</p>"
+    data-url-csv="{{ url('kns_csv', {'id': request.id}) }}"
+    data-url-email="{{ url('kns_email', {'id': request.id}) }}"
+    data-url-pdf="{{ url('kns_pdf', {'id': request.id}) }}"
+    data-url-xhr="{{ url('kns_xhr', {'id': request.id}) }}"
+    ng-controller="kns_simple"
+    >
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="page-header">
+                <h1>{{ module }}</h1>
+            </div>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="form-actions">
+                <a
+                    class="btn btn-info"
+                    data-toggle="tooltip"
+                    href="{{ url('kns_detailed', {'id': request.id}) }}"
+                    target="_blank"
+                    title="For very large reports this page could take a little while to complete. Please be patient."
+                    >
+                    <span class="icon-bar-chart icon-large"></span>
+                    View Detailed Report
+                </a>
+                <a
+                    class="btn btn-info"
+                    href="{{ url('kns_csv', {'id': request.id}) }}"
+                    title="Simple Report"
+                    data-toggle="tooltip"
+                    >
+                    <span class="icon-download icon-large"></span>
+                    Download CSV
+                </a>
+                {% if 3 in groups and logos %}
+                    <div
+                        class="btn btn-info"
+                        title="Detailed Report - Brandable"
+                        data-toggle="tooltip"
+                        popover
+                        >
+                        <span class="icon-download icon-large"></span>
+                        Download PDF
+                        <div class="hide">
+                            <img
+                                class="img-polaroid popover-pdf"
+                                data-url="{{ url('kns_pdf', {'id': request.id}) }}"
+                                src="{{ app.request.getSchemeAndHttpHost() }}{{ app.request.baseUrl }}/images/logo.png"
+                                >
+                            {% for logo in logos %}
+                                <img
+                                    class="img-polaroid popover-pdf"
+                                    data-url="{{ url('kns_pdf', {'id': request.id, 'logo': logo.file_name|e('url')}) }}"
+                                    src="{{ url('logos_view', {'file_name': logo.file_name}) }}"
+                                    >
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% else %}
+                    <button
+                        class="btn btn-info popover-pdf"
+                        title="Detailed Report"
+                        data-toggle="tooltip"
+                        data-url="{{ url('kns_pdf', {'id': request.id}) }}"
+                        >
+                        <span class="icon-download icon-large"></span>
+                        Download PDF
+                    </button>
+                {% endif %}
+                <div
+                    class="btn btn-info"
+                    data-url="{{ url('kns_email', {'id': request.id}) }}"
+                    disabled
+                    title="Simple Report + Detailed Report"
+                    data-toggle="tooltip"
+                    {# popover #}
+                    >
+                    <span class="icon-envelope icon-large"></span>
+                    Email
+                    <div class="hide">
+                        <form class="form-inline">
+                            <input type="text" value="{{ email }}">
+                            <button
+                                class="btn btn-success popover-email"
+                                type="button"
+                                >Submit</button>
+                            <button class="btn btn-warning" type="reset">Reset</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <p class="center">Mouse over headers for explanation</p>
+            <table class="table table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th
+                            class="header [[ order_by[0] == 'string' && get_order_by() || '' ]]"
+                            ng-click="set_order_by('string')"
+                            >
+                            <span
+                                title="Keyword"
+                                data-toggle="tooltip"
+                                >Keyword</span>
+                        </th>
+                        <th
+                            class="center header [[ order_by[0] == 'contents.buyer_behavior[0]' && get_order_by() || '' ]]"
+                            ng-click="set_order_by('contents.buyer_behavior[0]')"
+                            >
+                            <span
+                                title="The likelyhood of customers purchasing multiple books within this keyword"
+                                data-toggle="tooltip"
+                                >Buyer Behavior</span>
+                        </th>
+                        <th
+                            class="center header [[ order_by[0] == 'contents.competition[0]' && get_order_by() || '' ]]"
+                            ng-click="set_order_by('contents.competition[0]')"
+                            >
+                            <span
+                                title="Ranked by our advanced market analysis algorithm."
+                                data-toggle="tooltip"
+                                >Competition</span>
+                        </th>
+                        <th
+                            class="center header [[ order_by[0] == 'contents.optimization[0]' && get_order_by() || '' ]]"
+                            ng-click="set_order_by('contents.optimization[0]')"
+                            >
+                            <span
+                                title="Optimal keyword density and other factors on Titles and Descriptions (top competitors)."
+                                data-toggle="tooltip"
+                                >Optimization</span>
+                        </th>
+                        <th
+                            class="right header [[ order_by[0] == 'contents.spend[0][0]' && get_order_by() || '' ]]"
+                            ng-click="set_order_by('contents.spend[0][0]')"
+                            >
+                            <span
+                                title="The estimated amount of money spent on products in the top 48 most relevant listings (per day; paid books only)."
+                                data-toggle="tooltip"
+                                >Spend ({{ currency }})</span>
+                        </th>
+                        <th
+                            class="right header [[ order_by[0] == 'contents.average_price[0]' && get_order_by() || '' ]]"
+                            ng-click="set_order_by('contents.average_price[0]')"
+                            >
+                            <span
+                                title="The average price of products in the top 48 most relevant listings (paid books only)."
+                                data-toggle="tooltip"
+                                >Avg. Price ({{ currency }})</span>
+                        </th>
+                        <th
+                            class="right header [[ order_by[0] == 'contents.average_length[0]' && get_order_by() || '' ]]"
+                            ng-click="set_order_by('contents.average_length[0]')"
+                            >
+                            <span
+                                title="The average length of products in the top 48 most relevant listings (pages; paid books only)."
+                                data-toggle="tooltip"
+                                >Avg. Length</span>
+                        </th>
+                        <th
+                            class="right header [[ order_by[0] == 'contents.score[0]' && get_order_by() || '' ]]"
+                            ng-click="set_order_by('contents.score[0]')"
+                            >
+                            <span
+                                title="Ranked by our advanced market analysis algorithm."
+                                data-toggle="tooltip"
+                                >Score</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="keyword in keywords|orderBy:order_by[0]:order_by[1]">
+                        <td>[[ keyword['string'] ]]</td>
+                        <td class="center">
+                            <span ng-switch on="keyword['contents']">
+                                <span
+                                    class="icon-spinner icon-spin"
+                                    ng-switch-when="null"
+                                    ></span>
+                                <span ng-switch-default ng-bind-html-unsafe="keyword['contents']['buyer_behavior'][1]|label:keyword['contents']['buyer_behavior'][1]:true"></span>
+                            </span>
+                        </td>
+                        <td class="center">
+                            <span ng-switch on="keyword['contents']">
+                                <span
+                                    class="icon-spinner icon-spin"
+                                    ng-switch-when="null"
+                                    ></span>
+                                <span ng-switch-default ng-bind-html-unsafe="keyword['contents']['competition'][1]|label:keyword['contents']['competition'][1]:false"></span>
+                            </span>
+                        </td>
+                        <td class="center">
+                            <span ng-switch on="keyword['contents']">
+                                <span
+                                    class="icon-spinner icon-spin"
+                                    ng-switch-when="null"
+                                    ></span>
+                                <span ng-switch-default ng-bind-html-unsafe="keyword['contents']['optimization'][1]|label:keyword['contents']['optimization'][1]:false"></span>
+                            </span>
+                        </td>
+                        <td class="right">
+                            <span ng-switch on="keyword['contents']">
+                                <span
+                                    class="icon-spinner icon-spin"
+                                    ng-switch-when="null"
+                                    ></span>
+                                <span ng-switch-default ng-bind-html-unsafe="keyword['contents']['spend'][1]|label:keyword['contents']['spend'][0][1]:true"></span>
+                            </span>
+                        </td>
+                        <td class="right">
+                            <span ng-switch on="keyword['contents']">
+                                <span
+                                    class="icon-spinner icon-spin"
+                                    ng-switch-when="null"
+                                    ></span>
+                                <span ng-switch-default>[[ keyword['contents']['average_price'][1] ]]</span>
+                            </span>
+                        </td>
+                        <td class="right">
+                            <span ng-switch on="keyword['contents']">
+                                <span
+                                    class="icon-spinner icon-spin"
+                                    ng-switch-when="null"
+                                    ></span>
+                                <span ng-switch-default>[[ keyword['contents']['average_length'][1] ]]</span>
+                            </span>
+                        </td>
+                        <td class="right">
+                            <span ng-switch on="keyword['contents']">
+                                <span
+                                    class="icon-spinner icon-spin"
+                                    ng-switch-when="null"
+                                    ></span>
+                                <span ng-switch-default>[[ keyword['contents']['score'][1] ]]</span>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row-fluid" ng-show="!keywords.length">
+        <div class="span12">
+            <center>
+                <p>
+                    <span class="icon-spinner icon-spin icon-2x"></span>
+                </p>
+            </center>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+Order allow, deny
+
+<Files ~ '\.(json|sql)$'>
+   Deny from all
+</Files>
+
+<IfModule mod_rewrite.c>
+    Options -MultiViews
+    RewriteEngine On
+    RewriteBase /tools/current
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>

@@ -1,0 +1,26 @@
+Competition,Spend,Score
+Very Low,Very High,90
+Very Low,High,85
+Very Low,Medium,82
+Very Low,Low,60
+Very Low,Very Low,45
+Low,Very High,85
+Low,High,81
+Low,Medium,58
+Low,Low,41
+Low,Very Low,33.75
+Medium,Very High,75
+Medium,High,70
+Medium,Medium,66
+Medium,Low,50
+Medium,Very Low,40
+High,Very High,56.25
+High,High,45
+High,Medium,33.75
+High,Low,22.5
+High,Very Low,11.25
+Very High,Very High,45
+Very High,High,33.75
+Very High,Medium,22.5
+Very High,Low,11.25
+Very High,Very Low,0

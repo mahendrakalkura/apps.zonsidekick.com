@@ -1,0 +1,107 @@
+{% extends 'layout.twig' %}
+
+{% set module = 'Kindle Niche Sidekick - Overview' %}
+
+{% block content %}
+{% include 'slots/back-to-dashboard.twig' %}
+<div class="btn btn-primary pull-right qsg" data-target="#kns-qsg" data-toggle="modal">
+    <span class="icon-info-sign"></span>
+    Information
+</div>
+<div id="kns_overview">
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="page-header">
+                <h1>
+                    {{ module }}
+                </h1>
+            </div>
+            <p>
+                This page will display all of your previously run reports that
+                are still available for viewing and/or download. When a report
+                begins, it will appear in the list below. You may close your
+                browser as a report is running and then return to the same view
+                by clicking View in the Actions column for the desired report.
+            </p>
+            <p>
+                <strong>Note:</strong> We will complete your oldest report
+                first. Additional (new) reports will be queued until your
+                others have finished.
+            </p>
+            <div class="form-actions">
+                <a class="btn btn-success" href="{{ url('kns_add') }}">
+                    <span class="icon-plus-sign icon-large"></span>
+                    Analyze Keywords
+                </a>
+            </div>
+            {% include 'slots/alerts.twig' %}
+            {% if requests %}
+                <table class="table table-hover table-striped tablesorter">
+                    <thead>
+                        <tr>
+                            <th>Report #</th>
+                            <th class="right small">Keywords</th>
+                            <th class="right small">Expires In</th>
+                            <th class="center small">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in requests %}
+                            <tr>
+                                <td>{{ request.id }}</td>
+                                <td class="right small">
+                                    {{ request.preview }}
+                                    ({{ request.keywords[1] }})
+                                </td>
+                                <td class="right small">{{ request.expires_in }}</td>
+                                <td class="center small">
+                                    <a
+                                        class="icon-tasks icon-large"
+                                        href="{{ url('kns_simple', {'id': request.id}) }}"
+                                        title="View Simple Report"
+                                        data-placement="left"
+                                        data-toggle="tooltip"
+                                        ></a>
+                                    <a
+                                        class="icon-bar-chart icon-large"
+                                        href="{{ url('kns_detailed', {'id': request.id}) }}"
+                                        target="_blank"
+                                        title="View Detailed Report (For very large reports this page could take a little while to complete. Please be patient.)"
+                                        data-placement="left"
+                                        data-toggle="tooltip"
+                                        ></a>
+                                    <a
+                                        class="icon-download icon-large"
+                                        href="{{ url('kns_csv', {'id': request.id}) }}"
+                                        title="Download CSV (Simple Report)"
+                                        data-placement="left"
+                                        data-toggle="tooltip"
+                                        ></a>
+                                    <a
+                                        class="icon-download icon-large"
+                                        href="{{ url('kns_pdf', {'id': request.id}) }}"
+                                        title="Download PDF (Detailed Report)"
+                                        data-placement="left"
+                                        data-toggle="tooltip"
+                                        ></a>
+                                    <a
+                                        class="icon-remove icon-large"
+                                        href="{{ url('kns_delete', {'id': request.id}) }}"
+                                        title="Delete"
+                                        data-placement="left"
+                                        data-toggle="tooltip"
+                                        ></a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="alert alert-error">
+                    You have not added any requests yet.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% set types = ['error', 'success'] %}
+{% if app.session.flashBag is defined %}
+    {% for type in types %}
+        {% for items in app.session.flashBag.get(type) %}
+            {% for item in items %}
+                <div class="alert alert-{{ type }}" >{{ item }}</div>
+            {% endfor %}
+        {% endfor %}
+    {% endfor %}
+{% endif %}

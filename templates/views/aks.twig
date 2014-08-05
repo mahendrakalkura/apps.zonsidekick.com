@@ -1,0 +1,157 @@
+{% extends 'layout.twig' %}
+
+{% set module = 'Zon Keyword Sidekick' %}
+
+{% block content %}
+{% include 'slots/back-to-dashboard.twig' %}
+<div class="btn btn-primary pull-right qsg" data-target="#aks-qsg" data-toggle="modal">
+    <span class="icon-info-sign"></span>
+    Information
+</div>
+<div
+    id="aks"
+    data-error-1-top="Error #1"
+    data-error-1-middle="<p>Please enter a valid phrase.</p>"
+    data-error-1-top="Error #2"
+    data-error-2-middle="<p>An unknown error has occurred. Please try again.</p>"
+    data-url-download="{{ url('aks_download') }}"
+    data-url-xhr="{{ url('aks_xhr') }}"
+    ng-controller="aks"
+    >
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="page-header">
+                <h1>{{ module }}</h1>
+            </div>
+            <p>To begin, simply enter a phrase into the "Phrase" field then press Submit. Our keyword suggester will return all keyword suggestions from Amazon that begin with your phrase. The "Advanced" level will return the same results provided by Simple along with even more keywords by grabbing all suggestions that begin with the initially suggested phrases. Please be patient with Advanced searches as they may take several minutes to complete.</p>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span6">
+            <form accept-charset="UTF-8">
+                <label for="keyword">Phrase</label>
+                <input
+                    class="span12"
+                    id="keyword"
+                    placeholder="Phrase"
+                    type="text"
+                    value=""
+                    ng-focus="focus['keyword']"
+                    ng-model="keyword"
+                    ng-on-blur="focus['keyword'] = false"
+                    >
+                <label for="search_alias">Department</label>
+                <select
+                    class="span12"
+                    id="search_alias"
+                    ng-model="search_alias"
+                    >
+                    {% for key, value in search_aliases %}
+                        <option value="{{ key }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+                <label for="level">Level</label>
+                <label class="radio">
+                    <input
+                        checked="checked"
+                        name="level"
+                        type="radio"
+                        value="1"
+                        ng-model="level"
+                        > Simple
+                </label>
+                <label class="radio">
+                    <input
+                        name="level"
+                        type="radio"
+                        value="2"
+                        ng-model="level"
+                        > Advanced
+                </label>
+                {#
+                <label for="level">Mode</label>
+                <label class="radio">
+                    <input
+                        checked="checked"
+                        name="mode"
+                        type="radio"
+                        value="1"
+                        ng-model="mode"
+                        > Simple
+                </label>
+                <label class="radio">
+                    <input
+                        name="mode"
+                        type="radio"
+                        value="2"
+                        ng-model="mode"
+                        > Advanced
+                </label>
+                #}
+                <label for="country">Country</label>
+                <select class="span12" id="country" ng-model="country">
+                    {% for key, value in countries %}
+                        <option value="{{ key }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+                <label class="checkbox">
+                    <input
+                        type="checkbox"
+                        ng-model="checkbox"
+                        > Automatically download on completion
+                </label>
+                <div class="form-actions">
+                    <button
+                        class="btn btn-success"
+                        type="button"
+                        ng-click="process()"
+                        >
+                        <span class="icon-info-sign icon-large"></span>
+                        Submit
+                    </button>
+                    <button class="btn btn-danger" type="reset">
+                        <span class="icon-trash icon-large"></span>
+                        Reset
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="span6 hide [[ spinner == true && 'show' || 'hide']]">
+            <span class="icon-spinner icon-spin icon-2x pull-right"></span>
+        </div>
+        <div class="span6 hide [[ suggestions.length && 'show' || 'hide' ]]">
+            <form accept-charset="UTF-8">
+                <label class="pull-right" for="suggestions">Suggestions</label>
+                <textarea
+                    class="span12"
+                    id="suggestions"
+                    ng-focus="focus['suggestions']"
+                    ng-on-blur="focus['suggestions'] = false"
+                    >[[ suggestions.join('\n') ]]</textarea>
+                <span class="help-block right">
+                    Total Number of Suggestions:
+                    <span>[[ suggestions.length ]]</span>
+                </span>
+                <div class="form-actions right">
+                    <button
+                        class="btn btn-info copy-all"
+                        type="button"
+                        data-value="[[ suggestions.join('\n') ]]"
+                        >
+                        <span class="icon-copy icon-large"></span>
+                        Copy All
+                    </button>
+                    <button
+                        class="btn btn-success"
+                        type="button"
+                        ng-click="download()"
+                        >
+                        <span class="icon-download icon-large"></span>
+                        Download CSV
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

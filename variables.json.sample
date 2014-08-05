@@ -1,0 +1,24 @@
+{
+    "application": {
+        "debug": "...",
+    },
+    "mysql": {
+        "database": "...",
+        "driver": "...",
+        "host": "...",
+        "password": "...",
+        "use_unicode": "...",
+        "user": "..."
+    },
+    "python": {
+        "workon": "..."
+    },
+    "smtp": {
+        "auth_mode": "...",
+        "encryption": "...",
+        "host": "...",
+        "password": "...",
+        "port": "...",
+        "username": "..."
+    }
+}

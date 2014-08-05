@@ -1,0 +1,110 @@
+{% extends 'layout.twig' %}
+
+{% set module = 'Kindle Niche Sidekick - Add' %}
+
+{% block content %}
+{% include 'slots/back-to-dashboard.twig' %}
+<div class="btn btn-primary pull-right qsg" data-target="#kns-qsg" data-toggle="modal">
+    <span class="icon-info-sign"></span>
+    Information
+</div>
+<div
+    data-error-top-1="Error #1"
+    data-error-middle-1="<p>Please enter at least one valid keyword.</p>"
+    data-error-top-2="Error #2"
+    data-error-middle-2="<p>You cannot enter more than 500 keywords.</p>"
+    ng-controller="kns_add"
+    >
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="page-header">
+                <h1>{{ module }}</h1>
+            </div>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span12">
+            <p>
+                To begin, simply add your list of keywords (one per line) and
+                press Submit. The process will begin immediately and you'll see
+                your results come in as they complete. Please be patient with
+                larger lists as this research is intense, keywords may take
+                between 5 seconds and 1 minute to complete depending on server
+                utilization. You may close this window at any time, it will not
+                interrupt your keyword research.
+            </p>
+            {#
+            <div class="alert alert-info">
+                <strong>Notice (July 11th, 2013 @ 02:00 AM EST):</strong>
+                Server migration has concluded successfully. Reports are
+                temporarily limited to 50 keywords and will begin to scale back
+                until this limitation is lifted. Thank you for your patience.
+            </div>
+            #}
+            {#
+            <div class="alert alert-info">
+                <strong>Notice (July 11th, 2013 @ 08:30 AM EST):</strong>
+                Reports are temporarily limited to 50 keywords while we migrate.
+                You may process multiple reports simultaneously in separate
+                browser tabs. This limitation will be removed when we complete
+                our server migration and application updates. Please see
+                dashboard for status updates. Thank you for your patience.
+            </div>
+            #}
+            {% if count == -1 or count %}
+                {% if count != -1 %}
+                    <div class="alert alert-success">
+                        You may query {{ count }} more keywords today.
+                    </div>
+                {% endif %}
+                <form
+                    accept-charset="UTF-8"
+                    action="{{ url('kns_process') }}"
+                    method="POST"
+                    >
+                    <label for="keywords">Keywords</label>
+                    <textarea
+                        class="span12"
+                        id="keywords"
+                        name="keywords"
+                        ng-model="keywords"
+                        ng-on-blur="focus['keywords'] = false"
+                        rows="15"
+                        ></textarea>
+                    <p ng-class="get_class()">
+                        [[ count ]] keywords remaining
+                    </p>
+                    {% if has_statistics(user) %}
+                        <label for="country">Country</label>
+                        <select class="span12" id="country" name="country">
+                            {% for key, value in countries %}
+                                <option value="{{ key }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                    {% else %}
+                        <input name="country" type="hidden" value="com">
+                    {% endif %}
+                    <div class="form-actions">
+                        <button
+                            class="btn btn-success"
+                            ng-click="submit($event)"
+                            type="submit"
+                            >
+                            <span class="icon-info-sign icon-large"></span>
+                            Submit
+                        </button>
+                        <button class="btn btn-danger" type="reset">
+                            <span class="icon-trash icon-large"></span>
+                            Reset
+                        </button>
+                    </div>
+                </form>
+            {% else %}
+                <div class="alert alert-error">
+                    You may not query anymore keywords today.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

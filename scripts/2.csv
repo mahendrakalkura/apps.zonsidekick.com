@@ -1,0 +1,26 @@
+Buyer Behavior,Optimization,Score
+Very High,Very Low,10.0
+Very High,Low,8.75
+Very High,Medium,7.5
+Very High,High,6.25
+Very High,Very High,5.0
+High,Very Low,8.75
+High,Low,7.5
+High,Medium,6.25
+High,High,5.0
+High,Very High,3.75
+Medium,Very Low,7.5
+Medium,Low,6.25
+Medium,Medium,5.0
+Medium,High,3.75
+Medium,Very High,2.5
+Low,Very Low,6.25
+Low,Low,5.0
+Low,Medium,3.75
+Low,High,2.5
+Low,Very High,1.25
+Very Low,Very Low,5.0
+Very Low,Low,3.75
+Very Low,Medium,2.5
+Very Low,High,1.25
+Very Low,Very High,0.0

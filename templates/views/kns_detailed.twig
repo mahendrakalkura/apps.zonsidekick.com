@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <link href="{{ app.request.getSchemeAndHttpHost() }}{{ app.request.baseUrl }}/vendors/normalize.css" rel="stylesheet">
+        <meta charset="utf-8">
+        <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+        <meta content="width=device-width, initial-scale=1.0" name="viewport">
+        <style type="text/css">
+        body {
+            color: #333333;
+            font-size: 10px;
+            padding: 20px 20px 0 20px;
+        }
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+        h1 {
+            border-bottom: 1px solid #cccccc;
+            margin: 0 0 20px 0;
+            padding: 0 0 20px 0;
+            text-align: center;
+        }
+        h2 {
+            border-bottom: 1px solid #cccccc;
+            margin: 0 0 20px 0;
+            padding: 0 0 20px 0;
+            text-align: center;
+        }
+        h6 {
+            margin: 0 0 20px 0;
+            text-align: center;
+        }
+        ol {
+            list-style: none;
+            margin: -10px 0 20px 0;
+            padding: 0;
+        }
+        ol li {
+            margin: 0;
+        }
+        p {
+            line-height: 20px;
+            margin: 0 0 20px 0;
+        }
+        table {
+            border-collapse: collapse;
+            margin: 0 0 20px 0;
+            width: 100%;
+        }
+        table tr th {
+            background-color: #333333;
+            color: #ffffff;
+            padding: 5px;
+            text-align: left;
+            white-space: nowrap;
+        }
+        table tr td {
+            border-bottom: 1px solid #cccccc;
+            padding: 5px;
+            text-align: left;
+            white-space: nowrap;
+        }
+        .break {
+            page-break-after: always;
+        }
+        .center {
+            text-align: center;
+        }
+        .right {
+            text-align: right;
+        }
+        #credits {
+            text-align: center;
+        }
+        @page
+        {
+            size: A4 landscape;
+            margin: 10mm;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <h1>Kindle Niche Analyzer - PDF Reports</h1>
+        <h6>Page 1</h6>
+        <p class="center">
+            <img src="{{ logo? logo: 'http://www.zonsidekick.com/tools/current/images/logo.png' }}">
+        </p>
+        <p>This report displays a brief list of the keywords we consider best from the list you've analyzed, followed by a complete analysis of your keywords in greater detail than displayed within the browser.</p>
+        <p>Keywords analyzed: <strong>{{ keywords|length|number_format(0, '.', ',') }}</strong></p>
+        <p><strong>Best keywords:</strong> These keywords were selected by our advanced market analysis algorithm. Their inclusion on this page does not guarantee that they're highly profitable and easily accessible, they are simply the best of the list provided. On the following pages, you will see an overview of each keyword followed by the product information for the top results in order of relevance. <strong>Remember, you may click on any product title to open it in your web browser.</strong></p>
+        {% for keyword in keywords|slice(0, 3) %}
+            {% if keyword.contents %}
+                <table>
+                    <tr>
+                        <th>{{ keyword.string }}</th>
+                    </tr>
+                </table>
+                <ol>
+                    {% for item in keyword.contents? keyword.contents.items: []|slice(0, 3) %}
+                        <li>
+                            <a href="{{ item.url }}&t=booklistings-20">{{ loop.index }}. {{ item.title[0] }}</a>
+                        </li>
+                    {% endfor %}
+                </ol>
+            {% endif %}
+        {% endfor %}
+        <p>These keywords were selected by our advanced market analysis algorithm. Their inclusion on this page does not guarantee that they're highly profitable and easily accessible, they are simply the best of the list provided. On the following pages, you will see an overview of each keyword followed by the product information for the top results in order of relevance. Remember, you may click on any product title to open it in your web browser.</p>
+        <div class="break"></div>
+        <p class="center">
+            <img src="{{ logo? logo: 'http://www.zonsidekick.com/tools/current/images/logo.png' }}">
+        </p>
+        <table>
+            <tr>
+                <th>Keyword</th>
+                <th class="center small">Buyer Behavior</th>
+                <th class="center small">Competition</th>
+                <th class="center small">Optimization</th>
+                <th class="right small">Spend ({{ currency }})</th>
+                <th class="right small">Avg. Price ({{ currency }})</th>
+                <th class="right small">Avg. Length</th>
+                <th class="right small">Score</th>
+            </tr>
+            {% for keyword in keywords %}
+                <tr>
+                    <td>{{ loop.index }}. {{ keyword.string }}</td>
+                    <td class="center small">{{ keyword.contents? keyword.contents.buyer_behavior[1]: 'N/A' }}</td>
+                    <td class="center small">{{ keyword.contents? keyword.contents.competition[1]: 'N/A' }}</td>
+                    <td class="center small">{{ keyword.contents? keyword.contents.optimization[1]: 'N/A' }}</td>
+                    <td class="right small">{{ keyword.contents? keyword.contents.spend[0][1]: 'N/A' }}</td>
+                    <td class="right small">{{ keyword.contents? keyword.contents.average_price[1]: 'N/A' }}</td>
+                    <td class="right small">{{ keyword.contents? keyword.contents.average_length[1]: 'N/A' }}</td>
+                    <td class="right small">{{ keyword.contents? keyword.contents.score[1]: 'N/A' }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+        {% for keyword in keywords %}
+            {% if keyword.contents %}
+                <div class="break"></div>
+                <h2>{{ loop.index }}. {{ keyword.string }}</h2>
+                <table>
+                    <tr>
+                        <th>Title</th>
+                        <th class="center small">KW Match</th>
+                        <th class="right small">Best Seller Rank</th>
+                        <th class="right small">Price ({{ currency }})</th>
+                        <th class="center small">Date Published</th>
+                        <th class="right small"><nobr>Age (days)</nobr></th>
+                        <th class="right small">Stars</th>
+                    </tr>
+                    {% for item in keyword.contents.items %}
+                        <tr>
+                            <td><a href="{{ item.url }}&t=booklistings-20">{{ loop.index }}. {{ item.title[0][0:35] }}</a></td>
+                            <td class="center small">{{ item.title[1] }}</td>
+                            <td class="right small">{{ item.best_sellers_rank[1] }}</td>
+                            <td class="right small">{{ item.price[1] }}</td>
+                            <td class="center small">{{ item.publication_date }}</td>
+                            <td class="right small">{{ item.age }}</td>
+                            <td class="right small">{{ item.stars[1] }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
+        {% endfor %}
+        {% if not 3 in groups %}
+            <div id="credits">
+                <p>Report by <a href="http://www.zonsidekick.com">www.ZonSidekick.com</a></p>
+            </div>
+        {% endif %}
+    </body>
+</html>
