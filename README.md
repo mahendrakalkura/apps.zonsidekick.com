@@ -6,7 +6,7 @@ Step 1:
 ```
 $ mkdir zonsidekick.com
 $ cd zonsidekick
-$ git clone git clone git@bitbucket.org:mahendrakalkura/zonsidekick.com.git .
+$ git clone git@bitbucket.org:mahendrakalkura/zonsidekick.com.git .
 $ cp variables.json.sample variables.json # edit variables.json as required
 ```
 
