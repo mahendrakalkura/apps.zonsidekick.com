@@ -13,7 +13,7 @@ $ cp variables.json.sample variables.json # edit variables.json as required
 Step 2:
 
 ```
-$ mkdir zonsidekick.com
+$ cd zonsidekick.com
 $ mysql -h {{ host }} -p{{ password }} -u {{ user }}
 > CREATE DATABASE `zonsidekick.com`;
 $ mysql -h {{ host }} -p{{ password }} -u {{ user }} zonsidekick.com < files/structure.sql
@@ -23,7 +23,7 @@ $ mysql -h {{ host }} -p{{ password }} -u {{ user }} zonsidekick.com < files/dat
 Step 3:
 
 ```
-$ mkdir zonsidekick.com
+$ cd zonsidekick.com
 $ composer install
 $ bower install
 ```
@@ -31,6 +31,7 @@ $ bower install
 Step 4:
 
 ```
+$ cd zonsidekick.com
 $ mkvirtualenv zonsidekick.com
 $ workon zonsidekick.com
 $ pip install -r requirements.txt
