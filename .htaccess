@@ -1,6 +1,6 @@
 Order allow,deny
 
-<Files ~ '\.(json|sql)$'>
+<Files "\.(json|sql)$">
    Deny from all
 </Files>
 
