@@ -1,5 +1,4 @@
 *
 !.gitignore
 !.htaccess
-!data.sql
-!structure.sql
+!*.sql
