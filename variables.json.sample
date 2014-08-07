@@ -4,10 +4,8 @@
     },
     "mysql": {
         "database": "...",
-        "driver": "...", // Example: pdo_mysql
         "host": "...",
         "password": "...",
-        "use_unicode": ..., // Choices: true OR false
         "user": "..."
     },
     "python": "...", // Example: /home/{{ username }}/.virtualenvs/zonsidekick.com/bin

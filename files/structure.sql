@@ -1,6 +1,7 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
-CREATE TABLE `tools_keywords` (
+DROP TABLE IF EXISTS `tools_keywords`;
+CREATE TABLE IF NOT EXISTS `tools_keywords` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `request_id` int(11) NOT NULL,
     `string` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
@@ -8,10 +9,15 @@ CREATE TABLE `tools_keywords` (
     PRIMARY KEY (`id`),
     KEY `request_id` (`request_id`),
     KEY `string` (`string`),
-    CONSTRAINT `tools_keywords_request_id` FOREIGN KEY (`request_id`) REFERENCES `tools_requests` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT `tools_keywords_request_id`
+    FOREIGN KEY (`request_id`)
+    REFERENCES `tools_requests` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-CREATE TABLE `tools_requests` (
+DROP TABLE IF EXISTS `tools_requests`;
+CREATE TABLE IF NOT EXISTS `tools_requests` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `user_id` int(11) NOT NULL,
     `timestamp` datetime NOT NULL,
@@ -21,7 +27,8 @@ CREATE TABLE `tools_requests` (
     KEY `timestamp` (`timestamp`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-CREATE TABLE `wp_groups_group` (
+DROP TABLE IF EXISTS `wp_groups_group`;
+CREATE TABLE IF NOT EXISTS `wp_groups_group` (
     `group_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
     `parent_id` bigint(20) DEFAULT NULL,
     `creator_id` bigint(20) DEFAULT NULL,
@@ -32,14 +39,16 @@ CREATE TABLE `wp_groups_group` (
     UNIQUE KEY `group_n` (`name`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-CREATE TABLE `wp_groups_user_group` (
+DROP TABLE IF EXISTS `wp_groups_user_group`;
+CREATE TABLE IF NOT EXISTS `wp_groups_user_group` (
     `user_id` bigint(20) unsigned NOT NULL,
     `group_id` bigint(20) unsigned NOT NULL,
     PRIMARY KEY (`user_id`,`group_id`),
     KEY `user_group_gu` (`group_id`,`user_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-CREATE TABLE `wp_users` (
+DROP TABLE IF EXISTS `wp_users`;
+CREATE TABLE IF NOT EXISTS `wp_users` (
     `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
     `user_login` varchar(60) NOT NULL DEFAULT '',
     `user_pass` varchar(64) NOT NULL DEFAULT '',

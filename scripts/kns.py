@@ -22,7 +22,7 @@ from numpy import mean
 from scrapy.selector import Selector
 from simplejson import dumps
 
-from utilities import get_cleaned_string, get_mysql, get_proxies
+from utilities import get_string, get_mysql, get_proxies
 
 setlocale(LC_ALL, 'en_US.UTF-8')
 
@@ -432,7 +432,7 @@ def get_contents(keyword, country):
         hxs = Selector(text=response.text)
         asin = ''
         try:
-            asin = get_cleaned_string(
+            asin = get_string(
                 hxs.xpath('//input[@name="ASIN.0"]/@value').extract()[0]
             )
         except IndexError:
@@ -440,7 +440,7 @@ def get_contents(keyword, country):
         best_sellers_rank = 0
         try:
             best_sellers_rank = int(
-                get_cleaned_string(
+                get_string(
                     hxs.xpath(
                         '//li[@id="SalesRank"]/text()'
                     ).extract()[1]
@@ -457,7 +457,7 @@ def get_contents(keyword, country):
         except (IndexError, ValueError):
             try:
                 best_sellers_rank = int(
-                    get_cleaned_string(
+                    get_string(
                         hxs.xpath(
                             '//span[@class="zg_hrsr_rank"]/text()'
                         ).extract()[0]
@@ -475,14 +475,14 @@ def get_contents(keyword, country):
         best_sellers_rank = (best_sellers_rank, get_int(best_sellers_rank))
         description = ''
         try:
-            description = get_cleaned_string(
+            description = get_string(
                 hxs.xpath(
                     '//div[@id="postBodyPS"]'
                 ).xpath('string()').extract()[0]
             )
         except IndexError:
             try:
-                description = get_cleaned_string(
+                description = get_string(
                     hxs.xpath(
                         '//div[@class="productDescriptionWrapper"]'
                     ).xpath('string()').extract()[1]
@@ -491,7 +491,7 @@ def get_contents(keyword, country):
                 pass
         pages = 0
         try:
-            pages = int(get_cleaned_string(
+            pages = int(get_string(
                 hxs.xpath(
                     '//b[contains(text(), "Print Length:")]/../text()'
                 ).extract()[0]
@@ -500,7 +500,7 @@ def get_contents(keyword, country):
             try:
                 pages = int(
                     compile(r'(\d+)').search(
-                        get_cleaned_string(hxs.xpath(
+                        get_string(hxs.xpath(
                             '//a[@id="pageCountAvailable"]/span/text()'
                         ).extract()[0])
                     ).group(1)
@@ -512,7 +512,7 @@ def get_contents(keyword, country):
         if country != 'co.jp':
             try:
                 price = float(
-                    get_cleaned_string(
+                    get_string(
                         hxs.xpath(
                             '//b[@class="priceLarge"]/text()'
                         ).extract()[0]
@@ -533,7 +533,7 @@ def get_contents(keyword, country):
             except (IndexError, ValueError):
                 try:
                     price = float(
-                        get_cleaned_string(
+                        get_string(
                             hxs.xpath(
                                 '//span[@class="priceLarge"]/text()'
                             ).extract()[0]
@@ -555,7 +555,7 @@ def get_contents(keyword, country):
                     pass
         else:
             try:
-                price = float(get_cleaned_string(hxs.xpath(
+                price = float(get_string(hxs.xpath(
                     '//b[@class="priceLarge"]/text()'
                 ).extract()[0]).replace(',', '').replace(u'\uffe5', ''))
             except IndexError:
@@ -563,7 +563,7 @@ def get_contents(keyword, country):
             if not price:
                 try:
                     price = float(
-                        get_cleaned_string(
+                        get_string(
                             hxs.xpath(
                                 '//span[@class="priceLarge"]/text()'
                             ).extract()[0]
@@ -578,7 +578,7 @@ def get_contents(keyword, country):
         price = (price, get_float(price))
         publication_date = ''
         try:
-            publication_date = get_cleaned_string(
+            publication_date = get_string(
                 hxs.xpath(
                     '//input[@id="pubdate"]/@value'
                 ).extract()[0][0:10]
@@ -597,7 +597,7 @@ def get_contents(keyword, country):
         else:
             try:
                 publication_date = parse(compile('\((.*?)\)').search(
-                    get_cleaned_string(
+                    get_string(
                         hxs.xpath(
                             '//b[contains(text(), "Publisher")]/../text()'
                         ).extract()[0]
@@ -608,7 +608,7 @@ def get_contents(keyword, country):
             except (AttributeError, IndexError, ValueError):
                 try:
                     publication_date = parse(compile('\((.*?)\)').search(
-                        get_cleaned_string(hxs.xpath(
+                        get_string(hxs.xpath(
                             '//div[@class="content"]/ul/li[4]/text()'
                         ).extract()[0])
                     ).group(1)).date()
@@ -617,7 +617,7 @@ def get_contents(keyword, country):
                 except (AttributeError, IndexError, ValueError):
                     try:
                         publication_date = compile('\((.*?)\)').search(
-                            get_cleaned_string(hxs.xpath(
+                            get_string(hxs.xpath(
                                 '//b[contains(text(), "Verlag")]/../text()'
                             ).extract()[0])
                         ).group(1)
@@ -655,7 +655,7 @@ def get_contents(keyword, country):
         rank = (index, get_int(index))
         related_items = ''
         try:
-            related_items = get_cleaned_string(hxs.xpath(
+            related_items = get_string(hxs.xpath(
                 '//div[@id="purchaseSimsData"]/text()'
             ).extract()[0]).split(',')
         except IndexError:
@@ -666,21 +666,21 @@ def get_contents(keyword, country):
         spend = (spend, get_float(spend))
         stars = 0.0
         try:
-            stars = float(get_cleaned_string(
+            stars = float(get_string(
                 hxs.xpath(
                     '//div[@class="gry txtnormal acrRating"]/text()'
                 ).extract()[0]
             ).split(' ')[0].replace(',', ''))
         except IndexError:
             try:
-                stars = float(get_cleaned_string(
+                stars = float(get_string(
                     hxs.xpath(
                         '//span[contains(@class, "swSprite")]/@title'
                     ).extract()[0][-3:]
                 ))
             except (IndexError, ValueError):
                 try:
-                    stars = float(get_cleaned_string(hxs.xpath(
+                    stars = float(get_string(hxs.xpath(
                         '//span[contains(@class, "swSprite")]/@title'
                     ).extract()[1])[0:3])
                 except (IndexError, ValueError):
@@ -688,14 +688,14 @@ def get_contents(keyword, country):
         stars = (stars, get_float(stars))
         title_1 = ''
         try:
-            title_1 = get_cleaned_string(
+            title_1 = get_string(
                 hxs.xpath('//span[@id="btAsinTitle"]/text()').extract()[0]
             )
         except IndexError:
             pass
         if not title_1:
             try:
-                title_1 = get_cleaned_string(
+                title_1 = get_string(
                     hxs.xpath(
                         '//span[@id="btAsinTitle"]/span/text()'
                     ).extract()[0]

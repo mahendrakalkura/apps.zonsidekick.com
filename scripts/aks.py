@@ -4,7 +4,6 @@ from multiprocessing.pool import ThreadPool
 from sys import argv
 
 from requests import get
-from requests.exceptions import RequestException
 from simplejson import dumps, loads
 
 from utilities import get_proxies
@@ -20,7 +19,7 @@ def get_contents(url, params):
             timeout=10,
             verify=False
         ).text
-    except:
+    except Exception:
         pass
 
 

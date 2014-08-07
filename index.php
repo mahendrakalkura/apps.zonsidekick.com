@@ -465,7 +465,7 @@ $application['debug'] = $variables['application']['debug'];
 $application->register(new DoctrineServiceProvider(), array(
     'db.options' => array(
         'dbname' => $variables['mysql']['database'],
-        'driver' => $variables['mysql']['driver'],
+        'driver' => 'pdo_mysql',
         'host' => $variables['mysql']['host'],
         'password' => $variables['mysql']['password'],
         'user' => $variables['mysql']['user'],
