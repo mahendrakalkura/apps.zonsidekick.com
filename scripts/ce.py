@@ -153,9 +153,10 @@ class Pipeline(object):
         b = session.query(
             book,
         ).filter(
-            book.url == dictionary['url'],
-            book.title == dictionary['title'],
             book.author == dictionary['author'],
+            book.section == dictionary['section'],
+            book.title == dictionary['title'],
+            book.url == dictionary['url'],
         ).first()
         if not b:
             b = book(**{
