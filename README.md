@@ -52,6 +52,7 @@ Step 2:
 ```
 $ cd zonsidekick.com
 $ workon zonsidekick.com
+$ cd scripts
 $ python aks.py ...
 $ python kns.py ...
 ```
