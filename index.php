@@ -1053,7 +1053,7 @@ $application->match(
             ignore_user_abort(true);
             set_time_limit(0);
             exec(sprintf(
-                'workon %s && python %s/scripts/aks.py %s %s %s %s %s',
+                '~/.virtualenvs/%s/bin/python2.7 %s/scripts/aks.py %s %s %s %s %s',
                 $variables['python']['workon'],
                 __DIR__,
                 escapeshellarg($request->get('country')),

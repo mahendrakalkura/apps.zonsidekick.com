@@ -440,7 +440,7 @@ var zclip = function () {
                 'path': (
                     jQuery('body').attr('data-url')
                     +
-                    '/vendors/zclip/ZeroClipboard.swf'
+                    '/vendor/jquery-zclip/ZeroClipboard.swf'
                 )
             });
             element.data('zclip', true);
