@@ -96,7 +96,7 @@ function get_contents($application, $user, $logo) {
     if (is_file($file_path)) {
         return sprintf(
             'data:%s;base64,%s',
-            mime_content_type($image),
+            mime_content_type($file_path),
             base64_encode(file_get_contents($file_path))
         );
     }
@@ -213,7 +213,7 @@ function get_path($application, $user, $directory) {
     return $path;
 }
 
-function get_pdf($application, $user, $logo, $id) {
+function get_pdf($application, $user, $logo, $id, $variables) {
     list($request, $keywords) = get_request_and_keywords(
         $application, $user, $id
     );
@@ -242,7 +242,9 @@ function get_pdf($application, $user, $logo, $id) {
             ))
         );
         $contents = shell_exec(sprintf(
-            'weasyprint --format pdf %s -', escapeshellarg($file_path)
+            '%s/weasyprint --format pdf %s -',
+            $variables['python'],
+            escapeshellarg($file_path)
         ));
         unlink($file_path);
     }
@@ -732,9 +734,11 @@ $application->match(
 
 $application->match(
     '/kns/{id}/pdf',
-    function (Request $request, $id) use ($application) {
+    function (Request $request, $id) use ($application, $variables) {
         $user = $application['session']->get('user');
-        $pdf = get_pdf($application, $user, $request->get('logo'), $id);
+        $pdf = get_pdf(
+            $application, $user, $request->get('logo'), $id, $variables
+        );
         $stream = function () use ($pdf) {
             echo $pdf;
         };
@@ -788,7 +792,7 @@ $application->match(
 
 $application->match(
     '/kns/{id}/email',
-    function (Request $request, $id) use ($application) {
+    function (Request $request, $id) use ($application, $variables) {
         $user = $application['session']->get('user');
         $subject = 'Your Kindle Niche Sidekick report is ready!';
         $body = <<<EOD
@@ -808,7 +812,13 @@ EOD;
                     'text/csv'
                 ))
                 ->attach(\Swift_Attachment::newInstance(
-                    get_pdf($application, $user, $request->get('logo'), $id),
+                    get_pdf(
+                        $application,
+                        $user,
+                        $request->get('logo'),
+                        $id,
+                        $variables
+                    ),
                     sprintf('detailed_report_%s.pdf', date('m_d_Y')),
                     'application/pdf'
                 ))
@@ -877,11 +887,16 @@ $application->match(
     '/logos/view',
     function (Request $request) use ($application) {
         $user = $application['session']->get('user');
+        $stream = function () use ($request, $user) {
+            readfile(sprintf(
+                '%s/%s',
+                get_path($application, $user, 'logos'),
+                $request->get('file_name')
+            ));
+        };
 
-        return $application->sendFile(sprintf(
-            '%s/%s',
-            get_path($application, $user, 'logos'),
-            $request->get('file_name')
+        return $application->stream($stream, 200, array(
+            'Content-Type' => 'image/png',
         ));
     }
 )
@@ -893,17 +908,22 @@ $application->match(
     '/logos/download',
     function (Request $request) use ($application) {
         $user = $application['session']->get('user');
+        $file_path = sprintf(
+            '%s/%s',
+            get_path($application, $user, 'logos'),
+            $request->get('file_name')
+        );
+        $stream = function () use ($file_path) {
+            readfile($file_path);
+        };
 
-        return $application
-            ->sendFile(sprintf(
-                '%s/%s',
-                get_path($application, $user, 'logos'),
-                $request->get('file_name')
-            ))
-            ->setContentDisposition(
-                ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-                $request->get('file_name')
-            );
+        return $application->stream($stream, 200, array(
+            'Content-Disposition' => sprintf(
+                'attachment; filename="%s"', $request->get('file_name')
+            ),
+            'Content-length' => filesize($file_path),
+            'Content-Type' => 'image/png',
+        ));
     }
 )
 ->before($before_kns)
@@ -1053,7 +1073,7 @@ $application->match(
             ignore_user_abort(true);
             set_time_limit(0);
             exec(sprintf(
-                '%s %s/scripts/aks.py %s %s %s %s %s',
+                '%s/python %s/scripts/aks.py %s %s %s %s %s',
                 $variables['python'],
                 __DIR__,
                 escapeshellarg($request->get('country')),

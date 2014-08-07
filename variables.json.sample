@@ -10,7 +10,7 @@
         "use_unicode": ..., // Choices: true OR false
         "user": "..."
     },
-    "python": "...", // Example: /home/{{ username }}/.virtualenvs/zonsidekick.com/bin/python2.7
+    "python": "...", // Example: /home/{{ username }}/.virtualenvs/zonsidekick.com/bin
     "smtp": {
         "auth_mode": ..., // Example: null
         "encryption": ..., // Example: null
