@@ -27,7 +27,6 @@ def get_contents(url):
         index += 1
         if index >= 5:
             return ''
-        print url, index
         try:
             response = get(
                 url,
