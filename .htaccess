@@ -3,7 +3,16 @@ RedirectMatch 404 /\.gitattributes
 RedirectMatch 404 /\.gitignore
 RedirectMatch 404 /\.gitkeep
 RedirectMatch 404 /\.gitmodules
-RedirectMatch 404 /\.json
+
+<Files variables.json>
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files variables.json.sample>
+    Order allow,deny
+    Deny from all
+</Files>
 
 <IfModule mod_rewrite.c>
     Options -MultiViews
