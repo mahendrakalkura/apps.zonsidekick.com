@@ -1,21 +1,21 @@
 {
     "application": {
-        "debug": ... # Choices: true OR false
+        "debug": ... // Choices: true OR false
     },
     "mysql": {
         "database": "...",
-        "driver": "...", # Example: pdo_mysql
+        "driver": "...", // Example: pdo_mysql
         "host": "...",
         "password": "...",
-        "use_unicode": ..., # Choices: true OR false
+        "use_unicode": ..., // Choices: true OR false
         "user": "..."
     },
     "python": {
-        "workon": "..." # Example: zonsidekick.com
+        "workon": "..." // Example: zonsidekick.com
     },
     "smtp": {
-        "auth_mode": ..., # Example: null
-        "encryption": ..., # Example: null
+        "auth_mode": ..., // Example: null
+        "encryption": ..., // Example: null
         "host": "...",
         "password": "...",
         "port": "...",
