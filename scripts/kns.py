@@ -66,7 +66,7 @@ def get_keywords(requests):
         cursor.execute(
             '''
             SELECT `id`, `string`
-            FROM `tools_keywords`
+            FROM `tools_kns_keywords`
             WHERE `request_id` = %(request_id)s AND `contents` IS NULL
             ORDER BY `id` ASC
             ''', {
@@ -90,7 +90,7 @@ def get_requests(user):
     cursor.execute(
         '''
         SELECT `id`, `country`
-        FROM `tools_requests`
+        FROM `tools_kns_requests`
         WHERE `user_id` = %(user_id)s
         ORDER BY `id` ASC
         ''', {
@@ -167,7 +167,7 @@ def main():
     cursor = mysql.cursor()
     cursor.execute(
         '''
-        DELETE FROM `tools_requests`
+        DELETE FROM `tools_kns_requests`
         WHERE `timestamp` < NOW() - INTERVAL 30 DAY
         '''
     )
@@ -195,7 +195,7 @@ def main():
             cursor = mysql.cursor()
             cursor.execute(
                 '''
-                UPDATE `tools_keywords`
+                UPDATE `tools_kns_keywords`
                 SET `contents` = %(contents)s
                 WHERE `id` = %(id)s
                 ''',

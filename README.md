@@ -18,6 +18,7 @@ $ mysql -h {{ host }} -p{{ password }} -u {{ user }}
 > CREATE DATABASE `zonsidekick.com`;
 $ mysql -h {{ host }} -p{{ password }} -u {{ user }} zonsidekick.com < files/structure.sql
 $ mysql -h {{ host }} -p{{ password }} -u {{ user }} zonsidekick.com < files/data.sql
+$ mysql -h {{ host }} -p{{ password }} -u {{ user }} zonsidekick.com < files/1.sql
 ```
 
 Step 3:

@@ -66,12 +66,12 @@ function get_count_and_keywords($application, $user, $keywords) {
     ) {
         $query = <<<EOD
 SELECT COUNT(`id`) AS `count`
-FROM `tools_keywords`
-INNER JOIN `tools_requests` ON `keywords`.`request_id` = `requests`.`id`
+FROM `tools_kns_keywords`
+INNER JOIN `tools_kns_requests` ON `keywords`.`request_id` = `requests`.`id`
 WHERE
-    `tools_requests`.`user_id` = ?
+    `tools_kns_requests`.`user_id` = ?
     AND
-    DATE(`tools_requests`.`timestamp`) = ?
+    DATE(`tools_kns_requests`.`timestamp`) = ?
 EOD;
         $record = $application['db']->fetchAssoc(
             $query, array($user['id'], date('Y-m-d'))
@@ -253,7 +253,7 @@ function get_pdf($application, $user, $logo, $id) {
 function get_requests($application, $user) {
     $query = <<<EOD
 SELECT *
-FROM `tools_requests`
+FROM `tools_kns_requests`
 WHERE `user_id` = ?
 ORDER BY `timestamp` DESC
 EOD;
@@ -261,7 +261,7 @@ EOD;
     if ($requests) {
         $query_preview = <<<EOD
 SELECT `string`
-FROM `tools_keywords`
+FROM `tools_kns_keywords`
 WHERE `request_id` = ?
 ORDER BY `id` ASC
 LIMIT 5
@@ -269,21 +269,21 @@ OFFSET 0
 EOD;
         $query_keywords_1 = <<<EOD
 SELECT COUNT(`id`) AS `count`
-FROM `tools_keywords`
+FROM `tools_kns_keywords`
 WHERE `request_id` = ?
 EOD;
         $query_keywords_2 = <<<EOD
-SELECT COUNT(`tools_keywords`.`id`) AS `count`
-FROM `tools_keywords`
-LEFT JOIN `tools_requests` ON (
-    `tools_requests`.`id` = `tools_keywords`.`request_id`
+SELECT COUNT(`tools_kns_keywords`.`id`) AS `count`
+FROM `tools_kns_keywords`
+LEFT JOIN `tools_kns_requests` ON (
+    `tools_kns_requests`.`id` = `tools_kns_keywords`.`request_id`
 )
 WHERE (
-    `tools_keywords`.`request_id` = ?
+    `tools_kns_keywords`.`request_id` = ?
     AND
-    `tools_keywords`.`contents` IS NULL
+    `tools_kns_keywords`.`contents` IS NULL
     AND
-    `tools_requests`.`timestamp` < (NOW() - INTERVAL 5 HOUR)
+    `tools_kns_requests`.`timestamp` < (NOW() - INTERVAL 5 HOUR)
 )
 EOD;
         foreach ($requests as $key => $value) {
@@ -327,7 +327,7 @@ EOD;
 function get_request_and_keywords($application, $user, $id) {
     $query = <<<EOD
 SELECT *
-FROM `tools_requests`
+FROM `tools_kns_requests`
 WHERE `id` = ? AND `user_id` = ?
 EOD;
     $request = $application['db']->fetchAssoc(
@@ -337,7 +337,7 @@ EOD;
     if ($request) {
         $query = <<<EOD
 SELECT *
-FROM `tools_keywords`
+FROM `tools_kns_keywords`
 WHERE `request_id` = ?
 EOD;
         $keywords = $application['db']->fetchAll($query, array($id));
@@ -628,7 +628,7 @@ $application->match(
                 $application['url_generator']->generate('kns_add')
             );
         }
-        $application['db']->insert('tools_requests', array(
+        $application['db']->insert('tools_kns_requests', array(
             'country' => $request->get('country'),
             'timestamp' => date('Y-m-d H:i:s'),
             'user_id' => $user['id'],
@@ -636,7 +636,7 @@ $application->match(
         $id = $application['db']->lastInsertId();
         if ($keywords) {
             foreach ($keywords as $keyword) {
-                $application['db']->insert('tools_keywords', array(
+                $application['db']->insert('tools_kns_keywords', array(
                     'request_id' => $id,
                     'string' => $keyword,
                 ));
@@ -843,7 +843,7 @@ $application->match(
         }
         if ($request->isMethod('POST')) {
             $application['db']->executeUpdate(
-                'DELETE FROM `tools_requests` WHERE `ID` = ?',
+                'DELETE FROM `tools_kns_requests` WHERE `ID` = ?',
                 array($id)
             );
             $application['session']->getFlashBag()->add(
