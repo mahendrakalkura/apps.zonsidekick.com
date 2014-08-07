@@ -1053,8 +1053,8 @@ $application->match(
             ignore_user_abort(true);
             set_time_limit(0);
             exec(sprintf(
-                '~/.virtualenvs/%s/bin/python2.7 %s/scripts/aks.py %s %s %s %s %s',
-                $variables['python']['workon'],
+                '%s %s/scripts/aks.py %s %s %s %s %s',
+                $variables['python'],
                 __DIR__,
                 escapeshellarg($request->get('country')),
                 escapeshellarg($request->get('level')),
