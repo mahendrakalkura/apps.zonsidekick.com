@@ -1,3 +1,4 @@
+development.log
 error_log
 scripts/*.pyc
 variables.json
