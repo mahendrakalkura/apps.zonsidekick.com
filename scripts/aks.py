@@ -81,7 +81,6 @@ def get_results(country, level, mode, q, search_alias):
             ]
         else:
             results = get_suggestions(country, level, q, search_alias)
-    return []
     return sorted(set(results))
 
 
