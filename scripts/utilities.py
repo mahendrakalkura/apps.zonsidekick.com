@@ -103,6 +103,15 @@ class trend(base):
     )
 
 
+class popular_search(base):
+    __table_args__ = {
+        'autoload': True,
+    }
+    __tablename__ = 'tools_ps'
+
+    amazon_best_sellers_rank = Column(mutators_dict.as_mutable(json))
+
+
 def get_string(string):
     string = string.replace("\n", ' ')
     string = string.replace("\r", ' ')
@@ -167,6 +176,28 @@ def get_proxies():
             'port_number': 9150 + randint(1, 50),
         },
     }
+
+
+def get_user_agent():
+    return choice([
+        'Mozilla/4.0 (compatible; MSIE 6.0b; Windows NT 5.1)',
+        'Mozilla/4.0 (compatible; MSIE 6.0b; Windows NT 5.1; DigExt)',
+        'Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) '
+        'Chrome/31.0.1650.16 Safari/537.36',
+        'Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0',
+        'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 '
+        'Firefox/29.0',
+        'Mozilla/5.0 (Windows NT 6.2; rv:21.0) Gecko/20130326 Firefox/21.0',
+        'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 '
+        '(KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36',
+        'Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0; en-US))',
+        'Mozilla/5.0 (Windows; U; MSIE 9.0; Windows NT 9.0; en-US)',
+        'Mozilla/5.0 (X11; Linux i686; rv:21.0) Gecko/20100101 Firefox/21.0',
+        'Mozilla/5.0 (X11; Linux x86_64; rv:27.0) Gecko/20100101 Firefox/27.0',
+        'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:21.0) Gecko/20130331 '
+        'Firefox/21.0',
+        'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 7.1; Trident/5.0)',
+    ])
 
 
 def is_development():

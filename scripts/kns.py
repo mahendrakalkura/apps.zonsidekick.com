@@ -69,7 +69,8 @@ def get_keywords(requests):
             FROM `tools_kns_keywords`
             WHERE `request_id` = %(request_id)s AND `contents` IS NULL
             ORDER BY `id` ASC
-            ''', {
+            ''',
+            {
                 'request_id': request['id'],
             }
         )
@@ -93,7 +94,8 @@ def get_requests(user):
         FROM `tools_kns_requests`
         WHERE `user_id` = %(user_id)s
         ORDER BY `id` ASC
-        ''', {
+        ''',
+        {
             'user_id': user['ID'],
         }
     )
@@ -109,10 +111,10 @@ def get_responses(urls):
         responses[url] = None
     index = 0
     while True:
-        index += 1
         keys = [key for key in responses if not responses[key]]
         if not keys:
             return responses.values()
+        index += 1
         if index >= 5:
             return responses.values()
         try:

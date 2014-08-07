@@ -19,6 +19,8 @@ $ mysql -h {{ host }} -p{{ password }} -u {{ user }}
 $ mysql -h {{ host }} -p{{ password }} -u {{ user }} zonsidekick.com < files/structure.sql
 $ mysql -h {{ host }} -p{{ password }} -u {{ user }} zonsidekick.com < files/data.sql
 $ mysql -h {{ host }} -p{{ password }} -u {{ user }} zonsidekick.com < files/1.sql
+$ mysql -h {{ host }} -p{{ password }} -u {{ user }} zonsidekick.com < files/2.sql
+$ mysql -h {{ host }} -p{{ password }} -u {{ user }} zonsidekick.com < files/3.sql
 ```
 
 Step 3:

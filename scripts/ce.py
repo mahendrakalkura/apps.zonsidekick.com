@@ -19,15 +19,13 @@ from utilities import (
     get_number,
     get_proxies,
     get_string,
+    get_user_agent,
     referral,
     review,
     trend,
 )
 
-BOT_NAME = (
-    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) '
-    'Chrome/33.0.1750.149 Safari/537.36'
-)
+BOT_NAME = get_user_agent()
 CONCURRENT_ITEMS = 16
 CONCURRENT_REQUESTS_PER_DOMAIN = 16
 CONCURRENT_REQUESTS = 16
@@ -141,10 +139,8 @@ class Pipeline(object):
             session.commit()
         except DBAPIError:
             session.rollback()
-            raise
         except SQLAlchemyError:
             session.rollback()
-            raise
         finally:
             session.close()
         return item
@@ -314,12 +310,18 @@ class Spider(CrawlSpider):
             except IndexError:
                 pass
         try:
-            item_ = get_string(selector.xpath(
+            text = get_string(selector.xpath(
                 '//li[@id="SalesRank"]/text()'
             ).extract()[1]).split(' ', 1)
             amazon_best_sellers_rank[get_string(
-                item_[1].replace('(', '').replace(')', '')
-            )] = int(get_number(get_string(item_[0])))
+                text[1].replace(
+                    u'in ', ''
+                ).replace(
+                    '(', ''
+                ).replace(
+                    ')', ''
+                )
+            )] = int(get_number(get_string(text[0])))
         except IndexError:
             pass
         try:
@@ -403,10 +405,11 @@ class Spider(CrawlSpider):
                         'book': book,
                     },
                     url=(
-                        'http://www.amazon.com/gp/product/features/similarities/'
-                        'shoveler/cell-render.html/ref=pd_sim_kstore?id='
-                        '%(referrals)s&refTag=pd_sim_kstore&'
-                        'wdg=ebooks_display_on_website&shovelerName=purchase'
+                        'http://www.amazon.com/gp/product/features/'
+                        'similarities/shoveler/cell-render.html/'
+                        'ref=pd_sim_kstore?id=%(referrals)s&'
+                        'refTag=pd_sim_kstore&wdg=ebooks_display_on_website&'
+                        'shovelerName=purchase'
                     ) % {
                         'referrals': referrals,
                     }
@@ -544,9 +547,11 @@ class Spider(CrawlSpider):
             except IndexError:
                 pass
             try:
-                total_number_of_reviews = int(get_number(get_string(selector.xpath(
-                    '//span[@class="crAvgStars"]/a/text()'
-                ).extract()[0])))
+                total_number_of_reviews = int(get_number(get_string(
+                    selector.xpath(
+                        '//span[@class="crAvgStars"]/a/text()'
+                    ).extract()[0]
+                )))
             except IndexError:
                 pass
             try:
