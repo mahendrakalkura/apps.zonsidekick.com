@@ -160,18 +160,34 @@ if __name__ == '__main__':
                             ).extract()[0])))
                     except IndexError:
                         pass
-                    if not title in pss:
-                        pss[title] = popular_search(**{
-                            'amazon_best_sellers_rank':
-                            amazon_best_sellers_rank,
-                            'book_cover_image': book_cover_image,
-                            'title': title,
-                            'url': url,
-                        })
+                    if (
+                        not book_cover_image
+                        or
+                        not title
+                        or
+                        not amazon_best_sellers_rank
+                        or
+                        not url
+                    ):
+                        continue
+                    if title in pss:
+                        continue
+                    pss[title] = {
+                        'amazon_best_sellers_rank': amazon_best_sellers_rank,
+                        'book_cover_image': book_cover_image,
+                        'title': title,
+                        'url': url,
+                    }
     session = get_mysql_session()
     s = session()
     s.query(popular_search).delete()
-    s.add_all(pss.values())
+    for ps in pss:
+        s.add(popular_search(**{
+            'amazon_best_sellers_rank': ps['amazon_best_sellers_rank'],
+            'book_cover_image': ps['book_cover_image'],
+            'title': ps['title'],
+            'url': ps['url'],
+        }))
     try:
         s.commit()
     except DBAPIError:
