@@ -61,6 +61,23 @@ class mutators_dict(Mutable, dict):
         self.changed()
 
 
+class category(base):
+    __table_args__ = {
+        'autoload': True,
+    }
+    __tablename__ = 'tools_ce_categories'
+
+    id = Column(Integer(), primary_key=True)
+
+    category = relationship(
+        'category',
+        backref=backref(
+            'categories', cascade='all', lazy='dynamic',
+        ),
+        remote_side=id,
+    )
+
+
 class book(base):
     __table_args__ = {
         'autoload': True,

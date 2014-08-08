@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from re import compile, sub
+from re import compile
 from socket import timeout
 from string import lowercase
 
