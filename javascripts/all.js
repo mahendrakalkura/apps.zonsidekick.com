@@ -425,8 +425,7 @@ var media = function () {
         return;
     }
     medias.each( function() {
-        var h = $(this).innerHeight();
-        console.log(height, h);
+        var h = $(this).outerHeight();
         if (h > height) {
             height = h;
         }
