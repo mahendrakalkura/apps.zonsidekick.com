@@ -183,10 +183,10 @@ if __name__ == '__main__':
     s.query(popular_search).delete()
     for ps in pss:
         s.add(popular_search(**{
-            'amazon_best_sellers_rank': ps['amazon_best_sellers_rank'],
-            'book_cover_image': ps['book_cover_image'],
-            'title': ps['title'],
-            'url': ps['url'],
+            'amazon_best_sellers_rank': pss[ps]['amazon_best_sellers_rank'],
+            'book_cover_image': pss[ps]['book_cover_image'],
+            'title': pss[ps]['title'],
+            'url': pss[ps]['url'],
         }))
     try:
         s.commit()
