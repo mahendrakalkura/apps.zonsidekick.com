@@ -607,7 +607,7 @@ def get_contents(keyword, country):
                 ).group(1)).date()
                 age = get_int(get_age(date.today(), publication_date))
                 publication_date = publication_date.isoformat()
-            except (AttributeError, IndexError, ValueError):
+            except (AttributeError, IndexError, TypeError, ValueError):
                 try:
                     publication_date = parse(compile('\((.*?)\)').search(
                         get_string(hxs.xpath(
@@ -616,7 +616,7 @@ def get_contents(keyword, country):
                     ).group(1)).date()
                     age = get_int(get_age(date.today(), publication_date))
                     publication_date = publication_date.isoformat()
-                except (AttributeError, IndexError, ValueError):
+                except (AttributeError, IndexError, TypeError, ValueError):
                     try:
                         publication_date = compile('\((.*?)\)').search(
                             get_string(hxs.xpath(
