@@ -4,6 +4,7 @@ from re import compile, sub
 from socket import timeout
 from string import lowercase
 
+from furl import furl
 from requests import get
 from requests.exceptions import RequestException
 from scrapy.selector import Selector
@@ -27,6 +28,7 @@ def get_contents(url):
         index += 1
         if index >= 5:
             return ''
+        print index, url
         try:
             response = get(
                 url,
@@ -49,15 +51,19 @@ if __name__ == '__main__':
         'books similar to',
     ]:
         for alphabet in lowercase:
-            contents = get_contents(
-                'http://completion.amazon.com/search/complete?xcat=2&'
-                'search-alias=aps&mkt=1&q=%(q)s%%20%(alphabet)s' % {
-                    'alphabet': alphabet,
-                    'q': q.replace(' ', '%20'),
-                }
-            )
+            contents = None
             try:
-                contents = loads(contents)
+                contents = loads(get_contents(
+                    furl('http://completion.amazon.com/search/complete').add({
+                        'mkt': '1',
+                        'q': '%(q)s %(alphabet)s' % {
+                            'alphabet': alphabet,
+                            'q': q,
+                        },
+                        'search-alias': 'digital-text',
+                        'xcat': '2',
+                    }).url
+                ))
             except JSONDecodeError:
                 pass
             if not contents:
@@ -67,16 +73,13 @@ if __name__ == '__main__':
                     continue
                 keyword = get_string(keyword.replace(q, ''))
                 response = get_contents(
-                    'http://www.amazon.com/s/field-keywords=%(keyword)s&'
-                    'prefix=%(keyword)s' % {
-                        'keyword': keyword,
-                    }
+                    furl('http://www.amazon.com/s/').add({
+                        'field-keywords': keyword,
+                        'url': 'search-alias=digital-text',
+                    }).url
                 )
                 if not response:
                     continue
-                keyword = get_string(sub(
-                    '[,\-+\.@\(\)";:\'/]+', '', keyword.lower()
-                ))
                 selector = Selector(text=response)
                 url = ''
                 try:
@@ -126,23 +129,6 @@ if __name__ == '__main__':
                     except IndexError:
                         pass
                     try:
-                        author = get_string(selector.xpath(
-                            '//h1[@class="parseasinTitle "]/'
-                            'following-sibling::span/a/text()'
-                        ).extract()[0])
-                    except IndexError:
-                        pass
-                    if not keyword in get_string(sub(
-                        '[,\-+\.@\(\)";:\'/]+',
-                        '',
-                        title.lower().split(':')[0]
-                    )) and not keyword in get_string(sub(
-                        '[,\-+\.@\(\)";:\'/]+',
-                        '',
-                        author.lower().split(':')[0]
-                    )):
-                        continue
-                    try:
                         text = get_string(selector.xpath(
                             '//li[@id="SalesRank"]/text()'
                         ).extract()[1]).split(' ', 1)
@@ -174,12 +160,22 @@ if __name__ == '__main__':
                             ).extract()[0])))
                     except IndexError:
                         pass
-                    pss.append(popular_search(**{
-                        'amazon_best_sellers_rank': amazon_best_sellers_rank,
-                        'book_cover_image': book_cover_image,
-                        'title': title,
-                        'url': url,
-                    }))
+                    if (
+                        book_cover_image
+                        and
+                        title
+                        and
+                        amazon_best_sellers_rank
+                        and
+                        url
+                    ):
+                        pss.append(popular_search(**{
+                            'amazon_best_sellers_rank':
+                            amazon_best_sellers_rank,
+                            'book_cover_image': book_cover_image,
+                            'title': title,
+                            'url': url,
+                        }))
     session = get_mysql_session()
     s = session()
     s.query(popular_search).delete()
