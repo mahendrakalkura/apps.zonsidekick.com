@@ -396,6 +396,44 @@ jQuery.ajaxSetup({
     'timeout': 600000
 });
 
+var body = function (context) {
+    var keywords = jQuery('#keywords');
+    if (!keywords.length) {
+        return ;
+    }
+
+    var body = jQuery('#body');
+    if (!body.length) {
+        return ;
+    }
+
+    var get_bottom = function (context) {
+        return parseInt(context.position().top + context.height(), 10);
+    }
+
+    one = get_bottom(keywords);
+    two = get_bottom(body);
+    if (one != two) {
+        body.css('height', body.height() - (two - one) + 10);
+    }
+};
+
+var media = function () {
+    var medias = jQuery('.media');
+    var height = 0;
+    if (!medias.length) {
+        return;
+    }
+    medias.each( function() {
+        var h = $(this).innerHeight();
+        console.log(height, h);
+        if (h > height) {
+            height = h;
+        }
+    });
+    medias.css('height', height - 40);
+};
+
 var ui = function () {
     if (is_development()) {
         return;
@@ -452,28 +490,6 @@ var zclip = function () {
     setInterval(refresh, 500);
 };
 
-var body = function (context) {
-    var keywords = jQuery('#keywords');
-    if (!keywords.length) {
-        return ;
-    }
-
-    var body = jQuery('#body');
-    if (!body.length) {
-        return ;
-    }
-
-    var get_bottom = function (context) {
-        return parseInt(context.position().top + context.height(), 10);
-    }
-
-    one = get_bottom(keywords);
-    two = get_bottom(body);
-    if (one != two) {
-        body.css('height', body.height() - (two - one) + 10);
-    }
-};
-
 jQuery(function () {
     jQuery('body').tooltip({
         'container': jQuery('body'),
@@ -482,6 +498,7 @@ jQuery(function () {
     jQuery('.got-it').click(function () {
         jQuery.cookie(jQuery(this).parents('.modal').attr('id'), 'Yes');
     });
+    media();
     if (jQuery.cookie('kns-qsg') != 'Yes') {
         jQuery('[data-target="#kns-qsg"]').click();
     }

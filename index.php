@@ -252,6 +252,23 @@ function get_pdf($application, $user, $logo, $id, $variables) {
     return $contents;
 }
 
+function get_popular_searches($application) {
+    $query = <<<EOD
+SELECT *
+FROM `tools_ps`
+ORDER BY `title` ASC
+EOD;
+    $popular_searches = $application['db']->fetchAll($query);
+    foreach ($popular_searches as $key => $value) {
+        $popular_searches[$key]['amazon_best_sellers_rank'] = json_decode(
+            $popular_searches[$key]['amazon_best_sellers_rank'], true
+        );
+        asort($popular_searches[$key]['amazon_best_sellers_rank']);
+    }
+
+    return $popular_searches;
+}
+
 function get_requests($application, $user) {
     $query = <<<EOD
 SELECT *
@@ -578,7 +595,11 @@ $application->match('/transfer/{id}', function ($id) use ($application) {
 ->method('GET');
 
 $application->match('/dashboard', function () use ($application) {
-    return $application['twig']->render('views/dashboard.twig');
+    return $application['twig']->render('views/dashboard.twig', array(
+        'popular_searches' => array_slice(
+            get_popular_searches($application), 0, 3
+        ),
+    ));
 })
 ->bind('dashboard')
 ->method('GET');
@@ -1246,6 +1267,21 @@ EOD;
 )
 ->before($before_statistics)
 ->bind('statistics')
+->method('GET');
+
+$application->match(
+    '/popular-searches',
+    function (Request $request) use ($application) {
+        return $application['twig']->render(
+            'views/popular_searches.twig',
+            array(
+                'popular_searches' => get_popular_searches($application),
+            )
+        );
+    }
+)
+->before($before_statistics)
+->bind('popular_searches')
 ->method('GET');
 
 $application->run();

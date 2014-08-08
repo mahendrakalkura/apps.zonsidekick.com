@@ -213,6 +213,16 @@
                     </div>
                 {% endif %}
             </center>
+            {% if has_statistics(user) %}
+                {% if popular_searches %}
+                    <hr>
+                    <p>Kindle shoppers want to read more books like:</p>
+                    {% include 'slots/popular_searches.twig' %}
+                    <p class="text-right">
+                        <a href="{{ url('popular_searches') }}">See More</a>
+                    </p>
+                {% endif %}
+            {% endif %}
             <hr>
             <p>Current Version: <strong>3.1</strong></p>
             <ul>

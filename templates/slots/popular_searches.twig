@@ -1,0 +1,32 @@
+{% for batch in popular_searches|batch(3) %}
+    <div class="row-fluid">
+        {% for popular_search in batch %}
+            <div class="span4">
+                <div class="media well">
+                    <a
+                        class="pull-left"
+                        href="{{ popular_search.url }}"
+                        rel="nofollow"
+                        target="_blank"
+                        ><img src="{{ popular_search.book_cover_image }}"></a>
+                    <div class="media-body">
+                        <h4 class="media-heading">
+                            <a
+                                href="{{ popular_search.url }}"
+                                rel="nofollow"
+                                target="_blank"
+                                >{{ popular_search.title }}</a>
+                        </h4>
+                        <ul>
+                            {% for key, value in popular_search.amazon_best_sellers_rank %}
+                                <li>
+                                    <strong>#{{ value }}</strong> in {{ key }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endfor %}

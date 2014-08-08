@@ -1,0 +1,17 @@
+{% extends 'layout.twig' %}
+
+{% set module = 'Popular Searches' %}
+
+{% block content %}
+{% include 'slots/back-to-dashboard.twig' %}
+<div class="row-fluid">
+    <div class="span12">
+        <div class="page-header">
+            <h1>
+                {{ module }}
+            </h1>
+        </div>
+    </div>
+</div>
+{% include 'slots/popular_searches.twig' %}
+{% endblock %}

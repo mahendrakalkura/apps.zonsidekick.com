@@ -338,6 +338,11 @@ a {
     margin-bottom: 30px;
 }
 
+#middle .container-fluid hr {
+    margin: 0;
+    margin-bottom: 30px;
+}
+
 #middle .container-fluid table {
     margin-bottom: 30px;
 }
@@ -391,6 +396,22 @@ a {
 #middle .container-fluid .form-actions .btn.disabled,
 #middle .container-fluid .form-actions .btn[disabled] {
     opacity: 0.25;
+}
+
+#middle .container-fluid .media {
+    margin-bottom: 30px;
+}
+
+#middle .container-fluid .media img {
+    height: 100px;
+}
+
+#middle .container-fluid .media ul {
+    margin-bottom: 0;
+}
+
+#middle .container-fluid .media .media-heading {
+    margin-bottom: 20px;
 }
 
 #middle .container-fluid .row-fluid [class^="icon-"] {
