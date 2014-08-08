@@ -22,7 +22,7 @@ from numpy import mean
 from scrapy.selector import Selector
 from simplejson import dumps
 
-from utilities import get_string, get_mysql, get_proxies
+from utilities import get_mysql_connection, get_string, get_proxies
 
 setlocale(LC_ALL, 'en_US.UTF-8')
 
@@ -60,7 +60,7 @@ points = {
 
 def get_keywords(requests):
     keywords = []
-    mysql = get_mysql()
+    mysql = get_mysql_connection()
     for request in requests:
         cursor = mysql.cursor()
         cursor.execute(
@@ -86,7 +86,7 @@ def get_keywords(requests):
 
 
 def get_requests(user):
-    mysql = get_mysql()
+    mysql = get_mysql_connection()
     cursor = mysql.cursor()
     cursor.execute(
         '''
@@ -155,7 +155,7 @@ def get_responses(urls):
 
 
 def get_users():
-    mysql = get_mysql()
+    mysql = get_mysql_connection()
     cursor = mysql.cursor()
     cursor.execute('SELECT `ID` FROM `wp_users` ORDER BY `ID` ASC')
     users = cursor.fetchall()
@@ -165,7 +165,7 @@ def get_users():
 
 
 def main():
-    mysql = get_mysql()
+    mysql = get_mysql_connection()
     cursor = mysql.cursor()
     cursor.execute(
         '''
@@ -187,7 +187,7 @@ def main():
             })
             break
 
-    mysql = get_mysql()
+    mysql = get_mysql_connection()
     total = len(keywords)
     for index, keyword in enumerate(keywords):
         status = '-'
