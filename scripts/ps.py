@@ -45,7 +45,7 @@ def get_contents(url):
     return ''
 
 if __name__ == '__main__':
-    pss = []
+    pss = {}
     for q in [
         'books like',
         'books similar to',
@@ -160,26 +160,18 @@ if __name__ == '__main__':
                             ).extract()[0])))
                     except IndexError:
                         pass
-                    if (
-                        book_cover_image
-                        and
-                        title
-                        and
-                        amazon_best_sellers_rank
-                        and
-                        url
-                    ):
-                        pss.append(popular_search(**{
+                    if not title in pss:
+                        pss[title] = popular_search(**{
                             'amazon_best_sellers_rank':
                             amazon_best_sellers_rank,
                             'book_cover_image': book_cover_image,
                             'title': title,
                             'url': url,
-                        }))
+                        })
     session = get_mysql_session()
     s = session()
     s.query(popular_search).delete()
-    s.add_all(pss)
+    s.add_all(pss.values())
     try:
         s.commit()
     except DBAPIError:
