@@ -507,7 +507,7 @@ def get_contents(keyword, country):
                         ).extract()[0])
                     ).group(1)
                 )
-            except (IndexError, ValueError):
+            except (IndexError, TypeError, ValueError):
                 pass
         pages = (pages, get_int(pages))
         price = 0.00
