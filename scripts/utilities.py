@@ -112,15 +112,6 @@ class popular_search(base):
     amazon_best_sellers_rank = Column(mutators_dict.as_mutable(json))
 
 
-def get_string(string):
-    string = string.replace("\n", ' ')
-    string = string.replace("\r", ' ')
-    string = string.replace("\t", ' ')
-    string = sub(r'[ ]+', ' ', string)
-    string = string.strip()
-    return string
-
-
 def get_mysql_connection():
     mysql = connect(
         cursorclass=DictCursor,
@@ -176,6 +167,53 @@ def get_proxies():
             'port_number': 9150 + randint(1, 50),
         },
     }
+
+
+def get_sales(best_sellers_rank):
+    if best_sellers_rank == 1:
+        return 3500
+    if best_sellers_rank == 2:
+        return 3500
+    if best_sellers_rank == 3:
+        return 3500
+    if best_sellers_rank == 4:
+        return 3500
+    if best_sellers_rank == 5:
+        return 3500
+    if best_sellers_rank >= 6 and best_sellers_rank <= 10:
+        return 2000 + ((best_sellers_rank - 6) * 300)
+    if best_sellers_rank >= 11 and best_sellers_rank <= 20:
+        return 2000 + ((best_sellers_rank - 11) * 150)
+    if best_sellers_rank >= 21 and best_sellers_rank <= 65:
+        return 650 + ((best_sellers_rank - 21) * 10)
+    if best_sellers_rank >= 61 and best_sellers_rank <= 80:
+        return 550 + ((best_sellers_rank - 61) * 5)
+    if best_sellers_rank >= 81 and best_sellers_rank <= 200:
+        return 300 + ((best_sellers_rank - 81) * 2)
+    if best_sellers_rank >= 201 and best_sellers_rank <= 1000:
+        return 100 + ((best_sellers_rank - 201) * 0.25)
+    if best_sellers_rank >= 1001 and best_sellers_rank <= 2000:
+        return 55 + ((best_sellers_rank - 1001) * 0.045)
+    if best_sellers_rank >= 2001 and best_sellers_rank <= 3500:
+        return 30 + ((best_sellers_rank - 2001) * 0.01)
+    if best_sellers_rank >= 3501 and best_sellers_rank <= 8500:
+        return 10 + ((best_sellers_rank - 3501) * 0.004)
+    if best_sellers_rank >= 8501 and best_sellers_rank <= 40000:
+        return 1 + ((best_sellers_rank - 8501) * 0.0003)
+    if best_sellers_rank >= 40001 and best_sellers_rank <= 100000:
+        return 0.1 + ((best_sellers_rank - 40001) * 0.000015)
+    if best_sellers_rank >= 100001:
+        return 0
+    return 0
+
+
+def get_string(string):
+    string = string.replace("\n", ' ')
+    string = string.replace("\r", ' ')
+    string = string.replace("\t", ' ')
+    string = sub(r'[ ]+', ' ', string)
+    string = string.strip()
+    return string
 
 
 def get_user_agent():

@@ -19,6 +19,7 @@ from utilities import (
     get_number,
     get_proxies,
     get_string,
+    get_sales,
     get_user_agent,
     referral,
     review,
@@ -201,12 +202,6 @@ class Spider(CrawlSpider):
     start_urls = [
         'http://www.amazon.com/Best-Sellers-Kindle-Store-eBooks/zgbs/'
         'digital-text/154606011/ref=zg_bs_unv_kstore_2_154607011_1',
-        'http://www.amazon.com/gp/new-releases/digital-text/154606011/'
-        'ref=zg_bs_tab_t_bsnr',
-        'http://www.amazon.com/gp/bestsellers/2014/digital-text/154606011/'
-        'ref=zg_bs_tab_t_bsar',
-        'http://www.amazon.com/gp/top-rated/digital-text/154606011/'
-        'ref=zg_bs_tab_t_tr',
     ]
 
     def parse_pages(self, response):
@@ -250,7 +245,7 @@ class Spider(CrawlSpider):
         url = response.url
         title = ''
         author = ''
-        price = ''
+        price = 0.00
         publication_date = ''
         print_length = 0
         amazon_best_sellers_rank = {}
@@ -341,6 +336,11 @@ class Spider(CrawlSpider):
                 ).extract()[0])))
         except IndexError:
             pass
+        if amazon_best_sellers_rank:
+            estimated_sales_per_day = get_sales(min(
+                amazon_best_sellers_rank.values()
+            ))
+            earnings_per_day = estimated_sales_per_day * price
         try:
             total_number_of_reviews = int(get_number(get_string(
                 compile('all\s*([^\s]*)').search(selector.xpath(
