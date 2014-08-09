@@ -253,15 +253,59 @@ function get_pdf($application, $user, $logo, $id, $variables) {
 }
 
 function get_popular_searches($application) {
+    $appearances = array(
+        'last 7 days' => 0,
+        'last 30 days' => 0,
+    );
+    $query = <<<EOD
+SELECT COUNT(DISTINCT `date_and_time`) AS `count`
+FROM `tools_ps_trends`
+WHERE `date_and_time` >= NOW() - INTERVAL 7 DAY
+EOD;
+    $row = $application['db']->fetchAssoc($query);
+    $appearances['last 7 days'] = $row['count'];
+    $query = <<<EOD
+SELECT COUNT(DISTINCT `date_and_time`) AS `count`
+FROM `tools_ps_trends`
+WHERE `date_and_time` >= NOW() - INTERVAL 30 DAY
+EOD;
+    $row = $application['db']->fetchAssoc($query);
+    $appearances['last 30 days'] = $row['count'];
     $query = <<<EOD
 SELECT *
-FROM `tools_ps`
+FROM `tools_ps_books`
 ORDER BY `title` ASC
 EOD;
     $popular_searches = $application['db']->fetchAll($query);
     foreach ($popular_searches as $key => $value) {
         $popular_searches[$key]['amazon_best_sellers_rank'] = json_decode(
             $popular_searches[$key]['amazon_best_sellers_rank'], true
+        );
+        $query = <<<EOD
+SELECT COUNT(id) AS `count`
+FROM `tools_ps_trends`
+WHERE `book_id` = ? AND `date_and_time` >= NOW() - INTERVAL 7 DAY
+EOD;
+        $row_1 = $application['db']->fetchAssoc(
+            $query,
+            array($popular_searches[$key]['id'])
+        );
+        $query = <<<EOD
+SELECT COUNT(id) AS `count`
+FROM `tools_ps_trends`
+WHERE `book_id` = ? AND `date_and_time` >= NOW() - INTERVAL 7 DAY
+EOD;
+        $row_2 = $application['db']->fetchAssoc(
+            $query,
+            array($popular_searches[$key]['id'])
+        );
+        $popular_searches[$key]['appearances'] = array(
+            'last 7 days' => (
+                $row_1['count'] * 100.00
+            ) / $appearances['last 7 days'],
+            'last 30 days' => (
+                $row_2['count'] * 100.00
+            ) / $appearances['last 30 days'],
         );
         asort($popular_searches[$key]['amazon_best_sellers_rank']);
     }

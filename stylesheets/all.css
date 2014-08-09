@@ -406,12 +406,16 @@ a {
     height: 100px;
 }
 
+#middle .container-fluid .media p {
+    margin-bottom: 10px;
+}
+
 #middle .container-fluid .media ul {
-    margin-bottom: 0;
+    margin-bottom: 10px;
 }
 
 #middle .container-fluid .media .media-heading {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 #middle .container-fluid .row-fluid [class^="icon-"] {

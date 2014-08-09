@@ -430,7 +430,7 @@ var media = function () {
             height = h;
         }
     });
-    medias.css('height', height - 40);
+    medias.css('height', height - 20);
 };
 
 var ui = function () {

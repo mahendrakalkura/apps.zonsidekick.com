@@ -17,10 +17,23 @@
                                 target="_blank"
                                 >{{ popular_search.title }}</a>
                         </h4>
+                        <p><strong>Categories & Ranks:</strong></p>
                         <ul>
                             {% for key, value in popular_search.amazon_best_sellers_rank %}
                                 <li>
                                     <strong>#{{ value }}</strong> in {{ key }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <p><strong>Appearances:</strong></p>
+                        <ul>
+                            {% for key, value in popular_search.appearances %}
+                                <li>
+                                    <strong>
+                                    {{ value|number_format(2, '.', ',') }}%
+                                    </strong>
+                                    in the
+                                    {{ key }}
                                 </li>
                             {% endfor %}
                         </ul>
