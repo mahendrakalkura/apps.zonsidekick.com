@@ -12,12 +12,12 @@ application.config(function ($httpProvider, $interpolateProvider) {
     $httpProvider.defaults.headers.post[
         'Content-Type'
     ] = 'application/x-www-form-urlencoded';
-    $interpolateProvider.startSymbol('[[').endSymbol(']]');
+    $interpolateProvider.startSymbol('[!').endSymbol('!]');
 });
 
 application.directive('ngFocus', function ($timeout) {
     return {
-        'link': function (scope, element, attrs) {
+        link: function (scope, element, attrs) {
             scope.$watch(attrs.ngFocus, function (value) {
                 if (angular.isDefined(value) && value) {
                     $timeout(function () {
@@ -36,15 +36,15 @@ application.directive('ngFocus', function ($timeout) {
 
 application.directive('popover', function () {
     return {
-        'link': function (scope, element, attrs) {
+        link: function (scope, element, attrs) {
             jQuery(element).popover({
-                'container': 'body',
-                'content': jQuery(element).find('div').contents(),
-                'html': true,
-                'placement': 'top'
+                container: 'body',
+                content: jQuery(element).find('div').contents(),
+                html: true,
+                placement: 'top'
             });
         },
-        'restrict': 'A'
+        restrict: 'A'
     };
 });
 
@@ -126,22 +126,22 @@ application.controller('kns_add', [
     '$attrs', '$rootScope', '$scope', function ($attrs, $rootScope, $scope) {
         $scope.count = 500;
         $scope.focus = {
-            'keywords': true
+            keywords: true
         };
         $scope.keywords = '';
 
         $scope.submit = function ($event) {
             if ($scope.count >= 500) {
                 $rootScope.$broadcast('open', {
-                    'top': $attrs.errorTop1,
-                    'middle': $attrs.errorMiddle1
+                    top: $attrs.errorTop1,
+                    middle: $attrs.errorMiddle1
                 });
                 $event.preventDefault();
             }
             if ($scope.count < 0) {
                 $rootScope.$broadcast('open', {
-                    'top': $attrs.errorTop2,
-                    'middle': $attrs.errorMiddle2
+                    top: $attrs.errorTop2,
+                    middle: $attrs.errorMiddle2
                 });
                 $event.preventDefault();
             }
@@ -190,12 +190,12 @@ application.controller('kns_simple', [
                 '[data-original-title="Simple Report + Detailed Report"]'
             ).popover('hide');
             $http({
-                'data': jQuery.param({
-                    'email': email,
-                    'logo': ''
+                data: jQuery.param({
+                    email: email,
+                    logo: ''
                 }),
-                'method': 'POST',
-                'url': $attrs.urlEmail
+                method: 'POST',
+                url: $attrs.urlEmail
             }).
             error(function (data, status, headers, config) {
                 $scope.email(email);
@@ -203,15 +203,15 @@ application.controller('kns_simple', [
             success(function (data, status, headers, config) {
             });
             $rootScope.$broadcast('open', {
-                'top': $attrs.emailTop,
-                'middle': $attrs.emailMiddle
+                top: $attrs.emailTop,
+                middle: $attrs.emailMiddle
             });
         };
 
         $scope.process = function () {
             $http({
-                'method': 'POST',
-                'url': $attrs.urlXhr
+                method: 'POST',
+                url: $attrs.urlXhr
             }).
             error(function (data, status, headers, config) {
                 $timeout($scope.process, 15000);
@@ -264,8 +264,8 @@ application.controller('kns_simple', [
                 '[data-original-title="Detailed Report - Brandable"]'
             ).popover('hide');
             $rootScope.$broadcast('open', {
-                'top': $attrs.pdfTop,
-                'middle': $attrs.pdfMiddle
+                top: $attrs.pdfTop,
+                middle: $attrs.pdfMiddle
             });
             window.location.href = jQuery(this).attr('data-url');
         });
@@ -283,8 +283,8 @@ application.controller('aks', function ($attrs, $http, $rootScope, $scope) {
     $scope.country = 'com';
     $scope.keyword = '';
     $scope.focus = {
-        'keyword': true,
-        'suggestions': false
+        keyword: true,
+        suggestions: false
     };
     $scope.level = '1';
     $scope.mode = '2';
@@ -294,10 +294,10 @@ application.controller('aks', function ($attrs, $http, $rootScope, $scope) {
 
     $scope.download = function () {
         $rootScope.$broadcast('download', {
-            'action': $attrs.urlDownload,
-            'json': JSON.stringify({
-                'keyword': $scope.keyword,
-                'suggestions': $scope.suggestions
+            action: $attrs.urlDownload,
+            json: JSON.stringify({
+                keyword: $scope.keyword,
+                suggestions: $scope.suggestions
             })
         });
     };
@@ -306,29 +306,29 @@ application.controller('aks', function ($attrs, $http, $rootScope, $scope) {
         $scope.suggestions = [];
         if (!$scope.keyword.length) {
             $rootScope.$broadcast('open', {
-                'top': $attrs.error1Top,
-                'middle': $attrs.error1Middle
+                top: $attrs.error1Top,
+                middle: $attrs.error1Middle
             });
 
             return;
         }
         $scope.spinner = true;
         $http({
-            'data': jQuery.param({
-                'country': $scope.country,
-                'keyword': $scope.keyword,
-                'level': $scope.level,
-                'mode': $scope.mode,
-                'search_alias': $scope.search_alias
+            data: jQuery.param({
+                country: $scope.country,
+                keyword: $scope.keyword,
+                level: $scope.level,
+                mode: $scope.mode,
+                search_alias: $scope.search_alias
             }),
-            'method': 'POST',
-            'url': $attrs.urlXhr
+            method: 'POST',
+            url: $attrs.urlXhr
         }).
         error(function (data, status, headers, config) {
             $scope.spinner = false;
             $scope.$broadcast('open', {
-                'top': $attrs.error2Top,
-                'middle': $attrs.error2Middle
+                top: $attrs.error2Top,
+                middle: $attrs.error2Middle
             });
         }).
         success(function (data, status, headers, config) {
@@ -387,13 +387,59 @@ application.controller('modal', function (
     });
 });
 
+application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
+    $scope.categories = jQuery.parseJSON($attrs.categories);
+    $scope.sections = jQuery.parseJSON($attrs.sections);
+    $scope.pages_1 = [
+        'Any',
+        'More Than',
+        'Less Than',
+    ];
+    $scope.counts = _.range(100, 0, -10);
+
+    $scope.category = $scope.categories[0][0];
+    $scope.section = $scope.sections[0][0];
+    $scope.page_1 = $scope.pages_1[0];
+    $scope.page_2 = 0;
+    $scope.count = $scope.counts[0];
+
+    $scope.spinner = false;
+    $scope.error = false;
+
+    $scope.process = function () {
+        $scope.spinner = true;
+        $scope.error = false;
+        $http({
+            data: {
+                category: $scope.category,
+                count: $scope.count,
+                page_1: $scope.page_1,
+                page_2: $scope.page_2,
+                section: $scope.section
+            },
+            method: 'POST',
+            url: $attrs.url
+        }).
+        error(function (data, status, headers, config) {
+            $scope.spinner = false;
+            $scope.error = true;
+        }).
+        success(function (data, status, headers, config) {
+            $scope.spinner = false;
+            $scope.error = true;
+        });
+
+        return;
+    };
+});
+
 application.controller('previous_versions', function ($scope) {
     $scope.status = false;
 });
 
 jQuery.ajaxSetup({
-    'cache': false,
-    'timeout': 600000
+    cache: false,
+    timeout: 600000
 });
 
 var body = function (context) {
@@ -438,11 +484,11 @@ var ui = function () {
         return;
     }
     jQuery.ajax({
-        'dataType': 'html',
-        'error': function (jqXHR, textStatus, errorThrown) {
+        dataType: 'html',
+        error: function (jqXHR, textStatus, errorThrown) {
             ui();
         },
-        'success': function (data, textStatus, jqXHR) {
+        success: function (data, textStatus, jqXHR) {
             var context = jQuery(data);
             jQuery('#top').append(context.find('.banner'));
             context.find('#content_area').find('#le_body_row_1').remove();
@@ -451,8 +497,8 @@ var ui = function () {
             );
             jQuery('#bottom').append(context.find('.footer').fadeIn('slow'));
         },
-        'type': 'GET',
-        'url': 'http://zonsidekick.com/toolspage/'
+        type: 'GET',
+        url: 'http://zonsidekick.com/toolspage/'
     });
 };
 
@@ -469,12 +515,12 @@ var zclip = function () {
                 return;
             }
             element.zclip({
-                'afterCopy': function () {},
-                'beforeCopy': function () {},
-                'copy': function () {
+                afterCopy: function () {},
+                beforeCopy: function () {},
+                copy: function () {
                     return element.attr('data-value');
                 },
-                'path': (
+                path: (
                     jQuery('body').attr('data-url')
                     +
                     '/vendor/jquery-zclip/ZeroClipboard.swf'
@@ -491,13 +537,15 @@ var zclip = function () {
 
 jQuery(function () {
     jQuery('body').tooltip({
-        'container': jQuery('body'),
-        'selector': '[data-toggle="tooltip"]'
+        container: jQuery('body'),
+        selector: '[data-toggle="tooltip"]'
     });
     jQuery('.got-it').click(function () {
         jQuery.cookie(jQuery(this).parents('.modal').attr('id'), 'Yes');
     });
-    media();
+    jQuery('.select2').select2({
+        placeholder: 'Select an option...'
+    });
     if (jQuery.cookie('kns-qsg') != 'Yes') {
         jQuery('[data-target="#kns-qsg"]').click();
     }
@@ -505,6 +553,7 @@ jQuery(function () {
         jQuery('[data-target="#aks-qsg"]').click();
     }
     body();
+    media();
     ui();
     zclip();
 });

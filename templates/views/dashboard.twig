@@ -185,6 +185,18 @@
                                 </a>
                             {% endif %}
                         </p>
+                        {% if has_statistics(user) %}
+                            <p>
+                                <a
+                                    class="btn btn-info btn-large"
+                                    href="{{ url('ce_overview') }}"
+                                    >
+                                    <span class="icon-key icon-large">
+                                    </span>
+                                    Competition Explorer
+                                </a>
+                            </p>
+                        {% endif %}
                     {% else %}
                         <div class="alert alert-error">
                             Your account has no active subscriptions to our
@@ -217,9 +229,9 @@
                 {% if popular_searches %}
                     <hr>
                     <p>Kindle shoppers want to read more books like:</p>
-                    {% include 'slots/popular_searches.twig' %}
+                    {% include 'slots/ps.twig' %}
                     <p class="text-right">
-                        <a href="{{ url('popular_searches') }}">See More</a>
+                        <a href="{{ url('ps') }}">See More</a>
                     </p>
                 {% endif %}
             {% endif %}

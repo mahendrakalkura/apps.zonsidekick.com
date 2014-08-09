@@ -338,6 +338,10 @@ a {
     margin-bottom: 30px;
 }
 
+#middle .container-fluid form select + input {
+    margin-top: 5px;
+}
+
 #middle .container-fluid hr {
     margin: 0;
     margin-bottom: 30px;

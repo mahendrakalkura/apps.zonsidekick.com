@@ -116,10 +116,10 @@
                 </div>
             </form>
         </div>
-        <div class="span6 hide [[ spinner == true && 'show' || 'hide']]">
+        <div class="span6 hide [! spinner == true && 'show' || 'hide' !]">
             <span class="icon-spinner icon-spin icon-2x pull-right"></span>
         </div>
-        <div class="span6 hide [[ suggestions.length && 'show' || 'hide' ]]">
+        <div class="span6 hide [! suggestions.length && 'show' || 'hide' !]">
             <form accept-charset="UTF-8">
                 <label class="pull-right" for="suggestions">Suggestions</label>
                 <textarea
@@ -127,16 +127,16 @@
                     id="suggestions"
                     ng-focus="focus['suggestions']"
                     ng-on-blur="focus['suggestions'] = false"
-                    >[[ suggestions.join('\n') ]]</textarea>
+                    >[! suggestions.join('\n') !]</textarea>
                 <span class="help-block right">
                     Total Number of Suggestions:
-                    <span>[[ suggestions.length ]]</span>
+                    <span>[! suggestions.length !]</span>
                 </span>
                 <div class="form-actions right">
                     <button
                         class="btn btn-info copy-all"
                         type="button"
-                        data-value="[[ suggestions.join('\n') ]]"
+                        data-value="[! suggestions.join('\n') !]"
                         >
                         <span class="icon-copy icon-large"></span>
                         Copy All

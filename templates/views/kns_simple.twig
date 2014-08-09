@@ -110,7 +110,7 @@
                 <thead>
                     <tr>
                         <th
-                            class="header [[ order_by[0] == 'string' && get_order_by() || '' ]]"
+                            class="header [! order_by[0] == 'string' && get_order_by() || '' !]"
                             ng-click="set_order_by('string')"
                             >
                             <span
@@ -119,7 +119,7 @@
                                 >Keyword</span>
                         </th>
                         <th
-                            class="center header [[ order_by[0] == 'contents.buyer_behavior[0]' && get_order_by() || '' ]]"
+                            class="center header [! order_by[0] == 'contents.buyer_behavior[0]' && get_order_by() || '' !]"
                             ng-click="set_order_by('contents.buyer_behavior[0]')"
                             >
                             <span
@@ -128,7 +128,7 @@
                                 >Buyer Behavior</span>
                         </th>
                         <th
-                            class="center header [[ order_by[0] == 'contents.competition[0]' && get_order_by() || '' ]]"
+                            class="center header [! order_by[0] == 'contents.competition[0]' && get_order_by() || '' !]"
                             ng-click="set_order_by('contents.competition[0]')"
                             >
                             <span
@@ -137,7 +137,7 @@
                                 >Competition</span>
                         </th>
                         <th
-                            class="center header [[ order_by[0] == 'contents.optimization[0]' && get_order_by() || '' ]]"
+                            class="center header [! order_by[0] == 'contents.optimization[0]' && get_order_by() || '' !]"
                             ng-click="set_order_by('contents.optimization[0]')"
                             >
                             <span
@@ -146,7 +146,7 @@
                                 >Optimization</span>
                         </th>
                         <th
-                            class="right header [[ order_by[0] == 'contents.spend[0][0]' && get_order_by() || '' ]]"
+                            class="right header [! order_by[0] == 'contents.spend[0][0]' && get_order_by() || '' !]"
                             ng-click="set_order_by('contents.spend[0][0]')"
                             >
                             <span
@@ -155,7 +155,7 @@
                                 >Spend ({{ currency }})</span>
                         </th>
                         <th
-                            class="right header [[ order_by[0] == 'contents.average_price[0]' && get_order_by() || '' ]]"
+                            class="right header [! order_by[0] == 'contents.average_price[0]' && get_order_by() || '' !]"
                             ng-click="set_order_by('contents.average_price[0]')"
                             >
                             <span
@@ -164,7 +164,7 @@
                                 >Avg. Price ({{ currency }})</span>
                         </th>
                         <th
-                            class="right header [[ order_by[0] == 'contents.average_length[0]' && get_order_by() || '' ]]"
+                            class="right header [! order_by[0] == 'contents.average_length[0]' && get_order_by() || '' !]"
                             ng-click="set_order_by('contents.average_length[0]')"
                             >
                             <span
@@ -173,7 +173,7 @@
                                 >Avg. Length</span>
                         </th>
                         <th
-                            class="right header [[ order_by[0] == 'contents.score[0]' && get_order_by() || '' ]]"
+                            class="right header [! order_by[0] == 'contents.score[0]' && get_order_by() || '' !]"
                             ng-click="set_order_by('contents.score[0]')"
                             >
                             <span
@@ -185,7 +185,7 @@
                 </thead>
                 <tbody>
                     <tr ng-repeat="keyword in keywords|orderBy:order_by[0]:order_by[1]">
-                        <td>[[ keyword['string'] ]]</td>
+                        <td>[! keyword['string'] !]</td>
                         <td class="center">
                             <span ng-switch on="keyword['contents']">
                                 <span
@@ -199,7 +199,7 @@
                                             ng-switch-when="N/A"
                                             >
                                             <strong>
-                                                [[ keyword['contents']['buyer_behavior'][1] ]]
+                                                [! keyword['contents']['buyer_behavior'][1] !]
                                             </strong>
                                         </span>
                                         <span ng-switch-default ng-bind-html-unsafe="keyword['contents']['buyer_behavior'][1]|label:keyword['contents']['buyer_behavior'][1]:true"></span>
@@ -220,7 +220,7 @@
                                             ng-switch-when="N/A"
                                             >
                                             <strong>
-                                                [[ keyword['contents']['competition'][1] ]]
+                                                [! keyword['contents']['competition'][1] !]
                                             </strong>
                                         </span>
                                         <span ng-switch-default ng-bind-html-unsafe="keyword['contents']['competition'][1]|label:keyword['contents']['competition'][1]:false"></span>
@@ -241,7 +241,7 @@
                                             ng-switch-when="N/A"
                                             >
                                             <strong>
-                                                [[ keyword['contents']['optimization'][1] ]]
+                                                [! keyword['contents']['optimization'][1] !]
                                             </strong>
                                         </span>
                                         <span ng-switch-default ng-bind-html-unsafe="keyword['contents']['optimization'][1]|label:keyword['contents']['optimization'][1]:false"></span>
@@ -262,7 +262,7 @@
                                             ng-switch-when="N/A"
                                             >
                                             <strong>
-                                                [[ keyword['contents']['spend'][1] ]]
+                                                [! keyword['contents']['spend'][1] !]
                                             </strong>
                                         </span>
                                         <span ng-switch-default ng-bind-html-unsafe="keyword['contents']['spend'][1]|label:keyword['contents']['spend'][0][1]:true"></span>
@@ -283,11 +283,11 @@
                                             ng-switch-when="N/A"
                                             >
                                             <strong>
-                                                [[ keyword['contents']['average_price'][1] ]]
+                                                [! keyword['contents']['average_price'][1] !]
                                             </strong>
                                         </span>
                                         <span ng-switch-default>
-                                            [[ keyword['contents']['average_price'][1] ]]
+                                            [! keyword['contents']['average_price'][1] !]
                                         </span>
                                     </span>
                                 </span>
@@ -306,11 +306,11 @@
                                             ng-switch-when="N/A"
                                             >
                                             <strong>
-                                                [[ keyword['contents']['average_length'][1] ]]
+                                                [! keyword['contents']['average_length'][1] !]
                                             </strong>
                                         </span>
                                         <span ng-switch-default>
-                                            [[ keyword['contents']['average_length'][1] ]]
+                                            [! keyword['contents']['average_length'][1] !]
                                         </span>
                                     </span>
                                 </span>
@@ -329,11 +329,11 @@
                                             ng-switch-when="N/A"
                                             >
                                             <strong>
-                                                [[ keyword['contents']['score'][1] ]]
+                                                [! keyword['contents']['score'][1] !]
                                             </strong>
                                         </span>
                                         <span ng-switch-default>
-                                            [[ keyword['contents']['score'][1] ]]
+                                            [! keyword['contents']['score'][1] !]
                                         </span>
                                     </span>
                                 </span>

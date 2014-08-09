@@ -41,6 +41,44 @@ function usort_logos($one, $two)
     return ($one < $two) ? -1 : 1;
 }
 
+function get_categories($application, $category_id, $prefixes) {
+    $categories = array();
+    if ($category_id) {
+        $query = <<<EOD
+SELECT *
+FROM `tools_ce_categories`
+WHERE `category_id` = ?
+ORDER BY `title` ASC
+EOD;
+    } else {
+        $query = <<<EOD
+SELECT *
+FROM `tools_ce_categories`
+WHERE `category_id` IS NULL
+ORDER BY `title` ASC
+EOD;
+    }
+    $rows = $application['db']->fetchAll($query, array($category_id));
+    if ($rows) {
+        foreach ($rows as $row) {
+            $categories[] = array(
+                $row['id'],
+                sprintf(
+                    '%s %s',
+                    implode(' » ', array_merge($prefixes, array(''))),
+                    $row['title']
+                ),
+            );
+            $categories = array_merge($categories, get_categories(
+                $application, $row['id'],
+                array_merge($prefixes, array($row['title']))
+            ));
+        }
+    }
+
+    return $categories;
+}
+
 function get_count_and_keywords($application, $user, $keywords) {
     $keywords = explode("\n", $keywords);
     if (!empty($keywords)) {
@@ -414,6 +452,23 @@ EOD;
     }
 
     return array($request, $keywords);
+}
+
+function get_sections($application) {
+    $sections = array();
+    $query = <<<EOD
+SELECT *
+FROM `tools_ce_sections`
+ORDER BY `id` ASC
+EOD;
+    $rows = $application['db']->fetchAll($query);
+    if ($rows) {
+        foreach ($rows as $row) {
+            $sections[] = array($row['id'], $row['title']);
+        }
+    }
+
+    return $sections;
 }
 
 function get_truncated_text($string, $length) {
@@ -1178,6 +1233,27 @@ $application->match(
 ->method('POST');
 
 $application->match(
+    '/ce/overview',
+    function (Request $request) use ($application) {
+        return $application['twig']->render('views/ce_overview.twig', array(
+            'categories' => get_categories($application, 0, array()),
+            'sections' => get_sections($application),
+        ));
+    }
+)
+->before($before_statistics)
+->bind('ce_overview')
+->method('GET');
+
+$application->match('/ce/xhr', function (Request $request) use ($application) {
+    sleep(5);
+    return new Response(json_encode(array()));
+})
+->before($before_statistics)
+->bind('ce_xhr')
+->method('POST');
+
+$application->match(
     '/feedback',
     function (Request $request) use ($application) {
         $error = '';
@@ -1314,18 +1390,15 @@ EOD;
 ->method('GET');
 
 $application->match(
-    '/popular-searches',
+    '/ps',
     function (Request $request) use ($application) {
-        return $application['twig']->render(
-            'views/popular_searches.twig',
-            array(
-                'popular_searches' => get_popular_searches($application),
-            )
-        );
+        return $application['twig']->render('views/ps.twig', array(
+            'popular_searches' => get_popular_searches($application),
+        ));
     }
 )
 ->before($before_statistics)
-->bind('popular_searches')
+->bind('ps')
 ->method('GET');
 
 $application->run();
