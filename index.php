@@ -312,6 +312,14 @@ EOD;
     $query = <<<EOD
 SELECT *
 FROM `tools_ps_books`
+WHERE ID IN (
+    SELECT `book_id`
+    FROM `tools_ps_trends`
+    WHERE `date_and_time` IN (
+        SELECT MAX(`date_and_time`)
+        FROM `tools_ps_trends`
+    )
+)
 ORDER BY `title` ASC
 EOD;
     $popular_searches = $application['db']->fetchAll($query);
