@@ -214,10 +214,16 @@ if __name__ == '__main__':
                 break
     for b in bs:
         session.add(b)
-        session.add(trend(**{
-            'book': b,
-            'date_and_time': date_and_time,
-        }))
+        if not session.query(
+            trend,
+        ).filter(
+            trend.book==b,
+            trend.date_and_time==date_and_time,
+        ).count():
+            session.add(trend(**{
+                'book': b,
+                'date_and_time': date_and_time,
+            }))
     try:
         session.commit()
     except DBAPIError:
