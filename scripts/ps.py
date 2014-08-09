@@ -21,6 +21,7 @@ from utilities import (
     get_number,
     get_proxies,
     get_string,
+    get_url,
     get_user_agent,
     is_development,
     json,
@@ -110,9 +111,9 @@ if __name__ == '__main__':
                 selector = Selector(text=response)
                 url = ''
                 try:
-                    url = selector.xpath(
+                    url = get_url(selector.xpath(
                         '//div[@id="result_0"]/h3[@class="newaps"]/a/@href'
-                    ).extract()[0]
+                    ).extract()[0])
                 except IndexError:
                     pass
                 if not url:
