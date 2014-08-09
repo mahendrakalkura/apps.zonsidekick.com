@@ -13,10 +13,11 @@ from scrapy.selector import Selector
 from simplejson import loads
 from simplejson.scanner import JSONDecodeError
 from sqlalchemy.exc import DBAPIError, SQLAlchemyError
+from sqlalchemy import Column, Integer
+from sqlalchemy.orm import backref, relationship
 
 from utilities import (
-    book,
-    category,
+    base,
     get_mysql_session,
     get_number,
     get_proxies,
@@ -24,10 +25,9 @@ from utilities import (
     get_sales,
     get_url,
     get_user_agent,
-    referral,
-    review,
-    section,
-    trend,
+    is_development,
+    json,
+    mutators_dict,
 )
 
 BOT_NAME = get_user_agent()
@@ -54,6 +54,78 @@ SPIDER_MODULES = [
     'ce',
 ]
 USER_AGENT = BOT_NAME
+
+
+class category(base):
+    __table_args__ = {
+        'autoload': True,
+    }
+    __tablename__ = 'tools_ce_categories'
+
+    id = Column(Integer(), primary_key=True)
+
+    category = relationship(
+        'category',
+        backref=backref(
+            'categories', cascade='all', lazy='dynamic',
+        ),
+        remote_side=id,
+    )
+
+
+class section(base):
+    __table_args__ = {
+        'autoload': True,
+    }
+    __tablename__ = 'tools_ce_sections'
+
+
+class book(base):
+    __table_args__ = {
+        'autoload': True,
+    }
+    __tablename__ = 'tools_ce_books'
+
+    amazon_best_sellers_rank = Column(mutators_dict.as_mutable(json))
+
+
+class review(base):
+    __table_args__ = {
+        'autoload': True,
+    }
+    __tablename__ = 'tools_ce_reviews'
+
+    book = relationship(
+        'book', backref=backref('reviews', cascade='all', lazy='dynamic'),
+    )
+
+
+class referral(base):
+    __tablename__ = 'tools_ce_referrals'
+    __table_args__ = {
+        'autoload': True,
+    }
+
+    book = relationship(
+        'book', backref=backref('referrals', cascade='all', lazy='dynamic'),
+    )
+
+
+class trend(base):
+    __tablename__ = 'tools_ce_trends'
+    __table_args__ = {
+        'autoload': True,
+    }
+
+    category = relationship(
+        'category', backref=backref('trends', cascade='all', lazy='dynamic'),
+    )
+    section = relationship(
+        'section', backref=backref('trends', cascade='all', lazy='dynamic'),
+    )
+    book = relationship(
+        'book', backref=backref('trends', cascade='all', lazy='dynamic'),
+    )
 
 
 class Book(Item):
@@ -249,6 +321,8 @@ class Spider(CrawlSpider):
                         'slug': s.slug,
                     }, c.url
                 ))
+            if is_development():
+                break
         session.close()
 
     def parse_pages(self, response):

@@ -7,11 +7,11 @@ from re import sub
 from MySQLdb import connect
 from MySQLdb.cursors import DictCursor
 from simplejson import dumps, loads
-from sqlalchemy import create_engine, Column, Integer
+from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.mutable import Mutable
-from sqlalchemy.orm import backref, relationship, sessionmaker
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy.schema import ThreadLocalMetaData
 from sqlalchemy.types import TEXT, TypeDecorator
 
@@ -59,87 +59,6 @@ class mutators_dict(Mutable, dict):
     def __setitem__(self, key, value):
         dict.__setitem__(self, key, value)
         self.changed()
-
-
-class category(base):
-    __table_args__ = {
-        'autoload': True,
-    }
-    __tablename__ = 'tools_ce_categories'
-
-    id = Column(Integer(), primary_key=True)
-
-    category = relationship(
-        'category',
-        backref=backref(
-            'categories', cascade='all', lazy='dynamic',
-        ),
-        remote_side=id,
-    )
-
-
-class section(base):
-    __table_args__ = {
-        'autoload': True,
-    }
-    __tablename__ = 'tools_ce_sections'
-
-
-class book(base):
-    __table_args__ = {
-        'autoload': True,
-    }
-    __tablename__ = 'tools_ce_books'
-
-    amazon_best_sellers_rank = Column(mutators_dict.as_mutable(json))
-
-
-class review(base):
-    __table_args__ = {
-        'autoload': True,
-    }
-    __tablename__ = 'tools_ce_reviews'
-
-    book = relationship(
-        'book', backref=backref('reviews', cascade='all', lazy='dynamic'),
-    )
-
-
-class referral(base):
-    __tablename__ = 'tools_ce_referrals'
-    __table_args__ = {
-        'autoload': True,
-    }
-
-    book = relationship(
-        'book', backref=backref('referrals', cascade='all', lazy='dynamic'),
-    )
-
-
-class trend(base):
-    __tablename__ = 'tools_ce_trends'
-    __table_args__ = {
-        'autoload': True,
-    }
-
-    category = relationship(
-        'category', backref=backref('trends', cascade='all', lazy='dynamic'),
-    )
-    section = relationship(
-        'section', backref=backref('trends', cascade='all', lazy='dynamic'),
-    )
-    book = relationship(
-        'book', backref=backref('trends', cascade='all', lazy='dynamic'),
-    )
-
-
-class popular_search(base):
-    __table_args__ = {
-        'autoload': True,
-    }
-    __tablename__ = 'tools_ps'
-
-    amazon_best_sellers_rank = Column(mutators_dict.as_mutable(json))
 
 
 def get_mysql_connection():

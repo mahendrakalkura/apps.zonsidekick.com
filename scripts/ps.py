@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from datetime import datetime
 from re import compile
 from socket import timeout
 from string import lowercase
@@ -10,16 +11,41 @@ from requests.exceptions import RequestException
 from scrapy.selector import Selector
 from simplejson import loads
 from simplejson.decoder import JSONDecodeError
+from sqlalchemy import Column
 from sqlalchemy.exc import DBAPIError, SQLAlchemyError
+from sqlalchemy.orm import backref, relationship
 
 from utilities import (
+    base,
     get_mysql_session,
     get_number,
     get_proxies,
     get_string,
     get_user_agent,
-    popular_search,
+    is_development,
+    json,
+    mutators_dict,
 )
+
+
+class book(base):
+    __table_args__ = {
+        'autoload': True,
+    }
+    __tablename__ = 'tools_ps_books'
+
+    amazon_best_sellers_rank = Column(mutators_dict.as_mutable(json))
+
+
+class trend(base):
+    __tablename__ = 'tools_ps_trends'
+    __table_args__ = {
+        'autoload': True,
+    }
+
+    book = relationship(
+        'book', backref=backref('trends', cascade='all', lazy='dynamic'),
+    )
 
 
 def get_contents(url):
@@ -45,7 +71,9 @@ def get_contents(url):
     return ''
 
 if __name__ == '__main__':
-    pss = {}
+    session = get_mysql_session()()
+    bs = []
+    date_and_time = datetime.now().strftime('%Y-%m-%d %H:00:00')
     for q in [
         'books like',
         'books similar to',
@@ -92,11 +120,17 @@ if __name__ == '__main__':
                     continue
                 response = get_contents(url)
                 if response:
-                    book_cover_image = ''
                     title = ''
-                    author = ''
+                    book_cover_image = ''
                     amazon_best_sellers_rank = {}
                     selector = Selector(text=response)
+                    try:
+                        title = get_string(selector.xpath(
+                            '//span[@id="btAsinTitle" or '
+                            '@id="productTitle"]/text()'
+                        ).extract()[0])
+                    except IndexError:
+                        pass
                     try:
                         book_cover_image = get_string(
                             compile(
@@ -121,13 +155,6 @@ if __name__ == '__main__':
                             )
                         except IndexError:
                             pass
-                    try:
-                        title = get_string(selector.xpath(
-                            '//span[@id="btAsinTitle" or '
-                            '@id="productTitle"]/text()'
-                        ).extract()[0])
-                    except IndexError:
-                        pass
                     try:
                         text = get_string(selector.xpath(
                             '//li[@id="SalesRank"]/text()'
@@ -161,37 +188,40 @@ if __name__ == '__main__':
                     except IndexError:
                         pass
                     if (
-                        not book_cover_image
+                        not url
                         or
                         not title
                         or
-                        not amazon_best_sellers_rank
+                        not book_cover_image
                         or
-                        not url
+                        not amazon_best_sellers_rank
                     ):
                         continue
-                    if title in pss:
-                        continue
-                    pss[title] = {
-                        'amazon_best_sellers_rank': amazon_best_sellers_rank,
-                        'book_cover_image': book_cover_image,
-                        'title': title,
-                        'url': url,
-                    }
-    session = get_mysql_session()
-    s = session()
-    s.query(popular_search).delete()
-    for ps in pss:
-        s.add(popular_search(**{
-            'amazon_best_sellers_rank': pss[ps]['amazon_best_sellers_rank'],
-            'book_cover_image': pss[ps]['book_cover_image'],
-            'title': pss[ps]['title'],
-            'url': pss[ps]['url'],
+                    b = session.query(
+                        book,
+                    ).filter(
+                        book.url==url,
+                    ).first()
+                    if not b:
+                        b = book(**{
+                            'amazon_best_sellers_rank': amazon_best_sellers_rank,
+                            'book_cover_image': book_cover_image,
+                            'title': title,
+                            'url': url,
+                        })
+                    bs.append(b)
+            if is_development():
+                break
+    for b in bs:
+        session.add(b)
+        session.add(trend(**{
+            'book': b,
+            'date_and_time': date_and_time,
         }))
     try:
-        s.commit()
+        session.commit()
     except DBAPIError:
-        s.rollback()
+        session.rollback()
     except SQLAlchemyError:
-        s.rollback()
-    s.close()
+        session.rollback()
+    session.close()
