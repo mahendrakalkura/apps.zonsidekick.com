@@ -605,6 +605,7 @@ $application['debug'] = $variables['application']['debug'];
 
 $application->register(new DoctrineServiceProvider(), array(
     'db.options' => array(
+        'charset' => 'utf-8',
         'dbname' => $variables['mysql']['database'],
         'driver' => 'pdo_mysql',
         'host' => $variables['mysql']['host'],
