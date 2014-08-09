@@ -2,6 +2,23 @@
 
 date_default_timezone_set('UTC');
 
+function usort_categories($one, $two)
+{
+    $one_frequency = intval($one[1]);
+    $two_frequency = intval($two[1]);
+    if ($one_frequency != $two_frequency) {
+        return ($one_frequency < $two_frequency) ? 1 : -1;
+    }
+
+    $one_title = $one[0];
+    $two_title = $two[0];
+    if ($one_title != $two_title) {
+        return ($one_title < $two_title) ? -1 : 1;
+    }
+
+    return 0;
+}
+
 function usort_keywords_1($one, $two)
 {
     $one = floatval($one['contents']['score'][0]);
@@ -65,14 +82,16 @@ EOD;
                 $row['id'],
                 sprintf(
                     '%s %s',
-                    implode(' » ', array_merge($prefixes, array(''))),
+                    implode(' > ', array_merge($prefixes, array(''))),
                     $row['title']
                 ),
             );
-            $categories = array_merge($categories, get_categories(
-                $application, $row['id'],
-                array_merge($prefixes, array($row['title']))
-            ));
+            if (!is_development()) {
+                $categories = array_merge($categories, get_categories(
+                    $application, $row['id'],
+                    array_merge($prefixes, array($row['title']))
+                ));
+            }
         }
     }
 
@@ -312,39 +331,38 @@ EOD;
     $query = <<<EOD
 SELECT *
 FROM `tools_ps_books`
-WHERE ID IN (
-    SELECT `book_id`
+INNER JOIN
+    `tools_ps_trends` ON `tools_ps_books`.`id` = `tools_ps_trends`.`book_id`
+WHERE `tools_ps_trends`.`date_and_time` IN (
+    SELECT MAX(`date_and_time`)
     FROM `tools_ps_trends`
-    WHERE `date_and_time` IN (
-        SELECT MAX(`date_and_time`)
-        FROM `tools_ps_trends`
-    )
 )
-ORDER BY `title` ASC
+ORDER BY `tools_ps_books`.`title` ASC
 EOD;
     $popular_searches = $application['db']->fetchAll($query);
     foreach ($popular_searches as $key => $value) {
         $popular_searches[$key]['amazon_best_sellers_rank'] = json_decode(
             $popular_searches[$key]['amazon_best_sellers_rank'], true
         );
-        $query = <<<EOD
-SELECT COUNT(id) AS `count`
-FROM `tools_ps_trends`
-WHERE `book_id` = ? AND `date_and_time` >= NOW() - INTERVAL 7 DAY
-EOD;
-        $row_1 = $application['db']->fetchAssoc(
-            $query,
-            array($popular_searches[$key]['id'])
+        asort(
+            $popular_searches[$key]['amazon_best_sellers_rank'], SORT_NUMERIC
         );
         $query = <<<EOD
 SELECT COUNT(id) AS `count`
 FROM `tools_ps_trends`
 WHERE `book_id` = ? AND `date_and_time` >= NOW() - INTERVAL 7 DAY
 EOD;
-        $row_2 = $application['db']->fetchAssoc(
-            $query,
-            array($popular_searches[$key]['id'])
-        );
+        $row_1 = $application['db']->fetchAssoc($query, array(
+            $popular_searches[$key]['id'],
+        ));
+        $query = <<<EOD
+SELECT COUNT(id) AS `count`
+FROM `tools_ps_trends`
+WHERE `book_id` = ? AND `date_and_time` >= NOW() - INTERVAL 7 DAY
+EOD;
+        $row_2 = $application['db']->fetchAssoc($query, array(
+            $popular_searches[$key]['id'],
+        ));
         $popular_searches[$key]['appearances'] = array(
             'last 7 days' => (
                 $row_1['count'] * 100.00
@@ -353,7 +371,6 @@ EOD;
                 $row_2['count'] * 100.00
             ) / $appearances['last 30 days'],
         );
-        asort($popular_searches[$key]['amazon_best_sellers_rank']);
     }
 
     return $popular_searches;
@@ -1254,8 +1271,211 @@ $application->match(
 ->method('GET');
 
 $application->match('/ce/xhr', function (Request $request) use ($application) {
-    sleep(5);
-    return new Response(json_encode(array()));
+    $contents = array(
+        'books' => array(),
+        'categories' => array(),
+        'reviews' => array(),
+        'referrals' => array(),
+    );
+
+    $category_id = intval($request->get('category_id'));
+    $section_id = intval($request->get('section_id'));
+    $page_1 = $request->get('page_1');
+    $page_2 = intval($request->get('page_2'));
+    $count = intval($request->get('count'));
+
+    $appearances = array(
+        'last 7 days' => 0,
+        'last 30 days' => 0,
+    );
+    $query = <<<EOD
+SELECT COUNT(DISTINCT `date_and_time`) AS `count`
+FROM `tools_ce_trends`
+WHERE
+    `category_id` = ?
+    AND
+    `section_id` = ?
+    AND
+    `date_and_time` >= NOW() - INTERVAL 7 DAY
+EOD;
+    $row = $application['db']->fetchAssoc($query, array(
+        $category_id,
+        $section_id,
+    ));
+    $appearances['last 7 days'] = $row['count'];
+    $query = <<<EOD
+SELECT COUNT(DISTINCT `date_and_time`) AS `count`
+FROM `tools_ce_trends`
+WHERE
+    `category_id` = ?
+    AND
+    `section_id` = ?
+    AND
+    `date_and_time` >= NOW() - INTERVAL 30 DAY
+EOD;
+    $row = $application['db']->fetchAssoc($query, array(
+        $category_id,
+        $section_id,
+    ));
+    $appearances['last 30 days'] = $row['count'];
+
+    $query = <<<EOD
+SELECT *
+FROM `tools_ce_books`
+INNER JOIN
+    `tools_ce_trends` ON `tools_ce_books`.`id` = `tools_ce_trends`.`book_id`
+WHERE
+    %s
+    AND
+    `tools_ce_trends`.`category_id` = ?
+    AND
+    `tools_ce_trends`.`section_id` = ?
+    AND
+    `tools_ce_trends`.`date_and_time` IN (
+        SELECT MAX(`date_and_time`)
+        FROM `tools_ce_trends`
+    )
+ORDER BY `tools_ce_trends`.`rank` ASC
+LIMIT %d OFFSET 0
+EOD;
+    $condition = '';
+    switch ($page_1) {
+        case 'Any':
+            $page_2 = '0';
+            $condition = '`tools_ce_books`.`print_length` >= ?';
+        case 'More Than':
+            $condition = '`tools_ce_books`.`print_length` > ?';
+            break;
+        case 'Less Than':
+            $condition = '`tools_ce_books`.`print_length` < ?';
+            break;
+        case 'Any':
+        default:
+            $page_2 = '0';
+            $condition = '`tools_ce_books`.`print_length` >= ?';
+            break;
+    }
+    $query = sprintf($query, $condition, $count);
+    $books = $application['db']->fetchAll($query, array(
+        $page_2,
+        $category_id,
+        $section_id,
+    ));
+    if ($books) {
+        foreach ($books as $book) {
+            $query = <<<EOD
+SELECT COUNT(id) AS `count`
+FROM `tools_ce_trends`
+WHERE
+    `category_id` = ?
+    AND
+    `section_id` = ?
+    AND
+    `book_id` = ?
+    AND
+    `date_and_time` >= NOW() - INTERVAL 7 DAY
+EOD;
+            $row_1 = $application['db']->fetchAssoc($query, array(
+                $category_id,
+                $section_id,
+                $book['id'],
+            ));
+            $query = <<<EOD
+SELECT COUNT(id) AS `count`
+FROM `tools_ce_trends`
+WHERE
+    `category_id` = ?
+    AND
+    `section_id` = ?
+    AND
+    `book_id` = ?
+    AND
+    `date_and_time` >= NOW() - INTERVAL 7 DAY
+EOD;
+            $row_2 = $application['db']->fetchAssoc($query, array(
+                $category_id,
+                $section_id,
+                $book['id'],
+            ));
+            $book['appearances'] = array(
+                'last 7 days' => (
+                    $row_1['count'] * 100.00
+                ) / $appearances['last 7 days'],
+                'last 30 days' => (
+                    $row_2['count'] * 100.00
+                ) / $appearances['last 30 days'],
+            );
+            $book['amazon_best_sellers_rank'] = json_decode(
+                $book['amazon_best_sellers_rank'], true
+            );
+            asort($book['amazon_best_sellers_rank'], SORT_NUMERIC);
+            $contents['books'][] = $book;
+            $query = <<<EOD
+SELECT *
+FROM `tools_ce_reviews`
+WHERE `book_id` = ?
+ORDER BY `id` ASC
+EOD;
+            $reviews = $application['db']->fetchAll($query, array(
+                $book['id'],
+            ));
+            if ($reviews) {
+                foreach ($reviews as $review) {
+                    $contents['reviews'][] = $review;
+                }
+            }
+            if ($book['amazon_best_sellers_rank']) {
+                foreach ($book['amazon_best_sellers_rank'] as $key => $value) {
+                    if (empty($contents['categories'][$key])) {
+                        $contents['categories'][$key] = 0;
+                    }
+                    $contents['categories'][$key] += 1;
+                }
+            }
+        }
+    }
+    $cs = array();
+    if ($contents['categories']) {
+        foreach ($contents['categories'] as $key => $value) {
+            if ($value > 1) {
+                $cs[] = array($key, $value);
+            }
+        }
+    }
+    $contents['categories'] = $cs;
+    usort($contents['categories'], 'usort_categories');
+    $book_ids = [];
+    if ($contents['books']) {
+        foreach ($contents['books'] as $book) {
+            $book_ids[] = $book['id'];
+        }
+    }
+    $query = <<<EOD
+SELECT *, COUNT(`url`) AS `count`
+FROM `tools_ce_referrals`
+WHERE `book_id` IN ( ? )
+GROUP BY `url`
+HAVING COUNT(`url`) > 1
+ORDER BY `count` DESC, `title` ASC
+EOD;
+    $referrals = $application['db']
+        ->executeQuery(
+            $query,
+            array(
+                $book_ids,
+            ),
+            array(
+                \Doctrine\DBAL\Connection::PARAM_INT_ARRAY,
+            )
+        )
+        ->fetchAll();
+    if ($referrals) {
+        foreach ($referrals as $referral) {
+            $contents['referrals'][] = $referral;
+        }
+    }
+
+    return new Response(json_encode($contents));
 })
 ->before($before_statistics)
 ->bind('ce_xhr')

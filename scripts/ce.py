@@ -541,8 +541,6 @@ class Spider(CrawlSpider):
             '1 star',
             '2 star',
             '3 star',
-            '4 star',
-            '5 star',
         ]:
             href = None
             try:

@@ -1,3 +1,10 @@
+Array.prototype.chunk = function (length) {
+    var array = this;
+    return [].concat.apply([], array.map(function (value, key) {
+        return key % length? []: [array.slice(key, key + length)];
+    }));
+}
+
 var is_development = function(){
     if(window.location.port == '5000'){
         return true;
@@ -401,22 +408,24 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
     $scope.section = $scope.sections[0][0];
     $scope.page_1 = $scope.pages_1[0];
     $scope.page_2 = 0;
-    $scope.count = $scope.counts[0];
+    $scope.count = is_development()? 10: $scope.counts[0];
 
     $scope.spinner = false;
     $scope.error = false;
+    $scope.contents = {};
 
     $scope.process = function () {
         $scope.spinner = true;
         $scope.error = false;
+        $scope.contents = {};
         $http({
-            data: {
-                category: $scope.category,
+            data: jQuery.param({
+                category_id: $scope.category,
                 count: $scope.count,
                 page_1: $scope.page_1,
                 page_2: $scope.page_2,
-                section: $scope.section
-            },
+                section_id: $scope.section
+            }),
             method: 'POST',
             url: $attrs.url
         }).
@@ -426,7 +435,9 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
         }).
         success(function (data, status, headers, config) {
             $scope.spinner = false;
-            $scope.error = true;
+            $scope.error = !data.books.length;
+            $scope.contents = data;
+            $scope.contents['books'] = $scope.contents['books'].chunk(3);
         });
 
         return;
@@ -462,21 +473,6 @@ var body = function (context) {
     if (one != two) {
         body.css('height', body.height() - (two - one) + 10);
     }
-};
-
-var media = function () {
-    var medias = jQuery('.media');
-    var height = 0;
-    if (!medias.length) {
-        return;
-    }
-    medias.each( function() {
-        var h = $(this).outerHeight();
-        if (h > height) {
-            height = h;
-        }
-    });
-    medias.css('height', height - 20);
 };
 
 var ui = function () {
@@ -553,7 +549,6 @@ jQuery(function () {
         jQuery('[data-target="#aks-qsg"]').click();
     }
     body();
-    media();
     ui();
     zclip();
 });

@@ -406,6 +406,10 @@ a {
     margin-bottom: 30px;
 }
 
+#middle .container-fluid .media :last-child {
+    margin-bottom: 0;
+}
+
 #middle .container-fluid .media img {
     height: 100px;
 }
@@ -420,6 +424,10 @@ a {
 
 #middle .container-fluid .media .media-heading {
     margin-bottom: 10px;
+}
+
+#middle .container-fluid .page-header {
+    padding-bottom: 20px;
 }
 
 #middle .container-fluid .row-fluid [class^="icon-"] {
@@ -466,6 +474,15 @@ a {
     margin: 0;
 }
 
+#middle .container-fluid .table .narrow {
+    white-space: nowrap;
+    width: 1px;
+}
+
+#middle .container-fluid .table .text-right {
+    text-align: right;
+}
+
 #middle .container-fluid .table .small {
     white-space: nowrap;
     width: 100px;
@@ -478,13 +495,13 @@ a {
 #middle .container-fluid #back-to-dashboard {
     position: absolute;
     right: 0;
-    top: 20px;
+    top: 25px;
 }
 
 #middle .container-fluid #back-to-dashboard + .btn {
     position: absolute;
     right: 205px;
-    top: 20px;
+    top: 25px;
 }
 
 #middle .container-fluid #aks #suggestions {
