@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from re import compile
+from re import compile, sub
 
 from dateutil.parser import parse
+from furl import furl
 from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
 from scrapy.contrib.spiders import CrawlSpider, Rule
 from scrapy.http import Request
@@ -15,14 +16,17 @@ from sqlalchemy.exc import DBAPIError, SQLAlchemyError
 
 from utilities import (
     book,
+    category,
     get_mysql_session,
     get_number,
     get_proxies,
     get_string,
     get_sales,
+    get_url,
     get_user_agent,
     referral,
     review,
+    section,
     trend,
 )
 
@@ -64,7 +68,6 @@ class Book(Item):
     earnings_per_day = Field()
     total_number_of_reviews = Field()
     review_average = Field()
-    section = Field()
     reviews = Field()
     referrals = Field()
     trend = Field()
@@ -89,6 +92,14 @@ class Referral(Item):
     review_average = Field()
 
 
+class Trend(Item):
+    category = Field()
+    section = Field()
+    book = Field()
+    date_and_time = Field()
+    rank = Field()
+
+
 class Middleware(object):
 
     def process_request(self, request, spider):
@@ -104,38 +115,65 @@ class Pipeline(object):
         session = self.session()
         if isinstance(item, Book):
             b = self.get_book(session, item)
+            session.add(b)
         if isinstance(item, Review):
             b = self.get_book(session, item['book'])
+            session.add(b)
             if not session.query(
                 review,
             ).filter(
                 review.book == b,
                 review.author == item['author'],
+                review.date == item['date'],
             ).count():
-                b.reviews.append(review(**{
+                session.add(review(**{
                     'author': item['author'],
                     'body': item['body'],
+                    'book': b,
                     'date': item['date'],
                     'stars': item['stars'],
                     'subject': item['subject'],
                 }))
         if isinstance(item, Referral):
             b = self.get_book(session, item['book'])
+            session.add(b)
             if not session.query(
                 referral,
             ).filter(
                 referral.book == b,
                 referral.url == item['url'],
             ).count():
-                b.referrals.append(referral(**{
+                session.add(referral(**{
                     'author': item['author'],
+                    'book': b,
                     'price': item['price'],
                     'review_average': item['review_average'],
                     'title': item['title'],
                     'total_number_of_reviews': item['total_number_of_reviews'],
                     'url': item['url']
                 }))
-        session.add(b)
+        if isinstance(item, Trend):
+            c = self.get_category(session, item['category'])
+            session.add(c)
+            s = self.get_section(session, item['section'])
+            session.add(s)
+            b = self.get_book(session, item['book'])
+            session.add(b)
+            if not session.query(
+                trend,
+            ).filter(
+                trend.category == c,
+                trend.section == s,
+                trend.book == b,
+                trend.date_and_time == item['date_and_time'],
+            ).count():
+                session.add(trend(**{
+                    'book': b,
+                    'category': c,
+                    'date_and_time': item['date_and_time'],
+                    'rank': item['rank'],
+                    'section': s,
+                }))
         try:
             session.commit()
         except DBAPIError:
@@ -150,18 +188,14 @@ class Pipeline(object):
         b = session.query(
             book,
         ).filter(
-            book.author == dictionary['author'],
-            book.section == dictionary['section'],
-            book.title == dictionary['title'],
             book.url == dictionary['url'],
         ).first()
         if not b:
             b = book(**{
-                'author': dictionary['author'],
-                'section': dictionary['section'],
-                'title': dictionary['title'],
                 'url': dictionary['url'],
             })
+        b.author = dictionary['author']
+        b.title = dictionary['title']
         b.price = dictionary['price']
         b.publication_date = dictionary['publication_date']
         b.print_length = dictionary['print_length']
@@ -170,18 +204,21 @@ class Pipeline(object):
         b.earnings_per_day = dictionary['earnings_per_day']
         b.total_number_of_reviews = dictionary['total_number_of_reviews']
         b.review_average = dictionary['review_average']
-        b.section = dictionary['section']
-        if not session.query(
-            trend,
-        ).filter(
-            trend.book == b,
-            trend.date_and_time == dictionary['trend']['date_and_time'],
-        ).count():
-            b.trends.append(trend(**{
-                'date_and_time': dictionary['trend']['date_and_time'],
-                'rank': dictionary['trend']['rank'],
-            }))
         return b
+
+    def get_category(self, session, dictionary):
+        return session.query(
+            category,
+        ).filter(
+            category.url==sub(r'/gp/.*?/', '/gp/zgbs/', dictionary['url']),
+        ).first()
+
+    def get_section(self, session, dictionary):
+        return session.query(
+            section,
+        ).filter(
+            section.slug==dictionary['slug'],
+        ).first()
 
 
 class Spider(CrawlSpider):
@@ -199,10 +236,20 @@ class Spider(CrawlSpider):
             callback='parse_pages',
         ),
     )
-    start_urls = [
-        'http://www.amazon.com/Best-Sellers-Kindle-Store-eBooks/zgbs/'
-        'digital-text/154606011/ref=zg_bs_unv_kstore_2_154607011_1',
-    ]
+
+    def __init__(self, *args, **kwargs):
+        super(Spider, self).__init__(*args, **kwargs)
+        self.start_urls = []
+        session = get_mysql_session()()
+        ss = session.query(section).order_by('id asc').all()
+        for c in session.query(category).order_by('id asc').all():
+            for s in ss:
+                self.start_urls.append(sub(
+                    r'/zgbs/', '/%(slug)s/' % {
+                        'slug': s.slug,
+                    }, c.url
+                ))
+        session.close()
 
     def parse_pages(self, response):
         selector = None
@@ -212,15 +259,12 @@ class Spider(CrawlSpider):
             pass
         if not selector:
             return
-        section = ''
+        category_url = ''
         try:
-            section = get_string(selector.xpath(
-                '//li[@id="zg_tabTitle"]/h3/text()'
-            ).extract()[0])
+            category_url = get_url(response.url)
         except IndexError:
             pass
-        if not section:
-            return
+        section_slug = response.url.split('/')[4]
         for div in selector.xpath(
             '//div[@id="zg_centerListWrapper"]/div[@class="zg_itemImmersion"]'
         ):
@@ -232,17 +276,23 @@ class Spider(CrawlSpider):
                     '@href'
                 ).extract()[0]),
                 callback=self.parse_book,
+                dont_filter=True,
                 meta={
+                    'category': {
+                        'url': category_url,
+                    },
                     'rank': int(get_number(get_string(div.xpath(
                         './/div[@class="zg_rankDiv"]/'
                         'span[@class="zg_rankNumber"]/text()'
                     ).extract()[0][:-1]))),
-                    'section': section,
+                    'section': {
+                        'slug': section_slug,
+                    },
                 },
             )
 
     def parse_book(self, response):
-        url = response.url
+        url = get_url(response.url)
         title = ''
         author = ''
         price = 0.00
@@ -253,10 +303,8 @@ class Spider(CrawlSpider):
         earnings_per_day = 0.00
         total_number_of_reviews = 0
         review_average = 0.00
-        section = response.meta['section']
         reviews = []
         referrals = []
-        trend = {}
         selector = Selector(response)
         try:
             title = get_string(selector.xpath(
@@ -367,28 +415,22 @@ class Spider(CrawlSpider):
             ).extract()[0])
         except IndexError:
             pass
-        trend = {
-            'date_and_time': datetime.now().strftime('%Y-%m-%d %H:00:00'),
-            'rank': response.meta['rank'],
-        }
-        book = {
-            'amazon_best_sellers_rank': amazon_best_sellers_rank,
-            'author': author,
-            'earnings_per_day': earnings_per_day,
-            'estimated_sales_per_day': estimated_sales_per_day,
-            'price': price,
-            'print_length': print_length,
-            'publication_date': publication_date,
-            'referrals': referrals,
-            'review_average': review_average,
-            'reviews': reviews,
-            'section': section,
-            'title': title,
-            'total_number_of_reviews': total_number_of_reviews,
-            'trend': trend,
-            'url': url,
-        }
-        if url and title and author:
+        if url:
+            book = {
+                'amazon_best_sellers_rank': amazon_best_sellers_rank,
+                'author': author,
+                'earnings_per_day': earnings_per_day,
+                'estimated_sales_per_day': estimated_sales_per_day,
+                'price': price,
+                'print_length': print_length,
+                'publication_date': publication_date,
+                'referrals': referrals,
+                'review_average': review_average,
+                'reviews': reviews,
+                'title': title,
+                'total_number_of_reviews': total_number_of_reviews,
+                'url': url,
+            }
             yield Book(book)
             if reviews:
                 yield Request(
@@ -404,16 +446,20 @@ class Spider(CrawlSpider):
                     meta={
                         'book': book,
                     },
-                    url=(
+                    url=furl(
                         'http://www.amazon.com/gp/product/features/'
                         'similarities/shoveler/cell-render.html/'
-                        'ref=pd_sim_kstore?id=%(referrals)s&'
-                        'refTag=pd_sim_kstore&wdg=ebooks_display_on_website&'
-                        'shovelerName=purchase'
-                    ) % {
-                        'referrals': referrals,
-                    }
+                    ).add({
+                        'id': referrals,
+                    }).url,
                 )
+            yield Trend({
+                'book': book,
+                'category': response.meta['category'],
+                'section': response.meta['section'],
+                'date_and_time': datetime.now().strftime('%Y-%m-%d %H:00:00'),
+                'rank': response.meta['rank'],
+            })
 
     def parse_reviews_1(self, response):
         selector = Selector(response)
@@ -490,6 +536,7 @@ class Spider(CrawlSpider):
                     'stars': stars,
                     'subject': subject,
                 })
+        '''
         next = ''
         try:
             next = selector.xpath(
@@ -505,6 +552,8 @@ class Spider(CrawlSpider):
                 },
                 url=next,
             )
+        '''
+        # TO BE REMOVED
 
     def parse_referrals(self, response):
         rs = []
@@ -521,11 +570,11 @@ class Spider(CrawlSpider):
             review_average = 0.00
             selector = Selector(text=get_string(r['content']))
             try:
-                url = 'http://www.amazon.com%(href)s' % {
+                url = get_url('http://www.amazon.com%(href)s' % {
                     'href': get_string(selector.xpath(
                         '//a[@class="sim-img-title"]/@href'
                     ).extract()[0])
-                }
+                })
             except IndexError:
                 pass
             try:

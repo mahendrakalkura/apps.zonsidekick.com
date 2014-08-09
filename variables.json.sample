@@ -8,7 +8,6 @@
         "password": "...",
         "user": "..."
     },
-    "python": "...", // Example: /home/{{ username }}/.virtualenvs/zonsidekick.com/bin
     "smtp": {
         "auth_mode": ..., // Example: null
         "encryption": ..., // Example: null
@@ -16,5 +15,6 @@
         "password": "...",
         "port": "...",
         "username": "..."
-    }
+    },
+    "virtualenv": "..." // Example: /home/{{ username }}/.virtualenvs/zonsidekick.com/bin
 }

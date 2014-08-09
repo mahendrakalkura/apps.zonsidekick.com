@@ -7,7 +7,7 @@ from re import sub
 from MySQLdb import connect
 from MySQLdb.cursors import DictCursor
 from simplejson import dumps, loads
-from sqlalchemy import create_engine, Column
+from sqlalchemy import create_engine, Column, Integer
 from sqlalchemy.engine.url import URL
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.mutable import Mutable
@@ -78,6 +78,13 @@ class category(base):
     )
 
 
+class section(base):
+    __table_args__ = {
+        'autoload': True,
+    }
+    __tablename__ = 'tools_ce_sections'
+
+
 class book(base):
     __table_args__ = {
         'autoload': True,
@@ -115,6 +122,12 @@ class trend(base):
         'autoload': True,
     }
 
+    category = relationship(
+        'category', backref=backref('trends', cascade='all', lazy='dynamic'),
+    )
+    section = relationship(
+        'section', backref=backref('trends', cascade='all', lazy='dynamic'),
+    )
     book = relationship(
         'book', backref=backref('trends', cascade='all', lazy='dynamic'),
     )
@@ -231,6 +244,12 @@ def get_string(string):
     string = sub(r'[ ]+', ' ', string)
     string = string.strip()
     return string
+
+
+def get_url(url):
+    url = sub(r'/Best-Sellers-.*?/', '/gp/', url)
+    url = sub(r'ref=.*$', '', url)
+    return url
 
 
 def get_user_agent():

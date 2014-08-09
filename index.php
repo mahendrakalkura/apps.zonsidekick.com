@@ -243,7 +243,7 @@ function get_pdf($application, $user, $logo, $id, $variables) {
         );
         $contents = shell_exec(sprintf(
             '%s/weasyprint --format pdf %s -',
-            $variables['python'],
+            $variables['virtualenv'],
             escapeshellarg($file_path)
         ));
         unlink($file_path);
@@ -1095,7 +1095,7 @@ $application->match(
             set_time_limit(0);
             exec(sprintf(
                 '%s/python %s/scripts/aks.py %s %s %s %s %s',
-                $variables['python'],
+                $variables['virtualenv'],
                 __DIR__,
                 escapeshellarg($request->get('country')),
                 escapeshellarg($request->get('level')),

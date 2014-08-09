@@ -59,3 +59,25 @@ $ cd scripts
 $ python aks.py ...
 $ python kns.py ...
 ```
+
+Others (only for the server)
+============================
+
+crontab:
+
+```
+0 * * * * cd {{ path }} && {{ virtualenv }}/scrapy crawl ce
+0 * * * * supervisorctl restart kns
+*/2 * * * * cd {{ path }}/scripts && {{ virtualenv }}/python ps.py
+```
+
+supervisor:
+
+```
+[program:kns]
+autorestart=true
+autostart=true
+command={{ virtualenv }}/python kns.py
+directory=cd {{ path }}/scripts
+startsecs=0
+```
