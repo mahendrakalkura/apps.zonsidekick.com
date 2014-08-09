@@ -353,15 +353,15 @@ FROM `tools_ps_trends`
 WHERE `book_id` = ? AND `date_and_time` >= NOW() - INTERVAL 7 DAY
 EOD;
         $row_1 = $application['db']->fetchAssoc($query, array(
-            $popular_searches[$key]['id'],
+            $popular_searches[$key]['book_id'],
         ));
         $query = <<<EOD
 SELECT COUNT(id) AS `count`
 FROM `tools_ps_trends`
-WHERE `book_id` = ? AND `date_and_time` >= NOW() - INTERVAL 7 DAY
+WHERE `book_id` = ? AND `date_and_time` >= NOW() - INTERVAL 30 DAY
 EOD;
         $row_2 = $application['db']->fetchAssoc($query, array(
-            $popular_searches[$key]['id'],
+            $popular_searches[$key]['book_id'],
         ));
         $popular_searches[$key]['appearances'] = array(
             'last 7 days' => (
@@ -1378,7 +1378,7 @@ EOD;
             $row_1 = $application['db']->fetchAssoc($query, array(
                 $category_id,
                 $section_id,
-                $book['id'],
+                $book['book_id'],
             ));
             $query = <<<EOD
 SELECT COUNT(id) AS `count`
@@ -1390,12 +1390,12 @@ WHERE
     AND
     `book_id` = ?
     AND
-    `date_and_time` >= NOW() - INTERVAL 7 DAY
+    `date_and_time` >= NOW() - INTERVAL 30 DAY
 EOD;
             $row_2 = $application['db']->fetchAssoc($query, array(
                 $category_id,
                 $section_id,
-                $book['id'],
+                $book['book_id'],
             ));
             $book['appearances'] = array(
                 'last 7 days' => (
