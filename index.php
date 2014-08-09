@@ -1418,7 +1418,7 @@ WHERE `book_id` = ?
 ORDER BY `id` ASC
 EOD;
             $reviews = $application['db']->fetchAll($query, array(
-                $book['id'],
+                $book['book_id'],
             ));
             if ($reviews) {
                 foreach ($reviews as $review) {
@@ -1448,7 +1448,7 @@ EOD;
     $book_ids = array();
     if ($contents['books']) {
         foreach ($contents['books'] as $book) {
-            $book_ids[] = $book['id'];
+            $book_ids[] = $book['book_id'];
         }
     }
     $query = <<<EOD
