@@ -66,9 +66,9 @@ Others (only for the server)
 crontab:
 
 ```
-0 * * * * cd {{ path }} && {{ virtualenv }}/scrapy crawl ce
+0 */6 * * * cd {{ path }} && {{ virtualenv }}/scrapy crawl ce
 0 * * * * supervisorctl restart kns
-*/2 * * * * cd {{ path }}/scripts && {{ virtualenv }}/python ps.py
+*/30 * * * * cd {{ path }}/scripts && {{ virtualenv }}/python ps.py
 ```
 
 supervisor:
