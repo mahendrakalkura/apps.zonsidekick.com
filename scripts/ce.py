@@ -356,12 +356,6 @@ class Spider(CrawlSpider):
             except IndexError:
                 pass
             yield Request(
-                get_string(div.xpath(
-                    './/div[@class="zg_itemWrapper"]/'
-                    'div[@class="zg_image"]/'
-                    'div[@class="zg_itemImageImmersion"]/a/'
-                    '@href'
-                ).extract()[0]),
                 callback=self.parse_book,
                 dont_filter=True,
                 meta={
@@ -377,6 +371,13 @@ class Spider(CrawlSpider):
                         'slug': section_slug,
                     },
                 },
+                priority=100,
+                url=get_string(div.xpath(
+                    './/div[@class="zg_itemWrapper"]/'
+                    'div[@class="zg_image"]/'
+                    'div[@class="zg_itemImageImmersion"]/a/'
+                    '@href'
+                ).extract()[0]),
             )
 
     def parse_book(self, response):
@@ -531,11 +532,12 @@ class Spider(CrawlSpider):
             yield Book(book)
             if reviews:
                 yield Request(
-                    reviews,
                     callback=self.parse_reviews_1,
                     meta={
                         'book': book,
                     },
+                    priority=1,
+                    url=reviews,
                 )
             if referrals:
                 yield Request(
@@ -543,6 +545,7 @@ class Spider(CrawlSpider):
                     meta={
                         'book': book,
                     },
+                    priority=10,
                     url=furl(
                         'http://www.amazon.com/gp/product/features/'
                         'similarities/shoveler/cell-render.html/'
@@ -576,11 +579,12 @@ class Spider(CrawlSpider):
                 pass
             if href and href.startswith('http'):
                 yield Request(
-                    href,
                     callback=self.parse_reviews_2,
                     meta={
                         'book': response.meta['book'],
                     },
+                    priority=1,
+                    url=href,
                 )
                 break
 
@@ -645,6 +649,7 @@ class Spider(CrawlSpider):
                 meta={
                     'book': response.meta['book'],
                 },
+                priority=1,
                 url=next,
             )
         '''
