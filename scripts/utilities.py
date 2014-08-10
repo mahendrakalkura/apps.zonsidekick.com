@@ -132,7 +132,7 @@ def get_sales(best_sellers_rank):
     if best_sellers_rank == 5:
         return 3500
     if best_sellers_rank >= 6 and best_sellers_rank <= 10:
-        return 3000 + ((best_sellers_rank - 6) * 300)
+        return 2000 + ((best_sellers_rank - 6) * 300)
     if best_sellers_rank >= 11 and best_sellers_rank <= 20:
         return 2000 + ((best_sellers_rank - 11) * 150)
     if best_sellers_rank >= 21 and best_sellers_rank <= 65:
