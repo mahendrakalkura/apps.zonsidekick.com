@@ -529,27 +529,27 @@ class Spider(CrawlSpider):
                 'url': url,
             }
             yield Book(book)
-            # if reviews:
-            #     yield Request(
-            #         reviews,
-            #         callback=self.parse_reviews_1,
-            #         meta={
-            #             'book': book,
-            #         },
-            #     )
-            # if referrals:
-            #     yield Request(
-            #         callback=self.parse_referrals,
-            #         meta={
-            #             'book': book,
-            #         },
-            #         url=furl(
-            #             'http://www.amazon.com/gp/product/features/'
-            #             'similarities/shoveler/cell-render.html/'
-            #         ).add({
-            #             'id': referrals,
-            #         }).url,
-            #     )
+            if reviews:
+                yield Request(
+                    reviews,
+                    callback=self.parse_reviews_1,
+                    meta={
+                        'book': book,
+                    },
+                )
+            if referrals:
+                yield Request(
+                    callback=self.parse_referrals,
+                    meta={
+                        'book': book,
+                    },
+                    url=furl(
+                        'http://www.amazon.com/gp/product/features/'
+                        'similarities/shoveler/cell-render.html/'
+                    ).add({
+                        'id': referrals,
+                    }).url,
+                )
             yield Trend({
                 'book': book,
                 'category': response.meta['category'],
