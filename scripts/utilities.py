@@ -85,6 +85,7 @@ def get_number(number):
 
 
 def get_proxies():
+    '''
     if not is_development():
         item = choice([
             '173.234.250.113:3128',
@@ -108,6 +109,7 @@ def get_proxies():
                 'item': item,
             },
         }
+    '''
     return {
         'http': 'http://72.52.91.120:%(port_number)s' % {
             'port_number': 9150 + randint(1, 50),
