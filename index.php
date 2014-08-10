@@ -1356,13 +1356,13 @@ EOD;
         case 'Any':
             $page_2 = '0';
             $condition = '`tools_ce_books`.`print_length` >= ?';
+            break;
         case 'More Than':
             $condition = '`tools_ce_books`.`print_length` > ?';
             break;
         case 'Less Than':
             $condition = '`tools_ce_books`.`print_length` < ?';
             break;
-        case 'Any':
         default:
             $page_2 = '0';
             $condition = '`tools_ce_books`.`print_length` >= ?';

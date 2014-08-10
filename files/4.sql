@@ -3928,6 +3928,7 @@ CREATE TABLE IF NOT EXISTS `tools_ce_books` (
     `price` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
     `publication_date` date NOT NULL,
     `print_length` int(11) NOT NULL,
+    `days_in_the_top_100` int(11) NOT NULL,
     `amazon_best_sellers_rank` text COLLATE utf8_unicode_ci NOT NULL,
     `estimated_sales_per_day` int(11) NOT NULL,
     `earnings_per_day` decimal(9,2) NOT NULL,

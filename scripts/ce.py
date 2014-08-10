@@ -135,6 +135,7 @@ class Book(Item):
     price = Field()
     publication_date = Field()
     print_length = Field()
+    days_in_the_top_100 = Field()
     amazon_best_sellers_rank = Field()
     estimated_sales_per_day = Field()
     earnings_per_day = Field()
@@ -271,6 +272,7 @@ class Pipeline(object):
         b.price = dictionary['price']
         b.publication_date = dictionary['publication_date']
         b.print_length = dictionary['print_length']
+        b.days_in_the_top_100 = dictionary['days_in_the_top_100']
         b.amazon_best_sellers_rank = dictionary['amazon_best_sellers_rank']
         b.estimated_sales_per_day = dictionary['estimated_sales_per_day']
         b.earnings_per_day = dictionary['earnings_per_day']
@@ -314,7 +316,11 @@ class Spider(CrawlSpider):
         self.start_urls = []
         session = get_mysql_session()()
         ss = session.query(section).order_by('id asc').all()
-        for c in session.query(category).order_by('id asc').all():
+        for c in session.query(
+            category,
+        ).filter(
+            category.category==None,
+        ).order_by('id asc').all():
             for s in ss:
                 self.start_urls.append(sub(
                     r'/zgbs/', '/%(slug)s/' % {
@@ -339,9 +345,16 @@ class Spider(CrawlSpider):
         except IndexError:
             pass
         section_slug = response.url.split('/')[4]
+        days_in_the_top_100 = 0
         for div in selector.xpath(
             '//div[@id="zg_centerListWrapper"]/div[@class="zg_itemImmersion"]'
         ):
+            try:
+                days_in_the_top_100 = int(get_number(get_string(div.xpath(
+                    './/div/div/table/tr/td[@class="zg_daysInList"]/text()'
+                ).extract()[0].split(' ')[0])))
+            except IndexError:
+                pass
             yield Request(
                 get_string(div.xpath(
                     './/div[@class="zg_itemWrapper"]/'
@@ -355,6 +368,7 @@ class Spider(CrawlSpider):
                     'category': {
                         'url': category_url,
                     },
+                    'days_in_the_top_100': days_in_the_top_100,
                     'rank': int(get_number(get_string(div.xpath(
                         './/div[@class="zg_rankDiv"]/'
                         'span[@class="zg_rankNumber"]/text()'
@@ -372,6 +386,7 @@ class Spider(CrawlSpider):
         price = 0.00
         publication_date = ''
         print_length = 0
+        days_in_the_top_100 = response.meta['days_in_the_top_100']
         amazon_best_sellers_rank = {}
         estimated_sales_per_day = 0
         earnings_per_day = 0.00
@@ -412,18 +427,14 @@ class Spider(CrawlSpider):
         except IndexError:
             pass
         try:
-            print_length = int(get_number(get_string(
-                selector.xpath(
-                    '//b[contains(text(), "Print Length")]/../text()'
-                ).extract()[0]
-            )))
+            print_length = int(get_number(get_string(selector.xpath(
+                '//b[contains(text(), "Print Length")]/../text()'
+            ).extract()[0])))
         except IndexError:
             try:
-                print_length = int(get_number(get_string(
-                    selector.xpath(
-                        '//li[contains(text(), "Length")]/a/span/text()'
-                    ).extract()[0]
-                )))
+                print_length = int(get_number(get_string(selector.xpath(
+                    '//li[contains(text(), "Length")]/a/span/text()'
+                ).extract()[0])))
             except IndexError:
                 pass
         try:
@@ -433,6 +444,10 @@ class Spider(CrawlSpider):
             amazon_best_sellers_rank[get_string(
                 text[1].replace(
                     u'in ', ''
+                ).replace(
+                    u'in\xa0', ''
+                ).replace(
+                    'Paid Kindle Store', 'Paid in Kindle Store'
                 ).replace(
                     '(', ''
                 ).replace(
@@ -452,17 +467,24 @@ class Spider(CrawlSpider):
                         ).xpath(
                             'string()'
                         ).extract()[0]
-                    ).replace(u'in\xa0', '')
+                    ).replace(
+                        u'in\xa0', ''
+                    ).replace(
+                        'Paid Kindle Store', 'Paid in Kindle Store'
+                    )
                 ] = int(get_number(get_string(li.xpath(
                     './/span[@class="zg_hrsr_rank"]/text()'
                 ).extract()[0])))
         except IndexError:
             pass
         if amazon_best_sellers_rank:
-            estimated_sales_per_day = get_sales(min(
-                amazon_best_sellers_rank.values()
-            ))
-            earnings_per_day = estimated_sales_per_day * price
+            try:
+                estimated_sales_per_day = get_sales(
+                    amazon_best_sellers_rank['Paid in Kindle Store']
+                )
+            except KeyError:
+                pass
+        earnings_per_day = estimated_sales_per_day * price
         try:
             total_number_of_reviews = int(get_number(get_string(
                 compile('all\s*([^\s]*)').search(selector.xpath(
@@ -493,6 +515,7 @@ class Spider(CrawlSpider):
             book = {
                 'amazon_best_sellers_rank': amazon_best_sellers_rank,
                 'author': author,
+                'days_in_the_top_100': days_in_the_top_100,
                 'earnings_per_day': earnings_per_day,
                 'estimated_sales_per_day': estimated_sales_per_day,
                 'price': price,
@@ -506,27 +529,27 @@ class Spider(CrawlSpider):
                 'url': url,
             }
             yield Book(book)
-            if reviews:
-                yield Request(
-                    reviews,
-                    callback=self.parse_reviews_1,
-                    meta={
-                        'book': book,
-                    },
-                )
-            if referrals:
-                yield Request(
-                    callback=self.parse_referrals,
-                    meta={
-                        'book': book,
-                    },
-                    url=furl(
-                        'http://www.amazon.com/gp/product/features/'
-                        'similarities/shoveler/cell-render.html/'
-                    ).add({
-                        'id': referrals,
-                    }).url,
-                )
+            # if reviews:
+            #     yield Request(
+            #         reviews,
+            #         callback=self.parse_reviews_1,
+            #         meta={
+            #             'book': book,
+            #         },
+            #     )
+            # if referrals:
+            #     yield Request(
+            #         callback=self.parse_referrals,
+            #         meta={
+            #             'book': book,
+            #         },
+            #         url=furl(
+            #             'http://www.amazon.com/gp/product/features/'
+            #             'similarities/shoveler/cell-render.html/'
+            #         ).add({
+            #             'id': referrals,
+            #         }).url,
+            #     )
             yield Trend({
                 'book': book,
                 'category': response.meta['category'],

@@ -135,6 +135,15 @@
                                         <strong>Print Length:</strong>
                                         [! book.print_length|number:0 !]
                                     </p>
+                                    <p>
+                                        <strong>Days in the Top 100:</strong>
+                                        <span ng-show="book.days_in_the_top_100 > 0">
+                                            [! book.days_in_the_top_100|number:0 !]
+                                        </span>
+                                        <span ng-show="book.days_in_the_top_100 == 0">
+                                            N/A
+                                        </span>
+                                    </p>
                                     <p><strong>Categories & Ranks:</strong></p>
                                     <ul>
                                         <li ng-repeat="(key, value) in book.amazon_best_sellers_rank">
