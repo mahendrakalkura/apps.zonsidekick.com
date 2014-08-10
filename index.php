@@ -1446,6 +1446,7 @@ EOD;
     $contents['categories'] = $cs;
     usort($contents['categories'], 'usort_categories');
     $book_ids = array();
+    $book_ids[] = 0;
     if ($contents['books']) {
         foreach ($contents['books'] as $book) {
             $book_ids[] = $book['book_id'];
