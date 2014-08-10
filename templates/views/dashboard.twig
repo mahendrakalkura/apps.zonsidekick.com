@@ -228,7 +228,10 @@
             {% if has_statistics(user) %}
                 {% if popular_searches %}
                     <hr>
-                    <p>Kindle shoppers want to read more books like:</p>
+                    <p>
+                        {% include 'slots/how_do_we_know_this.twig' %}
+                        Kindle shoppers want to read more books like:
+                    </p>
                     {% include 'slots/ps.twig' %}
                     <p class="text-right">
                         <a href="{{ url('ps') }}">See More</a>

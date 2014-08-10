@@ -355,6 +355,10 @@ a {
     margin-bottom: 30px;
 }
 
+#middle .container-fluid p #how-do-we-know-this {
+    margin-top: -5px;
+}
+
 #middle .container-fluid ul {
     margin-bottom: 30px;
 }
@@ -492,6 +496,10 @@ a {
     height: 250px;
 }
 
+#middle .container-fluid #aks #suggestions {
+    height: 255px;
+}
+
 #middle .container-fluid #back-to-dashboard {
     position: absolute;
     right: 0;
@@ -502,10 +510,6 @@ a {
     position: absolute;
     right: 205px;
     top: 25px;
-}
-
-#middle .container-fluid #aks #suggestions {
-    height: 255px;
 }
 
 #middle .container-fluid #dashboard .btn-large {
