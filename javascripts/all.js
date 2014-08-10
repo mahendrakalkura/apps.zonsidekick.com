@@ -442,6 +442,8 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
 
         return;
     };
+
+    $scope.process();
 });
 
 application.controller('previous_versions', function ($scope) {
