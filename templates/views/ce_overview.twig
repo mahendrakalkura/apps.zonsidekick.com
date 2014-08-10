@@ -89,11 +89,11 @@
             <p class="alert alert-error" ng-show="error">
                 Your query did not yield any results.
             </p>
-            <div ng-show="contents.date_and_time.length || contents.books.length || contents.reviews.length || contents.categories.length || contents.referrals.length">
-                <div ng-show="contents.date_and_time.length">
+            <div ng-show="contents.date.length || contents.books.length || contents.reviews.length || contents.categories.length || contents.referrals.length">
+                <div ng-show="contents.date.length">
                     <p class="text-center">
                         This section was last updated on
-                        <strong>[! contents.date_and_time !].</strong>
+                        <strong>[! contents.date !].</strong>
                     </p>
                 </div>
                 <div ng-show="contents.books.length">

@@ -1275,7 +1275,7 @@ $application->match('/ce/xhr', function (Request $request) use ($application) {
     $contents = array(
         'books' => array(),
         'categories' => array(),
-        'date_and_time' => 'N/A',
+        'date' => 'N/A',
         'reviews' => array(),
         'referrals' => array(),
     );
@@ -1291,14 +1291,14 @@ $application->match('/ce/xhr', function (Request $request) use ($application) {
         'last 30 days' => 0,
     );
     $query = <<<EOD
-SELECT COUNT(DISTINCT `date_and_time`) AS `count`
+SELECT COUNT(DISTINCT `date`) AS `count`
 FROM `tools_ce_trends`
 WHERE
     `category_id` = ?
     AND
     `section_id` = ?
     AND
-    `date_and_time` >= NOW() - INTERVAL 7 DAY
+    `date` >= CURDATE() - INTERVAL 7 DAY
 EOD;
     $row = $application['db']->fetchAssoc($query, array(
         $category_id,
@@ -1306,14 +1306,14 @@ EOD;
     ));
     $appearances['last 7 days'] = $row['count'];
     $query = <<<EOD
-SELECT COUNT(DISTINCT `date_and_time`) AS `count`
+SELECT COUNT(DISTINCT `date`) AS `count`
 FROM `tools_ce_trends`
 WHERE
     `category_id` = ?
     AND
     `section_id` = ?
     AND
-    `date_and_time` >= NOW() - INTERVAL 30 DAY
+    `date` >= CURDATE() - INTERVAL 30 DAY
 EOD;
     $row = $application['db']->fetchAssoc($query, array(
         $category_id,
@@ -1322,7 +1322,7 @@ EOD;
     $appearances['last 30 days'] = $row['count'];
 
     $query = <<<EOD
-SELECT MAX(`date_and_time`) AS `date_and_time`
+SELECT MAX(`date`) AS `date`
 FROM `tools_ce_trends`
 WHERE
     `tools_ce_trends`.`category_id` = ?
@@ -1333,7 +1333,7 @@ EOD;
         $category_id,
         $section_id,
     ));
-    $contents['date_and_time'] = $row['date_and_time'];
+    $contents['date'] = $row['date'];
 
     $query = <<<EOD
 SELECT *
@@ -1347,7 +1347,7 @@ WHERE
     AND
     `tools_ce_trends`.`section_id` = ?
     AND
-    `tools_ce_trends`.`date_and_time` = ?
+    `tools_ce_trends`.`date` = ?
 ORDER BY `tools_ce_trends`.`rank` ASC
 LIMIT %d OFFSET 0
 EOD;
@@ -1373,7 +1373,7 @@ EOD;
         $page_2,
         $category_id,
         $section_id,
-        $contents['date_and_time'],
+        $contents['date'],
     ));
     if ($books) {
         foreach ($books as $book) {
@@ -1387,7 +1387,7 @@ WHERE
     AND
     `book_id` = ?
     AND
-    `date_and_time` >= NOW() - INTERVAL 7 DAY
+    `date` >= CURDATE() - INTERVAL 7 DAY
 EOD;
             $row_1 = $application['db']->fetchAssoc($query, array(
                 $category_id,
@@ -1404,7 +1404,7 @@ WHERE
     AND
     `book_id` = ?
     AND
-    `date_and_time` >= NOW() - INTERVAL 30 DAY
+    `date` >= CURDATE() - INTERVAL 30 DAY
 EOD;
             $row_2 = $application['db']->fetchAssoc($query, array(
                 $category_id,
