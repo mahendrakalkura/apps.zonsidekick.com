@@ -3982,9 +3982,9 @@ CREATE TABLE IF NOT EXISTS `tools_ce_trends` (
     `category_id` int(11) NOT NULL,
     `section_id` int(11) NOT NULL,
     `book_id` int(11) NOT NULL,
-    `date_and_time` datetime NOT NULL,
+    `date` date NOT NULL,
     `rank` int(11) NOT NULL,
-    KEY `date_and_time` (`date_and_time`),
+    KEY `date` (`date`),
     PRIMARY KEY (`id`),
     CONSTRAINT `tools_ce_trends_category_id`
     FOREIGN KEY (`category_id`)

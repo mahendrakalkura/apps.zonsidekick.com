@@ -169,7 +169,7 @@ class Trend(Item):
     category = Field()
     section = Field()
     book = Field()
-    date_and_time = Field()
+    date = Field()
     rank = Field()
 
 
@@ -238,12 +238,12 @@ class Pipeline(object):
                 trend.category == c,
                 trend.section == s,
                 trend.book == b,
-                trend.date_and_time == item['date_and_time'],
+                trend.date == item['date'],
             ).count():
                 session.add(trend(**{
                     'book': b,
                     'category': c,
-                    'date_and_time': item['date_and_time'],
+                    'date': item['date'],
                     'rank': item['rank'],
                     'section': s,
                 }))
@@ -557,7 +557,7 @@ class Spider(CrawlSpider):
                 'book': book,
                 'category': response.meta['category'],
                 'section': response.meta['section'],
-                'date_and_time': datetime.now().strftime('%Y-%m-%d %H:00:00'),
+                'date': datetime.now().date().isoformat(),
                 'rank': response.meta['rank'],
             })
 
