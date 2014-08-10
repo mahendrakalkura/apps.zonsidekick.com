@@ -1275,6 +1275,7 @@ $application->match('/ce/xhr', function (Request $request) use ($application) {
     $contents = array(
         'books' => array(),
         'categories' => array(),
+        'date_and_time' => 'N/A',
         'reviews' => array(),
         'referrals' => array(),
     );
@@ -1321,6 +1322,20 @@ EOD;
     $appearances['last 30 days'] = $row['count'];
 
     $query = <<<EOD
+SELECT MAX(`date_and_time`) AS `date_and_time`
+FROM `tools_ce_trends`
+WHERE
+    `tools_ce_trends`.`category_id` = ?
+    AND
+    `tools_ce_trends`.`section_id` = ?
+EOD;
+    $row = $application['db']->fetchAssoc($query, array(
+        $category_id,
+        $section_id,
+    ));
+    $contents['date_and_time'] = $row['date_and_time'];
+
+    $query = <<<EOD
 SELECT *
 FROM `tools_ce_books`
 INNER JOIN
@@ -1332,10 +1347,7 @@ WHERE
     AND
     `tools_ce_trends`.`section_id` = ?
     AND
-    `tools_ce_trends`.`date_and_time` IN (
-        SELECT MAX(`date_and_time`)
-        FROM `tools_ce_trends`
-    )
+    `tools_ce_trends`.`date_and_time` = ?
 ORDER BY `tools_ce_trends`.`rank` ASC
 LIMIT %d OFFSET 0
 EOD;
@@ -1361,6 +1373,7 @@ EOD;
         $page_2,
         $category_id,
         $section_id,
+        $contents['date_and_time'],
     ));
     if ($books) {
         foreach ($books as $book) {
