@@ -614,11 +614,11 @@ jQuery(function () {
         container: jQuery('body'),
         selector: '[data-toggle="tooltip"]'
     });
+    jQuery('select.select2').select2({
+        placeholder: 'Select an option...'
+    });
     jQuery('.got-it').click(function () {
         jQuery.cookie(jQuery(this).parents('.modal').attr('id'), 'Yes');
-    });
-    jQuery('.select2').select2({
-        placeholder: 'Select an option...'
     });
     if (jQuery.cookie('kns-qsg') != 'Yes') {
         jQuery('[data-target="#kns-qsg"]').click();
