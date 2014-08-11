@@ -4,11 +4,6 @@
 {% set nav = 'kns' %}
 
 {% block content %}
-{% include 'slots/back-to-dashboard.twig' %}
-<div class="btn btn-primary pull-right qsg" data-target="#kns-qsg" data-toggle="modal">
-    <span class="icon-info-sign"></span>
-    Information
-</div>
 <div
     data-error-top-1="Error #1"
     data-error-middle-1="<p>Please enter at least one valid keyword.</p>"
@@ -19,6 +14,14 @@
     <div class="row-fluid">
         <div class="span12">
             <div class="page-header">
+                <div
+                    class="btn btn-primary pull-right qsg"
+                    data-target="#kns-qsg"
+                    data-toggle="modal"
+                    >
+                    <span class="icon-info-sign"></span>
+                    Information
+                </div>
                 <h1>{{ module }}</h1>
             </div>
         </div>
@@ -45,11 +48,11 @@
             {#
             <div class="alert alert-info">
                 <strong>Notice (July 11th, 2013 @ 08:30 AM EST):</strong>
-                Reports are temporarily limited to 50 keywords while we migrate.
-                You may process multiple reports simultaneously in separate
-                browser tabs. This limitation will be removed when we complete
-                our server migration and application updates. Please see
-                dashboard for status updates. Thank you for your patience.
+                Reports are temporarily limited to 50 keywords while we
+                migrate. You may process multiple reports simultaneously in
+                separate browser tabs. This limitation will be removed when we
+                complete our server migration and application updates. Please
+                see dashboard for status updates. Thank you for your patience.
             </div>
             #}
             {% if count == -1 or count %}

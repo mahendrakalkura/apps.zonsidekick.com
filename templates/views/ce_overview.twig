@@ -4,7 +4,6 @@
 {% set nav = 'ce' %}
 
 {% block content %}
-{% include 'slots/back-to-dashboard.twig' %}
 <div
     ng-controller="ce"
     data-categories="{{ categories|json_encode()|e('html') }}"

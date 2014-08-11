@@ -4,11 +4,6 @@
 {% set nav = 'aks' %}
 
 {% block content %}
-{% include 'slots/back-to-dashboard.twig' %}
-<div class="btn btn-primary pull-right qsg" data-target="#aks-qsg" data-toggle="modal">
-    <span class="icon-info-sign"></span>
-    Information
-</div>
 <div
     id="aks"
     data-error-1-top="Error #1"
@@ -22,9 +17,26 @@
     <div class="row-fluid">
         <div class="span12">
             <div class="page-header">
+                <div
+                    class="btn btn-primary pull-right qsg"
+                    data-target="#aks-qsg"
+                    data-toggle="modal"
+                    >
+                    <span class="icon-info-sign"></span>
+                    Information
+                </div>
                 <h1>{{ module }}</h1>
             </div>
-            <p>To begin, simply enter a phrase into the "Phrase" field then press Submit. Our keyword suggester will return all keyword suggestions from Amazon that begin with your phrase. The "Advanced" level will return the same results provided by Simple along with even more keywords by grabbing all suggestions that begin with the initially suggested phrases. Please be patient with Advanced searches as they may take several minutes to complete.</p>
+            <p>
+                To begin, simply enter a phrase into the "Phrase" field then
+                press Submit. Our keyword suggester will return all keyword
+                suggestions from Amazon that begin with your phrase. The
+                "Advanced" level will return the same results provided by
+                Simple along with even more keywords by grabbing all
+                suggestions that begin with the initially suggested phrases.
+                Please be patient with Advanced searches as they may take
+                several minutes to complete.
+            </p>
         </div>
     </div>
     <div class="row-fluid">

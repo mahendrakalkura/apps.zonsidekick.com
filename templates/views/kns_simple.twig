@@ -4,11 +4,6 @@
 {% set nav = 'kns' %}
 
 {% block content %}
-{% include 'slots/back-to-dashboard.twig' %}
-<div class="btn btn-primary pull-right qsg" data-target="#kns-qsg" data-toggle="modal">
-    <span class="icon-info-sign"></span>
-    Information
-</div>
 <div
     data-email-top="Email"
     data-email-middle="<p>The email has been queued for delivery successfully.</p>"
@@ -23,6 +18,14 @@
     <div class="row-fluid">
         <div class="span12">
             <div class="page-header">
+                <div
+                    class="btn btn-primary pull-right qsg"
+                    data-target="#kns-qsg"
+                    data-toggle="modal"
+                    >
+                    <span class="icon-info-sign"></span>
+                    Information
+                </div>
                 <h1>{{ module }}</h1>
             </div>
         </div>
@@ -101,7 +104,9 @@
                                 class="btn btn-success popover-email"
                                 type="button"
                                 >Submit</button>
-                            <button class="btn btn-warning" type="reset">Reset</button>
+                            <button class="btn btn-warning" type="reset">
+                                Reset
+                            </button>
                         </form>
                     </div>
                 </div>

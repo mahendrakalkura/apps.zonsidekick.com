@@ -4,7 +4,6 @@
 {% set nav = 'others' %}
 
 {% block content %}
-{% include 'slots/back-to-dashboard.twig' %}
 <div id="logos_overview">
     <div class="row-fluid">
         <div class="span12">
@@ -17,7 +16,12 @@
                     Add
                 </a>
             </div>
-            <p>To add custom logos to your detailed analysis reports, simply press "Add" to upload your desired logo. You may store as many logos as you’d like here and they will be available for selection when you choose to download reports.</p>
+            <p>
+                To add custom logos to your detailed analysis reports, simply
+                press "Add" to upload your desired logo. You may store as many
+                logos as you'd like here and they will be available for
+                selection when you choose to download reports.
+            </p>
             {% include 'slots/alerts.twig' %}
             {% if logos %}
                 <table class="table table-hover table-striped tablesorter">
@@ -32,8 +36,13 @@
                         {% for logo in logos %}
                             <tr>
                                 <td>
-                                    <span class="pull-right">{{ logo.file_name }}</span>
-                                    <img class="img-polaroid" src="{{ url('logos_view', {'file_name': logo.file_name}) }}">
+                                    <span class="pull-right">
+                                        {{ logo.file_name }}
+                                    </span>
+                                    <img
+                                        class="img-polaroid"
+                                        src="{{ url('logos_view', {'file_name': logo.file_name}) }}"
+                                        >
                                 </td>
                                 <td class="right small">{{ logo.dimensions }}</td>
                                 <td class="center small">

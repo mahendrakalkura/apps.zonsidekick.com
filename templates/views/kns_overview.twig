@@ -4,18 +4,19 @@
 {% set nav = 'kns' %}
 
 {% block content %}
-{% include 'slots/back-to-dashboard.twig' %}
-<div class="btn btn-primary pull-right qsg" data-target="#kns-qsg" data-toggle="modal">
-    <span class="icon-info-sign"></span>
-    Information
-</div>
 <div id="kns_overview">
     <div class="row-fluid">
         <div class="span12">
             <div class="page-header">
-                <h1>
-                    {{ module }}
-                </h1>
+                <div
+                    class="btn btn-primary pull-right qsg"
+                    data-target="#kns-qsg"
+                    data-toggle="modal"
+                    >
+                    <span class="icon-info-sign"></span>
+                    Information
+                </div>
+                <h1>{{ module }}</h1>
             </div>
             <p>
                 This page will display all of your previously run reports that
@@ -54,7 +55,9 @@
                                     {{ request.preview }}
                                     ({{ request.keywords[1] }})
                                 </td>
-                                <td class="right small">{{ request.expires_in }}</td>
+                                <td class="right small">
+                                    {{ request.expires_in }}
+                                </td>
                                 <td class="center small">
                                     <a
                                         class="icon-tasks icon-large"
