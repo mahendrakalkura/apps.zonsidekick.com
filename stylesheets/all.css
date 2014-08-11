@@ -325,7 +325,7 @@ a {
 }
 
 #middle {
-    padding: 10px 30px 1px 30px;
+    padding: 1px 30px 1px 30px;
 }
 
 #middle .container-fluid {
@@ -463,7 +463,17 @@ a {
 }
 
 #middle .container-fluid .page-header {
-    padding-bottom: 20px;
+    margin-top: 0;
+    padding-bottom: 30px;
+}
+
+#middle .container-fluid .page-header h1,
+#middle .container-fluid .page-header h2,
+#middle .container-fluid .page-header h3,
+#middle .container-fluid .page-header h4,
+#middle .container-fluid .page-header h5,
+#middle .container-fluid .page-header h6 {
+    margin: 0;
 }
 
 #middle .container-fluid .row-fluid [class^="icon-"] {
@@ -551,13 +561,11 @@ a {
 #middle .container-fluid #back-to-dashboard {
     position: absolute;
     right: 0;
-    top: 25px;
 }
 
 #middle .container-fluid #back-to-dashboard + .btn {
     position: absolute;
     right: 205px;
-    top: 25px;
 }
 
 #middle .container-fluid #dashboard .btn-large {
@@ -571,6 +579,11 @@ a {
 #middle .container-fluid #logos_add #logo {
     line-height: 22px;
     margin-top: 5px;
+}
+
+#middle .navbar {
+    margin-bottom: 30px;
+    margin-top: 30px;
 }
 
 #bottom {
