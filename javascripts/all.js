@@ -1,4 +1,4 @@
-Array.prototype.chunk = function (length) {
+Array.prototype.get_chunks = function (length) {
     var array = this;
     return [].concat.apply([], array.map(function (value, key) {
         return key % length? []: [array.slice(key, key + length)];
@@ -205,10 +205,10 @@ application.controller('aks', function ($attrs, $http, $rootScope, $scope) {
 
 application.controller('amazon_best_sellers_rank', function ($scope) {
     $scope.status = false;
+});
 
-    $scope.$watch('status', function () {
-        console.log(arguments);
-    });
+application.controller('book', function ($scope) {
+    $scope.status = false;
 });
 
 application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
@@ -230,6 +230,8 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
     $scope.spinner = false;
     $scope.error = false;
     $scope.contents = {};
+
+    $scope.mode = 'table';
 
     $scope.process = function () {
         $scope.spinner = true;
@@ -254,7 +256,7 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
             $scope.spinner = false;
             $scope.error = !data.books.length;
             $scope.contents = data;
-            $scope.contents['books'] = $scope.contents['books'].chunk(3);
+            $scope.contents['chunks'] = $scope.contents['books'].get_chunks(3);
         });
 
         return;

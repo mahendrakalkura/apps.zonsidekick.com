@@ -383,6 +383,14 @@ a {
     margin-right: 5px;
 }
 
+#middle .container-fluid .btn-group {
+    margin-top: 5px;
+}
+
+#middle .container-fluid .btn-group .btn {
+    margin :0;
+}
+
 #middle .container-fluid .center,
 #middle .container-fluid .table .center {
     text-align: center;
@@ -443,6 +451,10 @@ a {
     display: block;
 }
 
+#middle .container-fluid .table tbody {
+    border-top: 0;
+}
+
 #middle .container-fluid .table th {
     background-color: #333333;
     color: #ffffff;
@@ -451,6 +463,18 @@ a {
 #middle .container-fluid .table td {
     border-bottom: 1px solid #dddddd;
     border-top: 1px solid #dddddd;
+}
+
+#middle .container-fluid .table td p {
+    margin-bottom: 5px;
+}
+
+#middle .container-fluid .table td ul {
+    margin-bottom: 5px;
+}
+
+#middle .container-fluid .table .details {
+    padding-bottom: 0;
 }
 
 #middle .container-fluid .table .header {

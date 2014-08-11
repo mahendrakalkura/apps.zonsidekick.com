@@ -99,15 +99,152 @@
                 <div ng-show="contents.books.length">
                     <hr>
                     <div class="page-header">
+                        <div
+                            class="btn-group pull-right"
+                            data-toggle="buttons-radio"
+                            >
+                            <button
+                                class="btn btn-default"
+                                ng-class="mode == 'table' && 'active' || ''"
+                                ng-click="mode = 'table'"
+                                type="button"
+                                >Table</button>
+                            <button
+                                class="btn btn-default"
+                                ng-class="mode == 'tiles' && 'active' || ''"
+                                ng-click="mode = 'tiles'"
+                                type="button"
+                                >Tiles</button>
+                        </div>
                         <h2>Books</h2>
                     </div>
+                    <table
+                        class="table table-hover table-striped"
+                        ng-show="mode == 'table'"
+                        >
+                        <thead>
+                            <th class="narrow right">Rank</th>
+                            <th>Title</th>
+                            <th class="narrow">Author</th>
+                            <th class="narrow right">Price ($)</th>
+                            <th class="narrow right">Print Length</th>
+                            <th class="narrow right">Reviews</th>
+                            <th class="narrow right">Review Average</th>
+                            <th class="narrow right">Amazon BSR</th>
+                            <th class="narrow right">Days in the Top 100</th>
+                        </thead>
+                        <tbody
+                            ng-controller="book"
+                            ng-repeat="book in contents.books"
+                            >
+                            <tr>
+                                <td class="narrow right">
+                                    [! book.rank|number:0 !]
+                                </td>
+                                <td>
+                                    <a
+                                        class="pull-right"
+                                        ng-click="status = true"
+                                        ng-show="!status"
+                                        >Show More</a>
+                                    <a
+                                        class="pull-right"
+                                        ng-click="status = false"
+                                        ng-show="status"
+                                        >Show Less</a>
+                                    <a
+                                        href="[! book.url !]"
+                                        rel="noreferrer"
+                                        target="_blank"
+                                        >[! book.title !]</a>
+                                </td>
+                                <td class="narrow">
+                                    [! book.author !]
+                                </td>
+                                <td class="narrow right">
+                                    [! book.price|number:2 !]
+                                </td>
+                                <td class="narrow right">
+                                    [! book.print_length|number:0 !]
+                                </td>
+                                <td class="narrow right">
+                                    [! book.total_number_of_reviews|number:0 !]
+                                </td>
+                                <td class="narrow right">
+                                    [! book.review_average|number:2 !]
+                                </td>
+                                <td class="narrow right">
+                                    <span ng-show="book.amazon_best_sellers_rank['Paid in Kindle Store']">
+                                        [! book.amazon_best_sellers_rank['Paid in Kindle Store'] !]
+                                    </span>
+                                    <span ng-show="!book.amazon_best_sellers_rank['Paid in Kindle Store']">
+                                        N/A
+                                    </span>
+                                </td>
+                                <td class="narrow right">
+                                    <span ng-show="book.days_in_the_top_100 > 0">
+                                        [! book.days_in_the_top_100|number:0 !]
+                                    </span>
+                                    <span ng-show="book.days_in_the_top_100 == 0">
+                                        N/A
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr ng-show="status">
+                                <td class="details" colspan="9">
+                                    <p><strong>Categories & Ranks:</strong></p>
+                                    <ul ng-controller="amazon_best_sellers_rank">
+                                        <li
+                                            ng-repeat="(key, value) in book.amazon_best_sellers_rank"
+                                            ng-show="(key == 'Paid in Kindle Store') || $parent.status"
+                                            >
+                                            <strong>#[! value !]</strong>
+                                            in
+                                            [! key !]
+                                            <span ng-show="key == 'Paid in Kindle Store'">
+                                                <a
+                                                    ng-click="$parent.status = true"
+                                                    ng-show="!$parent.status"
+                                                    >Show More</a>
+                                                <a
+                                                    ng-click="$parent.status = false"
+                                                    ng-show="$parent.status"
+                                                    >Show Less</a>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                    <p>
+                                        <strong>
+                                            Estimated Sales Per Day:
+                                        </strong>
+                                        [! book.estimated_sales_per_day|number:0 !]
+                                    </p>
+                                    <p>
+                                        <strong>Earnings Per Day:</strong>
+                                        $[! book.earnings_per_day|number:2 !]
+                                    </p>
+                                    <p><strong>Appearances:</strong></p>
+                                    <ul>
+                                        <li ng-repeat="(key, value) in book.appearances">
+                                            <strong>
+                                                [! value|number:2 !]%
+                                            </strong>
+                                            in the
+                                            [! key !]
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                     <div
                         class="row-fluid"
-                        ng-repeat="batch in contents.books"
+                        ng-repeat="chunk in contents.chunks"
+                        ng-show="mode == 'tiles'"
                         >
                         <div
                             class="span4"
-                            ng-repeat="book in batch"
+                            ng-repeat="book in chunk"
                             >
                             <div class="media well">
                                 <div class="media-body">
