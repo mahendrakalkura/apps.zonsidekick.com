@@ -228,6 +228,10 @@ application.controller('book', function ($scope) {
     $scope.status = false;
 });
 
+application.controller('category', function ($scope) {
+    $scope.status = false;
+});
+
 application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
     $scope.categories = jQuery.parseJSON($attrs.categories);
     $scope.sections = jQuery.parseJSON($attrs.sections);

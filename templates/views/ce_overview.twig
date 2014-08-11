@@ -238,13 +238,19 @@
                                 ng-class="mode == 'table' && 'active' || ''"
                                 ng-click="mode = 'table'"
                                 type="button"
-                                >Table</button>
+                                >
+                                <i class="icon-table"></i>
+                                Table
+                            </button>
                             <button
                                 class="btn btn-default"
                                 ng-class="mode == 'tiles' && 'active' || ''"
                                 ng-click="mode = 'tiles'"
                                 type="button"
-                                >Tiles</button>
+                                >
+                                <i class="icon-th-large"></i>
+                                Tiles
+                            </button>
                         </div>
                         <h2>Books</h2>
                     </div>
@@ -469,9 +475,30 @@
                         </div>
                     </div>
                 </div>
-                <div ng-show="contents.categories.length">
+                <div
+                    ng-controller="category"
+                    ng-show="contents.categories.length"
+                    >
                     <hr>
                     <div class="page-header">
+                        <button
+                            class="btn btn-default pull-right"
+                            ng-click="status = true"
+                            ng-show="!status"
+                            type="button"
+                            >
+                            <i class="icon-plus-sign"></i>
+                            Show More
+                        </button>
+                        <button
+                            class="btn btn-default pull-right"
+                            ng-click="status = false"
+                            ng-show="status"
+                            type="button"
+                            >
+                            <i class="icon-minus-sign"></i>
+                            Show Less
+                        </button>
                         <h2>Categories</h2>
                     </div>
                     <table class="table table-hover table-striped">
@@ -482,7 +509,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="category in contents.categories">
+                            <tr
+                                ng-repeat="category in contents.categories"
+                                ng-show="($index <= 4) || status"
+                                >
                                 <td><strong>[! category[0] !]</strong></td>
                                 <td class="narrow text-right">
                                     [! category[1]|number:0 !]

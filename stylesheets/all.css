@@ -401,7 +401,8 @@ a {
     margin-right: 5px;
 }
 
-#middle .container-fluid .btn-group {
+#middle .container-fluid .btn-group,
+#middle .container-fluid .btn {
     margin-top: 5px;
 }
 
