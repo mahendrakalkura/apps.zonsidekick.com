@@ -61,6 +61,57 @@ class mutators_dict(Mutable, dict):
         self.changed()
 
 
+def get_amazon_best_sellers_rank(selector):
+    amazon_best_sellers_rank = {}
+    try:
+        text = get_string(selector.xpath(
+            '//li[@id="SalesRank"]/text()'
+        ).extract()[1]).split(' ', 1)
+        amazon_best_sellers_rank[get_string(
+            text[1].replace(
+                u'in ', ''
+            ).replace(
+                u'in\xa0', ''
+            ).replace(
+                '(', ''
+            ).replace(
+                ')', ''
+            ).replace(
+                'Paid Kindle Store', 'Paid in Kindle Store'
+            )
+        )] = int(get_number(get_string(text[0])))
+    except IndexError:
+        pass
+    try:
+        for li in selector.xpath(
+            '//ul[@class="zg_hrsr"]/li[@class="zg_hrsr_item"]'
+        ):
+            amazon_best_sellers_rank[
+                get_string(
+                    li.xpath(
+                        './/span[@class="zg_hrsr_ladder"]'
+                    ).xpath(
+                        'string()'
+                    ).extract()[0].replace(
+                        u'in ', ''
+                    ).replace(
+                        u'in\xa0', ''
+                    ).replace(
+                        '(', ''
+                    ).replace(
+                        ')', ''
+                    ).replace(
+                        'Paid Kindle Store', 'Paid in Kindle Store'
+                    )
+                )
+            ] = int(get_number(get_string(li.xpath(
+                './/span[@class="zg_hrsr_rank"]/text()'
+            ).extract()[0])))
+    except IndexError:
+        pass
+    return amazon_best_sellers_rank
+
+
 def get_mysql_connection():
     mysql = connect(
         cursorclass=DictCursor,

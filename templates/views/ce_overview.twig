@@ -145,11 +145,24 @@
                                         </span>
                                     </p>
                                     <p><strong>Categories & Ranks:</strong></p>
-                                    <ul>
-                                        <li ng-repeat="(key, value) in book.amazon_best_sellers_rank">
+                                    <ul ng-controller="amazon_best_sellers_rank">
+                                        <li
+                                            ng-repeat="(key, value) in book.amazon_best_sellers_rank"
+                                            ng-show="(key == 'Paid in Kindle Store') || $parent.status"
+                                            >
                                             <strong>#[! value !]</strong>
                                             in
                                             [! key !]
+                                            <span ng-show="key == 'Paid in Kindle Store'">
+                                                <a
+                                                    ng-click="$parent.status = true"
+                                                    ng-show="!$parent.status"
+                                                    >Show More</a>
+                                                <a
+                                                    ng-click="$parent.status = false"
+                                                    ng-show="$parent.status"
+                                                    >Show Less</a>
+                                            </span>
                                         </li>
                                     </ul>
                                     <p>

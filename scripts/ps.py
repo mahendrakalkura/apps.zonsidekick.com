@@ -17,6 +17,7 @@ from sqlalchemy.orm import backref, relationship
 
 from utilities import (
     base,
+    get_amazon_best_sellers_rank,
     get_mysql_session,
     get_number,
     get_proxies,
@@ -155,38 +156,9 @@ if __name__ == '__main__':
                             )
                         except IndexError:
                             pass
-                    try:
-                        text = get_string(selector.xpath(
-                            '//li[@id="SalesRank"]/text()'
-                        ).extract()[1]).split(' ', 1)
-                        amazon_best_sellers_rank[get_string(
-                            text[1].replace(
-                                u'in ', ''
-                            ).replace(
-                                '(', ''
-                            ).replace(
-                                ')', ''
-                            )
-                        )] = int(get_number(get_string(text[0])))
-                    except IndexError:
-                        pass
-                    try:
-                        for li in selector.xpath(
-                            '//ul[@class="zg_hrsr"]/li[@class="zg_hrsr_item"]'
-                        ):
-                            amazon_best_sellers_rank[
-                                get_string(
-                                    li.xpath(
-                                        './/span[@class="zg_hrsr_ladder"]'
-                                    ).xpath(
-                                        'string()'
-                                    ).extract()[0]
-                                ).replace(u'in\xa0', '')
-                            ] = int(get_number(get_string(li.xpath(
-                                './/span[@class="zg_hrsr_rank"]/text()'
-                            ).extract()[0])))
-                    except IndexError:
-                        pass
+                    amazon_best_sellers_rank = get_amazon_best_sellers_rank(
+                        selector
+                    )
                     if (
                         not url
                         or
@@ -204,11 +176,11 @@ if __name__ == '__main__':
                     ).first()
                     if not b:
                         b = book(**{
-                            'amazon_best_sellers_rank': amazon_best_sellers_rank,
-                            'book_cover_image': book_cover_image,
-                            'title': title,
                             'url': url,
                         })
+                    b.title = title
+                    b.book_cover_image = book_cover_image
+                    b.amazon_best_sellers_rank = amazon_best_sellers_rank
                     bs.append(b)
             if is_development():
                 break

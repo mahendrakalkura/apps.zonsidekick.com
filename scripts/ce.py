@@ -18,6 +18,7 @@ from sqlalchemy.orm import backref, relationship
 
 from utilities import (
     base,
+    get_amazon_best_sellers_rank,
     get_mysql_session,
     get_number,
     get_proxies,
@@ -438,46 +439,7 @@ class Spider(CrawlSpider):
                 ).extract()[0])))
             except IndexError:
                 pass
-        try:
-            text = get_string(selector.xpath(
-                '//li[@id="SalesRank"]/text()'
-            ).extract()[1]).split(' ', 1)
-            amazon_best_sellers_rank[get_string(
-                text[1].replace(
-                    u'in ', ''
-                ).replace(
-                    u'in\xa0', ''
-                ).replace(
-                    'Paid Kindle Store', 'Paid in Kindle Store'
-                ).replace(
-                    '(', ''
-                ).replace(
-                    ')', ''
-                )
-            )] = int(get_number(get_string(text[0])))
-        except IndexError:
-            pass
-        try:
-            for li in selector.xpath(
-                '//ul[@class="zg_hrsr"]/li[@class="zg_hrsr_item"]'
-            ):
-                amazon_best_sellers_rank[
-                    get_string(
-                        li.xpath(
-                            './/span[@class="zg_hrsr_ladder"]'
-                        ).xpath(
-                            'string()'
-                        ).extract()[0]
-                    ).replace(
-                        u'in\xa0', ''
-                    ).replace(
-                        'Paid Kindle Store', 'Paid in Kindle Store'
-                    )
-                ] = int(get_number(get_string(li.xpath(
-                    './/span[@class="zg_hrsr_rank"]/text()'
-                ).extract()[0])))
-        except IndexError:
-            pass
+        amazon_best_sellers_rank = get_amazon_best_sellers_rank(selector)
         if amazon_best_sellers_rank:
             try:
                 estimated_sales_per_day = get_sales(

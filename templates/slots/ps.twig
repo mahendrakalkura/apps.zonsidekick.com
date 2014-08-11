@@ -18,10 +18,26 @@
                                 >{{ popular_search.title }}</a>
                         </h4>
                         <p><strong>Categories & Ranks:</strong></p>
-                        <ul>
+                        <ul ng-controller="amazon_best_sellers_rank">
                             {% for key, value in popular_search.amazon_best_sellers_rank %}
-                                <li>
+                                <li
+                                    {% if key == 'Paid in Kindle Store' %}
+                                    {% else %}
+                                        ng-show="status"
+                                    {% endif %}
+                                    >
                                     <strong>#{{ value }}</strong> in {{ key }}
+                                    {% if key == 'Paid in Kindle Store' %}
+                                        <a
+                                            ng-click="status = true"
+                                            ng-show="!status"
+                                            >Show More</a>
+                                        <a
+                                            ng-click="status = false"
+                                            ng-show="status"
+                                            >Show Less</a>
+                                    {% else %}
+                                    {% endif %}
                                 </li>
                             {% endfor %}
                         </ul>

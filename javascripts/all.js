@@ -129,6 +129,151 @@ application.filter('label', function () {
     }
 });
 
+application.controller('aks', function ($attrs, $http, $rootScope, $scope) {
+    $scope.checkbox = false;
+    $scope.country = 'com';
+    $scope.keyword = '';
+    $scope.focus = {
+        keyword: true,
+        suggestions: false
+    };
+    $scope.level = '1';
+    $scope.mode = '2';
+    $scope.search_alias = 'digital-text';
+    $scope.spinner = false;
+    $scope.suggestions = [];
+
+    $scope.download = function () {
+        $rootScope.$broadcast('download', {
+            action: $attrs.urlDownload,
+            json: JSON.stringify({
+                keyword: $scope.keyword,
+                suggestions: $scope.suggestions
+            })
+        });
+    };
+
+    $scope.process = function () {
+        $scope.suggestions = [];
+        if (!$scope.keyword.length) {
+            $rootScope.$broadcast('open', {
+                top: $attrs.error1Top,
+                middle: $attrs.error1Middle
+            });
+
+            return;
+        }
+        $scope.spinner = true;
+        $http({
+            data: jQuery.param({
+                country: $scope.country,
+                keyword: $scope.keyword,
+                level: $scope.level,
+                mode: $scope.mode,
+                search_alias: $scope.search_alias
+            }),
+            method: 'POST',
+            url: $attrs.urlXhr
+        }).
+        error(function (data, status, headers, config) {
+            $scope.spinner = false;
+            $scope.$broadcast('open', {
+                top: $attrs.error2Top,
+                middle: $attrs.error2Middle
+            });
+        }).
+        success(function (data, status, headers, config) {
+            $scope.suggestions = data;
+            $scope.spinner = false;
+            $scope.focus['suggestions'] = true;
+            if ($scope.checkbox) {
+                $scope.download();
+            }
+        });
+    };
+
+    $scope.$on('focus', function () {
+        $scope.focus['keyword'] = true;
+        $scope.focus['suggestions'] = false;
+    });
+
+    if (is_development()) {
+        $scope.keyword = '1';
+        $scope.process();
+    }
+});
+
+application.controller('amazon_best_sellers_rank', function ($scope) {
+    $scope.status = false;
+
+    $scope.$watch('status', function () {
+        console.log(arguments);
+    });
+});
+
+application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
+    $scope.categories = jQuery.parseJSON($attrs.categories);
+    $scope.sections = jQuery.parseJSON($attrs.sections);
+    $scope.pages_1 = [
+        'Any',
+        'More Than',
+        'Less Than',
+    ];
+    $scope.counts = _.range(100, 0, -10);
+
+    $scope.category = $scope.categories[0][0];
+    $scope.section = $scope.sections[0][0];
+    $scope.page_1 = $scope.pages_1[0];
+    $scope.page_2 = 0;
+    $scope.count = is_development()? 10: $scope.counts[0];
+
+    $scope.spinner = false;
+    $scope.error = false;
+    $scope.contents = {};
+
+    $scope.process = function () {
+        $scope.spinner = true;
+        $scope.error = false;
+        $scope.contents = {};
+        $http({
+            data: jQuery.param({
+                category_id: $scope.category,
+                count: $scope.count,
+                page_1: $scope.page_1,
+                page_2: $scope.page_2,
+                section_id: $scope.section
+            }),
+            method: 'POST',
+            url: $attrs.url
+        }).
+        error(function (data, status, headers, config) {
+            $scope.spinner = false;
+            $scope.error = true;
+        }).
+        success(function (data, status, headers, config) {
+            $scope.spinner = false;
+            $scope.error = !data.books.length;
+            $scope.contents = data;
+            $scope.contents['books'] = $scope.contents['books'].chunk(3);
+        });
+
+        return;
+    };
+
+    $scope.process();
+});
+
+application.controller('download', function ($element, $scope) {
+    $scope.action = '';
+    $scope.json = '';
+
+    $scope.$on('download', function (event, options) {
+        jQuery($element).attr('action', options.action);
+        jQuery($element).find('[name="json"]').val(options.json);
+        jQuery($element).submit();
+    });
+});
+
 application.controller('kns_add', [
     '$attrs', '$rootScope', '$scope', function ($attrs, $rootScope, $scope) {
         $scope.count = 500;
@@ -285,91 +430,6 @@ application.controller('kns_simple', [
     }
 ]);
 
-application.controller('aks', function ($attrs, $http, $rootScope, $scope) {
-    $scope.checkbox = false;
-    $scope.country = 'com';
-    $scope.keyword = '';
-    $scope.focus = {
-        keyword: true,
-        suggestions: false
-    };
-    $scope.level = '1';
-    $scope.mode = '2';
-    $scope.search_alias = 'digital-text';
-    $scope.spinner = false;
-    $scope.suggestions = [];
-
-    $scope.download = function () {
-        $rootScope.$broadcast('download', {
-            action: $attrs.urlDownload,
-            json: JSON.stringify({
-                keyword: $scope.keyword,
-                suggestions: $scope.suggestions
-            })
-        });
-    };
-
-    $scope.process = function () {
-        $scope.suggestions = [];
-        if (!$scope.keyword.length) {
-            $rootScope.$broadcast('open', {
-                top: $attrs.error1Top,
-                middle: $attrs.error1Middle
-            });
-
-            return;
-        }
-        $scope.spinner = true;
-        $http({
-            data: jQuery.param({
-                country: $scope.country,
-                keyword: $scope.keyword,
-                level: $scope.level,
-                mode: $scope.mode,
-                search_alias: $scope.search_alias
-            }),
-            method: 'POST',
-            url: $attrs.urlXhr
-        }).
-        error(function (data, status, headers, config) {
-            $scope.spinner = false;
-            $scope.$broadcast('open', {
-                top: $attrs.error2Top,
-                middle: $attrs.error2Middle
-            });
-        }).
-        success(function (data, status, headers, config) {
-            $scope.suggestions = data;
-            $scope.spinner = false;
-            $scope.focus['suggestions'] = true;
-            if ($scope.checkbox) {
-                $scope.download();
-            }
-        });
-    };
-
-    $scope.$on('focus', function () {
-        $scope.focus['keyword'] = true;
-        $scope.focus['suggestions'] = false;
-    });
-
-    if (is_development()) {
-        $scope.keyword = '1';
-        $scope.process();
-    }
-});
-
-application.controller('download', function ($element, $scope) {
-    $scope.action = '';
-    $scope.json = '';
-
-    $scope.$on('download', function (event, options) {
-        jQuery($element).attr('action', options.action);
-        jQuery($element).find('[name="json"]').val(options.json);
-        jQuery($element).submit();
-    });
-});
-
 application.controller('modal', function (
     $attrs, $element, $rootScope, $scope
 ) {
@@ -392,58 +452,6 @@ application.controller('modal', function (
         $rootScope.$$phase || $rootScope.$apply();
         jQuery($element).modal('show');
     });
-});
-
-application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
-    $scope.categories = jQuery.parseJSON($attrs.categories);
-    $scope.sections = jQuery.parseJSON($attrs.sections);
-    $scope.pages_1 = [
-        'Any',
-        'More Than',
-        'Less Than',
-    ];
-    $scope.counts = _.range(100, 0, -10);
-
-    $scope.category = $scope.categories[0][0];
-    $scope.section = $scope.sections[0][0];
-    $scope.page_1 = $scope.pages_1[0];
-    $scope.page_2 = 0;
-    $scope.count = is_development()? 10: $scope.counts[0];
-
-    $scope.spinner = false;
-    $scope.error = false;
-    $scope.contents = {};
-
-    $scope.process = function () {
-        $scope.spinner = true;
-        $scope.error = false;
-        $scope.contents = {};
-        $http({
-            data: jQuery.param({
-                category_id: $scope.category,
-                count: $scope.count,
-                page_1: $scope.page_1,
-                page_2: $scope.page_2,
-                section_id: $scope.section
-            }),
-            method: 'POST',
-            url: $attrs.url
-        }).
-        error(function (data, status, headers, config) {
-            $scope.spinner = false;
-            $scope.error = true;
-        }).
-        success(function (data, status, headers, config) {
-            $scope.spinner = false;
-            $scope.error = !data.books.length;
-            $scope.contents = data;
-            $scope.contents['books'] = $scope.contents['books'].chunk(3);
-        });
-
-        return;
-    };
-
-    $scope.process();
 });
 
 application.controller('previous_versions', function ($scope) {
