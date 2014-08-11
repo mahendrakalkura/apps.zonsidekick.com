@@ -180,6 +180,16 @@ application.controller('aks', function ($attrs, $http, $rootScope, $scope) {
 
             return;
         }
+        if ($scope.level == 2) {
+            if ($scope.keyword.indexOf(' ') !== -1) {
+                $rootScope.$broadcast('open', {
+                    top: $attrs.error2Top,
+                    middle: $attrs.error2Middle
+                });
+
+                return;
+            }
+        }
         $scope.spinner = true;
         $http({
             data: jQuery.param({
@@ -195,8 +205,8 @@ application.controller('aks', function ($attrs, $http, $rootScope, $scope) {
         error(function (data, status, headers, config) {
             $scope.spinner = false;
             $scope.$broadcast('open', {
-                top: $attrs.error2Top,
-                middle: $attrs.error2Middle
+                top: $attrs.error3Top,
+                middle: $attrs.error3Middle
             });
         }).
         success(function (data, status, headers, config) {
