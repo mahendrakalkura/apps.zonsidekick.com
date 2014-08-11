@@ -1276,6 +1276,14 @@ $application->match('/ce/xhr', function (Request $request) use ($application) {
     $contents = array(
         'books' => array(),
         'categories' => array(),
+        'glance' => array(
+            'estimated_sales_per_day' => 0,
+            'price' => 0.00,
+            'print_length' => 0,
+            'review_average' => 0.00,
+            'total_number_of_reviews' => 0,
+            'words' => array(),
+        ),
         'date' => 'N/A',
     );
 
@@ -1521,6 +1529,23 @@ EOD;
                 }
             }
             $contents['books'][] = $book;
+            $contents['glance']['price'] += $book['price'];
+            $contents[
+                'glance'
+            ]['estimated_sales_per_day'] += $book['estimated_sales_per_day'];
+            $contents[
+                'glance'
+            ]['total_number_of_reviews'] += $book['total_number_of_reviews'];
+            $contents['glance']['review_average'] += $book['review_average'];
+            $contents['glance']['print_length'] += $book['print_length'];
+            $words = preg_split('/[^A-Za-z0-9]/', $book['title']);
+            if ($words) {
+                foreach ($words as $word) {
+                    if (strlen($word) > 3) {
+                        $contents['glance']['words'][] = $word;
+                    }
+                }
+            }
             if ($book['amazon_best_sellers_rank']) {
                 foreach ($book['amazon_best_sellers_rank'] as $key => $value) {
                     if (empty($contents['categories'][$key])) {
@@ -1541,6 +1566,21 @@ EOD;
     }
     $contents['categories'] = $cs;
     usort($contents['categories'], 'usort_categories');
+
+    $count = count($contents['books']);
+
+    $contents['glance']['price'] /= $count;
+    $contents['glance']['estimated_sales_per_day'] /= $count;
+    $contents['glance']['total_number_of_reviews']  /= $count;
+    $contents['glance']['review_average'] /= $count;
+    $contents['glance']['print_length'] /= $count;
+    $contents['glance']['words'] = array_count_values(
+        $contents['glance']['words']
+    );
+    arsort($contents['glance']['words']);
+    $contents['glance']['words'] = implode(', ', array_keys(array_slice(
+        $contents['glance']['words'], 0, 10
+    )));
 
     return new Response(json_encode($contents));
 })

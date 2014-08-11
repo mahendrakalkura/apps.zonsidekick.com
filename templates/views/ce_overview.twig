@@ -215,12 +215,56 @@
             <p class="alert alert-error" ng-show="error">
                 Your query did not yield any results.
             </p>
-            <div ng-show="contents.date.length || contents.books.length || contents.categories.length">
+            <div ng-show="contents.date.length || contents.glance || contents.books.length || contents.categories.length">
                 <div ng-show="contents.date.length">
                     <p class="text-center">
                         This section was last updated on
                         <strong>[! contents.date !].</strong>
                     </p>
+                </div>
+                <div ng-show="contents.glance">
+                    <hr>
+                    <div class="page-header">
+                        <h2>At A Glance</h2>
+                    </div>
+                    <table class="table table-hover table-striped">
+                        <tr>
+                            <td>Average Price ($)</td>
+                            <td class="narrow right">
+                                [! contents.glance.price|number:2 !]
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Average Sales Per Day</td>
+                            <td class="narrow right">
+                                [! contents.glance.estimated_sales_per_day|number:2 !]
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Average Number of Reviews</td>
+                            <td class="narrow right">
+                                [! contents.glance.total_number_of_reviews|number:0 !]
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Average Review Score</td>
+                            <td class="narrow right">
+                                [! contents.glance.review_average|number:2 !]
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Average Book Length</td>
+                            <td class="narrow right">
+                                [! contents.glance.print_length|number:0 !]
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Top 10 words in titles</td>
+                            <td class="narrow right">
+                                [! contents.glance.words !]
+                            </td>
+                        </tr>
+                    </table>
                 </div>
                 <div ng-show="contents.books.length">
                     <hr>
