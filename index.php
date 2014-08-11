@@ -60,7 +60,7 @@ function usort_logos($one, $two)
 
 function get_categories($application, $category_id, $prefixes) {
     $categories = array();
-    if (count($prefixes) >= 3) {
+    if (count($prefixes) >= 2) {
         return $categories;
     }
     if ($category_id) {

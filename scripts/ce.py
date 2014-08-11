@@ -256,20 +256,29 @@ class Spider(CrawlSpider):
         super(Spider, self).__init__(*args, **kwargs)
         self.start_urls = []
         session = get_mysql_session()()
-        ss = session.query(section).order_by('id asc').all()
-        for c in session.query(
+        urls = []
+        for c_1 in session.query(
             category,
         ).filter(
             category.category==None,
         ).order_by('id asc').all():
+            urls.append(c_1.url)
+            for c_2 in session.query(
+                category,
+            ).filter(
+                category.category==c_1,
+            ).order_by('id asc').all():
+                urls.append(c_2.url)
+        if is_development():
+            urls = urls[0:3]
+        ss = session.query(section).order_by('id asc').all()
+        for url in urls:
             for s in ss:
                 self.start_urls.append(sub(
                     r'/zgbs/', '/%(slug)s/' % {
                         'slug': s.slug,
-                    }, c.url
+                    }, url
                 ))
-            if is_development():
-                break
         session.close()
 
     def parse_pages(self, response):
