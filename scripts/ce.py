@@ -268,17 +268,40 @@ class Pipeline(object):
             b = book(**{
                 'url': dictionary['url'],
             })
-        b.author = dictionary['author']
-        b.title = dictionary['title']
-        b.price = dictionary['price']
-        b.publication_date = dictionary['publication_date']
-        b.print_length = dictionary['print_length']
-        b.days_in_the_top_100 = dictionary['days_in_the_top_100']
-        b.amazon_best_sellers_rank = dictionary['amazon_best_sellers_rank']
-        b.estimated_sales_per_day = dictionary['estimated_sales_per_day']
-        b.earnings_per_day = dictionary['earnings_per_day']
-        b.total_number_of_reviews = dictionary['total_number_of_reviews']
-        b.review_average = dictionary['review_average']
+        if not b.author or dictionary['author']:
+            b.author = dictionary['author']
+        if not b.title or dictionary['title']:
+            b.title = dictionary['title']
+        if not b.price or dictionary['price']:
+            b.price = dictionary['price']
+        if not b.publication_date or dictionary['publication_date']:
+            b.publication_date = dictionary['publication_date']
+        if not b.print_length or dictionary['print_length']:
+            b.print_length = dictionary['print_length']
+        if not b.days_in_the_top_100 or dictionary['days_in_the_top_100']:
+            b.days_in_the_top_100 = dictionary['days_in_the_top_100']
+        if (
+            not b.amazon_best_sellers_rank
+            or
+            dictionary['amazon_best_sellers_rank']
+        ):
+            b.amazon_best_sellers_rank = dictionary['amazon_best_sellers_rank']
+        if (
+            not b.estimated_sales_per_day
+            or
+            dictionary['estimated_sales_per_day']
+        ):
+            b.estimated_sales_per_day = dictionary['estimated_sales_per_day']
+        if not b.earnings_per_day or dictionary['earnings_per_day']:
+            b.earnings_per_day = dictionary['earnings_per_day']
+        if (
+            not b.total_number_of_reviews
+            or
+            dictionary['total_number_of_reviews']
+        ):
+            b.total_number_of_reviews = dictionary['total_number_of_reviews']
+        if not b.review_average or dictionary['review_average']:
+            b.review_average = dictionary['review_average']
         return b
 
     def get_category(self, session, dictionary):
