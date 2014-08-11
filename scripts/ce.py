@@ -269,6 +269,12 @@ class Spider(CrawlSpider):
                 category.category==c_1,
             ).order_by('id asc').all():
                 urls.append(c_2.url)
+                for c_3 in session.query(
+                    category,
+                ).filter(
+                    category.category==c_2,
+                ).order_by('id asc').all():
+                    urls.append(c_3.url)
         if is_development():
             urls = urls[0:1]
         ss = session.query(section).order_by('id asc').all()
