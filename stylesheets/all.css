@@ -424,6 +424,10 @@ a {
     margin-bottom: 30px;
 }
 
+#middle .container-fluid .form-actions.ce {
+    padding-left: 20px;
+}
+
 #middle .container-fluid .form-actions .btn {
     width: 200px;
 }

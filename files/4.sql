@@ -3938,44 +3938,6 @@ CREATE TABLE IF NOT EXISTS `tools_ce_books` (
     KEY `url` (`url`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
 
-DROP TABLE IF EXISTS `tools_ce_reviews`;
-CREATE TABLE IF NOT EXISTS `tools_ce_reviews` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `book_id` int(11) NOT NULL,
-    `author` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-    `date` date NOT NULL,
-    `subject` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-    `body` text COLLATE utf8_unicode_ci NOT NULL,
-    `stars` decimal(9,2) NOT NULL,
-    PRIMARY KEY (`id`),
-    KEY `author` (`author`),
-    KEY `date` (`date`),
-    CONSTRAINT `tools_ce_reviews_book_id`
-    FOREIGN KEY (`book_id`)
-    REFERENCES `tools_ce_books` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
-
-DROP TABLE IF EXISTS `tools_ce_referrals`;
-CREATE TABLE IF NOT EXISTS `tools_ce_referrals` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `book_id` int(11) NOT NULL,
-    `url` varchar(2048) COLLATE utf8_unicode_ci NOT NULL,
-    `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-    `author` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-    `price` decimal(9,2) NOT NULL,
-    `total_number_of_reviews` int(11) NOT NULL,
-    `review_average` decimal(9,2) NOT NULL,
-    PRIMARY KEY (`id`),
-    KEY `url` (`url`),
-    CONSTRAINT `tools_ce_referrals_book_id`
-    FOREIGN KEY (`book_id`)
-    REFERENCES `tools_ce_books` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
-
 DROP TABLE IF EXISTS `tools_ce_trends`;
 CREATE TABLE IF NOT EXISTS `tools_ce_trends` (
     `id` int(11) NOT NULL AUTO_INCREMENT,

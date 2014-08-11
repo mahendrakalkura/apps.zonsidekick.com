@@ -60,6 +60,9 @@ function usort_logos($one, $two)
 
 function get_categories($application, $category_id, $prefixes) {
     $categories = array();
+    if (count($prefixes) >= 3) {
+        return $categories;
+    }
     if ($category_id) {
         $query = <<<EOD
 SELECT *
@@ -86,12 +89,10 @@ EOD;
                     $row['title']
                 ),
             );
-            if (!is_development()) {
-                $categories = array_merge($categories, get_categories(
-                    $application, $row['id'],
-                    array_merge($prefixes, array($row['title']))
-                ));
-            }
+            $categories = array_merge($categories, get_categories(
+                $application, $row['id'],
+                array_merge($prefixes, array($row['title']))
+            ));
         }
     }
 
@@ -1276,8 +1277,6 @@ $application->match('/ce/xhr', function (Request $request) use ($application) {
         'books' => array(),
         'categories' => array(),
         'date' => 'N/A',
-        'reviews' => array(),
-        'referrals' => array(),
     );
 
     $category_id = intval($request->get('category_id'));
@@ -1522,20 +1521,6 @@ EOD;
                 }
             }
             $contents['books'][] = $book;
-            $query = <<<EOD
-SELECT *
-FROM `tools_ce_reviews`
-WHERE `book_id` = ?
-ORDER BY `id` ASC
-EOD;
-            $reviews = $application['db']->fetchAll($query, array(
-                $book['book_id'],
-            ));
-            if ($reviews) {
-                foreach ($reviews as $review) {
-                    $contents['reviews'][] = $review;
-                }
-            }
             if ($book['amazon_best_sellers_rank']) {
                 foreach ($book['amazon_best_sellers_rank'] as $key => $value) {
                     if (empty($contents['categories'][$key])) {
@@ -1556,37 +1541,6 @@ EOD;
     }
     $contents['categories'] = $cs;
     usort($contents['categories'], 'usort_categories');
-    $book_ids = array();
-    $book_ids[] = 0;
-    if ($contents['books']) {
-        foreach ($contents['books'] as $book) {
-            $book_ids[] = $book['book_id'];
-        }
-    }
-    $query = <<<EOD
-SELECT *, COUNT(`url`) AS `count`
-FROM `tools_ce_referrals`
-WHERE `book_id` IN ( ? )
-GROUP BY `url`
-HAVING COUNT(`url`) > 1
-ORDER BY `count` DESC, `title` ASC
-EOD;
-    $referrals = $application['db']
-        ->executeQuery(
-            $query,
-            array(
-                $book_ids,
-            ),
-            array(
-                \Doctrine\DBAL\Connection::PARAM_INT_ARRAY,
-            )
-        )
-        ->fetchAll();
-    if ($referrals) {
-        foreach ($referrals as $referral) {
-            $contents['referrals'][] = $referral;
-        }
-    }
 
     return new Response(json_encode($contents));
 })
