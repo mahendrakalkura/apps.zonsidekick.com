@@ -1034,7 +1034,7 @@ $application->match(
     '/logos/view',
     function (Request $request) use ($application) {
         $user = $application['session']->get('user');
-        $stream = function () use ($request, $user) {
+        $stream = function () use ($application, $request, $user) {
             readfile(sprintf(
                 '%s/%s',
                 get_path($application, $user, 'logos'),
