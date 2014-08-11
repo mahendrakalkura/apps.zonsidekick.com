@@ -312,7 +312,6 @@ class Spider(CrawlSpider):
                         'slug': section_slug,
                     },
                 },
-                priority=100,
                 url=get_string(div.xpath(
                     './/div[@class="zg_itemWrapper"]/'
                     'div[@class="zg_image"]/'
