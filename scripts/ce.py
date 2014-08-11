@@ -270,7 +270,7 @@ class Spider(CrawlSpider):
             ).order_by('id asc').all():
                 urls.append(c_2.url)
         if is_development():
-            urls = urls[0:3]
+            urls = urls[0:1]
         ss = session.query(section).order_by('id asc').all()
         for url in urls:
             for s in ss:
