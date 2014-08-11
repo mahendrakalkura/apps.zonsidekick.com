@@ -342,6 +342,24 @@ a {
     margin-top: 5px;
 }
 
+#middle .container-fluid form select + .date {
+    margin-left: 0;
+    margin-top: 5px;
+    position: relative;
+    z-index: 1;
+}
+
+#middle .container-fluid form .date .add-on {
+    border-radius: 0;
+    margin-left: -33px;
+    position: relative;
+    z-index: 10;
+}
+
+#middle .container-fluid form .date .add-on i {
+    margin-top: 3px;
+}
+
 #middle .container-fluid hr {
     margin: 0;
     margin-bottom: 30px;
@@ -402,6 +420,7 @@ a {
 }
 
 #middle .container-fluid .form-actions {
+    margin-top: 10px;
     margin-bottom: 30px;
 }
 

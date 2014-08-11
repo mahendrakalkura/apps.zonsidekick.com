@@ -18,58 +18,184 @@
                 </h1>
             </div>
             <form class="form-horizontal" name="form" ng-submit="process()">
-                <div class="control-group">
-                    <label class="control-label" for="category">
-                        Category
-                    </label>
-                    <div class="controls">
-                        <select
-                            class="select2 span12"
-                            id="category"
-                            ng-model="category"
-                            ng-options="category[0] as category[1] for category in categories"
-                            ></select>
+                <div class="row-fluid">
+                    <div class="span4">
+                        <div class="control-group">
+                            <label class="control-label" for="category">
+                                Category
+                            </label>
+                            <div class="controls">
+                                <select
+                                    class="select2 span12"
+                                    id="category"
+                                    ng-model="category"
+                                    ng-options="category[0] as category[1] for category in categories"
+                                    ></select>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="section">
+                                Section
+                            </label>
+                            <div class="controls">
+                                <select
+                                    class="select2 span12"
+                                    id="section"
+                                    ng-model="section"
+                                    ng-options="section[0] as section[1] for section in sections"
+                                    ></select>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="print_length">
+                                Print Length
+                            </label>
+                            <div class="controls">
+                                <select
+                                    class="select2 span12"
+                                    id="print_length"
+                                    ng-model="print_length_1"
+                                    ng-options="print_length as print_length for print_length in print_lengths"
+                                    ></select>
+                                <input
+                                    class="span12"
+                                    max="999999999"
+                                    min="0"
+                                    ng-model="print_length_2"
+                                    ng-show="print_length_1 != 'Any'"
+                                    type="number"
+                                    >
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label" for="section">Section</label>
-                    <div class="controls">
-                        <select
-                            class="select2 span12"
-                            id="section"
-                            ng-model="section"
-                            ng-options="section[0] as section[1] for section in sections"
-                            ></select>
+                    <div class="span4">
+                        <div class="control-group">
+                            <label class="control-label" for="price">
+                                Price
+                            </label>
+                            <div class="controls">
+                                <select
+                                    class="select2 span12"
+                                    id="prices"
+                                    ng-model="price_1"
+                                    ng-options="price as price for price in prices"
+                                    ></select>
+                                <input
+                                    class="span12"
+                                    max="999999999"
+                                    min="0"
+                                    ng-model="price_2"
+                                    ng-show="price_1 != 'Any'"
+                                    step="any"
+                                    type="number"
+                                    >
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label
+                                class="control-label"
+                                for="publication_date"
+                                >Publication Date</label>
+                            <div class="controls">
+                                <select
+                                    class="select2 span12"
+                                    id="publication_dates"
+                                    ng-model="publication_date_1"
+                                    ng-options="publication_date as publication_date for publication_date in publication_dates"
+                                    ></select>
+                                <div
+                                    class="date input-append span12"
+                                    datepicker
+                                    ng-show="publication_date_1 != 'Any'"
+                                    >
+                                    <input class="span12" type="text">
+                                    <span class="add-on">
+                                        <i class="icon-calendar"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label
+                                class="control-label"
+                                for="amazon_best_sellers_rank"
+                                >Amazon BSR</label>
+                            <div class="controls">
+                                <select
+                                    class="select2 span12"
+                                    id="amazon_best_sellers_ranks"
+                                    ng-model="amazon_best_sellers_rank_1"
+                                    ng-options="amazon_best_sellers_rank as amazon_best_sellers_rank for amazon_best_sellers_rank in amazon_best_sellers_ranks"
+                                    ></select>
+                                <input
+                                    class="span12"
+                                    max="999999999"
+                                    min="0"
+                                    ng-model="amazon_best_sellers_rank_2"
+                                    ng-show="amazon_best_sellers_rank_1 != 'Any'"
+                                    type="number"
+                                    >
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label" for="pages">Pages</label>
-                    <div class="controls">
-                        <select
-                            class="select2 span12"
-                            id="pages"
-                            ng-model="page_1"
-                            ng-options="page_1 as page_1 for page_1 in pages_1"
-                            ></select>
-                        <input
-                            class="span12"
-                            max="10000"
-                            min="1"
-                            ng-model="page_2"
-                            ng-show="page_1 != 'Any'"
-                            type="number"
-                            >
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label" for="count">Top</label>
-                    <div class="controls">
-                        <select
-                            class="select2 span12"
-                            id="count"
-                            ng-model="count"
-                            ng-options="count as count for count in counts"
-                            ></select>
+                    <div class="span4">
+                        <div class="control-group">
+                            <label class="control-label" for="review_average">
+                                Review Average
+                            </label>
+                            <div class="controls">
+                                <select
+                                    class="select2 span12"
+                                    id="review_averages"
+                                    ng-model="review_average_1"
+                                    ng-options="review_average as review_average for review_average in review_averages"
+                                    ></select>
+                                <input
+                                    class="span12"
+                                    max="5.0"
+                                    min="0.0"
+                                    ng-model="review_average_2"
+                                    ng-show="review_average_1 != 'Any'"
+                                    step="any"
+                                    type="number"
+                                    >
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="appearance">
+                                Prevalence
+                            </label>
+                            <div class="controls">
+                                <select
+                                    class="select2 span12"
+                                    id="appearances"
+                                    ng-model="appearance_1"
+                                    ng-options="appearance as appearance for appearance in appearances"
+                                    ></select>
+                                <input
+                                    class="span12"
+                                    max="100"
+                                    min="0"
+                                    ng-model="appearance_2"
+                                    ng-show="appearance_1 != 'Any'"
+                                    step="any"
+                                    type="number"
+                                    >
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="count">
+                                Top
+                            </label>
+                            <div class="controls">
+                                <select
+                                    class="select2 span12"
+                                    id="count"
+                                    ng-model="count"
+                                    ng-options="count as count for count in counts"
+                                    ></select>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="form-actions">
@@ -192,6 +318,10 @@
                             </tr>
                             <tr ng-show="status">
                                 <td class="details" colspan="9">
+                                    <p>
+                                        <strong>Publication Date:</strong>
+                                        [! book.publication_date !]
+                                    </p>
                                     <p><strong>Categories & Ranks:</strong></p>
                                     <ul ng-controller="amazon_best_sellers_rank">
                                         <li

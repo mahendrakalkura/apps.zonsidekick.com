@@ -22,6 +22,23 @@ application.config(function ($httpProvider, $interpolateProvider) {
     $interpolateProvider.startSymbol('[!').endSymbol('!]');
 });
 
+application.directive('datepicker', function () {
+    return {
+        link: function (scope, element, attrs) {
+            jQuery(element).datepicker({
+                format: 'yyyy-mm-dd'
+            }).on('changeDate', function (event) {
+                angular.element(element).scope().publication_date_2 = moment(
+                    new Date(event.date)
+                ).format('YYYY-MM-DD');
+                jQuery(element).datepicker('hide');
+            });
+        },
+        restrict: 'A'
+    };
+});
+
+
 application.directive('ngFocus', function ($timeout) {
     return {
         link: function (scope, element, attrs) {
@@ -214,7 +231,32 @@ application.controller('book', function ($scope) {
 application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
     $scope.categories = jQuery.parseJSON($attrs.categories);
     $scope.sections = jQuery.parseJSON($attrs.sections);
-    $scope.pages_1 = [
+    $scope.print_lengths = [
+        'Any',
+        'More Than',
+        'Less Than',
+    ];
+    $scope.prices = [
+        'Any',
+        'More Than',
+        'Less Than',
+    ];
+    $scope.publication_dates = [
+        'Any',
+        'More Than',
+        'Less Than',
+    ];
+    $scope.amazon_best_sellers_ranks = [
+        'Any',
+        'More Than',
+        'Less Than',
+    ];
+    $scope.review_averages = [
+        'Any',
+        'More Than',
+        'Less Than',
+    ];
+    $scope.appearances = [
         'Any',
         'More Than',
         'Less Than',
@@ -223,8 +265,18 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
 
     $scope.category = $scope.categories[0][0];
     $scope.section = $scope.sections[0][0];
-    $scope.page_1 = $scope.pages_1[0];
-    $scope.page_2 = 0;
+    $scope.print_length_1 = $scope.print_lengths[0];
+    $scope.print_length_2 = 0;
+    $scope.price_1 = $scope.prices[0];
+    $scope.price_2 = 0;
+    $scope.publication_date_1 = $scope.publication_dates[0];
+    $scope.publication_date_2 = '';
+    $scope.amazon_best_sellers_rank_1 = $scope.amazon_best_sellers_ranks[0];
+    $scope.amazon_best_sellers_rank_2 = 0;
+    $scope.review_average_1 = $scope.review_averages[0];
+    $scope.review_average_2 = 0;
+    $scope.appearance_1 = $scope.appearances[0];
+    $scope.appearance_2 = 0;
     $scope.count = is_development()? 10: $scope.counts[0];
 
     $scope.spinner = false;
@@ -239,10 +291,20 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
         $scope.contents = {};
         $http({
             data: jQuery.param({
+                amazon_best_sellers_rank_1: $scope.amazon_best_sellers_rank_1,
+                amazon_best_sellers_rank_2: $scope.amazon_best_sellers_rank_2,
                 category_id: $scope.category,
                 count: $scope.count,
-                page_1: $scope.page_1,
-                page_2: $scope.page_2,
+                print_length_1: $scope.print_length_1,
+                print_length_2: $scope.print_length_2,
+                appearance_1: $scope.appearance_1,
+                appearance_2: $scope.appearance_2,
+                price_1: $scope.price_1,
+                price_2: $scope.price_2,
+                publication_date_1: $scope.publication_date_1,
+                publication_date_2: $scope.publication_date_2,
+                review_average_1: $scope.review_average_1,
+                review_average_2: $scope.review_average_2,
                 section_id: $scope.section
             }),
             method: 'POST',

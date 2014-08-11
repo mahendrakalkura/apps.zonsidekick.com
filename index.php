@@ -1282,8 +1282,20 @@ $application->match('/ce/xhr', function (Request $request) use ($application) {
 
     $category_id = intval($request->get('category_id'));
     $section_id = intval($request->get('section_id'));
-    $page_1 = $request->get('page_1');
-    $page_2 = intval($request->get('page_2'));
+    $print_length_1 = $request->get('print_length_1');
+    $print_length_2 = intval($request->get('print_length_2'));
+    $price_1 = $request->get('price_1');
+    $price_2 = floatval($request->get('price_2'));
+    $publication_date_1 = $request->get('publication_date_1');
+    $publication_date_2 = $request->get('publication_date_2');
+    $amazon_best_sellers_rank_1 = $request->get('amazon_best_sellers_rank_1');
+    $amazon_best_sellers_rank_2 = intval(
+        $request->get('amazon_best_sellers_rank_2')
+    );
+    $review_average_1 = $request->get('review_average_1');
+    $review_average_2 = floatval($request->get('review_average_2'));
+    $appearance_1 = $request->get('appearance_1');
+    $appearance_2 = floatval($request->get('appearance_2'));
     $count = intval($request->get('count'));
 
     $appearances = array(
@@ -1340,37 +1352,85 @@ SELECT *
 FROM `tools_ce_books`
 INNER JOIN
     `tools_ce_trends` ON `tools_ce_books`.`id` = `tools_ce_trends`.`book_id`
-WHERE
-    %s
-    AND
-    `tools_ce_trends`.`category_id` = ?
-    AND
-    `tools_ce_trends`.`section_id` = ?
-    AND
-    `tools_ce_trends`.`date` = ?
+WHERE %s
 ORDER BY `tools_ce_trends`.`rank` ASC
 LIMIT %d OFFSET 0
 EOD;
-    $condition = '';
-    switch ($page_1) {
+    $conditions = array();
+    switch ($print_length_1) {
         case 'Any':
-            $page_2 = '0';
-            $condition = '`tools_ce_books`.`print_length` >= ?';
+            $print_length_2 = 0;
+            $conditions[] = '`tools_ce_books`.`print_length` >= ?';
             break;
         case 'More Than':
-            $condition = '`tools_ce_books`.`print_length` > ?';
+            $conditions[] = '`tools_ce_books`.`print_length` > ?';
             break;
         case 'Less Than':
-            $condition = '`tools_ce_books`.`print_length` < ?';
+            $conditions[] = '`tools_ce_books`.`print_length` < ?';
             break;
         default:
-            $page_2 = '0';
-            $condition = '`tools_ce_books`.`print_length` >= ?';
+            $print_length_2 = 0;
+            $conditions[] = '`tools_ce_books`.`print_length` >= ?';
             break;
     }
-    $query = sprintf($query, $condition, $count);
+    switch ($price_1) {
+        case 'Any':
+            $price_2 = 0.00;
+            $conditions[] = '`tools_ce_books`.`price` >= ?';
+            break;
+        case 'More Than':
+            $conditions[] = '`tools_ce_books`.`price` > ?';
+            break;
+        case 'Less Than':
+            $conditions[] = '`tools_ce_books`.`price` < ?';
+            break;
+        default:
+            $price_2 = 0.00;
+            $conditions[] = '`tools_ce_books`.`price` >= ?';
+            break;
+    }
+    switch ($publication_date_1) {
+        case 'Any':
+            $publication_date_2 = '0001-01-01';
+            $conditions[] = '`tools_ce_books`.`publication_date` >= ?';
+            break;
+        case 'More Than':
+            $conditions[] = '`tools_ce_books`.`publication_date` > ?';
+            break;
+        case 'Less Than':
+            $conditions[] = '`tools_ce_books`.`publication_date` < ?';
+            break;
+        default:
+            $publication_date_2 = '0001-01-01';
+            $conditions[] = '`tools_ce_books`.`publication_date` >= ?';
+            break;
+    }
+    switch ($review_average_1) {
+        case 'Any':
+            $review_average_2 = 0.00;
+            $conditions[] = '`tools_ce_books`.`review_average` >= ?';
+            break;
+        case 'More Than':
+            $conditions[] = '`tools_ce_books`.`review_average` > ?';
+            break;
+        case 'Less Than':
+            $conditions[] = '`tools_ce_books`.`review_average` < ?';
+            break;
+        default:
+            $review_average_2 = 0.00;
+            $conditions[] = '`tools_ce_books`.`review_average` >= ?';
+            break;
+    }
+    $conditions[] = '`tools_ce_trends`.`category_id` = ?';
+    $conditions[] = '`tools_ce_trends`.`section_id` = ?';
+    $conditions[] = '`tools_ce_trends`.`date` = ?';
+    $conditions = implode(' AND ', $conditions);
+    $query = sprintf($query, $conditions, $count);
     $books = $application['db']->fetchAll($query, array(
-        $page_2,
+        $print_length_2,
+        $price_2,
+        $publication_date_2,
+        $review_average_2,
         $category_id,
         $section_id,
         $contents['date'],
@@ -1423,6 +1483,44 @@ EOD;
                 $book['amazon_best_sellers_rank'], true
             );
             asort($book['amazon_best_sellers_rank'], SORT_NUMERIC);
+            if ($amazon_best_sellers_rank_1 == 'More Than') {
+                if (empty(
+                    $book['amazon_best_sellers_rank']['Paid in Kindle Store']
+                )) {
+                    continue;
+                }
+                if (
+                    $book['amazon_best_sellers_rank']['Paid in Kindle Store']
+                    <=
+                    $amazon_best_sellers_rank_2
+                ) {
+                    continue;
+                }
+            }
+            if ($amazon_best_sellers_rank_1 == 'Less Than') {
+                if (empty(
+                    $book['amazon_best_sellers_rank']['Paid in Kindle Store']
+                )) {
+                    continue;
+                }
+                if (
+                    $book['amazon_best_sellers_rank']['Paid in Kindle Store']
+                    >=
+                    $amazon_best_sellers_rank_2
+                ) {
+                    continue;
+                }
+            }
+            if ($appearance_1 == 'More Than') {
+                if ($book['appearances']['last 7 days'] <= $appearance_2) {
+                    continue;
+                }
+            }
+            if ($appearance_1 == 'Less Than') {
+                if ($book['appearances']['last 7 days'] >= $appearance_2) {
+                    continue;
+                }
+            }
             $contents['books'][] = $book;
             $query = <<<EOD
 SELECT *
