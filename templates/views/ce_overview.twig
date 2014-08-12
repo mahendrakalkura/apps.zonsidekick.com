@@ -313,22 +313,47 @@
                         ng-show="mode == 'table'"
                         >
                         <thead>
-                            <th class="narrow right">Rank</th>
-                            <th>Title</th>
-                            <th class="narrow">Author</th>
-                            <th class="narrow right">Price ($)</th>
-                            <th class="narrow right">Print Length</th>
-                            <th class="narrow right">Reviews</th>
-                            <th class="narrow right">Review Average</th>
-                            <th class="narrow right">Amazon BSR</th>
                             <th
-                                class="narrow right"
+                                class="header narrow right [! order_by['books'][0] == 'rank' && get_order_by('books') || '' !]"
+                                ng-click="set_order_by('books', 'rank')"
+                                >Rank</th>
+                            <th
+                                class="header [! order_by['books'][0] == 'title' && get_order_by('books') || '' !]"
+                                ng-click="set_order_by('books', 'title')"
+                                >Title</th>
+                            <th
+                                class="header narrow right [! order_by['books'][0] == 'author' && get_order_by('books') || '' !]"
+                                ng-click="set_order_by('books', 'author')"
+                                >Author</th>
+                            <th
+                                class="header narrow right [! order_by['books'][0] == 'price' && get_order_by('books') || '' !]"
+                                ng-click="set_order_by('books', 'price')"
+                                >Price ($)</th>
+                            <th
+                                class="header narrow right [! order_by['books'][0] == 'print_length' && get_order_by('books') || '' !]"
+                                ng-click="set_order_by('books', 'print_length')"
+                                >Print Length</th>
+                            <th
+                                class="header narrow right [! order_by['books'][0] == 'total_number_of_reviews' && get_order_by('books') || '' !]"
+                                ng-click="set_order_by('books', 'total_number_of_reviews')"
+                                >Reviews</th>
+                            <th
+                                class="header narrow right [! order_by['books'][0] == 'review_average' && get_order_by('books') || '' !]"
+                                ng-click="set_order_by('books', 'review_average')"
+                                >Review Average</th>
+                            <th
+                                class="header narrow right [! order_by['books'][0] == 'amazon_best_sellers_rank_' && get_order_by('books') || '' !]"
+                                ng-click="set_order_by('books', 'amazon_best_sellers_rank_')"
+                                >Amazon BSR</th>
+                            <th
+                                class="header narrow right [! order_by['books'][0] == 'days_in_the_top_100' && get_order_by('books') || '' !]"
+                                ng-click="set_order_by('books', 'days_in_the_top_100')"
                                 ng-show="category == 1"
                                 >Days in the Top 100</th>
                         </thead>
                         <tbody
                             ng-controller="book"
-                            ng-repeat="book in contents.books"
+                            ng-repeat="book in contents.books|orderBy:order_by['books'][0]:order_by['books'][1]"
                             >
                             <tr>
                                 <td class="narrow right">
@@ -564,18 +589,24 @@
                     <table class="table table-hover table-striped">
                         <thead>
                             <tr>
-                                <th>Category</th>
-                                <th class="narrow text-right">Frequency</th>
+                                <th
+                                    class="header [! order_by['categories'][0] == 'title' && get_order_by('categories') || '' !]"
+                                    ng-click="set_order_by('categories', 'title')"
+                                    >Category</th>
+                                <th
+                                    class="header right [! order_by['categories'][0] == 'frequency' && get_order_by('categories') || '' !]"
+                                    ng-click="set_order_by('categories', 'frequency')"
+                                    >Frequency</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr
-                                ng-repeat="category in contents.categories"
+                                ng-repeat="category in contents.categories|orderBy:order_by['categories'][0]:order_by['categories'][1]"
                                 ng-show="($index <= 4) || status"
                                 >
-                                <td><strong>[! category[0] !]</strong></td>
-                                <td class="narrow text-right">
-                                    [! category[1]|number:0 !]
+                                <td><strong>[! category.title !]</strong></td>
+                                <td class="narrow right">
+                                    [! category.frequency|number:0 !]
                                 </td>
                             </tr>
                         </tbody>

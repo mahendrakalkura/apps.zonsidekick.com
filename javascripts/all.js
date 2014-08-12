@@ -297,6 +297,11 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
     $scope.error = false;
     $scope.contents = {};
 
+    $scope.order_by = {
+        'books': ['rank', false],
+        'categories': ['frequency', true],
+    };
+
     $scope.mode = 'table';
 
     $scope.process = function () {
@@ -336,6 +341,19 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
         });
 
         return;
+    };
+
+    $scope.get_order_by = function (key) {
+        return $scope.order_by[key][1]? 'desc': 'asc';
+    };
+
+    $scope.set_order_by = function (key, value) {
+        if ($scope.order_by[key][0] == value) {
+            $scope.order_by[key][1] = !$scope.order_by[key][1];
+        } else {
+            $scope.order_by[key][0] = value;
+            $scope.order_by[key][1] = false;
+        }
     };
 
     $scope.process();

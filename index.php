@@ -4,14 +4,14 @@ date_default_timezone_set('UTC');
 
 function usort_categories($one, $two)
 {
-    $one_frequency = intval($one[1]);
-    $two_frequency = intval($two[1]);
+    $one_frequency = intval($one['frequency']);
+    $two_frequency = intval($two['frequency']);
     if ($one_frequency != $two_frequency) {
         return ($one_frequency < $two_frequency) ? 1 : -1;
     }
 
-    $one_title = $one[0];
-    $two_title = $two[0];
+    $one_title = $one['title'];
+    $two_title = $two['title'];
     if ($one_title != $two_title) {
         return ($one_title < $two_title) ? -1 : 1;
     }
@@ -945,7 +945,7 @@ $application->match(
 
         usort($keywords, 'usort_keywords_2');
 
-        return new Response(json_encode($keywords));
+        return new Response(json_encode($keywords, JSON_NUMERIC_CHECK));
     }
 )
 ->before($before_kns)
@@ -1543,6 +1543,14 @@ EOD;
                     continue;
                 }
             }
+            $book['amazon_best_sellers_rank_'] = 0;
+            if (!empty(
+                $book['amazon_best_sellers_rank']['Paid in Kindle Store']
+            )) {
+                $book[
+                    'amazon_best_sellers_rank_'
+                ] = $book['amazon_best_sellers_rank']['Paid in Kindle Store'];
+            }
             $contents['books'][] = $book;
             $contents['glance']['price'] += $book['price'];
             $contents[
@@ -1575,7 +1583,10 @@ EOD;
     if ($contents['categories']) {
         foreach ($contents['categories'] as $key => $value) {
             if ($value > 1) {
-                $cs[] = array($key, $value);
+                $cs[] = array(
+                    'frequency' => $value,
+                    'title' => $key,
+                );
             }
         }
     }
@@ -1604,7 +1615,7 @@ EOD;
     }
     $contents['glance']['words'] = $words;
 
-    return new Response(json_encode($contents));
+    return new Response(json_encode($contents, JSON_NUMERIC_CHECK));
 })
 ->before($before_new_features)
 ->bind('ce_xhr')
