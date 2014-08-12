@@ -26,7 +26,11 @@
                                         ng-show="status"
                                     {% endif %}
                                     >
-                                    <strong>#{{ value }}</strong> in {{ key }}
+                                    <strong>
+                                        #{{ value|number_format(0, '.', ',') }}
+                                    </strong>
+                                    in
+                                    {{ key }}
                                     {% if key == 'Paid in Kindle Store' %}
                                         <a
                                             ng-click="status = true"

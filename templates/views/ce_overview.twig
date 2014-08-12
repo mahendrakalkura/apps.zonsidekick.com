@@ -351,7 +351,7 @@
                                 </td>
                                 <td class="narrow right">
                                     <span ng-show="book.amazon_best_sellers_rank['Paid in Kindle Store']">
-                                        [! book.amazon_best_sellers_rank['Paid in Kindle Store'] !]
+                                        [! book.amazon_best_sellers_rank['Paid in Kindle Store']|number:0 !]
                                     </span>
                                     <span ng-show="!book.amazon_best_sellers_rank['Paid in Kindle Store']">
                                         N/A
@@ -378,7 +378,7 @@
                                             ng-repeat="(key, value) in book.amazon_best_sellers_rank"
                                             ng-show="(key == 'Paid in Kindle Store') || $parent.status"
                                             >
-                                            <strong>#[! value !]</strong>
+                                            <strong>#[! value|number:0 !]</strong>
                                             in
                                             [! key !]
                                             <span ng-show="key == 'Paid in Kindle Store'">
@@ -467,7 +467,7 @@
                                             ng-repeat="(key, value) in book.amazon_best_sellers_rank"
                                             ng-show="(key == 'Paid in Kindle Store') || $parent.status"
                                             >
-                                            <strong>#[! value !]</strong>
+                                            <strong>#[! value|number:0 !]</strong>
                                             in
                                             [! key !]
                                             <span ng-show="key == 'Paid in Kindle Store'">
