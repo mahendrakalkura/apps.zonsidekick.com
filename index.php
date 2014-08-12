@@ -1278,7 +1278,10 @@ $application->match(
     '/ce/overview',
     function (Request $request) use ($application) {
         return $application['twig']->render('views/ce_overview.twig', array(
-            'categories' => get_categories($application, 0, array()),
+            'categories' => array_merge(
+                array(array(-1, 'All')),
+                get_categories($application, 0, array())
+            ),
             'sections' => get_sections($application),
         ));
     }
@@ -1325,7 +1328,19 @@ $application->match('/ce/xhr', function (Request $request) use ($application) {
         'last 7 days' => 0,
         'last 30 days' => 0,
     );
-    $query = <<<EOD
+    if ($category_id == -1) {
+        $query = <<<EOD
+SELECT COUNT(DISTINCT `date`) AS `count`
+FROM `tools_ce_trends`
+WHERE
+    `category_id` > ?
+    AND
+    `section_id` = ?
+    AND
+    `date` >= CURDATE() - INTERVAL 7 DAY
+EOD;
+    } else {
+        $query = <<<EOD
 SELECT COUNT(DISTINCT `date`) AS `count`
 FROM `tools_ce_trends`
 WHERE
@@ -1335,12 +1350,25 @@ WHERE
     AND
     `date` >= CURDATE() - INTERVAL 7 DAY
 EOD;
+    }
     $row = $application['db']->fetchAssoc($query, array(
         $category_id,
         $section_id,
     ));
     $appearances['last 7 days'] = $row['count'];
-    $query = <<<EOD
+    if ($category_id == -1) {
+        $query = <<<EOD
+SELECT COUNT(DISTINCT `date`) AS `count`
+FROM `tools_ce_trends`
+WHERE
+    `category_id` > ?
+    AND
+    `section_id` = ?
+    AND
+    `date` >= CURDATE() - INTERVAL 30 DAY
+EOD;
+    } else {
+        $query = <<<EOD
 SELECT COUNT(DISTINCT `date`) AS `count`
 FROM `tools_ce_trends`
 WHERE
@@ -1350,13 +1378,24 @@ WHERE
     AND
     `date` >= CURDATE() - INTERVAL 30 DAY
 EOD;
+    }
     $row = $application['db']->fetchAssoc($query, array(
         $category_id,
         $section_id,
     ));
     $appearances['last 30 days'] = $row['count'];
 
-    $query = <<<EOD
+    if ($category_id == -1) {
+        $query = <<<EOD
+SELECT MAX(`date`) AS `date`
+FROM `tools_ce_trends`
+WHERE
+    `tools_ce_trends`.`category_id` > ?
+    AND
+    `tools_ce_trends`.`section_id` = ?
+EOD;
+    } else {
+        $query = <<<EOD
 SELECT MAX(`date`) AS `date`
 FROM `tools_ce_trends`
 WHERE
@@ -1364,6 +1403,7 @@ WHERE
     AND
     `tools_ce_trends`.`section_id` = ?
 EOD;
+    }
     $row = $application['db']->fetchAssoc($query, array(
         $category_id,
         $section_id,
@@ -1376,7 +1416,7 @@ FROM `tools_ce_books`
 INNER JOIN
     `tools_ce_trends` ON `tools_ce_books`.`id` = `tools_ce_trends`.`book_id`
 WHERE %s
-ORDER BY `tools_ce_trends`.`rank` ASC
+ORDER BY `tools_ce_trends`.`rank` ASC, `tools_ce_trends`.`category_id` ASC
 LIMIT %d OFFSET 0
 EOD;
     $conditions = array();
@@ -1444,7 +1484,11 @@ EOD;
             $conditions[] = '`tools_ce_books`.`review_average` >= ?';
             break;
     }
-    $conditions[] = '`tools_ce_trends`.`category_id` = ?';
+    if ($category_id == -1) {
+        $conditions[] = '`tools_ce_trends`.`category_id` > ?';
+    } else {
+        $conditions[] = '`tools_ce_trends`.`category_id` = ?';
+    }
     $conditions[] = '`tools_ce_trends`.`section_id` = ?';
     $conditions[] = '`tools_ce_trends`.`date` = ?';
     $conditions = implode(' AND ', $conditions);
@@ -1460,7 +1504,21 @@ EOD;
     ));
     if ($books) {
         foreach ($books as $book) {
-            $query = <<<EOD
+            if ($category_id == -1) {
+                $query = <<<EOD
+SELECT COUNT(id) AS `count`
+FROM `tools_ce_trends`
+WHERE
+    `category_id` > ?
+    AND
+    `section_id` = ?
+    AND
+    `book_id` = ?
+    AND
+    `date` >= CURDATE() - INTERVAL 7 DAY
+EOD;
+            } else {
+                $query = <<<EOD
 SELECT COUNT(id) AS `count`
 FROM `tools_ce_trends`
 WHERE
@@ -1472,12 +1530,27 @@ WHERE
     AND
     `date` >= CURDATE() - INTERVAL 7 DAY
 EOD;
+            }
             $row_1 = $application['db']->fetchAssoc($query, array(
                 $category_id,
                 $section_id,
                 $book['book_id'],
             ));
-            $query = <<<EOD
+            if ($category_id == -1) {
+                $query = <<<EOD
+SELECT COUNT(id) AS `count`
+FROM `tools_ce_trends`
+WHERE
+    `category_id` > ?
+    AND
+    `section_id` = ?
+    AND
+    `book_id` = ?
+    AND
+    `date` >= CURDATE() - INTERVAL 30 DAY
+EOD;
+            } else {
+                $query = <<<EOD
 SELECT COUNT(id) AS `count`
 FROM `tools_ce_trends`
 WHERE
@@ -1489,6 +1562,7 @@ WHERE
     AND
     `date` >= CURDATE() - INTERVAL 30 DAY
 EOD;
+            }
             $row_2 = $application['db']->fetchAssoc($query, array(
                 $category_id,
                 $section_id,

@@ -277,7 +277,7 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
     ];
     $scope.counts = _.range(100, 0, -10);
 
-    $scope.category = $scope.categories[0][0];
+    $scope.category = $scope.categories[1][0];
     $scope.section = $scope.sections[0][0];
     $scope.print_length_1 = $scope.print_lengths[0];
     $scope.print_length_2 = 0;
