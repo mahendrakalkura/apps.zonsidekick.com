@@ -68,7 +68,7 @@
                                 </a>
                             </li>
                         {% endif %}
-                        {% if has_statistics(user) %}
+                        {% if has_new_features(user) %}
                             <li class="{% if nav == 'ce' %}active{% endif %}">
                                 <a href="{{ url('ce_overview') }}">
                                     <i class="icon-key icon-large"></i>
