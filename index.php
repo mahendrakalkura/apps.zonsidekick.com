@@ -1292,6 +1292,7 @@ $application->match('/ce/xhr', function (Request $request) use ($application) {
         'books' => array(),
         'categories' => array(),
         'glance' => array(
+            'absr' => 0,
             'estimated_sales_per_day' => 0,
             'price' => 0.00,
             'print_length' => 0,
@@ -1550,6 +1551,9 @@ EOD;
                 $book[
                     'amazon_best_sellers_rank_'
                 ] = $book['amazon_best_sellers_rank']['Paid in Kindle Store'];
+                if ($book['amazon_best_sellers_rank_'] <= 25000) {
+                    $contents['glance']['absr'] += 1;
+                }
             }
             $contents['books'][] = $book;
             $contents['glance']['price'] += $book['price'];
