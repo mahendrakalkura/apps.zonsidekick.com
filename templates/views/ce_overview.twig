@@ -307,7 +307,10 @@
                             <th class="narrow right">Reviews</th>
                             <th class="narrow right">Review Average</th>
                             <th class="narrow right">Amazon BSR</th>
-                            <th class="narrow right">Days in the Top 100</th>
+                            <th
+                                class="narrow right"
+                                ng-show="category == 1"
+                                >Days in the Top 100</th>
                         </thead>
                         <tbody
                             ng-controller="book"
@@ -357,7 +360,10 @@
                                         N/A
                                     </span>
                                 </td>
-                                <td class="narrow right">
+                                <td
+                                    class="narrow right"
+                                    ng-show="category == 1"
+                                    >
                                     <span ng-show="book.days_in_the_top_100 > 0">
                                         [! book.days_in_the_top_100|number:0 !]
                                     </span>
@@ -452,7 +458,7 @@
                                         <strong>Print Length:</strong>
                                         [! book.print_length|number:0 !]
                                     </p>
-                                    <p>
+                                    <p ng-show="category == 1">
                                         <strong>Days in the Top 100:</strong>
                                         <span ng-show="book.days_in_the_top_100 > 0">
                                             [! book.days_in_the_top_100|number:0 !]
