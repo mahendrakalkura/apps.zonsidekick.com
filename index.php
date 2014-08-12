@@ -1506,7 +1506,7 @@ EOD;
         foreach ($books as $book) {
             if ($category_id == -1) {
                 $query = <<<EOD
-SELECT COUNT(id) AS `count`
+SELECT COUNT(DISTINCT `date`) AS `count`
 FROM `tools_ce_trends`
 WHERE
     `category_id` > ?
@@ -1519,7 +1519,7 @@ WHERE
 EOD;
             } else {
                 $query = <<<EOD
-SELECT COUNT(id) AS `count`
+SELECT COUNT(DISTINCT `date`) AS `count`
 FROM `tools_ce_trends`
 WHERE
     `category_id` = ?
@@ -1538,7 +1538,7 @@ EOD;
             ));
             if ($category_id == -1) {
                 $query = <<<EOD
-SELECT COUNT(id) AS `count`
+SELECT COUNT(DISTINCT `date`) AS `count`
 FROM `tools_ce_trends`
 WHERE
     `category_id` > ?
@@ -1551,7 +1551,7 @@ WHERE
 EOD;
             } else {
                 $query = <<<EOD
-SELECT COUNT(id) AS `count`
+SELECT COUNT(DISTINCT `date`) AS `count`
 FROM `tools_ce_trends`
 WHERE
     `category_id` = ?
