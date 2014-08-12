@@ -499,16 +499,16 @@ a {
     border-top: 1px solid #dddddd;
 }
 
-#middle .container-fluid .table td p {
-    margin-bottom: 5px;
-}
-
-#middle .container-fluid .table td ul {
-    margin-bottom: 5px;
-}
-
 #middle .container-fluid .table .details {
     padding-bottom: 0;
+}
+
+#middle .container-fluid .table .details p {
+    margin-bottom: 10px;
+}
+
+#middle .container-fluid .table .details ul {
+    margin-bottom: 10px;
 }
 
 #middle .container-fluid .table .header {

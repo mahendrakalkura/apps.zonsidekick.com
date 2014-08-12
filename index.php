@@ -1593,9 +1593,16 @@ EOD;
         $contents['glance']['words']
     );
     arsort($contents['glance']['words']);
-    $contents['glance']['words'] = implode(', ', array_keys(array_slice(
+    $words = array();
+    $contents['glance']['words'] = array_slice(
         $contents['glance']['words'], 0, 10
-    )));
+    );
+    if ($contents['glance']['words']) {
+        foreach ($contents['glance']['words'] as $key => $value) {
+            $words[] = array($key, $value);
+        }
+    }
+    $contents['glance']['words'] = $words;
 
     return new Response(json_encode($contents));
 })
