@@ -416,47 +416,67 @@
                         </tr>
                         <tr ng-show="status">
                             <td class="details" colspan="9">
-                                <p>
-                                    <strong>Publication Date:</strong>
-                                    [! book.publication_date !]
-                                </p>
-                                <p><strong>Categories & Ranks:</strong></p>
-                                <ul ng-controller="amazon_best_sellers_rank">
-                                    <li
-                                        ng-repeat="(key, value) in book.amazon_best_sellers_rank"
-                                        ng-show="(key == 'Paid in Kindle Store') || $parent.status"
-                                        >
-                                        <strong>#[! value|number:0 !]</strong>
-                                        in
-                                        [! key !]
-                                        <span ng-show="key == 'Paid in Kindle Store'">
-                                            <a
-                                                ng-click="$parent.status = true"
-                                                ng-show="!$parent.status"
-                                                >Show More</a>
-                                            <a
-                                                ng-click="$parent.status = false"
-                                                ng-show="$parent.status"
-                                                >Show Less</a>
-                                        </span>
-                                    </li>
-                                </ul>
-                                <p>
-                                    <strong>Estimated Sales Per Day:</strong>
-                                    [! book.estimated_sales_per_day|number:0 !]
-                                </p>
-                                <p>
-                                    <strong>Earnings Per Day:</strong>
-                                    $[! book.earnings_per_day|number:2 !]
-                                </p>
-                                <p><strong>Appearances:</strong></p>
-                                <ul>
-                                    <li ng-repeat="(key, value) in book.appearances">
-                                        <strong>[! value|number:2 !]%</strong>
-                                        in the
-                                        [! key !]
-                                    </li>
-                                </ul>
+                                <div class="row-fluid">
+                                    <div class="span4">
+                                        <p ng-show="category == -1">
+                                            <strong>Category:</strong>
+                                            [! book.category !]
+                                        </p>
+                                        <p>
+                                            <strong>Publication Date:</strong>
+                                            [! book.publication_date !]
+                                        </p>
+                                        <p>
+                                            <strong>
+                                                Estimated Sales Per Day:
+                                            </strong>
+                                            [! book.estimated_sales_per_day|number:0 !]
+                                        </p>
+                                        <p>
+                                            <strong>Earnings Per Day:</strong>
+                                            $[! book.earnings_per_day|number:2 !]
+                                        </p>
+                                    </div>
+                                    <div class="span4">
+                                        <p>
+                                            <strong>
+                                                Categories & Ranks:
+                                            </strong>
+                                        </p>
+                                        <ul ng-controller="amazon_best_sellers_rank">
+                                            <li
+                                                ng-repeat="(key, value) in book.amazon_best_sellers_rank"
+                                                ng-show="(key == 'Paid in Kindle Store') || $parent.status"
+                                                >
+                                                <strong>
+                                                    #[! value|number:0 !]
+                                                </strong>
+                                                in
+                                                [! key !]
+                                                <span ng-show="key == 'Paid in Kindle Store'">
+                                                    <a
+                                                        ng-click="$parent.status = true"
+                                                        ng-show="!$parent.status"
+                                                        >Show More</a>
+                                                    <a
+                                                        ng-click="$parent.status = false"
+                                                        ng-show="$parent.status"
+                                                        >Show Less</a>
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="span4">
+                                        <p><strong>Appearances:</strong></p>
+                                        <ul>
+                                            <li ng-repeat="(key, value) in book.appearances">
+                                                <strong>[! value|number:2 !]%</strong>
+                                                in the
+                                                [! key !]
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                     </tbody>

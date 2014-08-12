@@ -58,6 +58,27 @@ function usort_logos($one, $two)
     return ($one < $two) ? -1 : 1;
 }
 
+function get_category($application, $category_id) {
+    $categories = array();
+    while (true) {
+        $query = <<<EOD
+SELECT `category_id`, `title`
+FROM `tools_ce_categories`
+WHERE `id` = ?
+EOD;
+        $row = $application['db']->fetchAssoc($query, array(
+            $category_id,
+        ));
+        $categories[] = $row['title'];
+        $category_id = $row['category_id'];
+        if (!$category_id) {
+            break;
+        }
+    }
+
+    return implode(' > ', array_reverse($categories));
+}
+
 function get_categories($application, $category_id, $prefixes) {
     $categories = array();
     if (count($prefixes) >= 3) {
@@ -1629,6 +1650,9 @@ EOD;
                     $contents['glance']['absr'] += 1;
                 }
             }
+            $book['category'] = get_category(
+                $application, $book['category_id']
+            );
             $contents['books'][] = $book;
             $contents['glance']['price'] += $book['price'];
             $contents[
