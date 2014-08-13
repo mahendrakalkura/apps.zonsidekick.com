@@ -285,6 +285,55 @@
                     </div>
                 </div>
                 <hr>
+                <div ng-controller="category">
+                    <div class="page-header">
+                        <button
+                            class="btn btn-default pull-right"
+                            ng-click="status = true"
+                            ng-show="!status"
+                            type="button"
+                            >
+                            <i class="icon-plus-sign"></i>
+                            Show More
+                        </button>
+                        <button
+                            class="btn btn-default pull-right"
+                            ng-click="status = false"
+                            ng-show="status"
+                            type="button"
+                            >
+                            <i class="icon-minus-sign"></i>
+                            Show Less
+                        </button>
+                        <h2>Categories</h2>
+                    </div>
+                    <table class="table table-hover table-striped">
+                        <thead>
+                            <tr>
+                                <th
+                                    class="header [! order_by['categories'][0] == 'title' && get_order_by('categories') || '' !]"
+                                    ng-click="set_order_by('categories', 'title')"
+                                    >Category</th>
+                                <th
+                                    class="header right [! order_by['categories'][0] == 'frequency' && get_order_by('categories') || '' !]"
+                                    ng-click="set_order_by('categories', 'frequency')"
+                                    >Frequency</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                ng-repeat="category in contents.categories|orderBy:order_by['categories'][0]:order_by['categories'][1]"
+                                ng-show="($index <= 4) || status"
+                                >
+                                <td><strong>[! category.title !]</strong></td>
+                                <td class="narrow right">
+                                    [! category.frequency|number:0 !]
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <hr>
                 <div class="page-header">
                     <div
                         class="btn-group pull-right"
@@ -569,55 +618,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <hr>
-                <div ng-controller="category">
-                    <div class="page-header">
-                        <button
-                            class="btn btn-default pull-right"
-                            ng-click="status = true"
-                            ng-show="!status"
-                            type="button"
-                            >
-                            <i class="icon-plus-sign"></i>
-                            Show More
-                        </button>
-                        <button
-                            class="btn btn-default pull-right"
-                            ng-click="status = false"
-                            ng-show="status"
-                            type="button"
-                            >
-                            <i class="icon-minus-sign"></i>
-                            Show Less
-                        </button>
-                        <h2>Categories</h2>
-                    </div>
-                    <table class="table table-hover table-striped">
-                        <thead>
-                            <tr>
-                                <th
-                                    class="header [! order_by['categories'][0] == 'title' && get_order_by('categories') || '' !]"
-                                    ng-click="set_order_by('categories', 'title')"
-                                    >Category</th>
-                                <th
-                                    class="header right [! order_by['categories'][0] == 'frequency' && get_order_by('categories') || '' !]"
-                                    ng-click="set_order_by('categories', 'frequency')"
-                                    >Frequency</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr
-                                ng-repeat="category in contents.categories|orderBy:order_by['categories'][0]:order_by['categories'][1]"
-                                ng-show="($index <= 4) || status"
-                                >
-                                <td><strong>[! category.title !]</strong></td>
-                                <td class="narrow right">
-                                    [! category.frequency|number:0 !]
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
                 </div>
             </div>
         </div>
