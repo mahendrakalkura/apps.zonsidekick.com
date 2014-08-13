@@ -204,17 +204,24 @@ application.controller('aks', function ($attrs, $http, $rootScope, $scope) {
         }).
         error(function (data, status, headers, config) {
             $scope.spinner = false;
-            $scope.$broadcast('open', {
+            $rootScope.$broadcast('open', {
                 top: $attrs.error3Top,
                 middle: $attrs.error3Middle
             });
         }).
         success(function (data, status, headers, config) {
-            $scope.suggestions = data;
             $scope.spinner = false;
-            $scope.focus['suggestions'] = true;
-            if ($scope.checkbox) {
-                $scope.download();
+            if (data.length > 0) {
+                $scope.suggestions = data;
+                $scope.focus['suggestions'] = true;
+                if ($scope.checkbox) {
+                    $scope.download();
+                }
+            } else {
+                $rootScope.$broadcast('open', {
+                    top: $attrs.error3Top,
+                    middle: $attrs.error3Middle
+                });
             }
         });
     };
