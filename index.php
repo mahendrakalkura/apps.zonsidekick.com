@@ -1331,6 +1331,8 @@ $application->match('/ce/xhr', function (Request $request) use ($application) {
     $section_id = intval($request->get('section_id'));
     $print_length_1 = $request->get('print_length_1');
     $print_length_2 = intval($request->get('print_length_2'));
+    $print_length_3 = intval($request->get('print_length_3'));
+    $print_length_4 = intval($request->get('print_length_4'));
     $price_1 = $request->get('price_1');
     $price_2 = floatval($request->get('price_2'));
     $publication_date_1 = $request->get('publication_date_1');
@@ -1441,88 +1443,65 @@ ORDER BY `tools_ce_trends`.`rank` ASC, `tools_ce_trends`.`category_id` ASC
 LIMIT %d OFFSET 0
 EOD;
     $conditions = array();
+    $parameters = array();
     switch ($print_length_1) {
-        case 'Any':
-            $print_length_2 = 0;
-            $conditions[] = '`tools_ce_books`.`print_length` >= ?';
-            break;
         case 'More Than':
             $conditions[] = '`tools_ce_books`.`print_length` > ?';
+            $parameters[] = $print_length_2;
             break;
         case 'Less Than':
             $conditions[] = '`tools_ce_books`.`print_length` < ?';
+            $parameters[] = $print_length_2;
             break;
-        default:
-            $print_length_2 = 0;
-            $conditions[] = '`tools_ce_books`.`print_length` >= ?';
+        case 'Between':
+            $conditions[] = <<<EOD
+`tools_ce_books`.`print_length` >= ? AND `tools_ce_books`.`print_length` <= ?
+EOD;
+            $parameters[] = $print_length_3;
+            $parameters[] = $print_length_4;
             break;
     }
     switch ($price_1) {
-        case 'Any':
-            $price_2 = 0.00;
-            $conditions[] = '`tools_ce_books`.`price` >= ?';
-            break;
         case 'More Than':
             $conditions[] = '`tools_ce_books`.`price` > ?';
+            $parameters[] = $price_2;
             break;
         case 'Less Than':
             $conditions[] = '`tools_ce_books`.`price` < ?';
-            break;
-        default:
-            $price_2 = 0.00;
-            $conditions[] = '`tools_ce_books`.`price` >= ?';
+            $parameters[] = $price_2;
             break;
     }
     switch ($publication_date_1) {
-        case 'Any':
-            $publication_date_2 = '0001-01-01';
-            $conditions[] = '`tools_ce_books`.`publication_date` >= ?';
-            break;
         case 'More Than':
             $conditions[] = '`tools_ce_books`.`publication_date` > ?';
+            $parameters[] = $publication_date_2;
             break;
         case 'Less Than':
             $conditions[] = '`tools_ce_books`.`publication_date` < ?';
-            break;
-        default:
-            $publication_date_2 = '0001-01-01';
-            $conditions[] = '`tools_ce_books`.`publication_date` >= ?';
+            $parameters[] = $publication_date_2;
             break;
     }
     switch ($review_average_1) {
-        case 'Any':
-            $review_average_2 = 0.00;
-            $conditions[] = '`tools_ce_books`.`review_average` >= ?';
-            break;
         case 'More Than':
             $conditions[] = '`tools_ce_books`.`review_average` > ?';
+            $parameters[] = $review_average_2;
             break;
         case 'Less Than':
             $conditions[] = '`tools_ce_books`.`review_average` < ?';
-            break;
-        default:
-            $review_average_2 = 0.00;
-            $conditions[] = '`tools_ce_books`.`review_average` >= ?';
+            $parameters[] = $review_average_2;
             break;
     }
-    if ($category_id == -1) {
-        $conditions[] = '`tools_ce_trends`.`category_id` > ?';
-    } else {
+    if ($category_id !== -1) {
         $conditions[] = '`tools_ce_trends`.`category_id` = ?';
+        $parameters[] = $category_id;
     }
     $conditions[] = '`tools_ce_trends`.`section_id` = ?';
+    $parameters[] = $section_id;
     $conditions[] = '`tools_ce_trends`.`date` = ?';
+    $parameters[] = $contents['date'];
     $conditions = implode(' AND ', $conditions);
     $query = sprintf($query, $conditions, $count);
-    $books = $application['db']->fetchAll($query, array(
-        $print_length_2,
-        $price_2,
-        $publication_date_2,
-        $review_average_2,
-        $category_id,
-        $section_id,
-        $contents['date'],
-    ));
+    $books = $application['db']->fetchAll($query, $parameters);
     if ($books) {
         foreach ($books as $book) {
             if ($category_id == -1) {

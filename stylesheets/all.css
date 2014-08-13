@@ -349,6 +349,10 @@ a {
     z-index: 1;
 }
 
+#middle .container-fluid form .between input {
+    margin-top: 5px;
+}
+
 #middle .container-fluid form .date .add-on {
     border-radius: 0;
     margin-left: -33px;
@@ -426,6 +430,7 @@ a {
 }
 
 #middle .container-fluid .form-actions.ce {
+    margin-top: 0;
     padding-left: 20px;
 }
 

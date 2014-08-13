@@ -249,6 +249,7 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
         'Any',
         'More Than',
         'Less Than',
+        'Between',
     ];
     $scope.prices = [
         'Any',
@@ -281,6 +282,8 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
     $scope.section = $scope.sections[0][0];
     $scope.print_length_1 = $scope.print_lengths[0];
     $scope.print_length_2 = 0;
+    $scope.print_length_3 = 0;
+    $scope.print_length_4 = 0;
     $scope.price_1 = $scope.prices[0];
     $scope.price_2 = 0;
     $scope.publication_date_1 = $scope.publication_dates[0];
@@ -316,6 +319,8 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
                 count: $scope.count,
                 print_length_1: $scope.print_length_1,
                 print_length_2: $scope.print_length_2,
+                print_length_3: $scope.print_length_3,
+                print_length_4: $scope.print_length_4,
                 appearance_1: $scope.appearance_1,
                 appearance_2: $scope.appearance_2,
                 price_1: $scope.price_1,

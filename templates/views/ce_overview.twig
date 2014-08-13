@@ -81,9 +81,32 @@
                                     max="999999999"
                                     min="0"
                                     ng-model="print_length_2"
-                                    ng-show="print_length_1 != 'Any'"
+                                    ng-show="print_length_1 == 'Less Than' || print_length_1 == 'More Than'"
                                     type="number"
                                     >
+                                <div
+                                    class="between"
+                                    ng-show="print_length_1 == 'Between'"
+                                    >
+                                    <div class="span6">
+                                        <input
+                                            class="span12"
+                                            max="999999999"
+                                            min="0"
+                                            ng-model="print_length_3"
+                                            type="number"
+                                            >
+                                    </div>
+                                    <div class="span6">
+                                        <input
+                                            class="span12"
+                                            max="999999999"
+                                            min="0"
+                                            ng-model="print_length_4"
+                                            type="number"
+                                            >
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="control-group">
@@ -102,7 +125,7 @@
                                     max="999999999"
                                     min="0"
                                     ng-model="price_2"
-                                    ng-show="price_1 != 'Any'"
+                                    ng-show="price_1 == 'Less Than' || price_1 == 'More Than'"
                                     step="any"
                                     type="number"
                                     >
@@ -123,7 +146,7 @@
                                 <div
                                     class="date input-append span12"
                                     datepicker
-                                    ng-show="publication_date_1 != 'Any'"
+                                    ng-show="publication_date_1 == 'Less Than' || publication_date_1 == 'More Than'"
                                     >
                                     <input class="span12" type="text">
                                     <span class="add-on">
@@ -151,7 +174,7 @@
                                     max="999999999"
                                     min="0"
                                     ng-model="amazon_best_sellers_rank_2"
-                                    ng-show="amazon_best_sellers_rank_1 != 'Any'"
+                                    ng-show="amazon_best_sellers_rank_1 == 'Less Than' || amazon_best_sellers_rank_1 == 'More Than'"
                                     type="number"
                                     >
                             </div>
@@ -172,7 +195,7 @@
                                     max="5.0"
                                     min="0.0"
                                     ng-model="review_average_2"
-                                    ng-show="review_average_1 != 'Any'"
+                                    ng-show="review_average_1 == 'Less Than' || review_average_1 == 'More Than'"
                                     step="any"
                                     type="number"
                                     >
@@ -194,7 +217,7 @@
                                     max="100"
                                     min="0"
                                     ng-model="appearance_2"
-                                    ng-show="appearance_1 != 'Any'"
+                                    ng-show="appearance_1 == 'Less Than' || appearance_1 == 'More Than'"
                                     step="any"
                                     type="number"
                                     >
@@ -358,7 +381,7 @@
                             Tiles
                         </button>
                     </div>
-                    <h2>Books</h2>
+                    <h2>Books ([! contents.books.length|number:0 !])</h2>
                 </div>
                 <table
                     class="table table-hover table-striped"
