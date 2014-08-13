@@ -105,7 +105,7 @@ EOD;
             $categories[] = array(
                 $row['id'],
                 sprintf(
-                    '%s %s',
+                    '%s%s',
                     implode(' > ', array_merge($prefixes, array(''))),
                     $row['title']
                 ),
@@ -1659,6 +1659,7 @@ EOD;
                     ) {
                         continue;
                     }
+                    $key = str_replace('Kindle Store > ', '', $key);
                     if (empty($contents['categories'][$key])) {
                         $contents['categories'][$key] = 0;
                     }

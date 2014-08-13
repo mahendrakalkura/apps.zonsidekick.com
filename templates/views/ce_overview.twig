@@ -348,7 +348,18 @@
                                 ng-repeat="category in contents.categories|orderBy:order_by['categories'][0]:order_by['categories'][1]"
                                 ng-show="($index <= 4) || status"
                                 >
-                                <td><strong>[! category.title !]</strong></td>
+                                <td>
+                                    <a
+                                        ng-show="category.id > 0"
+                                        href="{{ url('ce_overview') }}?category_id=[! category.id !]"
+                                        target="_blank"
+                                        >
+                                        [! category.title !]
+                                    </a>
+                                    <span ng-show="category.id == 0">
+                                        [! category.title !]
+                                    </span>
+                                </td>
                                 <td class="narrow right">
                                     [! category.frequency|number:0 !]
                                 </td>

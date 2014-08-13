@@ -5,6 +5,14 @@ Array.prototype.get_chunks = function (length) {
     }));
 }
 
+var get_parameter = function (name) {
+    var pattern = new RegExp('[\\?&]' + name + '=([^&#]*)', 'gi');
+    var results = pattern.exec(window.location.search);
+    return results == null? '': decodeURIComponent(
+        results[1].replace(/\+/gi, ' ')
+    );
+};
+
 var is_development = function(){
     if(window.location.port == '5000'){
         return true;
@@ -285,7 +293,7 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
     ];
     $scope.counts = _.range(100, 0, -10);
 
-    $scope.category = $scope.categories[1][0];
+    $scope.category = get_parameter('category_id') || $scope.categories[1][0];
     $scope.section = $scope.sections[0][0];
     $scope.print_length_1 = $scope.print_lengths[0];
     $scope.print_length_2 = 0;
@@ -301,7 +309,7 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
     $scope.review_average_2 = 0;
     $scope.appearance_1 = $scope.appearances[0];
     $scope.appearance_2 = 0;
-    $scope.count = is_development()? 10: $scope.counts[0];
+    $scope.count = $scope.counts[0];
 
     $scope.spinner = false;
     $scope.error = false;
@@ -350,6 +358,33 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
             $scope.error = !data.books.length;
             $scope.contents = data;
             $scope.contents['chunks'] = $scope.contents['books'].get_chunks(3);
+            for (var index in $scope.contents['categories']) {
+                $scope.contents['categories'][index]['id'] = 0;
+                if (
+                    $scope.contents['categories'][index]['title']
+                    ==
+                    'Paid in Kindle Store'
+                ) {
+                    $scope.contents['categories'][index]['id'] = 1;
+                } else {
+                    for (var i in $scope.categories) {
+                        console.log(
+                            $scope.contents['categories'][index]['title'],
+                            $scope.categories[i][1]
+                        );
+                        if (
+                            $scope.contents['categories'][index]['title']
+                            ==
+                            $scope.categories[i][1]
+                        ) {
+                            $scope.contents[
+                                'categories'
+                            ][index]['id'] = $scope.categories[i][0];
+                            break;
+                        }
+                    }
+                }
+            }
         });
 
         return;
