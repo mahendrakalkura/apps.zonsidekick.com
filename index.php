@@ -1673,6 +1673,13 @@ EOD;
             }
             if ($book['amazon_best_sellers_rank']) {
                 foreach ($book['amazon_best_sellers_rank'] as $key => $value) {
+                    if (
+                        !preg_match('/^Paid in Kindle Store/', $key)
+                        AND
+                        !preg_match('/^Kindle Store > Kindle eBooks/', $key)
+                    ) {
+                        continue;
+                    }
                     if (empty($contents['categories'][$key])) {
                         $contents['categories'][$key] = 0;
                     }
