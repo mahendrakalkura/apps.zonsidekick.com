@@ -155,7 +155,7 @@ application.controller('aks', function ($attrs, $http, $rootScope, $scope) {
         suggestions: false
     };
     $scope.level = '1';
-    $scope.mode = '2';
+    $scope.mode = '1';
     $scope.search_alias = 'digital-text';
     $scope.spinner = false;
     $scope.suggestions = [];
