@@ -476,6 +476,24 @@ application.controller('kns_simple', [
     '$scope',
     '$timeout',
     function ($attrs, $filter, $http, $rootScope, $scope, $timeout) {
+        $scope.books = [
+            'Any',
+            'More Than',
+            'Less Than',
+        ];
+        $scope.amazon_best_sellers_ranks = [
+            'Any',
+            'More Than',
+            'Less Than',
+        ];
+        $scope.counts = _.range(48, 0, -12);
+
+        $scope.books_1 = $scope.books[0];
+        $scope.books_2 = 0;
+        $scope.amazon_best_sellers_rank_1 = $scope.amazon_best_sellers_ranks[0];
+        $scope.amazon_best_sellers_rank_2 = 0;
+        $scope.count = $scope.counts[0];
+
         $scope.keywords = [];
         $scope.order_by = [];
         $scope.user_email = $attrs.userEmail;
@@ -512,7 +530,7 @@ application.controller('kns_simple', [
                 $timeout($scope.process, 15000);
             }).
             success(function (data, status, headers, config) {
-                $scope.keywords = $scope.reorder(data, $scope.order_by);
+                $scope.keywords = data;
                 var status = (
                     $scope.keywords.length
                     &&
@@ -528,14 +546,72 @@ application.controller('kns_simple', [
             return;
         };
 
-        $scope.reorder = function(data, order_by) {
-            if (order_by.length) {
-                return $filter('orderBy')(
-                    $scope.keywords, $scope.order_by[0], $scope.order_by[1]
+        $scope.get_keywords = function () {
+            var keywords = $scope.keywords;
+            keywords = $filter('filter')(keywords, function (keyword) {
+                if (keyword.contents == null) {
+                    return true;
+                }
+
+                var count = 0;
+                var books = keyword.contents.items.slice(
+                    0, $scope.count
+                ).filter(
+                    function (book) {
+                        var status = false;
+                        switch ($scope.amazon_best_sellers_rank_1) {
+                            case 'More Than':
+                                if (
+                                    book.best_sellers_rank[0]
+                                    >
+                                    $scope.amazon_best_sellers_rank_2
+                                ) {
+                                    status = true;
+                                }
+                                break;
+                            case 'Less Than':
+                                if (
+                                    book.best_sellers_rank[0]
+                                    <
+                                    $scope.amazon_best_sellers_rank_2
+                                ) {
+                                    status = true;
+                                }
+                                break;
+                            default:
+                                status = true;
+                                break;
+                        }
+                        return status;
+                    }
+                );
+
+                var status = false;
+                switch ($scope.books_1) {
+                    case 'More Than':
+                        if (books.length > $scope.books_2) {
+                            status = true;
+                        }
+                        break;
+                    case 'Less Than':
+                        if (books.length < $scope.books_2) {
+                            status = true;
+                        }
+                        break;
+                    default:
+                        status = true;
+                        break;
+                }
+
+                return status;
+            });
+            if ($scope.order_by.length) {
+                keywords = $filter('orderBy')(
+                    keywords, $scope.order_by[0], $scope.order_by[1]
                 );
             }
 
-            return data;
+            return keywords;
         };
 
         $scope.get_order_by = function () {

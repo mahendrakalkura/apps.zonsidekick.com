@@ -424,13 +424,16 @@ a {
     text-align: right;
 }
 
+#middle .container-fluid .control-group.kns {
+    margin-bottom: 0;
+}
+
 #middle .container-fluid .form-actions {
     margin-top: 10px;
     margin-bottom: 30px;
 }
 
 #middle .container-fluid .form-actions.ce {
-    margin-top: 0;
     padding-left: 20px;
 }
 
@@ -634,6 +637,10 @@ a {
     margin-bottom: 10px;
 }
 
+.p {
+    margin-bottom: 30px;
+}
+
 .popover {
     max-width: 500px;
     width: 500px;
@@ -668,6 +675,10 @@ a {
 
 .popover p {
     margin-bottom: 10px;
+}
+
+.select2-drop {
+    margin-top: -3px;
 }
 
 .tooltip-inner {

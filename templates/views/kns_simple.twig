@@ -32,7 +32,7 @@
     </div>
     <div class="row-fluid">
         <div class="span12">
-            <div class="form-actions">
+            <div class="p text-center">
                 <a
                     class="btn btn-info"
                     data-toggle="tooltip"
@@ -110,6 +110,78 @@
                     </div>
                 </div>
             </div>
+            <hr>
+        </div>
+    </div>
+    <form class="form-horizontal">
+        <div class="row-fluid">
+            <div class="span4">
+                <div class="control-group kns">
+                    <label class="control-label" for="books">
+                        No. of Books
+                    </label>
+                    <div class="controls">
+                        <select
+                            class="select2 span12"
+                            id="books"
+                            ng-model="books_1"
+                            ng-options="book as book for book in books"
+                            ></select>
+                        <input
+                            class="span12"
+                            max="999999999"
+                            min="0"
+                            ng-model="books_2"
+                            ng-show="books_1 == 'Less Than' || books_1 == 'More Than'"
+                            step="any"
+                            type="number"
+                            >
+                    </div>
+                </div>
+            </div>
+            <div class="span4">
+                <div class="control-group kns">
+                    <label class="control-label" for="books">
+                        Amazon BSR
+                    </label>
+                    <div class="controls">
+                        <select
+                            class="select2 span12"
+                            id="amazon_best_sellers_ranks"
+                            ng-model="amazon_best_sellers_rank_1"
+                            ng-options="amazon_best_sellers_rank as amazon_best_sellers_rank for amazon_best_sellers_rank in amazon_best_sellers_ranks"
+                            ></select>
+                        <input
+                            class="span12"
+                            max="999999999"
+                            min="0"
+                            ng-model="amazon_best_sellers_rank_2"
+                            ng-show="amazon_best_sellers_rank_1 == 'Less Than' || amazon_best_sellers_rank_1 == 'More Than'"
+                            type="number"
+                            >
+                    </div>
+                </div>
+            </div>
+            <div class="span4">
+                <div class="control-group kns">
+                    <label class="control-label" for="count">
+                        Top
+                    </label>
+                    <div class="controls">
+                        <select
+                            class="select2 span12"
+                            id="count"
+                            ng-model="count"
+                            ng-options="count as count for count in counts"
+                            ></select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="row-fluid">
+        <div class="span12">
+            <hr>
             <p class="center">Mouse over headers for explanation</p>
             <table class="table table-hover table-striped">
                 <thead>
@@ -189,7 +261,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="keyword in keywords|orderBy:order_by[0]:order_by[1]">
+                    <tr ng-repeat="keyword in get_keywords()">
                         <td>[! keyword['string'] !]</td>
                         <td class="center">
                             <span ng-switch on="keyword['contents']">

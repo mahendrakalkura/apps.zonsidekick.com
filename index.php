@@ -954,7 +954,6 @@ $application->match(
         if ($keywords) {
             foreach ($keywords as $key => $value) {
                 if ($keywords[$key]['contents']) {
-                    unset($keywords[$key]['contents']['items']);
                     if ($keywords[$key]['contents']['score'][1] !== 'N/A') {
                         $keywords[$key]['position'] = 1;
                     } else {
