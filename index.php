@@ -1728,9 +1728,9 @@ $application->match(
                         $message = \Swift_Message::newInstance()
                             ->setBody(trim($request->get('body')))
                             ->setFrom(array(
-                                $application[
-                                    'swiftmailer.options'
-                                ]['username'] => 'Zon Sidekick',
+                                'reports@perfectsidekick.com'
+                                =>
+                                'Zon Sidekick',
                             ))
                             ->setSubject($subject)
                             ->setTo(array(
