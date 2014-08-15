@@ -5,6 +5,7 @@ from sys import argv
 
 from requests import get
 from simplejson import dumps, loads
+from simplejson.scanner import JSONDecodeError
 
 from utilities import get_proxies
 
@@ -117,7 +118,7 @@ def get_suggestions(country, level, q, search_alias):
                     if suggestion:
                         if not suggestion in strings:
                             strings.append(suggestion)
-            except IndexError:
+            except (AttributeError, IndexError, JSONDecodeError):
                 pass
         level -= 1
     return strings
