@@ -986,7 +986,7 @@ report includes our recommendations along with important information about each
 keyword.
 
 If you have any questions at all please don't hesitate to contact
-support@zonsidekick.com
+reports@perfectsidekick.com
 EOD;
         try {
             $message = \Swift_Message::newInstance()
@@ -1009,7 +1009,7 @@ EOD;
                 ))
                 ->setBody(trim($body))
                 ->setFrom(array(
-                    'reports@zonsidekick.com',
+                    'reports@perfectsidekick.com',
                 ))
                 ->setSubject($subject)
                 ->setTo(array($request->get('email')));
