@@ -986,7 +986,7 @@ report includes our recommendations along with important information about each
 keyword.
 
 If you have any questions at all please don't hesitate to contact
-reports@perfectsidekick.com
+support@perfectsidekick.com
 EOD;
         try {
             $message = \Swift_Message::newInstance()
@@ -1009,7 +1009,7 @@ EOD;
                 ))
                 ->setBody(trim($body))
                 ->setFrom(array(
-                    'reports@perfectsidekick.com',
+                    'reports@perfectsidekick.com' => 'Zon Sidekick',
                 ))
                 ->setSubject($subject)
                 ->setTo(array($request->get('email')));
@@ -1730,7 +1730,7 @@ $application->match(
                             ->setFrom(array(
                                 $application[
                                     'swiftmailer.options'
-                                ]['username'],
+                                ]['username'] => 'Zon Sidekick',
                             ))
                             ->setSubject($subject)
                             ->setTo(array(
