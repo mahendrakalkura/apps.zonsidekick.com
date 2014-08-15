@@ -110,10 +110,10 @@
                     </div>
                 </div>
             </div>
-            <hr>
+            <hr ng-show="is_finished()">
         </div>
     </div>
-    <form class="form-horizontal">
+    <form class="form-horizontal" ng-show="is_finished()">
         <div class="row-fluid">
             <div class="span4">
                 <div class="control-group kns">
@@ -181,7 +181,7 @@
     </form>
     <div class="row-fluid">
         <div class="span12">
-            <hr>
+            <hr ng-show="is_finished()">
             <p class="center">Mouse over headers for explanation</p>
             <table class="table table-hover table-striped">
                 <thead>

@@ -552,7 +552,6 @@ application.controller('kns_simple', [
                 if (keyword.contents == null) {
                     return true;
                 }
-
                 var count = 0;
                 var books = keyword.contents.items.slice(
                     0, $scope.count
@@ -585,7 +584,6 @@ application.controller('kns_simple', [
                         return status;
                     }
                 );
-
                 var status = false;
                 switch ($scope.books_1) {
                     case 'More Than':
@@ -610,7 +608,6 @@ application.controller('kns_simple', [
                     keywords, $scope.order_by[0], $scope.order_by[1]
                 );
             }
-
             return keywords;
         };
 
@@ -628,6 +625,16 @@ application.controller('kns_simple', [
             $scope.keywords = $filter('orderBy')(
                 $scope.keywords, $scope.order_by[0], $scope.order_by[1]
             );
+        };
+
+        $scope.is_finished = function () {
+            var status = true;
+            for (var index in $scope.keywords) {
+                if ($scope.keywords[index].contents == null) {
+                    status = false;
+                }
+            }
+            return status;
         };
 
         jQuery(document).on('click', '.popover-pdf', function () {
