@@ -639,7 +639,9 @@ $application->register(new DoctrineServiceProvider(), array(
         'user' => $variables['mysql']['user'],
     ),
 ));
-$application->register(new SessionServiceProvider());
+$application->register(new SessionServiceProvider(array(
+    'session.storage.save_path' => sprintf('%s/tmp', __DIR__),
+)));
 $application->register(new SwiftmailerServiceProvider(), array(
     'swiftmailer.options' => array(
         'auth_mode' => $variables['smtp']['auth_mode'],
