@@ -630,6 +630,9 @@ application.controller('kns_simple', [
         $scope.is_finished = function () {
             var status = true;
             for (var index in $scope.keywords) {
+                if (index == 'get_chunks') {
+                    continue;
+                }
                 if ($scope.keywords[index].contents == null) {
                     status = false;
                 }
