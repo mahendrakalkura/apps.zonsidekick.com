@@ -260,9 +260,24 @@
                         </th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr ng-repeat="keyword in get_keywords()">
-                        <td>[! keyword['string'] !]</td>
+                <tbody
+                    ng-controller="keyword"
+                    ng-repeat="keyword in get_keywords()"
+                    >
+                    <tr>
+                        <td>
+                            <a
+                                class="pull-right"
+                                ng-click="status = true"
+                                ng-show="keyword['contents'] != null && !status"
+                                >Show Details</a>
+                            <a
+                                class="pull-right"
+                                ng-click="status = false"
+                                ng-show="keyword['contents'] != null && status"
+                                >Hide Details</a>
+                            [! keyword['string'] !]
+                        </td>
                         <td class="center">
                             <span ng-switch on="keyword['contents']">
                                 <span
@@ -415,6 +430,61 @@
                                     </span>
                                 </span>
                             </span>
+                        </td>
+                    </tr>
+                    <tr ng-show="status">
+                        <td class="details" colspan="8">
+                            <p><strong>Top 10 words</strong></p>
+                            <div class="row-fluid">
+                                <div
+                                    class="span6"
+                                    ng-repeat="words in keyword['contents']['top_10_words']"
+                                    >
+                                    <ul>
+                                        <li ng-repeat="word in words">
+                                            [! word !]
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <table class="table table-hover table-striped">
+                                <tr>
+                                    <th>Title</th>
+                                    <th class="narrow center">
+                                        KW In Title (previously KW Match)
+                                    </th>
+                                    <th class="narrow right">
+                                        Best Seller Rank
+                                    </th>
+                                    <th class="narrow right">
+                                        Price ({{ currency }})
+                                    </th>
+                                    <th class="narrow right">
+                                        Date Published
+                                    </th>
+                                    <th class="narrow right">
+                                        Average Review
+                                    </th>
+                                </tr>
+                                <tr ng-repeat="item in keyword['contents']['items']">
+                                    <td>[! item.title[0] !]</td>
+                                    <td class="narrow center">
+                                        [! item.title[1] !]
+                                    </td>
+                                    <td class="narrow right">
+                                        [! item.best_sellers_rank[0]|number:0 !]
+                                    </td>
+                                    <td class="narrow right">
+                                        [! item.price[0]|number:2 !]
+                                    </td>
+                                    <td class="narrow right">
+                                        [! item.publication_date !]
+                                    </td>
+                                    <td class="narrow right">
+                                        [! item.stars[0]|number:2 !]
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
                 </tbody>

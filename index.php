@@ -954,6 +954,30 @@ $application->match(
         if ($keywords) {
             foreach ($keywords as $key => $value) {
                 if ($keywords[$key]['contents']) {
+                    $words = array();
+                    if ($keywords[$key]['contents']['items']) {
+                        foreach (
+                            $keywords[$key]['contents']['items'] as $item
+                        ) {
+                            $ws = preg_split(
+                                '/[^A-Za-z0-9]/', $item['title'][0]
+                            );
+                            if ($ws) {
+                                foreach ($ws as $w) {
+                                    if (strlen($w) > 3) {
+                                        $words[] = strtolower($w);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    $words = array_count_values($words);
+                    arsort($words);
+                    $words = array_keys($words);
+                    $keywords[$key]['contents']['top_10_words'] = array(
+                        array_slice($words, 0, 5),
+                        array_slice($words, 5, 5),
+                    );
                     if ($keywords[$key]['contents']['score'][1] !== 'N/A') {
                         $keywords[$key]['position'] = 1;
                     } else {

@@ -417,6 +417,10 @@ application.controller('download', function ($element, $scope) {
     });
 });
 
+application.controller('keyword', function ($scope) {
+    $scope.status = false;
+});
+
 application.controller('kns_add', [
     '$attrs', '$rootScope', '$scope', function ($attrs, $rootScope, $scope) {
         $scope.count = 500;

@@ -511,6 +511,10 @@ a {
     padding-bottom: 0;
 }
 
+#middle .container-fluid .table .details table {
+    margin-bottom: 10px;
+}
+
 #middle .container-fluid .table .details p {
     margin-bottom: 10px;
 }
