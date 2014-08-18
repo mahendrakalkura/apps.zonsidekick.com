@@ -465,7 +465,13 @@
                                     </th>
                                 </tr>
                                 <tr ng-repeat="item in keyword['contents']['items']">
-                                    <td>[! item.title[0] !]</td>
+                                    <td>
+                                        <a
+                                            href="[! item.url !]"
+                                            rel="noreferrer"
+                                            target="_blank"
+                                            >[! item.title[0] !]</a>
+                                    </td>
                                     <td class="narrow center">
                                         [! item.title[1] !]
                                     </td>
