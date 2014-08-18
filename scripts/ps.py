@@ -2,12 +2,9 @@
 
 from datetime import datetime
 from re import compile
-from socket import timeout
 from string import lowercase
 
 from furl import furl
-from requests import get
-from requests.exceptions import RequestException
 from scrapy.selector import Selector
 from simplejson import loads
 from simplejson.decoder import JSONDecodeError
@@ -18,6 +15,7 @@ from sqlalchemy.orm import backref, relationship
 from utilities import (
     base,
     get_amazon_best_sellers_rank,
+    get_contents,
     get_mysql_session,
     get_proxies,
     get_string,
@@ -48,27 +46,6 @@ class trend(base):
         'book', backref=backref('trends', cascade='all', lazy='dynamic'),
     )
 
-
-def get_contents(url):
-    index = 0
-    while True:
-        index += 1
-        if index >= 5:
-            return ''
-        try:
-            response = get(
-                url,
-                headers={
-                    'User-Agent': get_user_agent(),
-                },
-                proxies=get_proxies(),
-                timeout=300,
-            )
-            if response and response.status_code == 200:
-                return response.text
-        except (RequestException, timeout):
-            pass
-    return ''
 
 if __name__ == '__main__':
     session = get_mysql_session()()
