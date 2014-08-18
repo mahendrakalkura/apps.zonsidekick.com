@@ -16,7 +16,6 @@ from utilities import (
     base,
     get_amazon_best_sellers_rank,
     get_mysql_session,
-    get_amazon_best_sellers_rank,
     get_number,
     get_proxies,
     get_string,

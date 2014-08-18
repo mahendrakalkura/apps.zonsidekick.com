@@ -192,7 +192,7 @@ def get_book(url):
                 ).extract()[0])))
             except IndexError:
                 pass
-        amazon_best_sellers_rank = get_amazon_best_sellers_rank(response)
+        amazon_best_sellers_rank = get_amazon_best_sellers_rank(selector)
         if amazon_best_sellers_rank:
             try:
                 estimated_sales_per_day = float(get_sales(
