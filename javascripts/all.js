@@ -417,10 +417,6 @@ application.controller('download', function ($element, $scope) {
     });
 });
 
-application.controller('keyword', function ($scope) {
-    $scope.status = false;
-});
-
 application.controller('kns_add', [
     '$attrs', '$rootScope', '$scope', function ($attrs, $rootScope, $scope) {
         $scope.count = 500;
@@ -501,6 +497,8 @@ application.controller('kns_simple', [
         $scope.keywords = [];
         $scope.order_by = [];
         $scope.user_email = $attrs.userEmail;
+
+        $scope.statuses = {};
 
         $scope.email = function (email) {
             jQuery(

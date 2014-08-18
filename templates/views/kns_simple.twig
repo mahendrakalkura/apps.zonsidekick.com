@@ -260,21 +260,18 @@
                         </th>
                     </tr>
                 </thead>
-                <tbody
-                    ng-controller="keyword"
-                    ng-repeat="keyword in get_keywords()"
-                    >
+                <tbody ng-repeat="keyword in get_keywords()">
                     <tr>
                         <td>
                             <a
                                 class="pull-right"
-                                ng-click="status = true"
-                                ng-show="keyword['contents'] != null && !status"
+                                ng-click="statuses[keyword['string']] = true"
+                                ng-show="keyword['contents'] != null && !statuses[keyword['string']]"
                                 >Show Details</a>
                             <a
                                 class="pull-right"
-                                ng-click="status = false"
-                                ng-show="keyword['contents'] != null && status"
+                                ng-click="statuses[keyword['string']] = false"
+                                ng-show="keyword['contents'] != null && statuses[keyword['string']]"
                                 >Hide Details</a>
                             [! keyword['string'] !]
                         </td>
@@ -432,7 +429,7 @@
                             </span>
                         </td>
                     </tr>
-                    <tr ng-show="status">
+                    <tr ng-show="statuses[keyword['string']]">
                         <td class="details" colspan="8">
                             <p><strong>Top 10 words</strong></p>
                             <div class="row-fluid">
