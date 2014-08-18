@@ -2,7 +2,6 @@
 
 from furl import furl
 from scrapy.selector import Selector
-from sys import argv
 
 from utilities import get_book, get_contents, get_number, get_string, get_url
 
@@ -152,8 +151,3 @@ def get_author(url):
             'twitter': twitter,
             'url': url,
         }
-
-
-if __name__ == '__main__':
-    for url in get_authors(argv[1]):
-        print get_author(url)

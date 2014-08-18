@@ -39,12 +39,3 @@ def get_ranks(url, keywords=[]):
                 ranks[keyword] = index + 1
                 break
     return ranks
-
-for book in get_books('Hunger Games'):
-    print get_book(book['url'])
-
-print get_ranks(
-    'http://www.amazon.com/Effective-Specific-Improve-Programs-Designs-ebook'
-    '/dp/B004V4420U/ref=sr_1_10?s=digital-text&ie=UTF8',
-    ['c program', 'C++']
-)
