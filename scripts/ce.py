@@ -8,9 +8,10 @@ from scrapy.contrib.spiders import CrawlSpider, Rule
 from scrapy.http import Request
 from scrapy.item import Item, Field
 from scrapy.selector import Selector
-from sqlalchemy.exc import DBAPIError, SQLAlchemyError
 from sqlalchemy import Column, Integer
+from sqlalchemy.exc import DBAPIError, SQLAlchemyError
 from sqlalchemy.orm import backref, relationship
+from sqlalchemy.sql import null
 
 from utilities import (
     base,
@@ -18,8 +19,8 @@ from utilities import (
     get_mysql_session,
     get_number,
     get_proxies,
-    get_string,
     get_sales,
+    get_string,
     get_url,
     get_user_agent,
     is_development,
@@ -225,14 +226,14 @@ class Pipeline(object):
         return session.query(
             category,
         ).filter(
-            category.url==sub(r'/gp/.*?/', '/gp/zgbs/', dictionary['url']),
+            category.url == sub(r'/gp/.*?/', '/gp/zgbs/', dictionary['url']),
         ).first()
 
     def get_section(self, session, dictionary):
         return session.query(
             section,
         ).filter(
-            section.slug==dictionary['slug'],
+            section.slug == dictionary['slug'],
         ).first()
 
 
@@ -260,19 +261,19 @@ class Spider(CrawlSpider):
         for c_1 in session.query(
             category,
         ).filter(
-            category.category==None,
+            category.category == null(),
         ).order_by('id asc').all():
             urls.append(c_1.url)
             for c_2 in session.query(
                 category,
             ).filter(
-                category.category==c_1,
+                category.category == c_1,
             ).order_by('id asc').all():
                 urls.append(c_2.url)
                 for c_3 in session.query(
                     category,
                 ).filter(
-                    category.category==c_2,
+                    category.category == c_2,
                 ).order_by('id asc').all():
                     urls.append(c_3.url)
         if is_development():

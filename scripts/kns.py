@@ -147,7 +147,7 @@ def get_responses(urls):
                     and
                     response.status_code == 200
                     and
-                    not 'Enter the characters you see below' in response.text
+                    'Enter the characters you see below' not in response.text
                 ):
                     responses[response.request.url] = response
         except Exception:

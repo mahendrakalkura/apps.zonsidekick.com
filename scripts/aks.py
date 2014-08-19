@@ -116,7 +116,7 @@ def get_suggestions(country, level, q, search_alias):
                 )[1]:
                     suggestion = suggestion.strip()
                     if suggestion:
-                        if not suggestion in strings:
+                        if suggestion not in strings:
                             strings.append(suggestion)
             except (AttributeError, IndexError, JSONDecodeError):
                 pass

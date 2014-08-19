@@ -20,36 +20,42 @@ def get_authors(name):
             }).url
         )
         if response:
-            for anchor in Selector(text=response).xpath(
+            for anchor in Selector(
+                text=response
+            ).xpath(
                 '//span[@class="ptBrand"]/a'
             ):
-                author = 'http://www.amazon.com%(href)s' % {
-                    'href': anchor.xpath('.//@href').extract()[0],
-                }
-                author = get_url(author)
-                if not author in authors:
-                    authors.append(author)
+                authors.append({
+                    'url': get_url('http://www.amazon.com%(href)s' % {
+                        'href': anchor.xpath('.//@href').extract()[0],
+                    }),
+                    'name': anchor.xpath('.//text()').extract()[0],
+                })
     return authors
 
 
 def get_author(url):
-    amazon_authors_rank = {}
-    author = ''
-    books = []
+    name = ''
     description = ''
-    earnings = 0
-    earnings_per_month = 0.0
     photo = ''
-    twitter = {}
+    amazon_rank = {}
+    earnings_per_month = 0.0
+    twitter = {
+        'screen_name': '',
+        'profile_image_url': '',
+        'tweet': {
+            'text': '',
+        }
+    }
+    books = []
     response = get_contents(url)
     if response:
-        urls = []
         selector = Selector(text=response)
         try:
-            author = get_string(selector.xpath(
+            name = get_string(selector.xpath(
                 '//h1[@id="EntityName"]/b/text()'
             ).extract()[0])
-        except:
+        except IndexError:
             pass
         try:
             description = get_string(' '.join(selector.xpath(
@@ -64,7 +70,7 @@ def get_author(url):
         except IndexError:
             pass
         try:
-            amazon_authors_rank[
+            amazon_rank[
                 'Top 100 Authors'
             ] = get_number(selector.xpath(
                 '//div[@class="overallRank"]/text()'
@@ -75,11 +81,11 @@ def get_author(url):
             for div in selector.xpath(
                 '//div[@class="browseNodeRanks"]/div[@class="nodeRank"]'
             ):
-                string_ = get_string(
+                string = get_string(
                     div.xpath('string()').extract()[0]
                 ).split(' in ')
-                amazon_authors_rank[string_[1]] = get_number(
-                    string_[0]
+                amazon_rank[string[1]] = get_number(
+                    string[0]
                 )
         except IndexError:
             pass
@@ -88,66 +94,58 @@ def get_author(url):
                 '//p[@class="tweetScreenName"]/a/text()'
             ).extract()[0])
         except IndexError:
-            twitter['screen_name'] = ''
+            pass
         try:
             twitter['profile_image_url'] = get_string(selector.xpath(
                 '//a[@class="tweetProfileImage"]/img/@src'
             ).extract()[0])
         except IndexError:
-            twitter['profile_image_url'] = ''
+            pass
         try:
             twitter['tweet_text'] = get_string(selector.xpath(
                 '//p[@class="tweetText"]'
             ).xpath('string()').extract()[0])
         except IndexError:
-            twitter['tweet_text'] = ''
+            pass
+        urls = []
+        url = ''
         try:
-            kindle_url = selector.xpath(
+            url = selector.xpath(
                 '//div[@class="wwRefinements"]/ul/li'
                 '/a[contains(text(), "Kindle Edition")]/@href'
             ).extract()[0]
         except IndexError:
-            kindle_url = ''
-        index = 1
+            pass
+        index = 0
         while True:
-            if not kindle_url:
+            if not url:
                 break
-            response_ = get_contents(
-                'http://www.amazon.com%(kindle_url)s' % {
-                    'kindle_url': kindle_url,
-                }
-            )
-            if not response_:
+            index += 1
+            response = get_contents('http://www.amazon.com%(url)s' % {
+                'url': url,
+            })
+            if not response:
                 break
-            selector = Selector(text=response_)
+            selector = Selector(text=response)
             for href in selector.xpath(
                 '//h3[@class="title"]/a[@class="title"]/@href'
             ).extract():
                 urls.append(href)
+            url = ''
             if selector.xpath('//a[@class="pagnNext"]/@href').extract():
-                kindle_url = furl(
-                    kindle_url
-                ).remove(
-                    'page'
-                ).add({
+                url = furl(url).remove('page').add({
                     'page': index + 1
                 }).url
-            else:
-                kindle_url = ''
-            index += 1
-            response_ = ''
-        for url_ in urls:
-            book = get_book(url_)
-            earnings += book['earnings_per_day']
+        for url in urls:
+            book = get_book(url)
             books.append(book)
-        earnings_per_month = earnings * 30
+            earnings_per_month += (book['earnings_per_day'] * 30)
         return {
-            'amazon_authors_rank': amazon_authors_rank,
-            'author': author,
+            'amazon_rank': amazon_rank,
             'books': books,
             'description': description,
             'earnings_per_month': earnings_per_month,
+            'name': name,
             'photo': photo,
             'twitter': twitter,
-            'url': url,
         }

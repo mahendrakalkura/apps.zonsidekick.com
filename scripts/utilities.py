@@ -3,12 +3,12 @@
 from os.path import dirname, join
 from random import choice, randint
 from re import compile, sub
+from socket import timeout
 
 from MySQLdb import connect
 from MySQLdb.cursors import DictCursor
 from scrapy.selector import Selector
 from simplejson import dumps, loads
-from socket import timeout
 from requests import get
 from requests.exceptions import RequestException
 from sqlalchemy import create_engine
@@ -18,7 +18,6 @@ from sqlalchemy.ext.mutable import Mutable
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.schema import ThreadLocalMetaData
 from sqlalchemy.types import TEXT, TypeDecorator
-
 
 with open(join(
     dirname(__file__), '..', 'variables.json'
@@ -119,16 +118,17 @@ def get_amazon_best_sellers_rank(selector):
 
 def get_book(url):
     url = get_url(url)
-    amazon_best_sellers_rank = {}
     book_cover_image = ''
-    earnings_per_day = 0.0
-    estimated_sales_per_day = 0.0
-    price = 0.0
-    print_length = ''
-    publication_date = ''
-    review_average = ''
     title = ''
+    author = ''
+    price = 0.0
+    publication_date = ''
+    print_length = ''
+    amazon_best_sellers_rank = {}
+    estimated_sales_per_day = 0.0
+    earnings_per_day = 0.0
     total_number_of_reviews = ''
+    review_average = ''
     response = get_contents(url)
     if response:
         selector = Selector(text=response)
@@ -148,12 +148,10 @@ def get_book(url):
             )
         except AttributeError:
             try:
-                book_cover_image = get_string(
-                    selector.xpath(
-                        '//img[@id="imgBlkFront" or '
-                        '@id="main-image"]/@rel'
-                    ).extract()[0]
-                )
+                book_cover_image = get_string(selector.xpath(
+                    '//img[@id="imgBlkFront" or '
+                    '@id="main-image"]/@rel'
+                ).extract()[0])
             except IndexError:
                 pass
         try:
@@ -173,7 +171,7 @@ def get_book(url):
                     '//td[contains(text(), "Kindle Price")]/'
                     'following-sibling::td/b/text()'
                 ).extract()[0])))
-            except:
+            except IndexError:
                 pass
         try:
             publication_date = get_string(selector.xpath(
@@ -202,12 +200,6 @@ def get_book(url):
                 pass
         earnings_per_day = estimated_sales_per_day * price
         try:
-            review_average = float(get_number(get_string(selector.xpath(
-                '//div[@class="gry txtnormal acrRating"]/text()'
-            ).extract()[0].split(' ')[0])))
-        except IndexError:
-            pass
-        try:
             total_number_of_reviews = int(get_number(get_string(
                 selector.xpath(
                     '//span[@class="crAvgStars"]/a/text()'
@@ -215,8 +207,15 @@ def get_book(url):
             )))
         except IndexError:
             pass
+        try:
+            review_average = float(get_number(get_string(selector.xpath(
+                '//div[@class="gry txtnormal acrRating"]/text()'
+            ).extract()[0].split(' ')[0])))
+        except IndexError:
+            pass
         return {
             'amazon_best_sellers_rank': amazon_best_sellers_rank,
+            'author': author,
             'book_cover_image': book_cover_image,
             'earnings_per_day': earnings_per_day,
             'estimated_sales_per_day': estimated_sales_per_day,

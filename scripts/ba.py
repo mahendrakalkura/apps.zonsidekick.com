@@ -3,7 +3,7 @@
 from furl import furl
 from scrapy.selector import Selector
 
-from utilities import get_book, get_contents, get_url
+from utilities import get_contents, get_url
 
 
 def get_books(keyword):
@@ -18,7 +18,9 @@ def get_books(keyword):
             'sort': 'relevanceexprank',
         }).url)
         if response:
-            for anchor in Selector(text=response).xpath(
+            for anchor in Selector(
+                text=response
+            ).xpath(
                 '//h3[@class="title"]/a[@class="title"]'
             ):
                 books.append({
@@ -28,14 +30,14 @@ def get_books(keyword):
     return books
 
 
-def get_ranks(url, keywords=[]):
-    url = get_url(url)
+def get_ranks(url, keywords):
     ranks = {}
     for keyword in keywords:
         ranks[keyword] = 0
+    url = get_url(url)
     for keyword in keywords:
         for index, book in enumerate(get_books(keyword)):
-            if url == get_url(book['url']):
+            if url == book['url']:
                 ranks[keyword] = index + 1
                 break
     return ranks

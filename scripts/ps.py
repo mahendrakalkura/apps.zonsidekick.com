@@ -17,10 +17,8 @@ from utilities import (
     get_amazon_best_sellers_rank,
     get_contents,
     get_mysql_session,
-    get_proxies,
     get_string,
     get_url,
-    get_user_agent,
     is_development,
     json,
     mutators_dict,
@@ -148,7 +146,7 @@ if __name__ == '__main__':
                     b = session.query(
                         book,
                     ).filter(
-                        book.url==url,
+                        book.url == url,
                     ).first()
                     if not b:
                         b = book(**{
@@ -165,8 +163,8 @@ if __name__ == '__main__':
         if not session.query(
             trend,
         ).filter(
-            trend.book==b,
-            trend.date_and_time==date_and_time,
+            trend.book == b,
+            trend.date_and_time == date_and_time,
         ).count():
             session.add(trend(**{
                 'book': b,
