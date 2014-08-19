@@ -15,8 +15,8 @@ from sqlalchemy.orm import backref, relationship
 from utilities import (
     base,
     get_amazon_best_sellers_rank,
-    get_contents,
     get_mysql_session,
+    get_response,
     get_string,
     get_url,
     is_development,
@@ -56,8 +56,10 @@ if __name__ == '__main__':
         for alphabet in lowercase:
             contents = None
             try:
-                contents = loads(get_contents(
-                    furl('http://completion.amazon.com/search/complete').add({
+                contents = loads(get_response(
+                    furl(
+                        'http://completion.amazon.com/search/complete'
+                    ).add({
                         'mkt': '1',
                         'q': '%(q)s %(alphabet)s' % {
                             'alphabet': alphabet,
@@ -75,8 +77,10 @@ if __name__ == '__main__':
                 if not keyword.startswith(q):
                     continue
                 keyword = get_string(keyword.replace(q, ''))
-                response = get_contents(
-                    furl('http://www.amazon.com/s/').add({
+                response = get_response(
+                    furl(
+                        'http://www.amazon.com/s/'
+                    ).add({
                         'field-keywords': keyword,
                         'url': 'search-alias=digital-text',
                     }).url
@@ -93,7 +97,7 @@ if __name__ == '__main__':
                     pass
                 if not url:
                     continue
-                response = get_contents(url)
+                response = get_response(url)
                 if response:
                     title = ''
                     book_cover_image = ''
@@ -101,8 +105,8 @@ if __name__ == '__main__':
                     selector = Selector(text=response)
                     try:
                         title = get_string(selector.xpath(
-                            '//span[@id="btAsinTitle" or '
-                            '@id="productTitle"]/text()'
+                            '//span[@id="btAsinTitle" or @id="productTitle"]/'
+                            'text()'
                         ).extract()[0])
                     except IndexError:
                         pass
@@ -122,12 +126,10 @@ if __name__ == '__main__':
                         )
                     except AttributeError:
                         try:
-                            book_cover_image = get_string(
-                                selector.xpath(
-                                    '//img[@id="imgBlkFront" or '
-                                    '@id="main-image"]/@rel'
-                                ).extract()[0]
-                            )
+                            book_cover_image = get_string(selector.xpath(
+                                '//img[@id="imgBlkFront" or @id="main-image"]/'
+                                '@rel'
+                            ).extract()[0])
                         except IndexError:
                             pass
                     amazon_best_sellers_rank = get_amazon_best_sellers_rank(

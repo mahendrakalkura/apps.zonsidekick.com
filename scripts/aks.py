@@ -3,25 +3,11 @@
 from multiprocessing.pool import ThreadPool
 from sys import argv
 
-from requests import get
+from furl import furl
 from simplejson import dumps, loads
 from simplejson.scanner import JSONDecodeError
 
-from utilities import get_proxies
-
-
-def get_contents(url, params):
-    try:
-        return get(
-            url,
-            allow_redirects=True,
-            params=params,
-            proxies=get_proxies(),
-            timeout=10,
-            verify=False
-        ).text
-    except Exception:
-        pass
+from utilities import get_response
 
 
 def get_mkt_and_url(country):
@@ -72,12 +58,7 @@ def get_results(country, level, mode, q, search_alias):
             for q in qs:
                 results += get_suggestions(country, level, q, search_alias)
             results = [
-                result
-                for result in results
-                if all(
-                    q in result
-                    for q in qs
-                )
+                result for result in results if all(q in result for q in qs)
             ]
         else:
             results = get_suggestions(country, level, q, search_alias)
@@ -100,9 +81,9 @@ def get_suggestions(country, level, q, search_alias):
         pool = ThreadPool(50)
         for q in qs:
             mkt, url = get_mkt_and_url(country)
-            results.append(pool.apply_async(
-                get_contents, (url, get_params(mkt, q, search_alias))
-            ))
+            results.append(pool.apply_async(get_response, (
+                furl(url).add(get_params(mkt, q, search_alias)).url,
+            )))
         pool.close()
         pool.join()
         for result in results:

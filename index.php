@@ -321,7 +321,7 @@ function get_pdf($application, $user, $logo, $id, $variables) {
             ))
         );
         $contents = shell_exec(sprintf(
-            '%s/weasyprint --format pdf %s -',
+            '%s/weasyprint --format pdf %s - 2>/dev/null',
             $variables['virtualenv'],
             escapeshellarg($file_path)
         ));
@@ -1281,7 +1281,7 @@ $application->match(
             ignore_user_abort(true);
             set_time_limit(0);
             exec(sprintf(
-                '%s/python %s/scripts/aks.py %s %s %s %s %s',
+                '%s/python %s/scripts/aks.py %s %s %s %s %s 2>/dev/null',
                 $variables['virtualenv'],
                 __DIR__,
                 escapeshellarg($request->get('country')),

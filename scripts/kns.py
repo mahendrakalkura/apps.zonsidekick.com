@@ -17,12 +17,13 @@ from re import compile, sub
 from dateutil import relativedelta
 from dateutil.parser import parse
 from furl import furl
-from grequests import get, map as map_
 from numpy import mean
 from scrapy.selector import Selector
 from simplejson import dumps
 
-from utilities import get_mysql_connection, get_string, get_proxies, get_sales
+from utilities import (
+    get_mysql_connection, get_responses, get_string, get_sales,
+)
 
 setlocale(LC_ALL, 'en_US.UTF-8')
 
@@ -103,55 +104,6 @@ def get_requests(user):
     cursor.close()
     mysql.close()
     return requests
-
-
-def get_responses(urls):
-    responses = {}
-    for url in urls:
-        responses[url] = None
-    index = 0
-    while True:
-        keys = [key for key in responses if not responses[key]]
-        if not keys:
-            return responses.values()
-        index += 1
-        if index >= 5:
-            return responses.values()
-        try:
-            for response in map_(get(
-                key,
-                allow_redirects=True,
-                headers={
-                    'Accept': (
-                        'text/html,application/xhtml+xml,application/xml;'
-                        'q=0.9,*/*;q=0.8'
-                    ),
-                    'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
-                    'Accept-Encoding': 'gzip,deflate,sdch',
-                    'Accept-Language': 'en-US,en;q=0.8',
-                    'Cache-Control': 'max-age=0',
-                    'Connection': 'keep-alive',
-                    'Host': 'www.amazon.com',
-                    'Referer': 'http://www.amazon.com',
-                    'User-Agent': (
-                        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.31 '
-                        '(KHTML, like Gecko) Chrome/26.0.1410.63 Safari/537.31'
-                    ),
-                },
-                proxies=get_proxies(),
-                timeout=300,
-                verify=False,
-            ) for key in keys):
-                if (
-                    response
-                    and
-                    response.status_code == 200
-                    and
-                    'Enter the characters you see below' not in response.text
-                ):
-                    responses[response.request.url] = response
-        except Exception:
-            pass
 
 
 def get_users():
@@ -412,8 +364,7 @@ def get_contents(keyword, country):
     ):
         for response in responses:
             for href in Selector(text=response.text).xpath(
-                '//h3[@class="newaps"]/a/span[@class="lrg bold"]/../'
-                '@href'
+                '//h3[@class="newaps"]/a/span[@class="lrg bold"]/../@href'
             ).extract():
                 if not href.startswith('http'):
                     href = 'http://www.amazon.com%(href)s' % {
@@ -431,11 +382,11 @@ def get_contents(keyword, country):
         if not response:
             continue
         index += 1
-        hxs = Selector(text=response.text)
+        selector = Selector(text=response.text)
         asin = ''
         try:
             asin = get_string(
-                hxs.xpath('//input[@name="ASIN.0"]/@value').extract()[0]
+                selector.xpath('//input[@name="ASIN.0"]/@value').extract()[0]
             )
         except IndexError:
             pass
@@ -443,7 +394,7 @@ def get_contents(keyword, country):
         try:
             best_sellers_rank = int(
                 get_string(
-                    hxs.xpath(
+                    selector.xpath(
                         '//li[@id="SalesRank"]/text()'
                     ).extract()[1]
                 ).split(
@@ -460,7 +411,7 @@ def get_contents(keyword, country):
             try:
                 best_sellers_rank = int(
                     get_string(
-                        hxs.xpath(
+                        selector.xpath(
                             '//span[@class="zg_hrsr_rank"]/text()'
                         ).extract()[0]
                     ).replace(
@@ -478,14 +429,14 @@ def get_contents(keyword, country):
         description = ''
         try:
             description = get_string(
-                hxs.xpath(
+                selector.xpath(
                     '//div[@id="postBodyPS"]'
                 ).xpath('string()').extract()[0]
             )
         except IndexError:
             try:
                 description = get_string(
-                    hxs.xpath(
+                    selector.xpath(
                         '//div[@class="productDescriptionWrapper"]'
                     ).xpath('string()').extract()[1]
                 )
@@ -494,7 +445,7 @@ def get_contents(keyword, country):
         pages = 0
         try:
             pages = int(get_string(
-                hxs.xpath(
+                selector.xpath(
                     '//b[contains(text(), "Print Length:")]/../text()'
                 ).extract()[0]
             ).split(' ')[0].replace(',', ''))
@@ -502,7 +453,7 @@ def get_contents(keyword, country):
             try:
                 pages = int(
                     compile(r'(\d+)').search(
-                        get_string(hxs.xpath(
+                        get_string(selector.xpath(
                             '//a[@id="pageCountAvailable"]/span/text()'
                         ).extract()[0])
                     ).group(1)
@@ -515,7 +466,7 @@ def get_contents(keyword, country):
             try:
                 price = float(
                     get_string(
-                        hxs.xpath(
+                        selector.xpath(
                             '//b[@class="priceLarge"]/text()'
                         ).extract()[0]
                     ).replace(
@@ -536,7 +487,7 @@ def get_contents(keyword, country):
                 try:
                     price = float(
                         get_string(
-                            hxs.xpath(
+                            selector.xpath(
                                 '//span[@class="priceLarge"]/text()'
                             ).extract()[0]
                         ).replace(
@@ -557,7 +508,7 @@ def get_contents(keyword, country):
                     pass
         else:
             try:
-                price = float(get_string(hxs.xpath(
+                price = float(get_string(selector.xpath(
                     '//b[@class="priceLarge"]/text()'
                 ).extract()[0]).replace(',', '').replace(u'\uffe5', ''))
             except IndexError:
@@ -566,7 +517,7 @@ def get_contents(keyword, country):
                 try:
                     price = float(
                         get_string(
-                            hxs.xpath(
+                            selector.xpath(
                                 '//span[@class="priceLarge"]/text()'
                             ).extract()[0]
                         ).replace(
@@ -581,7 +532,7 @@ def get_contents(keyword, country):
         publication_date = ''
         try:
             publication_date = get_string(
-                hxs.xpath(
+                selector.xpath(
                     '//input[@id="pubdate"]/@value'
                 ).extract()[0][0:10]
             )
@@ -600,7 +551,7 @@ def get_contents(keyword, country):
             try:
                 publication_date = parse(compile('\((.*?)\)').search(
                     get_string(
-                        hxs.xpath(
+                        selector.xpath(
                             '//b[contains(text(), "Publisher")]/../text()'
                         ).extract()[0]
                     )
@@ -610,7 +561,7 @@ def get_contents(keyword, country):
             except (AttributeError, IndexError, TypeError, ValueError):
                 try:
                     publication_date = parse(compile('\((.*?)\)').search(
-                        get_string(hxs.xpath(
+                        get_string(selector.xpath(
                             '//div[@class="content"]/ul/li[4]/text()'
                         ).extract()[0])
                     ).group(1)).date()
@@ -619,7 +570,7 @@ def get_contents(keyword, country):
                 except (AttributeError, IndexError, TypeError, ValueError):
                     try:
                         publication_date = compile('\((.*?)\)').search(
-                            get_string(hxs.xpath(
+                            get_string(selector.xpath(
                                 '//b[contains(text(), "Verlag")]/../text()'
                             ).extract()[0])
                         ).group(1)
@@ -657,7 +608,7 @@ def get_contents(keyword, country):
         rank = (index, get_int(index))
         related_items = ''
         try:
-            related_items = get_string(hxs.xpath(
+            related_items = get_string(selector.xpath(
                 '//div[@id="purchaseSimsData"]/text()'
             ).extract()[0]).split(',')
         except IndexError:
@@ -669,20 +620,20 @@ def get_contents(keyword, country):
         stars = 0.0
         try:
             stars = float(get_string(
-                hxs.xpath(
+                selector.xpath(
                     '//div[@class="gry txtnormal acrRating"]/text()'
                 ).extract()[0]
             ).split(' ')[0].replace(',', ''))
         except IndexError:
             try:
                 stars = float(get_string(
-                    hxs.xpath(
+                    selector.xpath(
                         '//span[contains(@class, "swSprite")]/@title'
                     ).extract()[0][-3:]
                 ))
             except (IndexError, ValueError):
                 try:
-                    stars = float(get_string(hxs.xpath(
+                    stars = float(get_string(selector.xpath(
                         '//span[contains(@class, "swSprite")]/@title'
                     ).extract()[1])[0:3])
                 except (IndexError, ValueError):
@@ -691,14 +642,14 @@ def get_contents(keyword, country):
         title_1 = ''
         try:
             title_1 = get_string(
-                hxs.xpath('//span[@id="btAsinTitle"]/text()').extract()[0]
+                selector.xpath('//span[@id="btAsinTitle"]/text()').extract()[0]
             )
         except IndexError:
             pass
         if not title_1:
             try:
                 title_1 = get_string(
-                    hxs.xpath(
+                    selector.xpath(
                         '//span[@id="btAsinTitle"]/span/text()'
                     ).extract()[0]
                 )
@@ -873,7 +824,9 @@ def get_url(country, keyword, page):
         or
         country == 'it'
     ):
-        return furl('http://www.amazon.co.uk/s/').add({
+        return furl(
+            'http://www.amazon.co.uk/s/'
+        ).add({
             'fromApp': 'gp/search',
             'fromPage': 'results',
             'keywords': keyword,
@@ -883,7 +836,9 @@ def get_url(country, keyword, page):
             },
         }).url
     if country == 'co.jp':
-        return furl('http://www.amazon.co.jp/s/').add({
+        return furl(
+            'http://www.amazon.co.jp/s/'
+        ).add({
             'fromApp': 'gp/search',
             'fromPage': 'results',
             'keywords': keyword,
@@ -893,7 +848,9 @@ def get_url(country, keyword, page):
             },
         }).url
     if country == 'de':
-        return furl('http://www.amazon.de/s/').add({
+        return furl(
+            'http://www.amazon.de/s/'
+        ).add({
             'fromApp': 'gp/search',
             'fromPage': 'results',
             'keywords': keyword,
@@ -902,7 +859,9 @@ def get_url(country, keyword, page):
                 'keyword': keyword,
             },
         }).url
-    return furl('http://www.amazon.com/s/').add({
+    return furl(
+        'http://www.amazon.com/s/'
+    ).add({
         'fromApp': 'gp/search',
         'fromPage': 'results',
         'keywords': keyword,

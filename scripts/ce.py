@@ -131,7 +131,9 @@ class Trend(Item):
 class Middleware(object):
 
     def process_request(self, request, spider):
-        request.meta['proxy'] = get_proxies()['http']
+        proxies = get_proxies()
+        if 'http' in proxies:
+            request.meta['proxy'] = proxies['http']
 
 
 class Pipeline(object):
@@ -363,15 +365,15 @@ class Spider(CrawlSpider):
         except IndexError:
             try:
                 author = get_string(selector.xpath(
-                    '//h1[@class="parseasinTitle "]/'
-                    'following-sibling::span/a/text()'
+                    '//h1[@class="parseasinTitle "]/following-sibling::span/a/'
+                    'text()'
                 ).extract()[0])
             except IndexError:
                 pass
         try:
             price = float(get_number(get_string(selector.xpath(
-                '//td[contains(text(), "Kindle Price")]'
-                '/following-sibling::td/b/text()'
+                '//td[contains(text(), "Kindle Price")]/following-sibling::td/'
+                'b/text()'
             ).extract()[0])))
         except IndexError:
             pass

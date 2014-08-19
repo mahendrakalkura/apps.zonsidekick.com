@@ -5,12 +5,13 @@ from random import choice, randint
 from re import compile, sub
 from socket import timeout
 
+from grequests import get as get_, map as map_
 from MySQLdb import connect
 from MySQLdb.cursors import DictCursor
-from scrapy.selector import Selector
-from simplejson import dumps, loads
 from requests import get
 from requests.exceptions import RequestException
+from scrapy.selector import Selector
+from simplejson import dumps, loads
 from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
 from sqlalchemy.ext.declarative import declarative_base
@@ -19,20 +20,23 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.schema import ThreadLocalMetaData
 from sqlalchemy.types import TEXT, TypeDecorator
 
-with open(join(
-    dirname(__file__), '..', 'variables.json'
-), 'r') as resource:
+with open(join(dirname(__file__), '..', 'variables.json'), 'r') as resource:
     variables = loads(resource.read())
 
-engine = create_engine(URL(**{
-    'database': variables['mysql']['database'],
-    'drivername': 'mysql+mysqldb',
-    'host': variables['mysql']['host'],
-    'password': variables['mysql']['password'],
-    'username': variables['mysql']['user'],
-}), connect_args={
-    'charset': 'utf8',
-}, convert_unicode=True, encoding='utf-8')
+engine = create_engine(
+    URL(**{
+        'database': variables['mysql']['database'],
+        'drivername': 'mysql+mysqldb',
+        'host': variables['mysql']['host'],
+        'password': variables['mysql']['password'],
+        'username': variables['mysql']['user'],
+    }),
+    connect_args={
+        'charset': 'utf8',
+    },
+    convert_unicode=True,
+    encoding='utf-8',
+)
 base = declarative_base(bind=engine, metadata=ThreadLocalMetaData())
 
 
@@ -81,6 +85,8 @@ def get_amazon_best_sellers_rank(selector):
             ).replace(
                 ')', ''
             ).replace(
+                'Free Kindle Store', 'Free in Kindle Store'
+            ).replace(
                 'Paid Kindle Store', 'Paid in Kindle Store'
             )
         )] = int(get_number(get_string(text[0])))
@@ -90,25 +96,25 @@ def get_amazon_best_sellers_rank(selector):
         for li in selector.xpath(
             '//ul[@class="zg_hrsr"]/li[@class="zg_hrsr_item"]'
         ):
-            amazon_best_sellers_rank[
-                get_string(
-                    li.xpath(
-                        './/span[@class="zg_hrsr_ladder"]'
-                    ).xpath(
-                        'string()'
-                    ).extract()[0].replace(
-                        u'in ', ''
-                    ).replace(
-                        u'in\xa0', ''
-                    ).replace(
-                        '(', ''
-                    ).replace(
-                        ')', ''
-                    ).replace(
-                        'Paid Kindle Store', 'Paid in Kindle Store'
-                    )
+            amazon_best_sellers_rank[get_string(
+                li.xpath(
+                    './/span[@class="zg_hrsr_ladder"]'
+                ).xpath(
+                    'string()'
+                ).extract()[0].replace(
+                    u'in ', ''
+                ).replace(
+                    u'in\xa0', ''
+                ).replace(
+                    '(', ''
+                ).replace(
+                    ')', ''
+                ).replace(
+                    'Free Kindle Store', 'Free in Kindle Store'
+                ).replace(
+                    'Paid Kindle Store', 'Paid in Kindle Store'
                 )
-            ] = int(get_number(get_string(li.xpath(
+            )] = int(get_number(get_string(li.xpath(
                 './/span[@class="zg_hrsr_rank"]/text()'
             ).extract()[0])))
     except IndexError:
@@ -116,8 +122,7 @@ def get_amazon_best_sellers_rank(selector):
     return amazon_best_sellers_rank
 
 
-def get_book(url):
-    url = get_url(url)
+def get_book(response):
     book_cover_image = ''
     title = ''
     author = ''
@@ -129,126 +134,128 @@ def get_book(url):
     earnings_per_day = 0.0
     total_number_of_reviews = ''
     review_average = ''
-    response = get_contents(url)
-    if response:
-        selector = Selector(text=response)
+    selector = Selector(text=response.text)
+    try:
+        book_cover_image = get_string(
+            compile(
+                r'\[\{"mainUrl":"([^"]*)'
+            ).search(
+                '\n'.join(
+                    selector.xpath(
+                        '//script'
+                    ).xpath(
+                        'string()'
+                    ).extract()
+                )
+            ).group(1)
+        )
+    except AttributeError:
         try:
-            book_cover_image = get_string(
-                compile(
-                    r'\[\{"mainUrl":"([^"]*)'
-                ).search(
-                    '\n'.join(
-                        selector.xpath(
-                            '//script'
-                        ).xpath(
-                            'string()'
-                        ).extract()
-                    )
-                ).group(1)
-            )
-        except AttributeError:
-            try:
-                book_cover_image = get_string(selector.xpath(
-                    '//img[@id="imgBlkFront" or '
-                    '@id="main-image"]/@rel'
-                ).extract()[0])
-            except IndexError:
-                pass
-        try:
-            title = get_string(selector.xpath(
-                '//span[@id="btAsinTitle" or '
-                '@id="productTitle"]/text()'
+            book_cover_image = get_string(selector.xpath(
+                '//img[@id="imgBlkFront" or '
+                '@id="main-image"]/@rel'
             ).extract()[0])
         except IndexError:
             pass
+    try:
+        title = get_string(selector.xpath(
+            '//span[@id="btAsinTitle" or '
+            '@id="productTitle"]/text()'
+        ).extract()[0])
+    except IndexError:
+        pass
+    try:
+        author = get_string(selector.xpath(
+            '//span[@class="contributorNameTrigger"]/a/text()'
+        ).extract()[0])
+    except IndexError:
+        try:
+            author = get_string(selector.xpath(
+                '//h1[@class="parseasinTitle "]/following-sibling::span/a/'
+                'text()'
+            ).extract()[0])
+        except IndexError:
+            pass
+    try:
+        price = float(get_number(get_string(selector.xpath(
+            '//span[@class="price"]//text()'
+        ).extract()[0])))
+    except IndexError:
         try:
             price = float(get_number(get_string(selector.xpath(
-                '//span[@class="price"]//text()'
+                '//td[contains(text(), "Kindle Price")]/'
+                'following-sibling::td/b/text()'
             ).extract()[0])))
         except IndexError:
-            try:
-                price = float(get_number(get_string(selector.xpath(
-                    '//td[contains(text(), "Kindle Price")]/'
-                    'following-sibling::td/b/text()'
-                ).extract()[0])))
-            except IndexError:
-                pass
-        try:
-            publication_date = get_string(selector.xpath(
-                '//input[@id="pubdate"]/@value'
-            ).extract()[0][0:10])
-        except IndexError:
             pass
+    try:
+        publication_date = get_string(selector.xpath(
+            '//input[@id="pubdate"]/@value'
+        ).extract()[0][0:10])
+    except IndexError:
+        pass
+    try:
+        print_length = int(get_number(get_string(selector.xpath(
+            '//b[contains(text(), "Print Length")]/../text()'
+        ).extract()[0])))
+    except IndexError:
         try:
             print_length = int(get_number(get_string(selector.xpath(
-                '//b[contains(text(), "Print Length")]/../text()'
+                '//li[contains(text(), "Length")]/a/span/text()'
             ).extract()[0])))
         except IndexError:
-            try:
-                print_length = int(get_number(get_string(selector.xpath(
-                    '//li[contains(text(), "Length")]/a/span/text()'
-                ).extract()[0])))
-            except IndexError:
-                pass
-        amazon_best_sellers_rank = get_amazon_best_sellers_rank(selector)
-        if amazon_best_sellers_rank:
-            try:
-                estimated_sales_per_day = float(get_sales(
-                    amazon_best_sellers_rank['Paid in Kindle Store']
-                ))
-            except KeyError:
-                pass
-        earnings_per_day = estimated_sales_per_day * price
-        try:
-            total_number_of_reviews = int(get_number(get_string(
-                selector.xpath(
-                    '//span[@class="crAvgStars"]/a/text()'
-                ).extract()[0]
-            )))
-        except IndexError:
             pass
+    amazon_best_sellers_rank = get_amazon_best_sellers_rank(selector)
+    if amazon_best_sellers_rank:
         try:
-            review_average = float(get_number(get_string(selector.xpath(
-                '//div[@class="gry txtnormal acrRating"]/text()'
-            ).extract()[0].split(' ')[0])))
-        except IndexError:
+            estimated_sales_per_day = float(get_sales(
+                amazon_best_sellers_rank['Paid in Kindle Store']
+            ))
+        except KeyError:
             pass
-        return {
-            'amazon_best_sellers_rank': amazon_best_sellers_rank,
-            'author': author,
-            'book_cover_image': book_cover_image,
-            'earnings_per_day': earnings_per_day,
-            'estimated_sales_per_day': estimated_sales_per_day,
-            'price': price,
-            'print_length': print_length,
-            'publication_date': publication_date,
-            'review_average': review_average,
-            'title': title,
-            'total_number_of_reviews': total_number_of_reviews,
-            'url': url,
-        }
+    earnings_per_day = estimated_sales_per_day * price
+    try:
+        total_number_of_reviews = int(get_number(get_string(selector.xpath(
+            '//span[@class="crAvgStars"]/a/text()'
+        ).extract()[0])))
+    except IndexError:
+        pass
+    try:
+        review_average = float(get_number(get_string(selector.xpath(
+            '//div[@class="gry txtnormal acrRating"]/text()'
+        ).extract()[0].split(' ')[0])))
+    except IndexError:
+        pass
+    return {
+        'amazon_best_sellers_rank': amazon_best_sellers_rank,
+        'author': author,
+        'book_cover_image': book_cover_image,
+        'earnings_per_day': earnings_per_day,
+        'estimated_sales_per_day': estimated_sales_per_day,
+        'price': price,
+        'print_length': print_length,
+        'publication_date': publication_date,
+        'review_average': review_average,
+        'title': title,
+        'total_number_of_reviews': total_number_of_reviews,
+        'url': response.url,
+    }
 
 
-def get_contents(url):
-    index = 0
-    while True:
-        index += 1
-        if index >= 5:
-            return ''
-        try:
-            response = get(
-                url,
-                headers={
-                    'User-Agent': get_user_agent(),
-                },
-                proxies=get_proxies(),
-                timeout=300,
-            )
-            if response and response.status_code == 200:
-                return response.text
-        except (RequestException, timeout):
-            pass
-    return ''
+def get_headers():
+    return {
+        'Accept': (
+            'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+        ),
+        'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+        'Accept-Encoding': 'gzip,deflate,sdch',
+        'Accept-Language': 'en-US,en;q=0.8',
+        'Cache-Control': 'max-age=0',
+        'Connection': 'keep-alive',
+        'Host': 'www.amazon.com',
+        'Referer': 'http://www.amazon.com',
+        'User-Agent': get_user_agent(),
+    }
 
 
 def get_mysql_connection():
@@ -275,31 +282,8 @@ def get_number(number):
 
 
 def get_proxies():
-    '''
-    if not is_development():
-        item = choice([
-            '173.234.250.113:3128',
-            '173.234.250.254:3128',
-            '173.234.250.31:3128',
-            '173.234.250.71:3128',
-            '173.234.250.78:3128',
-            '173.234.57.122:3128',
-            '173.234.57.152:3128',
-            '173.234.57.199:3128',
-            '173.234.57.22:3128',
-            '173.234.57.254:3128',
-            '173.234.57.40:3128',
-            '173.234.57.96:3128',
-        ])
-        return {
-            'http': 'http://%(item)s' % {
-                'item': item,
-            },
-            'https': 'http://%(item)s' % {
-                'item': item,
-            },
-        }
-    '''
+    if is_development():
+        return {}
     return {
         'http': 'http://72.52.91.120:%(port_number)s' % {
             'port_number': 9150 + randint(1, 100),
@@ -308,6 +292,67 @@ def get_proxies():
             'port_number': 9150 + randint(1, 100),
         },
     }
+
+
+def get_response(url):
+    index = 0
+    while True:
+        index += 1
+        if index >= 5:
+            return ''
+        try:
+            response = get(
+                url,
+                allow_redirects=True,
+                headers=get_headers(),
+                proxies=get_proxies(),
+                timeout=get_timeout(),
+                verify=False,
+            )
+            if (
+                response
+                and
+                response.status_code == 200
+                and
+                'Enter the characters you see below' not in response.text
+            ):
+                return response.text
+        except (RequestException, timeout):
+            pass
+    return ''
+
+
+def get_responses(urls):
+    responses = {}
+    for url in urls:
+        responses[url] = None
+    index = 0
+    while True:
+        keys = [key for key in responses if not responses[key]]
+        if not keys:
+            return responses.values()
+        index += 1
+        if index >= 5:
+            return responses.keys()
+        try:
+            for response in map_(get_(
+                key,
+                allow_redirects=True,
+                headers=get_headers(),
+                proxies=get_proxies(),
+                timeout=get_timeout(),
+                verify=False,
+            ) for key in keys):
+                if (
+                    response
+                    and
+                    response.status_code == 200
+                    and
+                    'Enter the characters you see below' not in response.text
+                ):
+                    responses[response.request.url] = response
+        except Exception:
+            pass
 
 
 def get_sales(best_sellers_rank):
@@ -355,6 +400,10 @@ def get_string(string):
     string = sub(r'[ ]+', ' ', string)
     string = string.strip()
     return string
+
+
+def get_timeout():
+    return 30
 
 
 def get_url(url):
