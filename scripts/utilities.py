@@ -413,38 +413,41 @@ def get_responses(urls):
 
 
 def get_sales(best_sellers_rank):
-    if best_sellers_rank == 1:
+    if (
+        best_sellers_rank == 1
+        or
+        best_sellers_rank == 2
+        or
+        best_sellers_rank == 3
+        or
+        best_sellers_rank == 4
+        or
+        best_sellers_rank == 5
+    ):
         return 3500
-    if best_sellers_rank == 2:
-        return 3500
-    if best_sellers_rank == 3:
-        return 3500
-    if best_sellers_rank == 4:
-        return 3500
-    if best_sellers_rank == 5:
-        return 3500
+
     if best_sellers_rank >= 6 and best_sellers_rank <= 10:
-        return 2000 + ((best_sellers_rank - 6) * 300)
+        return 2000 + ((10 - best_sellers_rank) * 300)
     if best_sellers_rank >= 11 and best_sellers_rank <= 20:
-        return 2000 + ((best_sellers_rank - 11) * 150)
+        return 1100 + ((20 - best_sellers_rank) * 90)
     if best_sellers_rank >= 21 and best_sellers_rank <= 65:
-        return 650 + ((best_sellers_rank - 21) * 10)
-    if best_sellers_rank >= 61 and best_sellers_rank <= 80:
-        return 550 + ((best_sellers_rank - 61) * 5)
+        return 650 + ((65 - best_sellers_rank) * 10)
+    if best_sellers_rank >= 66 and best_sellers_rank <= 80:
+        return 550 + ((80 - best_sellers_rank) * 6.67)
     if best_sellers_rank >= 81 and best_sellers_rank <= 200:
-        return 300 + ((best_sellers_rank - 81) * 2)
+        return 300 + ((200 - best_sellers_rank) * 2.075)
     if best_sellers_rank >= 201 and best_sellers_rank <= 1000:
-        return 100 + ((best_sellers_rank - 201) * 0.25)
+        return 100 + ((1000 - best_sellers_rank) * 0.249)
     if best_sellers_rank >= 1001 and best_sellers_rank <= 2000:
-        return 55 + ((best_sellers_rank - 1001) * 0.045)
+        return 55 + ((2000 - best_sellers_rank) * 0.045)
     if best_sellers_rank >= 2001 and best_sellers_rank <= 3500:
-        return 30 + ((best_sellers_rank - 2001) * 0.01)
+        return 30 + ((3500 - best_sellers_rank) * 0.0165)
     if best_sellers_rank >= 3501 and best_sellers_rank <= 8500:
-        return 10 + ((best_sellers_rank - 3501) * 0.004)
+        return 10 + ((8500 - best_sellers_rank) * 0.004)
     if best_sellers_rank >= 8501 and best_sellers_rank <= 40000:
-        return 1 + ((best_sellers_rank - 8501) * 0.0003)
+        return 1 + ((40000 - best_sellers_rank) * 0.00028)
     if best_sellers_rank >= 40001 and best_sellers_rank <= 100000:
-        return 0.1 + ((best_sellers_rank - 40001) * 0.000015)
+        return 0.01 + ((100000 - best_sellers_rank) * 0.0000164)
     if best_sellers_rank >= 100001:
         return 0
     return 0
