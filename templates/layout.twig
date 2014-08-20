@@ -52,13 +52,68 @@
                                 Dashboard
                             </a>
                         </li>
-                        {% if has_kns(groups) %}
-                            <li class="{% if nav == 'kns' %}active{% endif %}">
-                                <a href="{{ url('kns_overview') }}">
+                        {% if has_statistics(user) %}
+                            <li class="dropdown">
+                                <a
+                                    class="dropdown-toggle"
+                                    data-toggle="dropdown"
+                                    >
+                                    <i class="icon-screenshot icon-large"></i>
+                                    Analyzers
+                                    <i class="caret"></i>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a>
+                                            <i class="icon-user icon-large">
+                                            </i>
+                                            Author Analyzer
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a>
+                                            <i class="icon-book icon-large">
+                                            </i>
+                                            Book Analyzer
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="{% if nav == 'kns' %}active{% endif %} dropdown">
+                                <a
+                                    class="dropdown-toggle"
+                                    data-toggle="dropdown"
+                                    >
                                     <i class="icon-user-md icon-large"></i>
                                     Kindle Niche Sidekick
+                                    <i class="caret"></i>
                                 </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a href="{{ url('kns_overview') }}">
+                                            <i class="icon-tags icon-large">
+                                            </i>
+                                            Multiple Keywords
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a>
+                                            <i class="icon-tag icon-large">
+                                            </i>
+                                            Single Keywords
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
+                        {% else %}
+                            {% if has_kns(groups) %}
+                                <li class="{% if nav == 'kns' %}active{% endif %}">
+                                    <a href="{{ url('kns_overview') }}">
+                                        <i class="icon-user-md icon-large"></i>
+                                        Kindle Niche Sidekick
+                                    </a>
+                                </li>
+                            {% endif %}
                         {% endif %}
                         {% if has_aks(groups) %}
                             <li class="{% if nav == 'aks' %}active{% endif %}">
