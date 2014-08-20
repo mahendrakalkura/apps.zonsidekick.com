@@ -463,7 +463,7 @@ def get_string(string):
 
 
 def get_timeout():
-    return 30
+    return 300
 
 
 def get_url(url):
