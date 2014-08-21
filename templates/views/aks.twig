@@ -45,86 +45,56 @@
     </div>
     <div class="row-fluid">
         <div class="span6">
-            <form accept-charset="UTF-8">
-                <label for="keyword">Phrase</label>
-                <input
-                    class="span12"
-                    id="keyword"
-                    placeholder="Phrase"
-                    type="text"
-                    value=""
-                    ng-focus="focus['keyword']"
-                    ng-model="keyword"
-                    ng-on-blur="focus['keyword'] = false"
-                    >
-                <label for="search_alias">Department</label>
-                <select
-                    class="span12"
-                    id="search_alias"
-                    ng-model="search_alias"
-                    >
-                    {% for key, value in search_aliases %}
-                        <option value="{{ key }}">{{ value }}</option>
-                    {% endfor %}
-                </select>
-                {#
-                <label for="level">Level</label>
-                <label class="radio">
-                    <input
-                        checked="checked"
-                        name="level"
-                        type="radio"
-                        value="1"
-                        ng-model="level"
-                        > Simple
-                </label>
-                <label class="radio">
-                    <input
-                        name="level"
-                        type="radio"
-                        value="2"
-                        ng-model="level"
-                        > Advanced
-                </label>
-                #}
-                {#
-                <label for="level">Mode</label>
-                <label class="radio">
-                    <input
-                        checked="checked"
-                        name="mode"
-                        type="radio"
-                        value="1"
-                        ng-model="mode"
-                        > Simple
-                </label>
-                <label class="radio">
-                    <input
-                        name="mode"
-                        type="radio"
-                        value="2"
-                        ng-model="mode"
-                        > Advanced
-                </label>
-                #}
-                <label for="country">Country</label>
-                <select class="span12" id="country" ng-model="country">
-                    {% for key, value in countries %}
-                        <option value="{{ key }}">{{ value }}</option>
-                    {% endfor %}
-                </select>
-                <label class="checkbox">
-                    <input
-                        type="checkbox"
-                        ng-model="checkbox"
-                        > Automatically download on completion
-                </label>
+            <form accept-charset="UTF-8" ng-submit="process()">
+                <div class="control-group">
+                    <label class="control-label" for="keyword">Phrase</label>
+                    <div class="controls">
+                        <input
+                            class="span12"
+                            id="keyword"
+                            placeholder="Phrase"
+                            type="text"
+                            value=""
+                            ng-focus="focus['keyword']"
+                            ng-model="keyword"
+                            ng-on-blur="focus['keyword'] = false"
+                            >
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="search_alias">
+                        Department
+                    </label>
+                    <div class="controls">
+                        <select
+                            class="span12"
+                            id="search_alias"
+                            ng-model="search_alias"
+                            >
+                            {% for key, value in search_aliases %}
+                                <option value="{{ key }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="country">Country</label>
+                    <div class="controls">
+                        <select class="span12" id="country" ng-model="country">
+                            {% for key, value in countries %}
+                                <option value="{{ key }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                        <label class="control-label" class="checkbox">
+                            <input
+                                type="checkbox"
+                                ng-model="checkbox"
+                                > Automatically download on completion
+                        </label>
+                    </div>
+                </div>
                 <div class="form-actions">
-                    <button
-                        class="btn btn-success"
-                        type="button"
-                        ng-click="process()"
-                        >
+                    <button class="btn btn-success" type="submit">
                         <span class="icon-info-sign icon-large"></span>
                         Submit
                     </button>
@@ -140,17 +110,25 @@
         </div>
         <div class="span6 hide [! suggestions.length && 'show' || 'hide' !]">
             <form accept-charset="UTF-8">
-                <label class="pull-right" for="suggestions">Suggestions</label>
-                <textarea
-                    class="span12"
-                    id="suggestions"
-                    ng-focus="focus['suggestions']"
-                    ng-on-blur="focus['suggestions'] = false"
-                    >[! suggestions.join('\n') !]</textarea>
-                <span class="help-block right">
-                    Total Number of Suggestions:
-                    <span>[! suggestions.length !]</span>
-                </span>
+                <div class="control-group">
+                    <label
+                        class="control-label"
+                        class="pull-right"
+                        for="suggestions"
+                        >Suggestions</label>
+                    <div class="controls">
+                        <textarea
+                            class="span12"
+                            id="suggestions"
+                            ng-focus="focus['suggestions']"
+                            ng-on-blur="focus['suggestions'] = false"
+                            >[! suggestions.join('\n') !]</textarea>
+                        <span class="help-block right">
+                            Total Number of Suggestions:
+                            <span>[! suggestions.length !]</span>
+                        </span>
+                    </div>
+                </div>
                 <div class="form-actions right">
                     <button
                         class="btn btn-info copy-all"

@@ -53,7 +53,7 @@
                             </a>
                         </li>
                         {% if has_statistics(user) %}
-                            <li class="dropdown">
+                            <li class="{% if nav == 'a' %}active{% endif %} dropdown">
                                 <a
                                     class="dropdown-toggle"
                                     data-toggle="dropdown"
@@ -64,7 +64,7 @@
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a>
+                                        <a href="{{ url('aa') }}">
                                             <i class="icon-user icon-large">
                                             </i>
                                             Author Analyzer

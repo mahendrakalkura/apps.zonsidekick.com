@@ -2,13 +2,15 @@
 
 from furl import furl
 from scrapy.selector import Selector
+from simplejson import dumps
+from sys import argv
 
 from utilities import (
     get_book, get_response, get_responses, get_number, get_string, get_url,
 )
 
 
-def get_authors(name):
+def get_authors(keyword):
     authors = []
     for response in get_responses([
         furl(
@@ -16,8 +18,8 @@ def get_authors(name):
         ).add({
             'page': index,
             'rh':
-            'n:283155,p_n_feature_browse-bin:618073011,p_27:%(name)s' % {
-                'name': name,
+            'n:283155,p_n_feature_browse-bin:618073011,p_27:%(keyword)s' % {
+                'keyword': keyword,
             },
         }).url
         for index in range(1, 4)
@@ -163,3 +165,9 @@ def get_author(url):
         'photo': photo,
         'twitter': twitter,
     }
+
+if __name__ == '__main__':
+    if argv[1] == 'get_authors':
+        print dumps(get_authors(argv[2]))
+    if argv[1] == 'get_author':
+        print dumps(get_author(argv[2]))

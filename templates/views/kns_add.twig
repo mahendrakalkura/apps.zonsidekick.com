@@ -64,27 +64,46 @@
                 <form
                     accept-charset="UTF-8"
                     action="{{ url('kns_process') }}"
+                    class="form-horizontal"
                     method="POST"
                     >
-                    <label for="keywords">Keywords</label>
-                    <textarea
-                        class="span12"
-                        id="keywords"
-                        name="keywords"
-                        ng-model="keywords"
-                        ng-on-blur="focus['keywords'] = false"
-                        rows="15"
-                        ></textarea>
-                    <p ng-class="get_class()">
-                        [! count !] keywords remaining
-                    </p>
+                    <div class="control-group">
+                        <label class="control-label" for="keywords">
+                            Keywords
+                        </label>
+                        <div class="controls">
+                            <textarea
+                                class="span12"
+                                id="keywords"
+                                name="keywords"
+                                ng-model="keywords"
+                                ng-on-blur="focus['keywords'] = false"
+                                rows="15"
+                                ></textarea>
+                            <span ng-class="get_class()">
+                                [! count !] keywords remaining
+                            </span>
+                        </div>
+                    </div>
                     {% if has_statistics(user) %}
-                        <label for="country">Country</label>
-                        <select class="span12" id="country" name="country">
-                            {% for key, value in countries %}
-                                <option value="{{ key }}">{{ value }}</option>
-                            {% endfor %}
-                        </select>
+                        <div class="control-group">
+                            <label class="control-label" for="country">
+                                Country
+                            </label>
+                            <div class="controls">
+                                <select
+                                    class="span12"
+                                    id="country"
+                                    name="country"
+                                    >
+                                    {% for key, value in countries %}
+                                        <option value="{{ key }}">
+                                            {{ value }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
                     {% else %}
                         <input name="country" type="hidden" value="com">
                     {% endif %}

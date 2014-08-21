@@ -154,6 +154,95 @@ application.filter('label', function () {
     }
 });
 
+application.controller('aa', function ($attrs, $http, $rootScope, $scope) {
+    $scope.keyword = '';
+    $scope.authors = {
+        'contents': [],
+        'spinner': false
+    };
+    $scope.author = {
+        'contents': '',
+        'spinner': false
+    };
+
+    $scope.get_authors = function () {
+        $scope.authors.contents = [];
+        $scope.authors.spinner = false;
+        $scope.author.contents = '';
+        $scope.author.spinner = false;
+
+        if (!$scope.keyword.length) {
+            $rootScope.$broadcast('open', {
+                top: $attrs.error1Top,
+                middle: $attrs.error1Middle
+            });
+
+            return;
+        }
+
+        $scope.authors.spinner = true;
+
+        $http({
+            data: jQuery.param({
+                keyword: $scope.keyword
+            }),
+            method: 'POST',
+            url: $attrs.urlAuthors
+        }).
+        error(function (data, status, headers, config) {
+            $scope.authors.spinner = false;
+            $rootScope.$broadcast('open', {
+                top: $attrs.error2Top,
+                middle: $attrs.error2Middle
+            });
+        }).
+        success(function (data, status, headers, config) {
+            $scope.authors.spinner = false;
+            if (data.length > 0) {
+                $scope.authors.contents = data;
+            } else {
+                $rootScope.$broadcast('open', {
+                    top: $attrs.error2Top,
+                    middle: $attrs.error2Middle
+                });
+            }
+        });
+    };
+
+    $scope.get_author = function (url) {
+        $scope.author.contents = '';
+        $scope.author.spinner = false;
+
+        $scope.author.spinner = true;
+
+        $http({
+            data: jQuery.param({
+                url: url
+            }),
+            method: 'POST',
+            url: $attrs.urlAuthor
+        }).
+        error(function (data, status, headers, config) {
+            $scope.author.spinner = false;
+            $rootScope.$broadcast('open', {
+                top: $attrs.error2Top,
+                middle: $attrs.error2Middle
+            });
+        }).
+        success(function (data, status, headers, config) {
+            $scope.author.spinner = false;
+            if (typeof(data) === 'object') {
+                $scope.author.contents = data;
+            } else {
+                $rootScope.$broadcast('open', {
+                    top: $attrs.error2Top,
+                    middle: $attrs.error2Middle
+                });
+            }
+        });
+    };
+});
+
 application.controller('aks', function ($attrs, $http, $rootScope, $scope) {
     $scope.checkbox = false;
     $scope.country = 'com';
@@ -368,10 +457,6 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
                     $scope.contents['categories'][index]['id'] = 1;
                 } else {
                     for (var i in $scope.categories) {
-                        console.log(
-                            $scope.contents['categories'][index]['title'],
-                            $scope.categories[i][1]
-                        );
                         if (
                             $scope.contents['categories'][index]['title']
                             ==

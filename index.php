@@ -768,6 +768,49 @@ $application->match('/dashboard', function () use ($application) {
 ->bind('dashboard')
 ->method('GET');
 
+$application->match('/aa', function () use ($application) {
+    return $application['twig']->render('views/aa.twig');
+})
+->before($before_statistics)
+->bind('aa')
+->method('GET');
+
+$application->match(
+    '/aa/authors',
+    function (Request $request) use ($application, $variables) {
+        ignore_user_abort(true);
+        set_time_limit(0);
+        exec(sprintf(
+            '%s/python %s/scripts/aa.py get_authors %s 2>/dev/null',
+            $variables['virtualenv'],
+            __DIR__,
+            escapeshellarg($request->get('keyword'))
+        ), $output, $return_var);
+        return new Response(implode('', $output));
+    }
+)
+->before($before_statistics)
+->bind('aa_authors')
+->method('POST');
+
+$application->match(
+    '/aa/author',
+    function (Request $request) use ($application, $variables) {
+        ignore_user_abort(true);
+        set_time_limit(0);
+        exec(sprintf(
+            '%s/python %s/scripts/aa.py get_author %s 2>/dev/null',
+            $variables['virtualenv'],
+            __DIR__,
+            escapeshellarg($request->get('url'))
+        ), $output, $return_var);
+        return new Response(implode('', $output));
+    }
+)
+->before($before_statistics)
+->bind('aa_author')
+->method('POST');
+
 $application->match('/kns/overview', function () use ($application) {
     $user = $application['session']->get('user');
     $requests = get_requests($application, $user);

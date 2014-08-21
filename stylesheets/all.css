@@ -429,11 +429,12 @@ a {
 }
 
 #middle .container-fluid .form-actions {
-    margin-top: 10px;
+    margin-top: 30px;
     margin-bottom: 30px;
 }
 
 #middle .container-fluid .form-actions.ce {
+    margin-top: 10px;
     padding-left: 20px;
 }
 
@@ -567,7 +568,7 @@ a {
 }
 
 #middle .container-fluid #aks #suggestions {
-    height: 255px;
+    height: 180px;
 }
 
 #middle .container-fluid #back-to-dashboard {
@@ -631,6 +632,10 @@ a {
     margin-top: 0;
     position: absolute;
     top: 0;
+}
+
+.img-polaroid.pull-left {
+    margin-right: 20px;
 }
 
 .modal-body {
