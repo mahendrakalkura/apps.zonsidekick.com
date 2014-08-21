@@ -253,11 +253,11 @@ application.controller('ba', function ($attrs, $http, $rootScope, $scope) {
         'contents': '',
         'spinner': false
     };
-    $scope.ranks = {
+    $scope.items = {
         'contents': '',
         'spinner': false
     };
-    $scope.keywors = '';
+    $scope.keywords = '';
 
     $scope.get_books = function () {
         $scope.books.contents = [];
@@ -336,31 +336,31 @@ application.controller('ba', function ($attrs, $http, $rootScope, $scope) {
         });
     };
 
-    $scope.get_ranks = function () {
-        $scope.ranks.contents = '';
-        $scope.ranks.spinner = false;
+    $scope.get_items = function () {
+        $scope.items.contents = '';
+        $scope.items.spinner = false;
 
-        $scope.ranks.spinner = true;
+        $scope.items.spinner = true;
 
         $http({
             data: jQuery.param({
                 keywords: $scope.keywords,
-                url: $scope.ranks.url
+                url: $scope.book.url
             }),
             method: 'POST',
-            url: $attrs.urlRanks
+            url: $attrs.urlItems
         }).
         error(function (data, status, headers, config) {
-            $scope.ranks.spinner = false;
+            $scope.items.spinner = false;
             $rootScope.$broadcast('open', {
                 top: $attrs.error2Top,
                 middle: $attrs.error2Middle
             });
         }).
         success(function (data, status, headers, config) {
-            $scope.ranks.spinner = false;
+            $scope.items.spinner = false;
             if (typeof(data) === 'object') {
-                $scope.ranks.contents = data;
+                $scope.items.contents = data;
             } else {
                 $rootScope.$broadcast('open', {
                     top: $attrs.error2Top,

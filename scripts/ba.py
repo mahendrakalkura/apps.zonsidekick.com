@@ -51,21 +51,25 @@ def get_books(keyword):
     return books
 
 
-def get_ranks(url, keywords):
-    ranks = {}
+def get_items(url, keywords):
+    items = []
     for keyword in keywords:
-        ranks[keyword] = 0
-    for keyword in keywords:
+        rank = 0
         for index, book in enumerate(get_books(keyword)):
             if url == book['url']:
-                ranks[keyword] = index + 1
+                rank = index + 1
                 break
-    return ranks
+        items.append({
+            'keyword': keyword,
+            'rank': rank,
+            'optimization': 'Low',
+        })
+    return items
 
 if __name__ == '__main__':
     if argv[1] == 'get_books':
         print dumps(get_books(argv[2]))
     if argv[1] == 'get_book':
         print dumps(get_book(get_response(argv[2])))
-    if argv[1] == 'get_ranks':
-        print dumps(get_ranks(argv[2], loads(argv[3])))
+    if argv[1] == 'get_items':
+        print dumps(get_items(argv[2], loads(argv[3])))

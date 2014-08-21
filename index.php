@@ -855,22 +855,35 @@ $application->match(
 ->method('POST');
 
 $application->match(
-    '/ba/ranks',
+    '/ba/items',
     function (Request $request) use ($application, $variables) {
+        $keywords = $request->get('keywords');
+        $keywords = explode("\n", $keywords);
+        if (!empty($keywords)) {
+            foreach ($keywords as $key => $value) {
+                $value = trim($value);
+                if (!empty($value)) {
+                    $keywords[$key] = $value;
+                } else {
+                    unset($keywords[$key]);
+                }
+            }
+        }
+        $keywords = array_unique($keywords);
         ignore_user_abort(true);
         set_time_limit(0);
         exec(sprintf(
-            '%s/python %s/scripts/ba.py get_ranks %s %s 2>/dev/null',
+            '%s/python %s/scripts/ba.py get_items %s %s 2>/dev/null',
             $variables['virtualenv'],
             __DIR__,
             escapeshellarg($request->get('url')),
-            escapeshellarg(json_encode($request->get('keywords')))
+            escapeshellarg(json_encode($keywords))
         ), $output, $return_var);
         return new Response(implode('', $output));
     }
 )
 ->before($before_statistics)
-->bind('ba_ranks')
+->bind('ba_items')
 ->method('POST');
 
 $application->match('/kns/overview', function () use ($application) {
