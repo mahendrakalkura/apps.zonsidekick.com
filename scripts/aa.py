@@ -157,15 +157,16 @@ def get_author(url):
         book = get_book(response)
         books.append(book)
         earnings_per_month += (book['earnings_per_day'] * 30)
-    return {
-        'amazon_rank': amazon_rank,
-        'books': books,
-        'description': description,
-        'earnings_per_month': earnings_per_month,
-        'name': name,
-        'photo': photo,
-        'twitter': twitter,
-    }
+    if books:
+        return {
+            'amazon_rank': amazon_rank,
+            'books': books,
+            'description': description,
+            'earnings_per_month': earnings_per_month,
+            'name': name,
+            'photo': photo,
+            'twitter': twitter,
+        }
 
 if __name__ == '__main__':
     if argv[1] == 'get_authors':
