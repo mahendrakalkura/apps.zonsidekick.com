@@ -194,6 +194,7 @@ function get_csv($application, $user, $id) {
         'Buyer Behavior',
         'Competition',
         'Optimization',
+        'Popularity',
         sprintf('Spend (%s)', get_currency($request['country'])),
         sprintf('Avg. Price (%s)', get_currency($request['country'])),
         'Avg. Length',
@@ -206,6 +207,7 @@ function get_csv($application, $user, $id) {
                 $keyword['contents']['buyer_behavior'][1],
                 $keyword['contents']['competition'][1],
                 $keyword['contents']['optimization'][1],
+                $keyword['contents']['popularity'][1],
                 $keyword['contents']['spend'][0][1],
                 $keyword['contents']['average_price'][1],
                 $keyword['contents']['average_length'][1],
@@ -494,6 +496,13 @@ EOD;
                 $keywords[$key]['contents'] = json_decode(
                     $keywords[$key]['contents'], true
                 );
+                if ($keywords[$key]['contents']) {
+                    if (empty($keywords[$key]['contents']['popularity'])) {
+                        $keywords[$key]['contents']['popularity'] = array(
+                            0, 'Very Low',
+                        );
+                    }
+                }
             }
         }
     }
@@ -1114,7 +1123,7 @@ $application->match(
 
         usort($keywords, 'usort_keywords_2');
 
-        return new Response(json_encode($keywords, JSON_NUMERIC_CHECK));
+        return new Response(json_encode($keywords));
     }
 )
 ->before($before_kns)

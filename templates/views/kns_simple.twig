@@ -223,6 +223,15 @@
                                 >Optimization</span>
                         </th>
                         <th
+                            class="center header [! order_by[0] == 'contents.popularity[0]' && get_order_by() || '' !]"
+                            ng-click="set_order_by('contents.popularity[0]')"
+                            >
+                            <span
+                                title="Popularity"
+                                data-toggle="tooltip"
+                                >Popularity</span>
+                        </th>
+                        <th
                             class="right header [! order_by[0] == 'contents.spend[0][0]' && get_order_by() || '' !]"
                             ng-click="set_order_by('contents.spend[0][0]')"
                             >
@@ -291,7 +300,7 @@
                                                 [! keyword['contents']['buyer_behavior'][1] !]
                                             </strong>
                                         </span>
-                                        <span ng-switch-default ng-bind-html-unsafe="keyword['contents']['buyer_behavior'][1]|label:keyword['contents']['buyer_behavior'][1]:true"></span>
+                                        <span ng-switch-default ng-bind-html="keyword['contents']['buyer_behavior'][1]|label:keyword['contents']['buyer_behavior'][1]:true|html"></span>
                                     </span>
                                 </span>
                             </span>
@@ -312,7 +321,7 @@
                                                 [! keyword['contents']['competition'][1] !]
                                             </strong>
                                         </span>
-                                        <span ng-switch-default ng-bind-html-unsafe="keyword['contents']['competition'][1]|label:keyword['contents']['competition'][1]:false"></span>
+                                        <span ng-switch-default ng-bind-html="keyword['contents']['competition'][1]|label:keyword['contents']['competition'][1]:false|html"></span>
                                     </span>
                                 </span>
                             </span>
@@ -333,7 +342,28 @@
                                                 [! keyword['contents']['optimization'][1] !]
                                             </strong>
                                         </span>
-                                        <span ng-switch-default ng-bind-html-unsafe="keyword['contents']['optimization'][1]|label:keyword['contents']['optimization'][1]:false"></span>
+                                        <span ng-switch-default ng-bind-html="keyword['contents']['optimization'][1]|label:keyword['contents']['optimization'][1]:false|html"></span>
+                                    </span>
+                                </span>
+                            </span>
+                        </td>
+                        <td class="center">
+                            <span ng-switch on="keyword['contents']">
+                                <span
+                                    class="icon-spinner icon-spin"
+                                    ng-switch-when="null"
+                                    ></span>
+                                <span ng-switch-default>
+                                    <span ng-switch on="keyword['contents']['popularity'][1]">
+                                        <span
+                                            class="text-error"
+                                            ng-switch-when="N/A"
+                                            >
+                                            <strong>
+                                                [! keyword['contents']['popularity'][1] !]
+                                            </strong>
+                                        </span>
+                                        <span ng-switch-default ng-bind-html="keyword['contents']['popularity'][1]|label:keyword['contents']['popularity'][1]:true|html"></span>
                                     </span>
                                 </span>
                             </span>
@@ -354,7 +384,7 @@
                                                 [! keyword['contents']['spend'][1] !]
                                             </strong>
                                         </span>
-                                        <span ng-switch-default ng-bind-html-unsafe="keyword['contents']['spend'][1]|label:keyword['contents']['spend'][0][1]:true"></span>
+                                        <span ng-switch-default ng-bind-html="keyword['contents']['spend'][1]|label:keyword['contents']['spend'][0][1]:true|html"></span>
                                     </span>
                                 </span>
                             </span>
@@ -430,7 +460,7 @@
                         </td>
                     </tr>
                     <tr ng-show="statuses[keyword['string']]">
-                        <td class="details" colspan="8">
+                        <td class="details" colspan="9">
                             <p><strong>Top 10 words</strong></p>
                             <div class="row-fluid">
                                 <div

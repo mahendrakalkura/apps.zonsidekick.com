@@ -6,8 +6,7 @@ from string import lowercase
 
 from furl import furl
 from scrapy.selector import Selector
-from simplejson import loads
-from simplejson.decoder import JSONDecodeError
+from simplejson import JSONDecodeError, loads
 from sqlalchemy import Column
 from sqlalchemy.exc import DBAPIError, SQLAlchemyError
 from sqlalchemy.orm import backref, relationship

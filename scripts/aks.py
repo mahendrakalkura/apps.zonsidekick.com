@@ -4,8 +4,7 @@ from multiprocessing.pool import ThreadPool
 from sys import argv
 
 from furl import furl
-from simplejson import dumps, loads
-from simplejson.scanner import JSONDecodeError
+from simplejson import dumps, JSONDecodeError, loads
 
 from utilities import get_response
 

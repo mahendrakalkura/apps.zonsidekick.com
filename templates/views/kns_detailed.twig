@@ -149,6 +149,7 @@
                 <th class="center small">Buyer Behavior</th>
                 <th class="center small">Competition</th>
                 <th class="center small">Optimization</th>
+                <th class="center small">Popularity</th>
                 <th class="right small">Spend ({{ currency }})</th>
                 <th class="right small">Avg. Price ({{ currency }})</th>
                 <th class="right small">Avg. Length</th>
@@ -165,6 +166,9 @@
                     </td>
                     <td class="center small">
                         {{ keyword.contents? keyword.contents.optimization[1]: 'N/A' }}
+                    </td>
+                    <td class="center small">
+                        {{ keyword.contents? keyword.contents.popularity[1]: 'N/A' }}
                     </td>
                     <td class="right small">
                         {{ keyword.contents? keyword.contents.spend[0][1]: 'N/A' }}

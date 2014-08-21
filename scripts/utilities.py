@@ -6,14 +6,13 @@ from random import choice, randint
 from re import compile, sub
 from socket import timeout
 
-from furl import furl
 from grequests import get as get_, map as map_
 from MySQLdb import connect
 from MySQLdb.cursors import DictCursor
 from requests import get
 from requests.exceptions import RequestException
 from scrapy.selector import Selector
-from simplejson import JSONDecodeError, dumps, loads
+from simplejson import dumps, loads
 from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
 from sqlalchemy.ext.declarative import declarative_base
@@ -296,62 +295,6 @@ def get_number(number):
     number = sub(r'[^0-9\.]', '', number)
     number = number.strip()
     return number
-
-
-def get_popularity(keyword):
-    kps = 0.00
-    sp = 0
-    src = 0
-    trb = 0
-    spr = 0
-    length = len(keyword)
-    for index in range(0, length):
-        keywords = {
-            'premium': [],
-            'non-premium': [],
-        }
-        response = get_response(
-            furl(
-                'http://completion.amazon.com/search/complete'
-            ).add({
-                'mkt': '1',
-                'q': keyword[0:index + 1],
-                'search-alias': 'digital-text',
-                'xcat': '2',
-            }).url
-        )
-        if not response:
-            continue
-        contents = []
-        try:
-            contents = loads(response.text)
-        except JSONDecodeError:
-            pass
-        if not contents:
-            continue
-        for i, item in enumerate(contents[2]):
-            key = 'non-premium'
-            if isinstance(item, dict) and 'nodes'in item and item['nodes']:
-                key = 'premium'
-            keywords[key].append(contents[1][i])
-        if not kps and not sp and not src:
-            if keyword in keywords['non-premium']:
-                kps = ((index + 1) * 100.00) / (length * 1.00)
-                src = len(keywords['non-premium'])
-                sp = contents[1].index(keyword)
-        if not trb:
-            total = len(keywords['premium'])
-            if total:
-                if keyword in keywords['premium']:
-                    rank = contents[1].index(keyword)
-                    trb = (((total - rank) * 100.00) / (total * 1.00))
-        if kps and sp and src and trb:
-            break
-    if src:
-        spr = (((src - sp) * 100.00) / (src * 1.00))
-        if sp != 1:
-            spr = spr * 0.75
-    return (kps * 0.80) + (spr * 0.10) + (trb * 0.10)
 
 
 def get_proxies():

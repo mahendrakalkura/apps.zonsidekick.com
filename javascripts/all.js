@@ -80,6 +80,12 @@ application.directive('popover', function () {
     };
 });
 
+application.filter('html', function ($sce) {
+    return function (html) {
+        return $sce.trustAsHtml(html);
+    };
+});
+
 application.filter('label', function () {
     return function (one, two, status) {
         if (status) {

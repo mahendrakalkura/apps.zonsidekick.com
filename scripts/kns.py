@@ -19,10 +19,10 @@ from dateutil.parser import parse
 from furl import furl
 from numpy import mean
 from scrapy.selector import Selector
-from simplejson import dumps
+from simplejson import dumps, JSONDecodeError, loads
 
 from utilities import (
-    get_mysql_connection, get_responses, get_string, get_sales,
+    get_mysql_connection, get_response, get_responses, get_string, get_sales,
 )
 
 setlocale(LC_ALL, 'en_US.UTF-8')
@@ -50,6 +50,13 @@ points = {
         'Very Low': 4,
     },
     'spend': {
+        'Very High': 4,
+        'High': 3,
+        'Medium': 2,
+        'Low': 1,
+        'Very Low': 0,
+    },
+    'popularity': {
         'Very High': 4,
         'High': 3,
         'Medium': 2,
@@ -685,6 +692,7 @@ def get_contents(keyword, country):
     buyer_behavior = get_buyer_behavior(items) if price else (-1, 'N/A')
     competition = get_competition(items) if price else (-1, 'N/A')
     optimization = get_optimization(keyword, items) if price else (-1, 'N/A')
+    popularity = get_popularity(keyword)
     spend = get_spend(items) if price else ((-1, 'N/A'), 'N/A')
     return {
         'average_length': (
@@ -699,8 +707,9 @@ def get_contents(keyword, country):
         'items': items,
         'matches': get_matches(items),
         'optimization': optimization,
+        'popularity': popularity,
         'score': get_score(
-            buyer_behavior, competition, optimization, spend
+            buyer_behavior, competition, optimization, popularity, spend,
         ) if price else (-1, 'N/A'),
         'spend': spend,
     }
@@ -760,6 +769,71 @@ def get_optimization(keyword, items):
     return number, 'Very Low'
 
 
+def get_popularity(keyword):
+    kps = 0.00
+    sp = 0
+    src = 0
+    trb = 0
+    spr = 0
+    length = len(keyword)
+    for index in range(0, length):
+        keywords = {
+            'premium': [],
+            'non-premium': [],
+        }
+        response = get_response(
+            furl(
+                'http://completion.amazon.com/search/complete'
+            ).add({
+                'mkt': '1',
+                'q': keyword[0:index + 1],
+                'search-alias': 'digital-text',
+                'xcat': '2',
+            }).url
+        )
+        if not response:
+            continue
+        contents = []
+        try:
+            contents = loads(response.text)
+        except JSONDecodeError:
+            pass
+        if not contents:
+            continue
+        for i, item in enumerate(contents[2]):
+            key = 'non-premium'
+            if isinstance(item, dict) and 'nodes'in item and item['nodes']:
+                key = 'premium'
+            keywords[key].append(contents[1][i])
+        if not kps and not sp and not src:
+            if keyword in keywords['non-premium']:
+                kps = ((index + 1) * 100.00) / (length * 1.00)
+                src = len(keywords['non-premium'])
+                sp = contents[1].index(keyword)
+        if not trb:
+            total = len(keywords['premium'])
+            if total:
+                if keyword in keywords['premium']:
+                    rank = contents[1].index(keyword)
+                    trb = (((total - rank) * 100.00) / (total * 1.00))
+        if kps and sp and src and trb:
+            break
+    if src:
+        spr = (((src - sp) * 100.00) / (src * 1.00))
+        if sp != 1:
+            spr = spr * 0.75
+    number = (kps * 0.80) + (spr * 0.10) + (trb * 0.10)
+    if number > 80.00:
+        return number, 'Very High'
+    if number > 60.00:
+        return number, 'High'
+    if number > 40.00:
+        return number, 'Medium'
+    if number > 20.00:
+        return number, 'Low'
+    return number, 'Very Low'
+
+
 def get_spend(items):
     number = sum([item['spend'][0] for item in items])
     number = (number, get_float(number))
@@ -774,7 +848,7 @@ def get_spend(items):
     return number, 'Very Low'
 
 
-def get_score(buyer_behavior, competition, optimization, spend):
+def get_score(buyer_behavior, competition, optimization, popularity, spend):
     score = 0.00
     key = '-'.join([
         competition[1],
@@ -810,6 +884,7 @@ def get_score(buyer_behavior, competition, optimization, spend):
             if key == '-'.join([row[0], row[1]]):
                 score += float(row[2])
                 break
+    score = score + (popularity[0] * 0.20)
     return score, get_float(score)
 
 
