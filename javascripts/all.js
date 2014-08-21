@@ -264,6 +264,8 @@ application.controller('ba', function ($attrs, $http, $rootScope, $scope) {
         $scope.books.spinner = false;
         $scope.book.contents = '';
         $scope.book.spinner = false;
+        $scope.items.contents = '';
+        $scope.items.spinner = false;
 
         if (!$scope.keyword.length) {
             $rootScope.$broadcast('open', {
@@ -306,6 +308,8 @@ application.controller('ba', function ($attrs, $http, $rootScope, $scope) {
     $scope.get_book = function (url) {
         $scope.book.contents = '';
         $scope.book.spinner = false;
+        $scope.items.contents = '';
+        $scope.items.spinner = false;
 
         $scope.book.spinner = true;
 
