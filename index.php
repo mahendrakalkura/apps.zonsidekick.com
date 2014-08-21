@@ -168,6 +168,20 @@ EOD;
     return array($count, $keywords);
 }
 
+function get_countries() {
+    return array(
+        'com' => 'US',
+        'co.uk' => 'UK',
+        'es' => 'Spain',
+        'fr' => 'France',
+        'it' => 'Italy',
+        'com.br' => 'Brazil',
+        'ca' => 'Canada',
+        'de' => 'Germany',
+        'co.jp' => 'Japan',
+    );
+};
+
 function get_contents($application, $user, $logo) {
     $file_path = sprintf(
         '%s/%s', get_path($application, $user, 'logos'), $logo
@@ -918,17 +932,7 @@ $application->match('/kns/add', function () use ($application) {
 
     return $application['twig']->render('views/kns_add.twig', array(
         'count' => $count,
-        'countries' => array(
-            'com' => 'US',
-            'co.uk' => 'UK',
-            'es' => 'Spain',
-            'fr' => 'France',
-            'it' => 'Italy',
-            'com.br' => 'Brazil',
-            'ca' => 'Canada',
-            'de' => 'Germany',
-            'co.jp' => 'Japan',
-        ),
+        'countries' => get_countries(),
     ));
 })
 ->before($before_kns)
@@ -1211,6 +1215,41 @@ $application->match(
 ->before($before_kns)
 ->bind('kns_delete')
 ->method('GET|POST');
+
+$application->match('/kns/single', function () use ($application) {
+    $countries = array();
+    $c = get_countries();
+    if ($c) {
+        foreach ($c as $key => $value) {
+            $countries[] = array($key, $value);
+        }
+    }
+    return $application['twig']->render('views/kns_single.twig', array(
+        'countries' => $countries,
+    ));
+})
+->before($before_statistics)
+->bind('kns_single')
+->method('GET');
+
+$application->match(
+    '/kns/single/xhr',
+    function (Request $request) use ($application, $variables) {
+        ignore_user_abort(true);
+        set_time_limit(0);
+        exec(sprintf(
+            '%s/python %s/scripts/kns.py %s %s 2>/dev/null',
+            $variables['virtualenv'],
+            __DIR__,
+            escapeshellarg($request->get('keyword')),
+            escapeshellarg($request->get('country'))
+        ), $output, $return_var);
+        return new Response(implode('', $output));
+    }
+)
+->before($before_statistics)
+->bind('kns_single_xhr')
+->method('POST');
 
 $application->match('/logos/overview', function () use ($application) {
     $user = $application['session']->get('user');

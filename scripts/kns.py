@@ -13,6 +13,7 @@ from locale import LC_ALL, format, setlocale
 from math import sqrt
 from os.path import dirname, join
 from re import compile, sub
+from sys import argv
 
 from dateutil import relativedelta
 from dateutil.parser import parse
@@ -947,4 +948,7 @@ def get_url(country, keyword, page):
     }).url
 
 if __name__ == '__main__':
-    main()
+    if len(argv) == 3:
+        print dumps(get_contents(argv[1], argv[2]))
+    else:
+        main()

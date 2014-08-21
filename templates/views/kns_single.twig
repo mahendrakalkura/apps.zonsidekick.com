@@ -1,0 +1,78 @@
+{% extends 'layout.twig' %}
+
+{% set module = 'Kindle Niche Sidekick - Single Keyword' %}
+{% set nav = 'a' %}
+
+{% block content %}
+<div
+    data-countries="{{ countries|json_encode }}"
+    data-error-1-middle="<p>Please enter a valid keyword.</p>"
+    data-error-1-top="Error #1"
+    data-error-2-middle="<p>An unknown error has occurred. Please try again.</p>"
+    data-error-2-top="Error #2"
+    data-url="{{ url('kns_single_xhr') }}"
+    id="kns_single"
+    ng-controller="kns_single"
+    >
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="page-header">
+                <h1>{{ module }}</h1>
+            </div>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span12">
+            <form
+                class="form-horizontal"
+                name="form"
+                ng-submit="process()"
+                >
+                <div class="control-group">
+                    <label class="control-label" for="keyword">Keyword</label>
+                    <div class="controls">
+                        <input
+                            class="span12"
+                            id="keyword"
+                            placeholder="Keyword"
+                            type="text"
+                            value=""
+                            ng-model="keyword"
+                            >
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="country">Country</label>
+                    <div class="controls">
+                        <select
+                            class="span12"
+                            id="country"
+                            ng-model="country"
+                            ng-options="country[0] as country[1] for country in countries"
+                            ></select>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-success" type="submit">
+                        <span class="icon-info-sign icon-large"></span>
+                        Submit
+                    </button>
+                    <button class="btn btn-danger" type="reset">
+                        <span class="icon-trash icon-large"></span>
+                        Reset
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <p class="text-center span12 hide [! spinner == true && 'show' || 'hide' !]">
+            <span class="icon-spinner icon-spin icon-2x"></span>
+        </p>
+    </div>
+    <div class="row-fluid">
+        <div class="span12 hide [! contents != '' > 0 && 'show' || 'hide' !]">
+        </div>
+    </div>
+</div>
+{% endblock %}

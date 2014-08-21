@@ -906,6 +906,60 @@ application.controller('kns_simple', [
     }
 ]);
 
+application.controller(
+    'kns_single',
+    function ($attrs, $http, $rootScope, $scope) {
+        $scope.countries = jQuery.parseJSON($attrs.countries);
+        $scope.keyword = '';
+        $scope.country = $scope.countries[0][0];
+        $scope.contents = '';
+        $scope.spinner = false;
+
+        $scope.process = function () {
+            $scope.contents = '';
+            $scope.spinner = false;
+
+            if (!$scope.keyword.length) {
+                $rootScope.$broadcast('open', {
+                    top: $attrs.error1Top,
+                    middle: $attrs.error1Middle
+                });
+
+                return;
+            }
+
+            $scope.spinner = true;
+
+            $http({
+                data: jQuery.param({
+                    country: $scope.country,
+                    keyword: $scope.keyword
+                }),
+                method: 'POST',
+                url: $attrs.url
+            }).
+            error(function (data, status, headers, config) {
+                $scope.spinner = false;
+                $rootScope.$broadcast('open', {
+                    top: $attrs.error2Top,
+                    middle: $attrs.error2Middle
+                });
+            }).
+            success(function (data, status, headers, config) {
+                $scope.spinner = false;
+                if (typeof(data) == 'object') {
+                    $scope.contents = data;
+                } else {
+                    $rootScope.$broadcast('open', {
+                        top: $attrs.error2Top,
+                        middle: $attrs.error2Middle
+                    });
+                }
+            });
+        };
+    }
+);
+
 application.controller('modal', function (
     $attrs, $element, $rootScope, $scope
 ) {
