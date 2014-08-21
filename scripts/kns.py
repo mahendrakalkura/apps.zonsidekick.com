@@ -284,10 +284,9 @@ def get_competition(items):
 
 
 def get_contents(keyword, country):
-    urls = []
-    for page in ['1', '2', '3']:
-        urls.append(get_url(country, keyword, page))
-    responses = get_responses(urls)
+    responses = get_responses([
+        get_url(country, keyword, page) for page in ['1', '2', '3']
+    ])
     if None in responses:
         return
     breadcrumb = ''

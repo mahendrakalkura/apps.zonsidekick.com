@@ -8,20 +8,18 @@ from utilities import get_responses, get_string, get_url
 
 def get_books(keyword):
     books = []
-    urls = []
-    for index in range(1, 4):
-        urls.append(
-            furl(
-                'http://www.amazon.com/s'
-            ).add({
-                'keywords': keyword,
-                'page': index,
-                'rh': 'n:283155,p_n_feature_browse-bin:618073011,k:%(keyword)s' % {
-                    'keyword': keyword,
-                },
-            }).url
-        )
-    for response in get_responses(urls):
+    for response in get_responses([
+        furl(
+            'http://www.amazon.com/s'
+        ).add({
+            'keywords': keyword,
+            'page': index,
+            'rh': 'n:283155,p_n_feature_browse-bin:618073011,k:%(keyword)s' % {
+                'keyword': keyword,
+            },
+        }).url
+        for index in range(1, 4)
+    ]):
         if not response:
             continue
         for anchor in Selector(

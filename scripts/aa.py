@@ -10,20 +10,18 @@ from utilities import (
 
 def get_authors(name):
     authors = []
-    urls = []
-    for index in range(1, 4):
-        urls.append(
-            furl(
-                'http://www.amazon.com/s'
-            ).add({
-                'page': index,
-                'rh':
-                'n:283155,p_n_feature_browse-bin:618073011,p_27:%(name)s' % {
-                    'name': name,
-                },
-            }).url
-        )
-    for response in get_responses(urls):
+    for response in get_responses([
+        furl(
+            'http://www.amazon.com/s'
+        ).add({
+            'page': index,
+            'rh':
+            'n:283155,p_n_feature_browse-bin:618073011,p_27:%(name)s' % {
+                'name': name,
+            },
+        }).url
+        for index in range(1, 4)
+    ]):
         if not response:
             continue
         for anchor in Selector(
