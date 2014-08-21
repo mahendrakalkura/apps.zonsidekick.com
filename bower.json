@@ -2,6 +2,7 @@
     "dependencies": {
         "angular": "1.0.7",
         "angular-encode-uri": "~1.0.0",
+        "angular-scroll": "~0.6.1",
         "bootstrap": "2.3.2",
         "bootstrap-datepicker": "1.1.1",
         "font-awesome": "3.0.2",
@@ -17,5 +18,8 @@
     "ignore": [],
     "main": "",
     "name": "zonsidekick.com",
+    "resolutions": {
+        "angular": "~1.2.16"
+    },
     "version": "1.0.0"
 }

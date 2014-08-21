@@ -21,7 +21,7 @@ var is_development = function(){
     return false;
 };
 
-var application = angular.module('application', ['rt.encodeuri']);
+var application = angular.module('application', ['duScroll', 'rt.encodeuri']);
 
 application.config(function ($httpProvider, $interpolateProvider) {
     $httpProvider.defaults.headers.post[
@@ -154,234 +154,248 @@ application.filter('label', function () {
     }
 });
 
-application.controller('aa', function ($attrs, $http, $rootScope, $scope) {
-    $scope.keyword = '';
-    $scope.authors = {
-        'contents': [],
-        'spinner': false
-    };
-    $scope.author = {
-        'contents': '',
-        'spinner': false
-    };
+application.controller(
+    'aa',
+    function ($attrs, $document, $http, $rootScope, $scope) {
+        $scope.keyword = '';
+        $scope.authors = {
+            'contents': [],
+            'spinner': false
+        };
+        $scope.author = {
+            'contents': '',
+            'spinner': false
+        };
 
-    $scope.get_authors = function () {
-        $scope.authors.contents = [];
-        $scope.authors.spinner = false;
-        $scope.author.contents = '';
-        $scope.author.spinner = false;
-
-        if (!$scope.keyword.length) {
-            $rootScope.$broadcast('open', {
-                top: $attrs.error1Top,
-                middle: $attrs.error1Middle
-            });
-
-            return;
-        }
-
-        $scope.authors.spinner = true;
-
-        $http({
-            data: jQuery.param({
-                keyword: $scope.keyword
-            }),
-            method: 'POST',
-            url: $attrs.urlAuthors
-        }).
-        error(function (data, status, headers, config) {
+        $scope.get_authors = function () {
+            $scope.authors.contents = [];
             $scope.authors.spinner = false;
-            $rootScope.$broadcast('open', {
-                top: $attrs.error2Top,
-                middle: $attrs.error2Middle
-            });
-        }).
-        success(function (data, status, headers, config) {
-            $scope.authors.spinner = false;
-            if (data.length > 0) {
-                $scope.authors.contents = data;
-            } else {
+            $scope.author.contents = '';
+            $scope.author.spinner = false;
+
+            if (!$scope.keyword.length) {
+                $rootScope.$broadcast('open', {
+                    top: $attrs.error1Top,
+                    middle: $attrs.error1Middle
+                });
+
+                return;
+            }
+
+            $scope.authors.spinner = true;
+
+            $http({
+                data: jQuery.param({
+                    keyword: $scope.keyword
+                }),
+                method: 'POST',
+                url: $attrs.urlAuthors
+            }).
+            error(function (data, status, headers, config) {
+                $scope.authors.spinner = false;
                 $rootScope.$broadcast('open', {
                     top: $attrs.error2Top,
                     middle: $attrs.error2Middle
                 });
-            }
-        });
-    };
-
-    $scope.get_author = function (url) {
-        $scope.author.contents = '';
-        $scope.author.spinner = false;
-
-        $scope.author.spinner = true;
-
-        $http({
-            data: jQuery.param({
-                url: url
-            }),
-            method: 'POST',
-            url: $attrs.urlAuthor
-        }).
-        error(function (data, status, headers, config) {
-            $scope.author.spinner = false;
-            $rootScope.$broadcast('open', {
-                top: $attrs.error2Top,
-                middle: $attrs.error2Middle
+            }).
+            success(function (data, status, headers, config) {
+                $scope.authors.spinner = false;
+                if (data.length > 0) {
+                    $scope.authors.contents = data;
+                } else {
+                    $rootScope.$broadcast('open', {
+                        top: $attrs.error2Top,
+                        middle: $attrs.error2Middle
+                    });
+                }
             });
-        }).
-        success(function (data, status, headers, config) {
+        };
+
+        $scope.get_author = function (url) {
+            $scope.author.contents = '';
             $scope.author.spinner = false;
-            if (typeof(data) === 'object') {
-                $scope.author.contents = data;
-            } else {
+
+            $scope.author.spinner = true;
+
+            $document.scrollToElement(angular.element(
+                document.getElementById('scroll')
+            ));
+
+            $http({
+                data: jQuery.param({
+                    url: url
+                }),
+                method: 'POST',
+                url: $attrs.urlAuthor
+            }).
+            error(function (data, status, headers, config) {
+                $scope.author.spinner = false;
                 $rootScope.$broadcast('open', {
                     top: $attrs.error2Top,
                     middle: $attrs.error2Middle
                 });
-            }
-        });
-    };
-
-    if ($attrs.url.length) {
-        $scope.get_author($attrs.url);
-    }
-});
-
-application.controller('ba', function ($attrs, $http, $rootScope, $scope) {
-    $scope.keyword = '';
-    $scope.books = {
-        'contents': [],
-        'spinner': false
-    };
-    $scope.book = {
-        'contents': '',
-        'spinner': false
-    };
-    $scope.items = {
-        'contents': '',
-        'spinner': false
-    };
-    $scope.keywords = '';
-
-    $scope.get_books = function () {
-        $scope.books.contents = [];
-        $scope.books.spinner = false;
-        $scope.book.contents = '';
-        $scope.book.spinner = false;
-        $scope.items.contents = '';
-        $scope.items.spinner = false;
-
-        if (!$scope.keyword.length) {
-            $rootScope.$broadcast('open', {
-                top: $attrs.error1Top,
-                middle: $attrs.error1Middle
+            }).
+            success(function (data, status, headers, config) {
+                $scope.author.spinner = false;
+                if (typeof(data) === 'object') {
+                    $scope.author.contents = data;
+                } else {
+                    $rootScope.$broadcast('open', {
+                        top: $attrs.error2Top,
+                        middle: $attrs.error2Middle
+                    });
+                }
             });
+        };
 
-            return;
+        if ($attrs.url.length) {
+            $scope.get_author($attrs.url);
         }
-
-        $scope.books.spinner = true;
-
-        $http({
-            data: jQuery.param({
-                keyword: $scope.keyword
-            }),
-            method: 'POST',
-            url: $attrs.urlBooks
-        }).
-        error(function (data, status, headers, config) {
-            $scope.books.spinner = false;
-            $rootScope.$broadcast('open', {
-                top: $attrs.error2Top,
-                middle: $attrs.error2Middle
-            });
-        }).
-        success(function (data, status, headers, config) {
-            $scope.books.spinner = false;
-            if (data.length > 0) {
-                $scope.books.contents = data;
-            } else {
-                $rootScope.$broadcast('open', {
-                    top: $attrs.error2Top,
-                    middle: $attrs.error2Middle
-                });
-            }
-        });
-    };
-
-    $scope.get_book = function (url) {
-        $scope.book.contents = '';
-        $scope.book.spinner = false;
-        $scope.items.contents = '';
-        $scope.items.spinner = false;
-
-        $scope.book.spinner = true;
-
-        $http({
-            data: jQuery.param({
-                url: url
-            }),
-            method: 'POST',
-            url: $attrs.urlBook
-        }).
-        error(function (data, status, headers, config) {
-            $scope.book.spinner = false;
-            $rootScope.$broadcast('open', {
-                top: $attrs.error2Top,
-                middle: $attrs.error2Middle
-            });
-        }).
-        success(function (data, status, headers, config) {
-            $scope.book.spinner = false;
-            if (typeof(data) === 'object') {
-                $scope.book.contents = data;
-            } else {
-                $rootScope.$broadcast('open', {
-                    top: $attrs.error2Top,
-                    middle: $attrs.error2Middle
-                });
-            }
-        });
-    };
-
-    $scope.get_items = function () {
-        $scope.items.contents = '';
-        $scope.items.spinner = false;
-
-        $scope.items.spinner = true;
-
-        $http({
-            data: jQuery.param({
-                keywords: $scope.keywords,
-                url: $scope.book.contents.url
-            }),
-            method: 'POST',
-            url: $attrs.urlItems
-        }).
-        error(function (data, status, headers, config) {
-            $scope.items.spinner = false;
-            $rootScope.$broadcast('open', {
-                top: $attrs.error2Top,
-                middle: $attrs.error2Middle
-            });
-        }).
-        success(function (data, status, headers, config) {
-            $scope.items.spinner = false;
-            if (typeof(data) === 'object') {
-                $scope.items.contents = data;
-            } else {
-                $rootScope.$broadcast('open', {
-                    top: $attrs.error2Top,
-                    middle: $attrs.error2Middle
-                });
-            }
-        });
-    };
-
-    if ($attrs.url.length) {
-        $scope.get_book($attrs.url);
     }
-});
+);
+
+application.controller(
+    'ba',
+    function ($attrs, $document, $http, $rootScope, $scope) {
+        $scope.keyword = '';
+        $scope.books = {
+            'contents': [],
+            'spinner': false
+        };
+        $scope.book = {
+            'contents': '',
+            'spinner': false
+        };
+        $scope.items = {
+            'contents': '',
+            'spinner': false
+        };
+        $scope.keywords = '';
+
+        $scope.get_books = function () {
+            $scope.books.contents = [];
+            $scope.books.spinner = false;
+            $scope.book.contents = '';
+            $scope.book.spinner = false;
+            $scope.items.contents = '';
+            $scope.items.spinner = false;
+
+            if (!$scope.keyword.length) {
+                $rootScope.$broadcast('open', {
+                    top: $attrs.error1Top,
+                    middle: $attrs.error1Middle
+                });
+
+                return;
+            }
+
+            $scope.books.spinner = true;
+
+            $http({
+                data: jQuery.param({
+                    keyword: $scope.keyword
+                }),
+                method: 'POST',
+                url: $attrs.urlBooks
+            }).
+            error(function (data, status, headers, config) {
+                $scope.books.spinner = false;
+                $rootScope.$broadcast('open', {
+                    top: $attrs.error2Top,
+                    middle: $attrs.error2Middle
+                });
+            }).
+            success(function (data, status, headers, config) {
+                $scope.books.spinner = false;
+                if (data.length > 0) {
+                    $scope.books.contents = data;
+                } else {
+                    $rootScope.$broadcast('open', {
+                        top: $attrs.error2Top,
+                        middle: $attrs.error2Middle
+                    });
+                }
+            });
+        };
+
+        $scope.get_book = function (url) {
+            $scope.book.contents = '';
+            $scope.book.spinner = false;
+            $scope.items.contents = '';
+            $scope.items.spinner = false;
+
+            $scope.book.spinner = true;
+
+            $document.scrollToElement(angular.element(
+                document.getElementById('scroll')
+            ));
+
+            $http({
+                data: jQuery.param({
+                    url: url
+                }),
+                method: 'POST',
+                url: $attrs.urlBook
+            }).
+            error(function (data, status, headers, config) {
+                $scope.book.spinner = false;
+                $rootScope.$broadcast('open', {
+                    top: $attrs.error2Top,
+                    middle: $attrs.error2Middle
+                });
+            }).
+            success(function (data, status, headers, config) {
+                $scope.book.spinner = false;
+                if (typeof(data) === 'object') {
+                    $scope.book.contents = data;
+                } else {
+                    $rootScope.$broadcast('open', {
+                        top: $attrs.error2Top,
+                        middle: $attrs.error2Middle
+                    });
+                }
+            });
+        };
+
+        $scope.get_items = function () {
+            $scope.items.contents = '';
+            $scope.items.spinner = false;
+
+            $scope.items.spinner = true;
+
+            $http({
+                data: jQuery.param({
+                    keywords: $scope.keywords,
+                    url: $scope.book.contents.url
+                }),
+                method: 'POST',
+                url: $attrs.urlItems
+            }).
+            error(function (data, status, headers, config) {
+                $scope.items.spinner = false;
+                $rootScope.$broadcast('open', {
+                    top: $attrs.error2Top,
+                    middle: $attrs.error2Middle
+                });
+            }).
+            success(function (data, status, headers, config) {
+                $scope.items.spinner = false;
+                if (typeof(data) === 'object') {
+                    $scope.items.contents = data;
+                } else {
+                    $rootScope.$broadcast('open', {
+                        top: $attrs.error2Top,
+                        middle: $attrs.error2Middle
+                    });
+                }
+            });
+        };
+
+        if ($attrs.url.length) {
+            $scope.get_book($attrs.url);
+        }
+    }
+);
 
 application.controller('aks', function ($attrs, $http, $rootScope, $scope) {
     $scope.checkbox = false;
