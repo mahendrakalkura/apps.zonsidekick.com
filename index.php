@@ -1233,7 +1233,7 @@ $application->match('/kns/single', function () use ($application) {
 ->method('GET');
 
 $application->match(
-    '/kns/single/xhr',
+    '/kns/single_',
     function (Request $request) use ($application, $variables) {
         ignore_user_abort(true);
         set_time_limit(0);
@@ -1248,7 +1248,7 @@ $application->match(
     }
 )
 ->before($before_statistics)
-->bind('kns_single_xhr')
+->bind('kns_single_')
 ->method('POST');
 
 $application->match('/logos/overview', function () use ($application) {
