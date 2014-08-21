@@ -126,7 +126,10 @@ def get_amazon_best_sellers_rank(selector):
 def get_book(response):
     book_cover_image = ''
     title = ''
-    author = ''
+    author = {
+        'name': '',
+        'url': '',
+    }
     price = 0.0
     publication_date = ''
     print_length = ''
@@ -166,14 +169,26 @@ def get_book(response):
     except IndexError:
         pass
     try:
-        author = get_string(selector.xpath(
+        author['name'] = get_string(selector.xpath(
             '//span[@class="contributorNameTrigger"]/a/text()'
         ).extract()[0])
     except IndexError:
         try:
-            author = get_string(selector.xpath(
+            author['name'] = get_string(selector.xpath(
                 '//h1[@class="parseasinTitle "]/following-sibling::span/a/'
                 'text()'
+            ).extract()[0])
+        except IndexError:
+            pass
+    try:
+        author['url'] = get_url(selector.xpath(
+            '//span[@class="contributorNameTrigger"]/a/@href'
+        ).extract()[0])
+    except IndexError:
+        try:
+            author['url'] = get_url(selector.xpath(
+                '//h1[@class="parseasinTitle "]/following-sibling::span/a/'
+                '@href'
             ).extract()[0])
         except IndexError:
             pass

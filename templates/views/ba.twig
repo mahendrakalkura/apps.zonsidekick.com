@@ -5,14 +5,15 @@
 
 {% block content %}
 <div
-    id="ba"
-    data-error-1-top="Error #1"
     data-error-1-middle="<p>Please enter a valid keyword.</p>"
-    data-error-2-top="Error #2"
+    data-error-1-top="Error #1"
     data-error-2-middle="<p>An unknown error has occurred. Please try again.</p>"
-    data-url-books="{{ url('ba_books') }}"
+    data-error-2-top="Error #2"
     data-url-book="{{ url('ba_book') }}"
+    data-url-books="{{ url('ba_books') }}"
     data-url-items="{{ url('ba_items') }}"
+    data-url="{{ url }}"
+    id="ba"
     ng-controller="ba"
     >
     <div class="row-fluid">
@@ -112,7 +113,21 @@
                     width="200"
                     >
                 <p>
-                    <strong>Author:</strong> [! book.contents.author !]
+                    <strong>Author:</strong>
+                    <span ng-show="book.contents.author.url.length > 0">
+                        <a
+                            href="{{ url('aa') }}?url=[! book.contents.author.url|encodeUri !]"
+                            target="_blank"
+                            >[! book.contents.author.name !]</a>
+                        <a
+                            href="[! book.contents.author.url !]"
+                            rel="noreferrer"
+                            target="_blank"
+                            ><i class="icon-external-link"></i></a>
+                    </span>
+                    <span ng-show="book.contents.author.url.length == 0">
+                        [! book.contents.author.name !]
+                    </span>
                     <br>
                     <strong>Price:</strong>
                     $[! book.contents.price|number:2 !]

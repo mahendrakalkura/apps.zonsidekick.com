@@ -5,13 +5,14 @@
 
 {% block content %}
 <div
-    id="aa"
-    data-error-1-top="Error #1"
     data-error-1-middle="<p>Please enter a valid keyword.</p>"
-    data-error-2-top="Error #2"
+    data-error-1-top="Error #1"
     data-error-2-middle="<p>An unknown error has occurred. Please try again.</p>"
-    data-url-authors="{{ url('aa_authors') }}"
+    data-error-2-top="Error #2"
     data-url-author="{{ url('aa_author') }}"
+    data-url-authors="{{ url('aa_authors') }}"
+    data-url="{{ url }}"
+    id="aa"
     ng-controller="aa"
     >
     <div class="row-fluid">
@@ -146,8 +147,13 @@
                     <tr ng-repeat="book in author.contents.books">
                         <td>
                             <a
+                                class="pull-right"
                                 href="[! book.url !]"
                                 rel="noreferrer"
+                                target="_blank"
+                                ><i class="icon-external-link"></i></a>
+                            <a
+                                href="{{ url('ba') }}?url=[! book.url|encodeUri !]"
                                 target="_blank"
                                 >[! book.title !]</a>
                         </td>
@@ -155,7 +161,7 @@
                             [! book.price|number:2 !]
                         </td>
                         <td class="narrow right">
-                            [! book.print_length|number:2 !]
+                            [! book.print_length|number:0 !]
                         </td>
                         <td class="narrow right">
                             [! book.total_number_of_reviews|number:0 !]

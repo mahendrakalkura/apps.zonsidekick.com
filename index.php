@@ -768,8 +768,10 @@ $application->match('/dashboard', function () use ($application) {
 ->bind('dashboard')
 ->method('GET');
 
-$application->match('/aa', function () use ($application) {
-    return $application['twig']->render('views/aa.twig');
+$application->match('/aa', function (Request $request) use ($application) {
+    return $application['twig']->render('views/aa.twig', array(
+        'url' => $request->get('url'),
+    ));
 })
 ->before($before_statistics)
 ->bind('aa')
@@ -811,8 +813,10 @@ $application->match(
 ->bind('aa_author')
 ->method('POST');
 
-$application->match('/ba', function () use ($application) {
-    return $application['twig']->render('views/ba.twig');
+$application->match('/ba', function (Request $request) use ($application) {
+    return $application['twig']->render('views/ba.twig', array(
+        'url' => $request->get('url'),
+    ));
 })
 ->before($before_statistics)
 ->bind('ba')

@@ -21,7 +21,7 @@ var is_development = function(){
     return false;
 };
 
-var application = angular.module('application', []);
+var application = angular.module('application', ['rt.encodeuri']);
 
 application.config(function ($httpProvider, $interpolateProvider) {
     $httpProvider.defaults.headers.post[
@@ -241,6 +241,10 @@ application.controller('aa', function ($attrs, $http, $rootScope, $scope) {
             }
         });
     };
+
+    if ($attrs.url.length) {
+        $scope.get_author($attrs.url);
+    }
 });
 
 application.controller('ba', function ($attrs, $http, $rootScope, $scope) {
@@ -373,6 +377,10 @@ application.controller('ba', function ($attrs, $http, $rootScope, $scope) {
             }
         });
     };
+
+    if ($attrs.url.length) {
+        $scope.get_book($attrs.url);
+    }
 });
 
 application.controller('aks', function ($attrs, $http, $rootScope, $scope) {
