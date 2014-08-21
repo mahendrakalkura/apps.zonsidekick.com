@@ -811,6 +811,68 @@ $application->match(
 ->bind('aa_author')
 ->method('POST');
 
+$application->match('/ba', function () use ($application) {
+    return $application['twig']->render('views/ba.twig');
+})
+->before($before_statistics)
+->bind('ba')
+->method('GET');
+
+$application->match(
+    '/ba/books',
+    function (Request $request) use ($application, $variables) {
+        ignore_user_abort(true);
+        set_time_limit(0);
+        exec(sprintf(
+            '%s/python %s/scripts/ba.py get_books %s 2>/dev/null',
+            $variables['virtualenv'],
+            __DIR__,
+            escapeshellarg($request->get('keyword'))
+        ), $output, $return_var);
+        return new Response(implode('', $output));
+    }
+)
+->before($before_statistics)
+->bind('ba_books')
+->method('POST');
+
+$application->match(
+    '/ba/book',
+    function (Request $request) use ($application, $variables) {
+        ignore_user_abort(true);
+        set_time_limit(0);
+        exec(sprintf(
+            '%s/python %s/scripts/ba.py get_book %s 2>/dev/null',
+            $variables['virtualenv'],
+            __DIR__,
+            escapeshellarg($request->get('url'))
+        ), $output, $return_var);
+        return new Response(implode('', $output));
+    }
+)
+->before($before_statistics)
+->bind('ba_book')
+->method('POST');
+
+$application->match(
+    '/ba/ranks',
+    function (Request $request) use ($application, $variables) {
+        ignore_user_abort(true);
+        set_time_limit(0);
+        exec(sprintf(
+            '%s/python %s/scripts/ba.py get_ranks %s %s 2>/dev/null',
+            $variables['virtualenv'],
+            __DIR__,
+            escapeshellarg($request->get('url')),
+            escapeshellarg(json_encode($request->get('keywords')))
+        ), $output, $return_var);
+        return new Response(implode('', $output));
+    }
+)
+->before($before_statistics)
+->bind('ba_ranks')
+->method('POST');
+
 $application->match('/kns/overview', function () use ($application) {
     $user = $application['session']->get('user');
     $requests = get_requests($application, $user);

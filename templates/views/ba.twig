@@ -1,0 +1,148 @@
+{% extends 'layout.twig' %}
+
+{% set module = 'Book Analyzer' %}
+{% set nav = 'a' %}
+
+{% block content %}
+<div
+    id="ba"
+    data-error-1-top="Error #1"
+    data-error-1-middle="<p>Please enter a valid keyword.</p>"
+    data-error-2-top="Error #2"
+    data-error-2-middle="<p>An unknown error has occurred. Please try again.</p>"
+    data-url-books="{{ url('ba_books') }}"
+    data-url-book="{{ url('ba_book') }}"
+    data-url-ranks="{{ url('ba_ranks') }}"
+    ng-controller="ba"
+    >
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="page-header">
+                <h1>{{ module }}</h1>
+            </div>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span12">
+            <form
+                class="form-horizontal"
+                name="form"
+                ng-submit="get_books()"
+                >
+                <div class="control-group">
+                    <label class="control-label" for="keyword">Keyword</label>
+                    <div class="controls">
+                        <input
+                            class="span12"
+                            id="keyword"
+                            placeholder="Keyword"
+                            type="text"
+                            value=""
+                            ng-model="keyword"
+                            >
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-success" type="submit">
+                        <span class="icon-info-sign icon-large"></span>
+                        Submit
+                    </button>
+                    <button class="btn btn-danger" type="reset">
+                        <span class="icon-trash icon-large"></span>
+                        Reset
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <p class="text-center span12 hide [! books.spinner == true && 'show' || 'hide' !]">
+            <span class="icon-spinner icon-spin icon-2x"></span>
+        </p>
+    </div>
+    <div class="row-fluid">
+        <div class="span12 hide [! books.contents.length > 0 && 'show' || 'hide' !]">
+            <table class="table table-hover table-striped">
+                <thead>
+                    <th class="book-cover-image">Image</th>
+                    <th>Name</th>
+                    <th class="narrow">URL</th>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="book in books.contents">
+                        <td class="book-cover-image">
+                            <img
+                                class="img-polaroid"
+                                ng-show="book.book_cover_image.length > 0"
+                                src="[! book.book_cover_image !]"
+                                >
+                        </td>
+                        <td>
+                            <a ng-click="get_book(book.url)">
+                                [! book.title !]
+                            </a>
+                        </td>
+                        <td class="narrow">
+                            <a
+                                href="[! book.url !]"
+                                rel="noreferrer"
+                                target="_blank"
+                                >[! book.url !]</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <p class="text-center span12 hide [! book.spinner == true && 'show' || 'hide' !]">
+            <span class="icon-spinner icon-spin icon-2x"></span>
+        </p>
+    </div>
+    <div class="row-fluid">
+        <div class="span12 hide [! book.contents != '' && 'show' || 'hide' !]">
+            <div class="page-header">
+                <h1>[! book.contents.title !]</h1>
+            </div>
+            <div class="clearfix">
+                <img
+                    class="img-polaroid pull-right"
+                    ng-show="book.contents.book_cover_image.length > 0"
+                    src="[! book.contents.book_cover_image !]"
+                    width="200"
+                    >
+                <p>
+                    <strong>Author:</strong> [! book.contents.author !]
+                    <br>
+                    <strong>Price:</strong>
+                    $[! book.contents.price|number:2 !]
+                    <br>
+                    <strong>Publication Date:</strong>
+                    [! book.contents.publication_date !]
+                    <br>
+                    <strong>Print Length:</strong>
+                    [! book.contents.print_length|number:0 !]
+                    <br>
+                    <strong>Estimated Sales Per Day:</strong>
+                    [! book.contents.estimated_sales_per_day|number:0 !]
+                    <br>
+                    <strong>Earnings Per Day:</strong>
+                    $[! book.contents.earnings_per_day|number:2 !]
+                    <br>
+                    <strong>Reviews:</strong>
+                    [! book.contents.total_number_of_reviews|number:0 !]
+                    <br>
+                    <strong>Review Average:</strong>
+                    [! book.contents.review_average|number:2 !]
+                </p>
+                <p><strong>Categories & Ranks:</strong></p>
+                <ul>
+                    <li ng-repeat="(key, value) in book.contents.amazon_best_sellers_rank">
+                        <strong>#[! value|number:0 !]</strong> in [! key !]
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

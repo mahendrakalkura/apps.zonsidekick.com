@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
+from sys import argv
+
 from furl import furl
 from scrapy.selector import Selector
 from simplejson import dumps
-from sys import argv
 
 from utilities import (
     get_book, get_response, get_responses, get_number, get_string, get_url,
@@ -57,7 +58,7 @@ def get_author(url):
     response = get_response(url)
     if not response:
         return
-    selector = Selector(text=response)
+    selector = Selector(text=response.text)
     try:
         name = get_string(selector.xpath(
             '//h1[@id="EntityName"]/b/text()'
@@ -129,7 +130,7 @@ def get_author(url):
         })
         if not response:
             break
-        selector = Selector(text=response)
+        selector = Selector(text=response.text)
         for href in selector.xpath(
             '//h3[@class="title"]/a[@class="title"]/@href'
         ).extract():

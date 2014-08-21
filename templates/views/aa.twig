@@ -1,7 +1,7 @@
 {% extends 'layout.twig' %}
 
 {% set module = 'Author Analyzer' %}
-{% set nav = 'aa' %}
+{% set nav = 'a' %}
 
 {% block content %}
 <div
@@ -105,8 +105,8 @@
                     [! author.contents.description !]
                 </p>
                 <p>
-                    Estimated earnings per month (in $):
-                    [! author.contents.earnings_per_month|number:2 !]
+                    Estimated earnings per month:
+                    $[! author.contents.earnings_per_month|number:2 !]
                 </p>
                 <img
                     class="img-polaroid pull-left"

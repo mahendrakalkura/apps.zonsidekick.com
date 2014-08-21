@@ -508,6 +508,14 @@ a {
     border-top: 1px solid #dddddd;
 }
 
+#middle .container-fluid .table .book-cover-image {
+    width: 50px;
+}
+
+#middle .container-fluid .table .book-cover-image img {
+    width: 100%;
+}
+
 #middle .container-fluid .table .details {
     padding-bottom: 0;
 }
@@ -636,6 +644,11 @@ a {
 
 .img-polaroid.pull-left {
     margin-right: 30px;
+    margin-bottom: 30px;
+}
+
+.img-polaroid.pull-right {
+    margin-left: 30px;
     margin-bottom: 30px;
 }
 

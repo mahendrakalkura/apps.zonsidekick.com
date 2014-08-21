@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
 
+from sys import argv
+
 from furl import furl
 from scrapy.selector import Selector
+from simplejson import dumps, loads
 
-from utilities import get_responses, get_string, get_url
+from utilities import (
+    get_book, get_response, get_responses, get_string, get_url,
+)
 
 
 def get_books(keyword):
@@ -27,12 +32,12 @@ def get_books(keyword):
         ).xpath(
             '//h3[@class="title"]/a[@class="title"]'
         ):
-            name = ''
+            title = ''
             try:
-                name = get_string(anchor.xpath('.//span/@title').extract()[0])
+                title = get_string(anchor.xpath('.//span/@title').extract()[0])
             except IndexError:
                 try:
-                    name = get_string(anchor.xpath('.//text()').extract()[0])
+                    title = get_string(anchor.xpath('.//text()').extract()[0])
                 except IndexError:
                     pass
             books.append({
@@ -40,7 +45,7 @@ def get_books(keyword):
                     './/../../../div[@class="image imageContainer"]/a/div/img/'
                     '@src'
                 ).extract()[0],
-                'name': name,
+                'title': title,
                 'url': get_url(anchor.xpath('.//@href').extract()[0]),
             })
     return books
@@ -56,3 +61,11 @@ def get_ranks(url, keywords):
                 ranks[keyword] = index + 1
                 break
     return ranks
+
+if __name__ == '__main__':
+    if argv[1] == 'get_books':
+        print dumps(get_books(argv[2]))
+    if argv[1] == 'get_book':
+        print dumps(get_book(get_response(argv[2])))
+    if argv[1] == 'get_ranks':
+        print dumps(get_ranks(argv[2], loads(argv[3])))

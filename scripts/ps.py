@@ -94,7 +94,7 @@ if __name__ == '__main__':
             )
             if not response:
                 continue
-            selector = Selector(text=response)
+            selector = Selector(text=response.text)
             url = ''
             try:
                 url = get_url(selector.xpath(
@@ -109,7 +109,7 @@ if __name__ == '__main__':
                 title = ''
                 book_cover_image = ''
                 amazon_best_sellers_rank = {}
-                selector = Selector(text=response)
+                selector = Selector(text=response.text)
                 try:
                     title = get_string(selector.xpath(
                         '//span[@id="btAsinTitle" or @id="productTitle"]/'

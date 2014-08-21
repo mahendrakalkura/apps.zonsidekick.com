@@ -308,7 +308,7 @@ def get_popularity(keyword):
             continue
         contents = []
         try:
-            contents = loads(response)
+            contents = loads(response.text)
         except JSONDecodeError:
             pass
         if not contents:
@@ -373,7 +373,7 @@ def get_response(url):
                 and
                 'Enter the characters you see below' not in response.text
             ):
-                return response.text
+                return response
         except (RequestException, timeout):
             pass
     return ''

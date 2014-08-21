@@ -243,6 +243,134 @@ application.controller('aa', function ($attrs, $http, $rootScope, $scope) {
     };
 });
 
+application.controller('ba', function ($attrs, $http, $rootScope, $scope) {
+    $scope.keyword = '';
+    $scope.books = {
+        'contents': [],
+        'spinner': false
+    };
+    $scope.book = {
+        'contents': '',
+        'spinner': false
+    };
+    $scope.ranks = {
+        'contents': '',
+        'spinner': false
+    };
+    $scope.keywors = '';
+
+    $scope.get_books = function () {
+        $scope.books.contents = [];
+        $scope.books.spinner = false;
+        $scope.book.contents = '';
+        $scope.book.spinner = false;
+
+        if (!$scope.keyword.length) {
+            $rootScope.$broadcast('open', {
+                top: $attrs.error1Top,
+                middle: $attrs.error1Middle
+            });
+
+            return;
+        }
+
+        $scope.books.spinner = true;
+
+        $http({
+            data: jQuery.param({
+                keyword: $scope.keyword
+            }),
+            method: 'POST',
+            url: $attrs.urlBooks
+        }).
+        error(function (data, status, headers, config) {
+            $scope.books.spinner = false;
+            $rootScope.$broadcast('open', {
+                top: $attrs.error2Top,
+                middle: $attrs.error2Middle
+            });
+        }).
+        success(function (data, status, headers, config) {
+            $scope.books.spinner = false;
+            if (data.length > 0) {
+                $scope.books.contents = data;
+            } else {
+                $rootScope.$broadcast('open', {
+                    top: $attrs.error2Top,
+                    middle: $attrs.error2Middle
+                });
+            }
+        });
+    };
+
+    $scope.get_book = function (url) {
+        $scope.book.contents = '';
+        $scope.book.spinner = false;
+
+        $scope.book.spinner = true;
+
+        $http({
+            data: jQuery.param({
+                url: url
+            }),
+            method: 'POST',
+            url: $attrs.urlBook
+        }).
+        error(function (data, status, headers, config) {
+            $scope.book.spinner = false;
+            $rootScope.$broadcast('open', {
+                top: $attrs.error2Top,
+                middle: $attrs.error2Middle
+            });
+        }).
+        success(function (data, status, headers, config) {
+            $scope.book.spinner = false;
+            if (typeof(data) === 'object') {
+                $scope.book.contents = data;
+            } else {
+                $rootScope.$broadcast('open', {
+                    top: $attrs.error2Top,
+                    middle: $attrs.error2Middle
+                });
+            }
+        });
+    };
+
+    $scope.get_ranks = function () {
+        $scope.ranks.contents = '';
+        $scope.ranks.spinner = false;
+
+        $scope.ranks.spinner = true;
+
+        $http({
+            data: jQuery.param({
+                keywords: $scope.keywords,
+                url: $scope.ranks.url
+            }),
+            method: 'POST',
+            url: $attrs.urlRanks
+        }).
+        error(function (data, status, headers, config) {
+            $scope.ranks.spinner = false;
+            $rootScope.$broadcast('open', {
+                top: $attrs.error2Top,
+                middle: $attrs.error2Middle
+            });
+        }).
+        success(function (data, status, headers, config) {
+            $scope.ranks.spinner = false;
+            if (typeof(data) === 'object') {
+                $scope.ranks.contents = data;
+            } else {
+                $rootScope.$broadcast('open', {
+                    top: $attrs.error2Top,
+                    middle: $attrs.error2Middle
+                });
+            }
+        });
+    };
+});
+
 application.controller('aks', function ($attrs, $http, $rootScope, $scope) {
     $scope.checkbox = false;
     $scope.country = 'com';
