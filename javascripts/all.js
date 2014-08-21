@@ -345,7 +345,7 @@ application.controller('ba', function ($attrs, $http, $rootScope, $scope) {
         $http({
             data: jQuery.param({
                 keywords: $scope.keywords,
-                url: $scope.book.url
+                url: $scope.book.contents.url
             }),
             method: 'POST',
             url: $attrs.urlItems
