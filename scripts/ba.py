@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from collections import OrderedDict
 from sys import argv
 
 from furl import furl
@@ -52,19 +53,32 @@ def get_books(keyword):
 
 
 def get_items(url, keywords):
-    items = []
+    items = OrderedDict({})
     for keyword in keywords:
-        rank = 0
+        items[keyword] = {
+            'keyword': keyword,
+            'optimization': 'Low',
+            'rank': 0,
+        }
         for index, book in enumerate(get_books(keyword)):
             if url == book['url']:
-                rank = index + 1
+                items[keyword] = {
+                    'keyword': keyword,
+                    'optimization': get_optimization(keyword, book['title']),
+                    'rank': index + 1,
+                }
                 break
-        items.append({
-            'keyword': keyword,
-            'rank': rank,
-            'optimization': 'Low',
-        })
-    return items
+    return items.values()
+
+
+def get_optimization(keyword, title):
+    if keyword in title:
+        return 'High'
+    if ' ' in keyword:
+        words = keyword.split(' ')
+        if any(word in title for word in words):
+            return 'Medium'
+    return 'Low'
 
 if __name__ == '__main__':
     if argv[1] == 'get_books':

@@ -862,6 +862,7 @@ $application->match(
     '/ba/items',
     function (Request $request) use ($application, $variables) {
         $keywords = $request->get('keywords');
+        $keywords = strtolower($keywords);
         $keywords = explode("\n", $keywords);
         if (!empty($keywords)) {
             foreach ($keywords as $key => $value) {

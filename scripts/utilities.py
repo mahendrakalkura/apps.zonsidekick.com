@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from furl import furl
+from collections import OrderedDict
 from os.path import dirname, join
 from random import choice, randint
 from re import compile, sub
 from socket import timeout
 
+from furl import furl
 from grequests import get as get_, map as map_
 from MySQLdb import connect
 from MySQLdb.cursors import DictCursor
@@ -395,7 +396,7 @@ def get_response(url):
 
 
 def get_responses(urls):
-    responses = {}
+    responses = OrderedDict({})
     for url in urls:
         responses[url] = None
     index = 0
