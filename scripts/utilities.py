@@ -343,10 +343,10 @@ def get_proxies():
         return {}
     return {
         'http': 'http://72.52.91.120:%(port_number)s' % {
-            'port_number': 9150 + randint(1, 100),
+            'port_number': 9150 + randint(1, 50),
         },
         'https': 'http://72.52.91.120:%(port_number)s' % {
-            'port_number': 9150 + randint(1, 100),
+            'port_number': 9150 + randint(1, 50),
         },
     }
 
