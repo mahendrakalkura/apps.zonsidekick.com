@@ -999,7 +999,12 @@ application.controller('suggested_keywords', function ($attrs, $http, $scope) {
         $scope.error = false;
         $http({
             data: jQuery.param({
-                keywords: $scope.$parent.contents.glance.words.join(',')
+                keywords: _.map(
+                    $scope.$parent.contents.glance.words,
+                    function (word) {
+                        return word[0];
+                    }
+                ).join(',')
             }),
             method: 'POST',
             url: $attrs.url
