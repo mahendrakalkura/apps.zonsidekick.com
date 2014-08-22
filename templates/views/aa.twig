@@ -29,13 +29,22 @@
                 name="form"
                 ng-submit="get_authors()"
                 >
+                <p>
+                    The Author Analyzer allows you to quickly inspect other
+                    authors and their books. This section is great for "reverse
+                    engineering" their publishing techniques. You may also open
+                    authors directly in this tool by clicking on their names in
+                    other tools.
+                </p>
                 <div class="control-group">
-                    <label class="control-label" for="keyword">Keyword</label>
+                    <label class="control-label" for="keyword">
+                        Author's name
+                    </label>
                     <div class="controls">
                         <input
                             class="span12"
                             id="keyword"
-                            placeholder="Keyword"
+                            placeholder="Enter a name"
                             type="text"
                             value=""
                             ng-model="keyword"
