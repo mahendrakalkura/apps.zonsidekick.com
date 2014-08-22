@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from multiprocessing.pool import ThreadPool
 from sys import argv
 
 from furl import furl
 from simplejson import dumps, JSONDecodeError, loads
 
-from utilities import get_response
+from utilities import get_responses
 
 
 def get_mkt_and_url(country):
@@ -33,14 +32,9 @@ def get_mkt_and_url(country):
 
 def get_params(mkt, q, search_alias):
     return {
-        'client': 'amazon-search-ui',
-        'fb': '1',
-        'method': 'completion',
         'mkt': mkt,
         'q': q,
-        'sc': '1',
         'search-alias': search_alias,
-        'x': 'updateISSCompletion',
         'xcat': '0',
     }
 
@@ -76,30 +70,23 @@ def get_suggestions(country, level, q, search_alias):
                     'alphabet': alphabet,
                     'string': string,
                 })
-        results = []
-        pool = ThreadPool(50)
+        urls = []
         for q in qs:
             mkt, url = get_mkt_and_url(country)
-            results.append(pool.apply_async(get_response, (
-                furl(url).add(get_params(mkt, q, search_alias)).url,
-            )))
-        pool.close()
-        pool.join()
-        for result in results:
+            urls.append(furl(url).add(get_params(mkt, q, search_alias)).url)
+        for response in get_responses(urls):
+            if not response:
+                continue
+            contents = ''
             try:
-                for suggestion in loads(
-                    result.get().replace(
-                        'completion = ', ''
-                    ).replace(
-                        ';updateISSCompletion();', ''
-                    )
-                )[1]:
-                    suggestion = suggestion.strip()
-                    if suggestion:
-                        if suggestion not in strings:
-                            strings.append(suggestion)
-            except (AttributeError, IndexError, JSONDecodeError):
+                contents = loads(response.text)
+            except JSONDecodeError:
                 pass
+            if not contents:
+                continue
+            for suggestion in contents[1]:
+                if suggestion not in strings:
+                    strings.append(suggestion)
         level -= 1
     return strings
 
