@@ -145,7 +145,7 @@
                     <th class="narrow right">Amazon BSR</th>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="book in author.contents.books|orderBy:publication_date:true">
+                    <tr ng-repeat="book in author.contents.books|orderBy:'publication_date':true">
                         <td>
                             <a
                                 class="pull-right"
