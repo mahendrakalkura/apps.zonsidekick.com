@@ -988,6 +988,37 @@ application.controller('previous_versions', function ($scope) {
     $scope.status = false;
 });
 
+application.controller('suggested_keywords', function ($attrs, $http, $scope) {
+    $scope.items = [];
+    $scope.spinner = false;
+    $scope.error = false;
+
+    $scope.process = function () {
+        $scope.items = [];
+        $scope.spinner = true;
+        $scope.error = false;
+        $http({
+            data: jQuery.param({
+                keywords: $scope.$parent.contents.glance.words.join(',')
+            }),
+            method: 'POST',
+            url: $attrs.url
+        }).
+        error(function (data, status, headers, config) {
+            $scope.items = [];
+            $scope.spinner = false;
+            $scope.error = true;
+        }).
+        success(function (data, status, headers, config) {
+            $scope.items = data;
+            $scope.spinner = false;
+            $scope.error = false;
+        });
+
+        return;
+    };
+});
+
 jQuery.ajaxSetup({
     cache: false,
     timeout: 600000

@@ -1907,6 +1907,24 @@ EOD;
 ->method('POST');
 
 $application->match(
+    '/suggested_keywords',
+    function (Request $request) use ($application, $variables) {
+        ignore_user_abort(true);
+        set_time_limit(0);
+        exec(sprintf(
+            '%s/python %s/scripts/sk.py %s 2>/dev/null',
+            $variables['virtualenv'],
+            __DIR__,
+            escapeshellarg($request->get('keywords'))
+        ), $output, $return_var);
+        return new Response(implode('', $output));
+    }
+)
+->before($before_new_features)
+->bind('suggested_keywords')
+->method('POST');
+
+$application->match(
     '/feedback',
     function (Request $request) use ($application) {
         $error = '';

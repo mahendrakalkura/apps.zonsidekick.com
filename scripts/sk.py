@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
+from sys import argv
+
 from furl import furl
-from simplejson import JSONDecodeError, loads
+from simplejson import dumps, JSONDecodeError, loads
 
 from utilities import get_responses
 
@@ -39,3 +41,6 @@ def get_suggested_keywords(original_keywords):
                 if keyword not in suggested_keywords:
                     suggested_keywords.append(keyword)
     return suggested_keywords
+
+if __name__ == '__main__':
+    print dumps(get_suggested_keywords(argv[1].split(',')))
