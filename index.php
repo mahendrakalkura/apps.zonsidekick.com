@@ -608,10 +608,6 @@ function has_groups($one, $two) {
     return false;
 }
 
-function has_new_features($user) {
-    return in_array($user['id'], array(1, 2, 3, 76));
-}
-
 function has_statistics($user) {
     return in_array($user['id'], array(1, 2, 3));
 }
@@ -726,9 +722,6 @@ $application->before(function (Request $request) use ($application) {
         'has_kns', new \Twig_Function_Function('has_kns')
     );
     $application['twig']->addFunction(
-        'has_new_features', new \Twig_Function_Function('has_new_features')
-    );
-    $application['twig']->addFunction(
         'has_statistics', new \Twig_Function_Function('has_statistics')
     );
 });
@@ -751,14 +744,6 @@ $before_kns = function () use ($application) {
 
 $before_statistics = function () use ($application) {
     if (!has_statistics($application['session']->get('user'))) {
-        return $application->redirect(
-            $application['url_generator']->generate('dashboard')
-        );
-    }
-};
-
-$before_new_features = function () use ($application) {
-    if (!has_new_features($application['session']->get('user'))) {
         return $application->redirect(
             $application['url_generator']->generate('dashboard')
         );
@@ -1503,7 +1488,7 @@ $application->match(
         ));
     }
 )
-->before($before_new_features)
+->before($before_statistics)
 ->bind('ce_overview')
 ->method('GET');
 
@@ -1902,7 +1887,7 @@ EOD;
 
     return new Response(json_encode($contents, JSON_NUMERIC_CHECK));
 })
-->before($before_new_features)
+->before($before_statistics)
 ->bind('ce_xhr')
 ->method('POST');
 
@@ -1920,7 +1905,7 @@ $application->match(
         return new Response(implode('', $output));
     }
 )
-->before($before_new_features)
+->before($before_statistics)
 ->bind('suggested_keywords')
 ->method('POST');
 
@@ -2068,7 +2053,7 @@ $application->match(
         ));
     }
 )
-->before($before_new_features)
+->before($before_statistics)
 ->bind('ps')
 ->method('GET');
 

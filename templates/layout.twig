@@ -123,7 +123,7 @@
                                 </a>
                             </li>
                         {% endif %}
-                        {% if has_new_features(user) %}
+                        {% if has_statistics(user) %}
                             <li class="{% if nav == 'ce' %}active{% endif %}">
                                 <a href="{{ url('ce_overview') }}">
                                     <i class="icon-key icon-large"></i>
