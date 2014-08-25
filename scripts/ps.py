@@ -47,7 +47,7 @@ class trend(base):
 
 if __name__ == '__main__':
     session = get_mysql_session()()
-    bs = []
+    items = []
     date_and_time = datetime.now().strftime('%Y-%m-%d %H:00:00')
     urls = [
         furl(
@@ -151,20 +151,25 @@ if __name__ == '__main__':
                     not amazon_best_sellers_rank
                 ):
                     continue
-                b = session.query(
-                    book,
-                ).filter(
-                    book.url == url,
-                ).first()
-                if not b:
-                    b = book(**{
-                        'url': url,
-                    })
-                b.title = title
-                b.book_cover_image = book_cover_image
-                b.amazon_best_sellers_rank = amazon_best_sellers_rank
-                bs.append(b)
-    for b in bs:
+                items.append({
+                    'amazon_best_sellers_rank': amazon_best_sellers_rank,
+                    'book_cover_image': book_cover_image,
+                    'title': title,
+                    'url': url,
+                })
+    for item in items:
+        b = session.query(
+            book,
+        ).filter(
+            book.url == item['url'],
+        ).first()
+        if not b:
+            b = book(**{
+                'url': item['url'],
+            })
+        b.title = item['title']
+        b.book_cover_image = item['book_cover_image']
+        b.amazon_best_sellers_rank = item['amazon_best_sellers_rank']
         session.add(b)
         if not session.query(
             trend,
