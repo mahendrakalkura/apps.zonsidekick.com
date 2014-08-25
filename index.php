@@ -409,6 +409,9 @@ EOD;
                 $row_2['count'] * 100.00
             ) / $appearances['last 30 days'],
         );
+        $popular_searches[$key]['url_'] = urlencode(
+            $popular_searches[$key]['url']
+        );
     }
 
     return $popular_searches;

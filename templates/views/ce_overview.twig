@@ -452,8 +452,8 @@
                             ng-click="set_order_by('books', 'title')"
                             >Title</th>
                         <th
-                            class="header narrow [! order_by['books'][0] == 'author' && get_order_by('books') || '' !]"
-                            ng-click="set_order_by('books', 'author')"
+                            class="header narrow [! order_by['books'][0] == 'author_name' && get_order_by('books') || '' !]"
+                            ng-click="set_order_by('books', 'author_name')"
                             >Author</th>
                         <th
                             class="header narrow right [! order_by['books'][0] == 'price' && get_order_by('books') || '' !]"
@@ -501,13 +501,31 @@
                                     ng-show="status"
                                     >Show Less</a>
                                 <a
+                                    href="{{ url('ba') }}?url=[! book.url|encodeUri !]"
+                                    target="_blank"
+                                    >[! book.title !]</a>
+                                <a
                                     href="[! book.url !]"
                                     rel="noreferrer"
                                     target="_blank"
-                                    >[! book.title !]</a>
+                                    ><i class="icon-external-link"></i></a>
                             </td>
                             <td class="narrow">
-                                [! book.author !]
+                                <a
+                                    class="pull-right"
+                                    href="[! book.author_url !]"
+                                    ng-show="book.author_url.length > 0"
+                                    rel="noreferrer"
+                                    target="_blank"
+                                    ><i class="icon-external-link"></i></a>
+                                <a
+                                    href="{{ url('aa') }}?url=[! book.author_url|encodeUri !]"
+                                    ng-show="book.author_url.length > 0"
+                                    target="_blank"
+                                    >[! book.author_name !]</a>
+                                <span ng-show="book.author_url.length == 0">
+                                    [! book.author_name !]
+                                </span>
                             </td>
                             <td class="narrow right">
                                 [! book.price|number:2 !]
@@ -619,13 +637,31 @@
                                 <h4 class="media-heading">
                                     [! book.rank !].
                                     <a
+                                        href="{{ url('ba') }}?url=[! book.url|encodeUri !]"
+                                        target="_blank"
+                                        >[! book.title !]</a>
+                                    <a
                                         href="[! book.url !]"
                                         rel="noreferrer"
                                         target="_blank"
-                                        >[! book.title !]</a>
+                                        ><i class="icon-external-link"></i></a>
                                 </h4>
                                 <p>
-                                    <strong>Author:</strong> [! book.author !]
+                                    <strong>Author:</strong>
+                                    <a
+                                        href="{{ url('aa') }}?url=[! book.author_url|encodeUri !]"
+                                        ng-show="book.author_url.length > 0"
+                                        target="_blank"
+                                        >[! book.author_name !]</a>
+                                    <a
+                                        href="[! book.author_url !]"
+                                        ng-show="book.author_url.length > 0"
+                                        rel="noreferrer"
+                                        target="_blank"
+                                        ><i class="icon-external-link"></i></a>
+                                    <span ng-show="book.author_url.length == 0">
+                                        [! book.author_name !]
+                                    </span>
                                 </p>
                                 <p>
                                     <strong>Price:</strong>

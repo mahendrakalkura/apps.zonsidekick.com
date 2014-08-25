@@ -12,10 +12,14 @@
                     <div class="media-body">
                         <h4 class="media-heading">
                             <a
+                                href="{{ url('ba') }}?url={{ popular_search.url_ }}"
+                                target="_blank"
+                                >{{ popular_search.title }}</a>
+                            <a
                                 href="{{ popular_search.url }}"
                                 rel="noreferrer"
                                 target="_blank"
-                                >{{ popular_search.title }}</a>
+                                ><i class="icon-external-link"></i></a>
                         </h4>
                         <p><strong>Categories & Ranks:</strong></p>
                         <ul ng-controller="amazon_best_sellers_rank">

@@ -107,7 +107,8 @@ class trend(base):
 class Book(Item):
     url = Field()
     title = Field()
-    author = Field()
+    author_name = Field()
+    author_url = Field()
     price = Field()
     publication_date = Field()
     print_length = Field()
@@ -188,8 +189,10 @@ class Pipeline(object):
             b = book(**{
                 'url': dictionary['url'],
             })
-        if not b.author or dictionary['author']:
-            b.author = dictionary['author']
+        if not b.author_name or dictionary['author_name']:
+            b.author_name = dictionary['author_name']
+        if not b.author_url or dictionary['author_url']:
+            b.author_url = dictionary['author_url']
         if not b.title or dictionary['title']:
             b.title = dictionary['title']
         if not b.price or dictionary['price']:
@@ -341,7 +344,8 @@ class Spider(CrawlSpider):
     def parse_book(self, response):
         url = get_url(response.url)
         title = ''
-        author = ''
+        author_name = ''
+        author_url = ''
         price = 0.00
         publication_date = ''
         print_length = 0
@@ -359,14 +363,26 @@ class Spider(CrawlSpider):
         except IndexError:
             pass
         try:
-            author = get_string(selector.xpath(
+            author_name = get_string(selector.xpath(
                 '//span[@class="contributorNameTrigger"]/a/text()'
             ).extract()[0])
         except IndexError:
             try:
-                author = get_string(selector.xpath(
+                author_name = get_string(selector.xpath(
                     '//h1[@class="parseasinTitle "]/following-sibling::span/a/'
                     'text()'
+                ).extract()[0])
+            except IndexError:
+                pass
+        try:
+            author_url = get_string(selector.xpath(
+                '//span[@class="contributorNameTrigger"]/a/@href'
+            ).extract()[0])
+        except IndexError:
+            try:
+                author_url = get_string(selector.xpath(
+                    '//h1[@class="parseasinTitle "]/following-sibling::span/a/'
+                    '@href'
                 ).extract()[0])
             except IndexError:
                 pass
@@ -420,7 +436,8 @@ class Spider(CrawlSpider):
         if url:
             book = {
                 'amazon_best_sellers_rank': amazon_best_sellers_rank,
-                'author': author,
+                'author_name': author_name,
+                'author_url': author_url,
                 'days_in_the_top_100': days_in_the_top_100,
                 'earnings_per_day': earnings_per_day,
                 'estimated_sales_per_day': estimated_sales_per_day,
