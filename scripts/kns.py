@@ -317,7 +317,12 @@ def get_contents(keyword, country):
                 '//h2[@id="s-result-count"]/a/text()'
             ).extract()[0]
         except IndexError:
-            pass
+            try:
+                breadcrumb = Selector(text=response.text).xpath(
+                    '//h2[@id="s-result-count"]/span/a/text()'
+                ).extract()[0]
+            except IndexError:
+                pass
     count = 0
     if (
         breadcrumb == 'Kindle Store'
@@ -327,37 +332,40 @@ def get_contents(keyword, country):
         (country == 'de' and breadcrumb == 'Kindle-Shop')
     ):
         for response in responses:
-            try:
-                count = int(
-                    Selector(
-                        text=response.text
-                    ).xpath(
-                        '//h2[@id="s-result-count"]'
-                    ).xpath(
-                        'string()'
-                    ).extract()[0].strip().split(
-                        ' '
-                    )[2].replace(
-                        ',', ''
+            if not count:
+                try:
+                    count = int(
+                        Selector(
+                            text=response.text
+                        ).xpath(
+                            '//h2[@id="s-result-count"]'
+                        ).xpath(
+                            'string()'
+                        ).extract()[0].strip().split(
+                            ' '
+                        )[0].replace(
+                            ',', ''
+                        )
                     )
-                )
-                break
-            except IndexError:
-                pass
-            except ValueError:
-                count = int(
-                    Selector(
-                        text=response.text
-                    ).xpath(
-                        '//h2[@id="s-result-count"]'
-                    ).xpath(
-                        'string()'
-                    ).extract()[0].strip().split(
-                        ' '
-                    )[0].replace(
-                        ',', ''
+                except (IndexError, ValueError):
+                    pass
+            if not count:
+                try:
+                    count = int(
+                        Selector(
+                            text=response.text
+                        ).xpath(
+                            '//h2[@id="s-result-count"]'
+                        ).xpath(
+                            'string()'
+                        ).extract()[0].strip().split(
+                            ' '
+                        )[2].replace(
+                            ',', ''
+                        )
                     )
-                )
+                except (IndexError, ValueError):
+                    pass
     if not count:
         return
     count = (count, get_int(count))
