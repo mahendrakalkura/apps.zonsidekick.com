@@ -397,7 +397,10 @@ def get_contents(keyword, country):
         if not response:
             continue
         index += 1
-        selector = Selector(text=response.text)
+        try:
+            selector = Selector(text=response.text)
+        except AttributeError:
+            continue
         asin = ''
         try:
             asin = get_string(
