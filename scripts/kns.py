@@ -77,7 +77,7 @@ def get_keywords(requests):
             SELECT `id`, `string`
             FROM `tools_kns_keywords`
             WHERE `request_id` = %(request_id)s AND `contents` IS NULL
-            ORDER BY `id` ASC
+            ORDER BY RAND()
             ''',
             {
                 'request_id': request['id'],
