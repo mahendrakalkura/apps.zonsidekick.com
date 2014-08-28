@@ -227,16 +227,25 @@
                 </div>
                 <div class="ce form-actions">
                     <button
-                        class="btn btn-danger pull-left"
+                        class="btn btn-default pull-left"
+                        data-target="#filter_definitions"
+                        data-toggle="modal"
+                        type="button"
+                        >
+                        <span class="icon-question-sign"></span>
+                        Filter Definitions
+                    </button>
+                    <button class="btn btn-success pull-right" type="submit">
+                        <span class="icon-info-sign icon-large"></span>
+                        Submit
+                    </button>
+                    <button
+                        class="btn btn-danger pull-right"
                         ng-click="reset()"
                         type="reset"
                         >
                         <span class="icon-trash icon-large"></span>
                         Reset
-                    </button>
-                    <button class="btn btn-success pull-right" type="submit">
-                        <span class="icon-info-sign icon-large"></span>
-                        Submit
                     </button>
                 </div>
             </form>
