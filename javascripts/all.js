@@ -571,6 +571,36 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
 
     $scope.mode = 'table';
 
+    $scope.reset = function() {
+        jQuery('#category').select2('val', "1");
+        $scope.category = 1;
+        jQuery('#section').select2('val', "0");
+        $scope.section = 1;
+        jQuery('#count').select2('val', "100");
+        $scope.count = 100;
+        jQuery('#print_length').select2('val', "");
+        $scope.print_length_1 = 'Any';
+        $scope.print_length_2 = 0;
+        $scope.print_length_3 = 0;
+        $scope.print_length_4 = 0;
+        jQuery('#prices').select2('val', "");
+        $scope.price_1 = 'Any';
+        $scope.price_2 = 0;
+        jQuery('#publication_dates').select2('val', "");
+        $scope.publication_date_1 = 'Any';
+        $scope.publication_date_2 = '';
+        jQuery('#amazon_best_sellers_ranks').select2('val', "");
+        $scope.amazon_best_sellers_rank_1 = 'Any';
+        $scope.amazon_best_sellers_rank_2 = 0;
+        jQuery('#review_averages').select2('val', "");
+        $scope.review_average_1 = 'Any';
+        $scope.review_average_2 = 0;
+        jQuery('#appearances').select2('val', "");
+        $scope.appearance_1 = 'Any';
+        $scope.appearance_2 = 0;
+        $scope.process();
+    };
+
     $scope.process = function () {
         $scope.spinner = true;
         $scope.error = false;
