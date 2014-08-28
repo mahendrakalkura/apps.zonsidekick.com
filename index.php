@@ -1497,16 +1497,30 @@ $application->match('/ce/xhr', function (Request $request) use ($application) {
     $print_length_4 = intval($request->get('print_length_4'));
     $price_1 = $request->get('price_1');
     $price_2 = floatval($request->get('price_2'));
+    $price_3 = floatval($request->get('price_3'));
+    $price_4 = floatval($request->get('price_4'));
     $publication_date_1 = $request->get('publication_date_1');
     $publication_date_2 = $request->get('publication_date_2');
+    $publication_date_3 = $request->get('publication_date_3');
+    $publication_date_4 = $request->get('publication_date_4');
     $amazon_best_sellers_rank_1 = $request->get('amazon_best_sellers_rank_1');
     $amazon_best_sellers_rank_2 = intval(
         $request->get('amazon_best_sellers_rank_2')
     );
+    $amazon_best_sellers_rank_3 = intval(
+        $request->get('amazon_best_sellers_rank_3')
+    );
+    $amazon_best_sellers_rank_4 = intval(
+        $request->get('amazon_best_sellers_rank_4')
+    );
     $review_average_1 = $request->get('review_average_1');
     $review_average_2 = floatval($request->get('review_average_2'));
+    $review_average_3 = floatval($request->get('review_average_3'));
+    $review_average_4 = floatval($request->get('review_average_4'));
     $appearance_1 = $request->get('appearance_1');
     $appearance_2 = floatval($request->get('appearance_2'));
+    $appearance_3 = floatval($request->get('appearance_3'));
+    $appearance_4 = floatval($request->get('appearance_4'));
     $count = intval($request->get('count'));
 
     if ($category_id == -1) {
@@ -1571,6 +1585,13 @@ EOD;
             $conditions[] = '`tools_ce_books`.`price` < ?';
             $parameters[] = $price_2;
             break;
+        case 'Between':
+            $conditions[] = <<<EOD
+`tools_ce_books`.`price` >= ? AND `tools_ce_books`.`price` <= ?
+EOD;
+            $parameters[] = $price_3;
+            $parameters[] = $price_4;
+            break;
     }
     switch ($publication_date_1) {
         case 'More Than':
@@ -1581,6 +1602,15 @@ EOD;
             $conditions[] = '`tools_ce_books`.`publication_date` < ?';
             $parameters[] = $publication_date_2;
             break;
+        case 'Between':
+            $conditions[] = <<<EOD
+`tools_ce_books`.`publication_date` >= ?
+AND
+`tools_ce_books`.`publication_date` <= ?
+EOD;
+            $parameters[] = $publication_date_3;
+            $parameters[] = $publication_date_4;
+            break;
     }
     switch ($review_average_1) {
         case 'More Than':
@@ -1590,6 +1620,15 @@ EOD;
         case 'Less Than':
             $conditions[] = '`tools_ce_books`.`review_average` < ?';
             $parameters[] = $review_average_2;
+            break;
+        case 'Between':
+            $conditions[] = <<<EOD
+`tools_ce_books`.`review_average` >= ?
+AND
+`tools_ce_books`.`review_average` <= ?
+EOD;
+            $parameters[] = $review_average_3;
+            $parameters[] = $review_average_4;
             break;
     }
     if ($category_id !== -1) {
@@ -1705,6 +1744,24 @@ EOD;
                     continue;
                 }
             }
+            if ($amazon_best_sellers_rank_1 == 'Between') {
+                if (empty(
+                    $book['amazon_best_sellers_rank']['Paid in Kindle Store']
+                )) {
+                    continue;
+                }
+                if (!(
+                    $book['amazon_best_sellers_rank']['Paid in Kindle Store']
+                    >=
+                    $amazon_best_sellers_rank_3
+                    AND
+                    $book['amazon_best_sellers_rank']['Paid in Kindle Store']
+                    <=
+                    $amazon_best_sellers_rank_4
+                )) {
+                    continue;
+                }
+            }
             if ($appearance_1 == 'More Than') {
                 if ($book['appearances']['last 7 days'] <= $appearance_2) {
                     continue;
@@ -1712,6 +1769,15 @@ EOD;
             }
             if ($appearance_1 == 'Less Than') {
                 if ($book['appearances']['last 7 days'] >= $appearance_2) {
+                    continue;
+                }
+            }
+            if ($appearance_1 == 'Between') {
+                if (!(
+                    $book['appearances']['last 7 days'] >= $appearance_3
+                    AND
+                    $book['appearances']['last 7 days'] <= $appearance_4
+                )) {
                     continue;
                 }
             }

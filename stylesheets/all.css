@@ -342,15 +342,16 @@ a {
     margin-top: 5px;
 }
 
-#middle .container-fluid form select + .date {
+#middle .container-fluid form select + .date ,
+#middle .container-fluid form .between .date {
     margin-left: 0;
     margin-top: 5px;
     position: relative;
     z-index: 1;
 }
 
-#middle .container-fluid form .between input {
-    margin-top: 5px;
+#middle .container-fluid form .between .date:first-child {
+    margin-right: 5px;
 }
 
 #middle .container-fluid form .date .add-on {

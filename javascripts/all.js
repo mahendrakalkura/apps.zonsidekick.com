@@ -32,16 +32,19 @@ application.config(function ($httpProvider, $interpolateProvider) {
 
 application.directive('datepicker', function () {
     return {
-        link: function (scope, element, attrs) {
+        link: function (scope, element, attrs, ngModel) {
             jQuery(element).datepicker({
                 format: 'yyyy-mm-dd'
             }).on('changeDate', function (event) {
-                angular.element(element).scope().publication_date_2 = moment(
-                    new Date(event.date)
-                ).format('YYYY-MM-DD');
+                scope.$apply(function() {
+                    ngModel.$setViewValue(moment(
+                        new Date(event.date)
+                    ).format('YYYY-MM-DD'));
+                });
                 jQuery(element).datepicker('hide');
             });
         },
+        require: 'ngModel',
         restrict: 'A'
     };
 });
@@ -519,26 +522,31 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
         'Any',
         'More Than',
         'Less Than',
+        'Between',
     ];
     $scope.publication_dates = [
         'Any',
         'More Than',
         'Less Than',
+        'Between',
     ];
     $scope.amazon_best_sellers_ranks = [
         'Any',
         'More Than',
         'Less Than',
+        'Between',
     ];
     $scope.review_averages = [
         'Any',
         'More Than',
         'Less Than',
+        'Between',
     ];
     $scope.appearances = [
         'Any',
         'More Than',
         'Less Than',
+        'Between',
     ];
     $scope.counts = _.range(100, 0, -10);
 
@@ -562,14 +570,24 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
         $scope.print_length_4 = 0;
         $scope.price_1 = $scope.prices[0];
         $scope.price_2 = 0;
+        $scope.price_3 = 0;
+        $scope.price_4 = 0;
         $scope.publication_date_1 = $scope.publication_dates[0];
         $scope.publication_date_2 = '';
+        $scope.publication_date_3 = '';
+        $scope.publication_date_4 = '';
         $scope.amazon_best_sellers_rank_1 = $scope.amazon_best_sellers_ranks[0];
         $scope.amazon_best_sellers_rank_2 = 0;
+        $scope.amazon_best_sellers_rank_3 = 0;
+        $scope.amazon_best_sellers_rank_4 = 0;
         $scope.review_average_1 = $scope.review_averages[0];
         $scope.review_average_2 = 0;
+        $scope.review_average_3 = 0;
+        $scope.review_average_4 = 0;
         $scope.appearance_1 = $scope.appearances[0];
         $scope.appearance_2 = 0;
+        $scope.appearance_3 = 0;
+        $scope.appearance_4 = 0;
         $scope.count = $scope.counts[0];
 
         jQuery('#category').select2('val', $scope.category);
@@ -595,6 +613,8 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
             data: jQuery.param({
                 amazon_best_sellers_rank_1: $scope.amazon_best_sellers_rank_1,
                 amazon_best_sellers_rank_2: $scope.amazon_best_sellers_rank_2,
+                amazon_best_sellers_rank_3: $scope.amazon_best_sellers_rank_3,
+                amazon_best_sellers_rank_4: $scope.amazon_best_sellers_rank_4,
                 category_id: $scope.category,
                 count: $scope.count,
                 print_length_1: $scope.print_length_1,
@@ -603,12 +623,20 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
                 print_length_4: $scope.print_length_4,
                 appearance_1: $scope.appearance_1,
                 appearance_2: $scope.appearance_2,
+                appearance_3: $scope.appearance_3,
+                appearance_4: $scope.appearance_4,
                 price_1: $scope.price_1,
                 price_2: $scope.price_2,
+                price_3: $scope.price_3,
+                price_4: $scope.price_4,
                 publication_date_1: $scope.publication_date_1,
                 publication_date_2: $scope.publication_date_2,
+                publication_date_3: $scope.publication_date_3,
+                publication_date_4: $scope.publication_date_4,
                 review_average_1: $scope.review_average_1,
                 review_average_2: $scope.review_average_2,
+                review_average_3: $scope.review_average_3,
+                review_average_4: $scope.review_average_4,
                 section_id: $scope.section
             }),
             method: 'POST',

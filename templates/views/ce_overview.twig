@@ -129,6 +129,29 @@
                                     step="any"
                                     type="number"
                                     >
+                                <div
+                                    class="between"
+                                    ng-show="price_1 == 'Between'"
+                                    >
+                                    <div class="span6">
+                                        <input
+                                            class="span12"
+                                            max="999999999"
+                                            min="0"
+                                            ng-model="price_3"
+                                            type="number"
+                                            >
+                                    </div>
+                                    <div class="span6">
+                                        <input
+                                            class="span12"
+                                            max="999999999"
+                                            min="0"
+                                            ng-model="price_4"
+                                            type="number"
+                                            >
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="control-group">
@@ -145,13 +168,44 @@
                                     ></select>
                                 <div
                                     class="date input-append span12"
-                                    datepicker
                                     ng-show="publication_date_1 == 'Less Than' || publication_date_1 == 'More Than'"
                                     >
-                                    <input class="span12" type="text">
+                                    <input
+                                        class="span12"
+                                        datepicker
+                                        ng-model="publication_date_2"
+                                        type="text"
+                                        >
                                     <span class="add-on">
                                         <i class="icon-calendar"></i>
                                     </span>
+                                </div>
+                                <div
+                                    class="between"
+                                    ng-show="publication_date_1 == 'Between'"
+                                    >
+                                    <div class="date input-append span6">
+                                        <input
+                                            class="span12"
+                                            datepicker
+                                            ng-model="publication_date_3"
+                                            type="text"
+                                            >
+                                        <span class="add-on">
+                                            <i class="icon-calendar"></i>
+                                        </span>
+                                    </div>
+                                    <div class="date input-append span6">
+                                        <input
+                                            class="span12"
+                                            datepicker
+                                            ng-model="publication_date_4"
+                                            type="text"
+                                            >
+                                        <span class="add-on">
+                                            <i class="icon-calendar"></i>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -177,6 +231,29 @@
                                     ng-show="amazon_best_sellers_rank_1 == 'Less Than' || amazon_best_sellers_rank_1 == 'More Than'"
                                     type="number"
                                     >
+                                <div
+                                    class="between"
+                                    ng-show="amazon_best_sellers_rank_1 == 'Between'"
+                                    >
+                                    <div class="span6">
+                                        <input
+                                            class="span12"
+                                            max="999999999"
+                                            min="0"
+                                            ng-model="amazon_best_sellers_rank_3"
+                                            type="number"
+                                            >
+                                    </div>
+                                    <div class="span6">
+                                        <input
+                                            class="span12"
+                                            max="999999999"
+                                            min="0"
+                                            ng-model="amazon_best_sellers_rank_4"
+                                            type="number"
+                                            >
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="control-group">
@@ -199,6 +276,29 @@
                                     step="any"
                                     type="number"
                                     >
+                                <div
+                                    class="between"
+                                    ng-show="review_average_1 == 'Between'"
+                                    >
+                                    <div class="span6">
+                                        <input
+                                            class="span12"
+                                            max="5.0"
+                                            min="0.0"
+                                            ng-model="review_average_3"
+                                            type="number"
+                                            >
+                                    </div>
+                                    <div class="span6">
+                                        <input
+                                            class="span12"
+                                            max="5.0"
+                                            min="0.0"
+                                            ng-model="review_average_4"
+                                            type="number"
+                                            >
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="control-group">
@@ -214,13 +314,36 @@
                                     ></select>
                                 <input
                                     class="span12"
-                                    max="100"
-                                    min="0"
+                                    max="7"
+                                    min="1"
                                     ng-model="appearance_2"
                                     ng-show="appearance_1 == 'Less Than' || appearance_1 == 'More Than'"
                                     step="any"
                                     type="number"
                                     >
+                                <div
+                                    class="between"
+                                    ng-show="appearance_1 == 'Between'"
+                                    >
+                                    <div class="span6">
+                                        <input
+                                            class="span12"
+                                            max="7"
+                                            min="1"
+                                            ng-model="appearance_3"
+                                            type="number"
+                                            >
+                                    </div>
+                                    <div class="span6">
+                                        <input
+                                            class="span12"
+                                            max="7"
+                                            min="1"
+                                            ng-model="appearance_4"
+                                            type="number"
+                                            >
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
