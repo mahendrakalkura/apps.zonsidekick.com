@@ -348,24 +348,6 @@ function get_pdf($application, $user, $logo, $id, $variables) {
 }
 
 function get_popular_searches($application) {
-    $appearances = array(
-        'last 7 days' => 0,
-        'last 30 days' => 0,
-    );
-    $query = <<<EOD
-SELECT COUNT(DISTINCT `date_and_time`) AS `count`
-FROM `tools_ps_trends`
-WHERE `date_and_time` >= NOW() - INTERVAL 7 DAY
-EOD;
-    $row = $application['db']->fetchAssoc($query);
-    $appearances['last 7 days'] = $row['count'];
-    $query = <<<EOD
-SELECT COUNT(DISTINCT `date_and_time`) AS `count`
-FROM `tools_ps_trends`
-WHERE `date_and_time` >= NOW() - INTERVAL 30 DAY
-EOD;
-    $row = $application['db']->fetchAssoc($query);
-    $appearances['last 30 days'] = $row['count'];
     $query = <<<EOD
 SELECT *
 FROM `tools_ps_books`
@@ -386,7 +368,7 @@ EOD;
             $popular_searches[$key]['amazon_best_sellers_rank'], SORT_NUMERIC
         );
         $query = <<<EOD
-SELECT COUNT(id) AS `count`
+SELECT COUNT(DISTINCT DATE(`date_and_time`)) AS `count`
 FROM `tools_ps_trends`
 WHERE `book_id` = ? AND `date_and_time` >= NOW() - INTERVAL 7 DAY
 EOD;
@@ -394,7 +376,7 @@ EOD;
             $popular_searches[$key]['book_id'],
         ));
         $query = <<<EOD
-SELECT COUNT(id) AS `count`
+SELECT COUNT(DISTINCT DATE(`date_and_time`)) AS `count`
 FROM `tools_ps_trends`
 WHERE `book_id` = ? AND `date_and_time` >= NOW() - INTERVAL 30 DAY
 EOD;
@@ -402,12 +384,8 @@ EOD;
             $popular_searches[$key]['book_id'],
         ));
         $popular_searches[$key]['appearances'] = array(
-            'last 7 days' => !$appearances['last 7 days']? 0: (
-                $row_1['count'] * 100.00
-            ) / $appearances['last 7 days'],
-            'last 30 days' => !$appearances['last 30 days']? 0: (
-                $row_2['count'] * 100.00
-            ) / $appearances['last 30 days'],
+            'last 7 days' => $row_1['count'],
+            'last 30 days' => $row_2['count'],
         );
         $popular_searches[$key]['url_'] = urlencode(
             $popular_searches[$key]['url']
@@ -1531,67 +1509,6 @@ $application->match('/ce/xhr', function (Request $request) use ($application) {
     $appearance_2 = floatval($request->get('appearance_2'));
     $count = intval($request->get('count'));
 
-    $appearances = array(
-        'last 7 days' => 0,
-        'last 30 days' => 0,
-    );
-    if ($category_id == -1) {
-        $query = <<<EOD
-SELECT COUNT(DISTINCT `date`) AS `count`
-FROM `tools_ce_trends`
-WHERE
-    `category_id` > ?
-    AND
-    `section_id` = ?
-    AND
-    `date` >= CURDATE() - INTERVAL 7 DAY
-EOD;
-    } else {
-        $query = <<<EOD
-SELECT COUNT(DISTINCT `date`) AS `count`
-FROM `tools_ce_trends`
-WHERE
-    `category_id` = ?
-    AND
-    `section_id` = ?
-    AND
-    `date` >= CURDATE() - INTERVAL 7 DAY
-EOD;
-    }
-    $row = $application['db']->fetchAssoc($query, array(
-        $category_id,
-        $section_id,
-    ));
-    $appearances['last 7 days'] = $row['count'];
-    if ($category_id == -1) {
-        $query = <<<EOD
-SELECT COUNT(DISTINCT `date`) AS `count`
-FROM `tools_ce_trends`
-WHERE
-    `category_id` > ?
-    AND
-    `section_id` = ?
-    AND
-    `date` >= CURDATE() - INTERVAL 30 DAY
-EOD;
-    } else {
-        $query = <<<EOD
-SELECT COUNT(DISTINCT `date`) AS `count`
-FROM `tools_ce_trends`
-WHERE
-    `category_id` = ?
-    AND
-    `section_id` = ?
-    AND
-    `date` >= CURDATE() - INTERVAL 30 DAY
-EOD;
-    }
-    $row = $application['db']->fetchAssoc($query, array(
-        $category_id,
-        $section_id,
-    ));
-    $appearances['last 30 days'] = $row['count'];
-
     if ($category_id == -1) {
         $query = <<<EOD
 SELECT MAX(`date`) AS `date`
@@ -1753,12 +1670,8 @@ EOD;
                 $book['book_id'],
             ));
             $book['appearances'] = array(
-                'last 7 days' => !$appearances['last 7 days']? 0: (
-                    $row_1['count'] * 100.00
-                ) / $appearances['last 7 days'],
-                'last 30 days' => !$appearances['last 30 days']? 0: (
-                    $row_2['count'] * 100.00
-                ) / $appearances['last 30 days'],
+                'last 7 days' => $row_1['count'],
+                'last 30 days' => $row_2['count'],
             );
             $book['amazon_best_sellers_rank'] = json_decode(
                 $book['amazon_best_sellers_rank'], true

@@ -623,7 +623,7 @@
                                         <p><strong>Appearances:</strong></p>
                                         <ul>
                                             <li ng-repeat="(key, value) in book.appearances">
-                                                <strong>[! value|number:2 !]%</strong>
+                                                <strong>[! value|number:0 !]</strong>
                                                 in the
                                                 [! key !]
                                             </li>
@@ -732,7 +732,7 @@
                                 <p><strong>Appearances:</strong></p>
                                 <ul>
                                     <li ng-repeat="(key, value) in book.appearances">
-                                        <strong>[! value|number:2 !]%</strong>
+                                        <strong>[! value|number:0 !]</strong>
                                         in the
                                         [! key !]
                                     </li>
