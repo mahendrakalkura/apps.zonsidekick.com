@@ -431,6 +431,11 @@ WHERE (
     `tools_kns_requests`.`timestamp` < (NOW() - INTERVAL 5 HOUR)
 )
 EOD;
+        $query_status = <<<EOD
+SELECT COUNT(`id`)
+FROM `tools_kns_keywords`
+WHERE `request_id` = ? AND `contents` IS NULL
+EOD;
         foreach ($requests as $key => $value) {
             $requests[$key]['preview'] = array();
             $records = $application['db']->fetchAll(
@@ -463,6 +468,9 @@ EOD;
             $new->add(new DateInterval('P30D'));
             $interval = $old->diff($new);
             $requests[$key]['expires_in'] = $interval->format('%R%a days');
+            $requests[$key]['status'] = $application['db']->fetchAssoc(
+                $query_status, array($value['id'])
+            )? 'In Progress': 'Completed';
         }
     }
 
