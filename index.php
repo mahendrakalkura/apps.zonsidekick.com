@@ -468,9 +468,11 @@ EOD;
             $new->add(new DateInterval('P30D'));
             $interval = $old->diff($new);
             $requests[$key]['expires_in'] = $interval->format('%R%a days');
-            $requests[$key]['status'] = $application['db']->fetchAssoc(
+            $status = $application['db']->fetchAssoc(
                 $query_status, array($value['id'])
-            )? 'In Progress': 'Completed';
+            );
+            $requests[$key]['status'] =
+                $status['count']? 'In Progress': 'Completed';
         }
     }
 
