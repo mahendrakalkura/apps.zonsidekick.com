@@ -17,7 +17,7 @@
                     {{ module }}
                 </h1>
             </div>
-            <form class="form-horizontal" name="form" ng-submit="process()">
+            <form class="form-horizontal" name="form" ng-submit="submit()">
                 <div class="row-fluid">
                     <div class="span12">
                         <div class="control-group">
@@ -116,7 +116,7 @@
                             <div class="controls">
                                 <select
                                     class="select2 span12"
-                                    id="prices"
+                                    id="price"
                                     ng-model="price_1"
                                     ng-options="price as price for price in prices"
                                     ></select>
@@ -139,7 +139,7 @@
                             <div class="controls">
                                 <select
                                     class="select2 span12"
-                                    id="publication_dates"
+                                    id="publication_date"
                                     ng-model="publication_date_1"
                                     ng-options="publication_date as publication_date for publication_date in publication_dates"
                                     ></select>
@@ -165,7 +165,7 @@
                             <div class="controls">
                                 <select
                                     class="select2 span12"
-                                    id="amazon_best_sellers_ranks"
+                                    id="amazon_best_sellers_rank"
                                     ng-model="amazon_best_sellers_rank_1"
                                     ng-options="amazon_best_sellers_rank as amazon_best_sellers_rank for amazon_best_sellers_rank in amazon_best_sellers_ranks"
                                     ></select>
@@ -186,7 +186,7 @@
                             <div class="controls">
                                 <select
                                     class="select2 span12"
-                                    id="review_averages"
+                                    id="review_average"
                                     ng-model="review_average_1"
                                     ng-options="review_average as review_average for review_average in review_averages"
                                     ></select>
@@ -208,7 +208,7 @@
                             <div class="controls">
                                 <select
                                     class="select2 span12"
-                                    id="appearances"
+                                    id="appearance"
                                     ng-model="appearance_1"
                                     ng-options="appearance as appearance for appearance in appearances"
                                     ></select>
@@ -226,7 +226,11 @@
                     </div>
                 </div>
                 <div class="ce form-actions">
-                    <button class="btn btn-danger pull-right" type="reset" ng-click="reset()">
+                    <button
+                        class="btn btn-danger pull-left"
+                        ng-click="reset()"
+                        type="reset"
+                        >
                         <span class="icon-trash icon-large"></span>
                         Reset
                     </button>

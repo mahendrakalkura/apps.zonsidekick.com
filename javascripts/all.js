@@ -542,24 +542,6 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
     ];
     $scope.counts = _.range(100, 0, -10);
 
-    $scope.category = get_parameter('category_id') || $scope.categories[1][0];
-    $scope.section = $scope.sections[0][0];
-    $scope.print_length_1 = $scope.print_lengths[0];
-    $scope.print_length_2 = 0;
-    $scope.print_length_3 = 0;
-    $scope.print_length_4 = 0;
-    $scope.price_1 = $scope.prices[0];
-    $scope.price_2 = 0;
-    $scope.publication_date_1 = $scope.publication_dates[0];
-    $scope.publication_date_2 = '';
-    $scope.amazon_best_sellers_rank_1 = $scope.amazon_best_sellers_ranks[0];
-    $scope.amazon_best_sellers_rank_2 = 0;
-    $scope.review_average_1 = $scope.review_averages[0];
-    $scope.review_average_2 = 0;
-    $scope.appearance_1 = $scope.appearances[0];
-    $scope.appearance_2 = 0;
-    $scope.count = $scope.counts[0];
-
     $scope.spinner = false;
     $scope.error = false;
     $scope.contents = {};
@@ -572,36 +554,40 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
     $scope.mode = 'table';
 
     $scope.reset = function() {
-        jQuery('#category').select2('val', "1");
-        $scope.category = 1;
-        jQuery('#section').select2('val', "0");
-        $scope.section = 1;
-        jQuery('#count').select2('val', "100");
-        $scope.count = 100;
-        jQuery('#print_length').select2('val', "");
-        $scope.print_length_1 = 'Any';
+        $scope.category = get_parameter('category_id') || $scope.categories[1][0];
+        $scope.section = $scope.sections[0][0];
+        $scope.print_length_1 = $scope.print_lengths[0];
         $scope.print_length_2 = 0;
         $scope.print_length_3 = 0;
         $scope.print_length_4 = 0;
-        jQuery('#prices').select2('val', "");
-        $scope.price_1 = 'Any';
+        $scope.price_1 = $scope.prices[0];
         $scope.price_2 = 0;
-        jQuery('#publication_dates').select2('val', "");
-        $scope.publication_date_1 = 'Any';
+        $scope.publication_date_1 = $scope.publication_dates[0];
         $scope.publication_date_2 = '';
-        jQuery('#amazon_best_sellers_ranks').select2('val', "");
-        $scope.amazon_best_sellers_rank_1 = 'Any';
+        $scope.amazon_best_sellers_rank_1 = $scope.amazon_best_sellers_ranks[0];
         $scope.amazon_best_sellers_rank_2 = 0;
-        jQuery('#review_averages').select2('val', "");
-        $scope.review_average_1 = 'Any';
+        $scope.review_average_1 = $scope.review_averages[0];
         $scope.review_average_2 = 0;
-        jQuery('#appearances').select2('val', "");
-        $scope.appearance_1 = 'Any';
+        $scope.appearance_1 = $scope.appearances[0];
         $scope.appearance_2 = 0;
-        $scope.process();
+        $scope.count = $scope.counts[0];
+
+        jQuery('#category').select2('val', $scope.category);
+        jQuery('#section').select2('val', $scope.section);
+        jQuery('#print_length').select2('val', $scope.print_length_1);
+        jQuery('#price').select2('val', $scope.price_1);
+        jQuery('#publication_date').select2('val', $scope.publication_date_1);
+        jQuery(
+            '#amazon_best_sellers_rank'
+        ).select2('val', $scope.amazon_best_sellers_rank_1);
+        jQuery('#review_average').select2('val', $scope.review_average_1);
+        jQuery('#appearance').select2('val', $scope.appearance_1);
+        jQuery('#count').select2('val', $scope.count);
+
+        $scope.submit();
     };
 
-    $scope.process = function () {
+    $scope.submit = function () {
         $scope.spinner = true;
         $scope.error = false;
         $scope.contents = {};
@@ -678,7 +664,7 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
         }
     };
 
-    $scope.process();
+    $scope.reset();
 });
 
 application.controller('download', function ($element, $scope) {

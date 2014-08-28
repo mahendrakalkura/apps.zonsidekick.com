@@ -402,10 +402,10 @@ EOD;
             $popular_searches[$key]['book_id'],
         ));
         $popular_searches[$key]['appearances'] = array(
-            'last 7 days' => (
+            'last 7 days' => !$appearances['last 7 days']? 0: (
                 $row_1['count'] * 100.00
             ) / $appearances['last 7 days'],
-            'last 30 days' => (
+            'last 30 days' => !$appearances['last 30 days']? 0: (
                 $row_2['count'] * 100.00
             ) / $appearances['last 30 days'],
         );
@@ -1753,10 +1753,10 @@ EOD;
                 $book['book_id'],
             ));
             $book['appearances'] = array(
-                'last 7 days' => (
+                'last 7 days' => !$appearances['last 7 days']? 0: (
                     $row_1['count'] * 100.00
                 ) / $appearances['last 7 days'],
-                'last 30 days' => (
+                'last 30 days' => !$appearances['last 30 days']? 0: (
                     $row_2['count'] * 100.00
                 ) / $appearances['last 30 days'],
             );
@@ -1867,26 +1867,27 @@ EOD;
     usort($contents['categories'], 'usort_categories');
 
     $count = count($contents['books']);
-
-    $contents['glance']['price'] /= $count;
-    $contents['glance']['estimated_sales_per_day'] /= $count;
-    $contents['glance']['total_number_of_reviews']  /= $count;
-    $contents['glance']['review_average'] /= $count;
-    $contents['glance']['print_length'] /= $count;
-    $contents['glance']['words'] = array_count_values(
-        $contents['glance']['words']
-    );
-    arsort($contents['glance']['words']);
-    $words = array();
-    $contents['glance']['words'] = array_slice(
-        $contents['glance']['words'], 0, 10
-    );
-    if ($contents['glance']['words']) {
-        foreach ($contents['glance']['words'] as $key => $value) {
-            $words[] = array($key, $value);
+    if ($count) {
+        $contents['glance']['price'] /= $count;
+        $contents['glance']['estimated_sales_per_day'] /= $count;
+        $contents['glance']['total_number_of_reviews']  /= $count;
+        $contents['glance']['review_average'] /= $count;
+        $contents['glance']['print_length'] /= $count;
+        $contents['glance']['words'] = array_count_values(
+            $contents['glance']['words']
+        );
+        arsort($contents['glance']['words']);
+        $words = array();
+        $contents['glance']['words'] = array_slice(
+            $contents['glance']['words'], 0, 10
+        );
+        if ($contents['glance']['words']) {
+            foreach ($contents['glance']['words'] as $key => $value) {
+                $words[] = array($key, $value);
+            }
         }
+        $contents['glance']['words'] = $words;
     }
-    $contents['glance']['words'] = $words;
 
     return new Response(json_encode($contents, JSON_NUMERIC_CHECK));
 })
