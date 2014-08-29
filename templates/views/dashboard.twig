@@ -36,10 +36,30 @@
                             <span class="video"></span>
                             <a
                                 class="btn btn-info btn-large"
-                                href="{{ url('aa') }}"
+                                href="{{ url('ce_overview') }}"
                                 >
-                                <i class="icon-user icon-large"></i>
-                                Author Analyzer
+                                <span class="icon-key icon-large">
+                                </span>
+                                Top 100 Explorer
+                            </a>
+                        </p>
+                    </div>
+                    <div class="span4">
+                        <p class="center">
+                            <iframe
+                                class="video"
+                                allowfullscreen
+                                frameborder="0"
+                                height="230"
+                                src="//www.youtube.com/embed/OSI7Ym1Xw0c"
+                                width="408"
+                            ></iframe>
+                            <a
+                                class="btn btn-info btn-large"
+                                href="{{ url('aks') }}"
+                                >
+                                <span class="icon-list icon-large"></span>
+                                Zon Keyword Sidekick
                             </a>
                         </p>
                     </div>
@@ -48,79 +68,13 @@
                             <span class="video"></span>
                             <a
                                 class="btn btn-info btn-large"
-                                href="{{ url('ba') }}"
+                                href="{{ url('kns_overview') }}"
                                 >
-                                <i class="icon-book icon-large"></i>
-                                Book Analyzer
+                                <i class="icon-tags icon-large"></i>
+                                KNS - Multiple
                             </a>
                         </p>
                     </div>
-                    {% if has_aks(groups) %}
-                        <div class="span4">
-                            <p class="center">
-                                <iframe
-                                    class="video"
-                                    allowfullscreen
-                                    frameborder="0"
-                                    height="230"
-                                    src="//www.youtube.com/embed/OSI7Ym1Xw0c"
-                                    width="408"
-                                ></iframe>
-                                <a
-                                    class="btn btn-info btn-large"
-                                    href="{{ url('aks') }}"
-                                    >
-                                    <span class="icon-list icon-large"></span>
-                                    Zon Keyword Sidekick
-                                </a>
-                            </p>
-                        </div>
-                    {% endif %}
-                </div>
-                <div class="row-fluid">
-                    {% if has_kns(groups) %}
-                        <div class="span4">
-                            <p class="center">
-                                <span class="video"></span>
-                                <a
-                                    class="btn btn-info btn-large"
-                                    href="{{ url('kns_overview') }}"
-                                    >
-                                    <i class="icon-tags icon-large"></i>
-                                    KNS - Multiple
-                                </a>
-                            </p>
-                        </div>
-                    {% endif %}
-                    {% if has_kns(groups) %}
-                        <div class="span4">
-                            <p class="center">
-                                <span class="video"></span>
-                                <a
-                                    class="btn btn-info btn-large"
-                                    href="{{ url('kns_single') }}"
-                                    >
-                                    <i class="icon-tag icon-large"></i>
-                                    KNS - Single
-                                </a>
-                            </p>
-                        </div>
-                    {% endif %}
-                    {% if has_new_features(user) %}
-                        <div class="span4">
-                            <p class="center">
-                                <span class="video"></span>
-                                <a
-                                    class="btn btn-info btn-large"
-                                    href="{{ url('ce_overview') }}"
-                                    >
-                                    <span class="icon-key icon-large">
-                                    </span>
-                                    Top 100 Explorer
-                                </a>
-                            </p>
-                        </div>
-                    {% endif %}
                 </div>
                 <p class="center">
                     {% if has_kns(groups) %}
