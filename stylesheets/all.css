@@ -591,7 +591,14 @@ a {
 }
 
 #middle .container-fluid #dashboard .btn-large {
-    width: 300px;
+    width: 368px;
+}
+
+#middle .container-fluid #dashboard .video {
+    display: block;
+    height: 230px;
+    margin-bottom: 10px;
+    width: 408px;
 }
 
 #middle .container-fluid #logos_overview .table tr td .img-polaroid {

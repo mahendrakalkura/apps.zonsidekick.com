@@ -10,185 +10,76 @@
             <div class="page-header">
                 <h1>{{ module }}</h1>
             </div>
-            <div class="alert alert-info">
-                <strong>Notice (August 29th, 2014 @ 03:00 AM EST):</strong>
-                We are making the new tools available to you now, these will
-                continue to receive regular updates over the next few days as
-                we prepare for the full launch. Please report any issues you
-                may experience with them to us so that we may resolve them as
-                quickly as possible. Introduction videos are coming soon.
-                Enjoy!
-                <br>
-                New: Top 100 Explorer, Single Keyword Analyzer,
-                Popular Searches
-            </div>
-            {#
-            <div class="alert alert-info">
-                <strong>Notice (July 28th, 2014 @ 11:00 AM EST):</strong>
-                Amazon has just published changes that impact our algorithms.
-                As a result, some keywords may inappropriately return N/A
-                results. We're working to rapidly resolve this problem and
-                anticipate completion within 24 hours. We'll update this notice
-                as new information becomes available. Thank you for your
-                patience while we work hard to restore full functionality.
-            </div>
-            #}
-            {#
-            <div class="alert alert-info">
-                <strong>Notice (June 23rd, 2014 @ 11:00 PM EST):</strong>
-                We are currently resolving an issue that is causing reports to
-                hang permanently. We anticipate this to be fully resolved by
-                June 25th, 00:00 AM EST and will provide updates here. We
-                apologize for the inconvenience and thank you for your
-                patience.
-            </div>
-            #}
-            {#
-            <div class="alert alert-info">
-                <strong>Notice (October 1st, 2013 @ 5:00 AM EST):</strong>
-                We are in the process of completing changes to circumvent
-                Amazon's recent roadblock for data scraping. Thank you very
-                much for your patience. We appreciate your business and are
-                working hard to restore full functionality.
-            </div>
-            #}
-            {#
-            <div class="alert alert-info">
-                <strong>Notice (August 1st, 2013 @ 11:00 PM EST):</strong>
-                Detailed reports are now available on-screen by clicking the
-                "Detailed Report" button. This report may still be downloaded
-                and we have reduced the size of them by including 100 of your
-                top keywords. This will make downloads much faster and clear
-                out some of the things you don't need to read anyway. Like it?
-                Tell us what you think in the Feedback form.
-            </div>
-            #}
-            {#
-            <div class="alert alert-info">
-                <strong>Notice (July 21th, 2013 @ 00:30 AM EST):</strong>
-                Version 3.0 has now been completely rolled out. Please use the
-                Feedback button here on the dashboard to submit any questions
-                regarding the new version. For support related issues please
-                visit the Support Center in the Resource section at the bottom
-                of the site.
-            </div>
-            #}
-            {#
-            <div class="alert alert-info">
-                <strong>Notice (July 19th, 2013 @ 11:30 AM EST):</strong>
-                <br>
-                We're putting the finishing touches on the new Kindle Niche
-                Sidekick. We thank everyone who has contributed in testing the
-                new build. Please be patient while we prepare for full launch.
-                A notice will be posted here when the update is complete. Thank
-                you for your patience and we really hope you enjoy the new
-                build. As always, feedback is welcome and appreciated.
-            </div>
-            #}
-            {#
-            <div class="alert alert-info">
-                <strong>Notice (July 18th, 2013 @ 07:00 AM EST):</strong>
-                <br>
-                The new version has been rolled out to select users with a red
-                button while we confirm stability. We'll update this message
-                when the new version goes live for
-                everyone.
-            </div>
-            #}
-            {#
-            <div class="alert alert-info">
-                <strong>Notice (July 11th, 2013 @ 10:00 AM EST):</strong>
-                <br>
-                Our hosting provider (GoDaddy) is currently troubleshooting a
-                connectivity problem in their datacenter. We apologize if you
-                experience intermittent connectivity and we're working hard to
-                make sure this gets resolved as soon as humanly possible. Rest
-                assured I'm personally riding them until this is finished.
-                Thank you for your patience.
-            </div>
-            #}
-            {#
-            <div class="alert alert-info">
-                <strong>Notice (July 11th, 2013 @ 03:00 AM EST):</strong>
-                <br>
-                Big changes are coming! A new version of the Kindle Niche
-                Sidekick is scheduled for a July 18th release. This version
-                will include major performance upgrades that shift load away
-                from your browser and completely onto our servers. This will
-                allow for the processing of extremely large keyword lists and
-                without the need for your browser tab to remain open. Get ready,
-                it's about to be awesome!
-            </div>
-            #}
-            {#
-            <div class="alert alert-info">
-                <strong>Notice (July 11th, 2013 @ 02:00 AM EST):</strong>
-                <br>
-                Server migration has concluded successfully. Reports are
-                temporarily limited to 50 keywords and will begin to scale back
-                until this limitation is lifted. Thank you for your
-                patience.
-            </div>
-            #}
-            {#
-            <div class="alert alert-info">
-                <strong>Notice (July 11th, 2013 @ 08:30 AM EST):</strong>
-                <br>
-                We are currently in the process of migrating to the new server.
-                This process is scheduled to be completed by
-                <strong>July 12th, 2013 @ 05:00 AM EST</strong> at which point
-                keyword limitations will be scaled back and eventually lifted.
-                We're preparing a major update to the application that will
-                allow for MUCH faster keyword processing and stability. This
-                version will shift all data processing to the server and away
-                from the browser so you may complete reports without needing to
-                keep the window open. This version is scheduled for release on
-                or before July 18th. If you have any questions at all, please
-                open a ticket here:
-                <a href="http://zonsidekick.freshdesk.com" target="_blank">
-                    zonsidekick.freshdesk.com
-                </a>
-            </div>
-            #}
-            {#
-            <div class="alert alert-info">
-                <strong>Notice (July 11th, 2013 @ 08:00 AM EST):</strong>
-                <br>
-                We are preparing for signifigant hardware upgrades to allow for
-                faster keyword processing and to alleviate errors that some
-                members have experienced. We'll update this notice with the
-                estimated time for completion. Thank you very much for your
-                patience during this process.
-            </div>
-            <hr>
-            #}
-            <center>
-                <p>
-                    Your dashboard displays all tools that are currently
-                    available to you. Exciting new features are coming soon!
-                </p>
-                {% if user.id %}
-                    {% if has_kns(groups) or has_aks(groups) %}
-                        <p>
-                            {% if has_kns(groups) %}
-                                <a
-                                    class="btn btn-info btn-large"
-                                    href="{{ url('kns_overview') }}"
-                                    >
-                                    <span class="icon-user-md icon-large">
-                                    </span>
-                                    Kindle Niche Sidekick
-                                </a>
-                            {% endif %}
-                        </p>
-                        <p>
-                            <a class="btn" href="{{ url('logos_overview') }}">
-                                <span class="icon-picture"></span>
-                                Logos
+            {% if user.id %}
+                <div class="alert alert-info">
+                    <strong>Notice (August 29th, 2014 @ 03:00 AM EST):</strong>
+                    We are making the new tools available to you now, these
+                    will continue to receive regular updates over the next few
+                    days as we prepare for the full launch. Please report any
+                    issues you may experience with them to us so that we may
+                    resolve them as quickly as possible. Introduction videos
+                    are coming soon. Enjoy!
+                    <br>
+                    New: Top 100 Explorer, Single Keyword Analyzer,
+                    Popular Searches
+                </div>
+                <center>
+                    <p>
+                        Your dashboard displays all tools that are currently
+                        available to you. Exciting new features are coming
+                        soon!
+                    </p>
+                </center>
+                <div class="row-fluid">
+                    <div class="span4">
+                        <p class="center">
+                            <iframe
+                                class="video"
+                                allowfullscreen
+                                frameborder="0"
+                                height="230"
+                                src="//www.youtube.com/embed/OSI7Ym1Xw0c"
+                                width="408"
+                            ></iframe>
+                            <a
+                                class="btn btn-info btn-large"
+                                href="{{ url('aa') }}"
+                                >
+                                <i class="icon-user icon-large"></i>
+                                Author Analyzer
                             </a>
                         </p>
-                        <p>
-                            {% if has_aks(groups) %}
+                    </div>
+                    <div class="span4">
+                        <p class="center">
+                            <iframe
+                                class="video"
+                                allowfullscreen
+                                frameborder="0"
+                                height="230"
+                                src="//www.youtube.com/embed/OSI7Ym1Xw0c"
+                                width="408"
+                            ></iframe>
+                            <a
+                                class="btn btn-info btn-large"
+                                href="{{ url('ba') }}"
+                                >
+                                <i class="icon-book icon-large"></i>
+                                Book Analyzer
+                            </a>
+                        </p>
+                    </div>
+                    {% if has_aks(groups) %}
+                        <div class="span4">
+                            <p class="center">
+                                <iframe
+                                    class="video"
+                                    allowfullscreen
+                                    frameborder="0"
+                                    height="230"
+                                    src="//www.youtube.com/embed/OSI7Ym1Xw0c"
+                                    width="408"
+                                ></iframe>
                                 <a
                                     class="btn btn-info btn-large"
                                     href="{{ url('aks') }}"
@@ -196,10 +87,64 @@
                                     <span class="icon-list icon-large"></span>
                                     Zon Keyword Sidekick
                                 </a>
-                            {% endif %}
-                        </p>
-                        {% if has_new_features(user) %}
-                            <p>
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="row-fluid">
+                    {% if has_kns(groups) %}
+                        <div class="span4">
+                            <p class="center">
+                                <iframe
+                                    class="video"
+                                    allowfullscreen
+                                    frameborder="0"
+                                    height="230"
+                                    src="//www.youtube.com/embed/OSI7Ym1Xw0c"
+                                    width="408"
+                                ></iframe>
+                                <a
+                                    class="btn btn-info btn-large"
+                                    href="{{ url('kns_overview') }}"
+                                    >
+                                    <i class="icon-tags icon-large"></i>
+                                    KNS - Multiple
+                                </a>
+                            </p>
+                        </div>
+                    {% endif %}
+                    {% if has_kns(groups) %}
+                        <div class="span4">
+                            <p class="center">
+                                <iframe
+                                    class="video"
+                                    allowfullscreen
+                                    frameborder="0"
+                                    height="230"
+                                    src="//www.youtube.com/embed/OSI7Ym1Xw0c"
+                                    width="408"
+                                ></iframe>
+                                <a
+                                    class="btn btn-info btn-large"
+                                    href="{{ url('kns_single') }}"
+                                    >
+                                    <i class="icon-tag icon-large"></i>
+                                    KNS - Single
+                                </a>
+                            </p>
+                        </div>
+                    {% endif %}
+                    {% if has_new_features(user) %}
+                        <div class="span4">
+                            <p class="center">
+                                <iframe
+                                    class="video"
+                                    allowfullscreen
+                                    frameborder="0"
+                                    height="230"
+                                    src="//www.youtube.com/embed/OSI7Ym1Xw0c"
+                                    width="408"
+                                ></iframe>
                                 <a
                                     class="btn btn-info btn-large"
                                     href="{{ url('ce_overview') }}"
@@ -209,99 +154,144 @@
                                     Top 100 Explorer
                                 </a>
                             </p>
-                        {% endif %}
-                    {% else %}
-                        <div class="alert alert-error">
-                            Your account has no active subscriptions to our
-                            tools.
                         </div>
                     {% endif %}
-                    <p>
-                        <a class="btn" href="{{ url('feedback') }}">
-                            <span class="icon-comments-alt"></span>
-                            Feedback
-                        </a>
-                        <a class="btn" href="{{ url('profile') }}">
-                            <span class="icon-user"></span>
-                            Profile
-                        </a>
-                        {% if has_new_features(user) %}
-                            <a class="btn" href="{{ url('statistics') }}">
-                                <span class="icon-bar-chart"></span>
-                                Statistics
-                            </a>
-                        {% endif %}
-                    </p>
-                {% else %}
-                    <div class="alert alert-error">
-                        You are not signed in.
-                    </div>
-                {% endif %}
-            </center>
-            {% if has_new_features(user) %}
-                {% if popular_searches %}
-                    <hr>
-                    <p>
-                        {% include 'slots/how_do_we_know_this.twig' %}
-                        Kindle shoppers want to read more books like:
-                    </p>
-                    {% include 'slots/ps.twig' %}
-                    <p class="text-right">
-                        <a href="{{ url('ps') }}">See More</a>
-                    </p>
-                {% endif %}
-            {% endif %}
-            <hr>
-            <p>Current Version: <strong>3.1</strong></p>
-            <ul>
-                <li>
-                    Niche Analyzer:
-                    <ul>
-                        <li>Performance improvements</li>
-                        {#<li>Support for multiple countries</li>#}
-                        <li>
-                            Results will now sort by highest score as default
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    Keyword Suggester:
-                    <ul>
-                        <li>
-                            Resolved an issue that prevented German queries
-                            from working correctly
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-            <div ng-controller="previous_versions">
-                <p ng-show="!status">
-                    <a ng-click="status = true">Show Previous Versions</a>
-                </p>
-                <p ng-show="status">
-                    <a ng-click="status = false">Hide Previous Versions</a>
-                </p>
-                <div ng-show="status">
-                    <p>Version: <strong>3.0</strong></p>
-                    <ul>
-                        <li>Processing of keywords is now done entirely server-side</li>
-                        <li>Multiple Reports may now be run simultaneously</li>
-                        <li>Framework improvements to enhance speed</li>
-                        <li>Changed mail server to improve email deliverability</li>
-                        <li>Reports are now safely stored in full for up to 30 days</li>
-                        <li>Partial reports may now be downloaded during analysis</li>
-                    </ul>
-                    <p>Version: <strong>2.0</strong>
-                    <ul>
-                        <li>
-                            Fixed a problem that caused some keywords to "hang"
-                            during the processing of extremely large lists
-                        </li>
-                        <li>Added guide for new users</li>
-                        <li>Added feedback form</li>
-                    </ul>
                 </div>
-            </div>
+                <div class="row-fluid">
+                    <div class="span4">
+                    </div>
+                    {% if has_new_features(user) %}
+                        <div class="span4">
+                            <p class="center">
+                                <iframe
+                                    class="video"
+                                    allowfullscreen
+                                    frameborder="0"
+                                    height="230"
+                                    src="//www.youtube.com/embed/OSI7Ym1Xw0c"
+                                    width="408"
+                                ></iframe>
+                                <a
+                                    class="btn btn-info btn-large"
+                                    href="{{ url('ps') }}"
+                                    >
+                                    <span class="icon-search icon-large">
+                                    </span>
+                                    Popular Searches
+                                </a>
+                            </p>
+                        </div>
+                    {% endif %}
+                    <div class="span4">
+                    </div>
+                </div>
+                <p class="center">
+                    {% if has_kns(groups) %}
+                        <a class="btn" href="{{ url('logos_overview') }}">
+                            <span class="icon-picture"></span>
+                            Logos
+                        </a>
+                    {% endif %}
+                    <a class="btn" href="{{ url('feedback') }}">
+                        <span class="icon-comments-alt"></span>
+                        Feedback
+                    </a>
+                    <a class="btn" href="{{ url('profile') }}">
+                        <span class="icon-user"></span>
+                        Profile
+                    </a>
+                    {% if has_new_features(user) %}
+                        <a class="btn" href="{{ url('statistics') }}">
+                            <span class="icon-bar-chart"></span>
+                            Statistics
+                        </a>
+                    {% endif %}
+                </p>
+                {% if has_new_features(user) %}
+                    {% if popular_searches %}
+                        <hr>
+                        <p>
+                            {% include 'slots/how_do_we_know_this.twig' %}
+                            Kindle shoppers want to read more books like:
+                        </p>
+                        {% include 'slots/ps.twig' %}
+                        <p class="text-right">
+                            <a href="{{ url('ps') }}">See More</a>
+                        </p>
+                    {% endif %}
+                {% endif %}
+                <hr>
+                <p>Current Version: <strong>3.1</strong></p>
+                <ul>
+                    <li>
+                        Niche Analyzer:
+                        <ul>
+                            <li>Performance improvements</li>
+                            {#<li>Support for multiple countries</li>#}
+                            <li>
+                                Results will now sort by highest score as
+                                default
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        Keyword Suggester:
+                        <ul>
+                            <li>
+                                Resolved an issue that prevented German queries
+                                from working correctly
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <div ng-controller="previous_versions">
+                    <p ng-show="!status">
+                        <a ng-click="status = true">Show Previous Versions</a>
+                    </p>
+                    <p ng-show="status">
+                        <a ng-click="status = false">Hide Previous Versions</a>
+                    </p>
+                    <div ng-show="status">
+                        <p>Version: <strong>3.0</strong></p>
+                        <ul>
+                            <li>
+                                Processing of keywords is now done entirely
+                                server-side
+                            </li>
+                            <li>
+                                Multiple Reports may now be run simultaneously
+                            </li>
+                            <li>Framework improvements to enhance speed</li>
+                            <li>
+                                Changed mail server to improve email
+                                deliverability
+                            </li>
+                            <li>
+                                Reports are now safely stored in full for up to
+                                30 days
+                            </li>
+                            <li>
+                                Partial reports may now be downloaded during
+                                analysis
+                            </li>
+                        </ul>
+                        <p>Version: <strong>2.0</strong>
+                        <ul>
+                            <li>
+                                Fixed a problem that caused some keywords to
+                                "hang" during the processing of extremely large
+                                lists
+                            </li>
+                            <li>Added guide for new users</li>
+                            <li>Added feedback form</li>
+                        </ul>
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-error">
+                    You are not signed in.
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>

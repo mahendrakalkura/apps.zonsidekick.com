@@ -80,6 +80,14 @@
                                 </ul>
                             </li>
                         {% endif %}
+                        {% if has_aks(groups) %}
+                            <li class="{% if nav == 'aks' %}active{% endif %}">
+                                <a href="{{ url('aks') }}">
+                                    <span class="icon-list icon-large"></span>
+                                    Zon Keyword Sidekick
+                                </a>
+                            </li>
+                        {% endif %}
                         {% if has_kns(groups) %}
                             <li class="{% if nav == 'kns' %}active{% endif %} dropdown">
                                 <a
@@ -105,14 +113,6 @@
                                         </a>
                                     </li>
                                 </ul>
-                            </li>
-                        {% endif %}
-                        {% if has_aks(groups) %}
-                            <li class="{% if nav == 'aks' %}active{% endif %}">
-                                <a href="{{ url('aks') }}">
-                                    <span class="icon-list icon-large"></span>
-                                    Zon Keyword Sidekick
-                                </a>
                             </li>
                         {% endif %}
                         {% if has_new_features(user) %}
