@@ -432,7 +432,7 @@ WHERE (
 )
 EOD;
         $query_status = <<<EOD
-SELECT COUNT(`id`)
+SELECT COUNT(`id`) AS `count`
 FROM `tools_kns_keywords`
 WHERE `request_id` = ? AND `contents` IS NULL
 EOD;
@@ -469,7 +469,7 @@ EOD;
             $interval = $old->diff($new);
             $requests[$key]['expires_in'] = $interval->format('%R%a days');
             $status = $application['db']->fetchAssoc(
-                $query_status, array($requests[$key]['id'])
+                $query_status, array($value['id'])
             );
             $requests[$key]['status'] =
                 $status['count']? 'In Progress': 'Completed';
