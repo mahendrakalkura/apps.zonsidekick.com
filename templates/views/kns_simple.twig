@@ -486,6 +486,9 @@
                                         Price ({{ currency }})
                                     </th>
                                     <th class="narrow right">
+                                        Print Length
+                                    </th>
+                                    <th class="narrow right">
                                         Date Published
                                     </th>
                                     <th class="narrow right">
@@ -508,6 +511,9 @@
                                     </td>
                                     <td class="narrow right">
                                         [! item.price[0]|number:2 !]
+                                    </td>
+                                    <td class="narrow right">
+                                        [! item.pages[0]|number:2 !]
                                     </td>
                                     <td class="narrow right">
                                         [! item.publication_date !]
