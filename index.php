@@ -599,7 +599,7 @@ function has_groups($one, $two) {
     return false;
 }
 
-function has_statistics($user) {
+function has_new_features($user) {
     return in_array($user['id'], array(1, 2, 3));
 }
 
@@ -713,7 +713,7 @@ $application->before(function (Request $request) use ($application) {
         'has_kns', new \Twig_Function_Function('has_kns')
     );
     $application['twig']->addFunction(
-        'has_statistics', new \Twig_Function_Function('has_statistics')
+        'has_new_features', new \Twig_Function_Function('has_new_features')
     );
 });
 
@@ -733,8 +733,8 @@ $before_kns = function () use ($application) {
     }
 };
 
-$before_statistics = function () use ($application) {
-    if (!has_statistics($application['session']->get('user'))) {
+$before_new_features = function () use ($application) {
+    if (!has_new_features($application['session']->get('user'))) {
         return $application->redirect(
             $application['url_generator']->generate('dashboard')
         );
@@ -772,7 +772,7 @@ $application->match('/aa', function (Request $request) use ($application) {
         'url' => $request->get('url'),
     ));
 })
-->before($before_statistics)
+->before($before_new_features)
 ->bind('aa')
 ->method('GET');
 
@@ -790,7 +790,7 @@ $application->match(
         return new Response(implode('', $output));
     }
 )
-->before($before_statistics)
+->before($before_new_features)
 ->bind('aa_authors')
 ->method('POST');
 
@@ -808,7 +808,7 @@ $application->match(
         return new Response(implode('', $output));
     }
 )
-->before($before_statistics)
+->before($before_new_features)
 ->bind('aa_author')
 ->method('POST');
 
@@ -817,7 +817,7 @@ $application->match('/ba', function (Request $request) use ($application) {
         'url' => $request->get('url'),
     ));
 })
-->before($before_statistics)
+->before($before_new_features)
 ->bind('ba')
 ->method('GET');
 
@@ -835,7 +835,7 @@ $application->match(
         return new Response(implode('', $output));
     }
 )
-->before($before_statistics)
+->before($before_new_features)
 ->bind('ba_books')
 ->method('POST');
 
@@ -853,7 +853,7 @@ $application->match(
         return new Response(implode('', $output));
     }
 )
-->before($before_statistics)
+->before($before_new_features)
 ->bind('ba_book')
 ->method('POST');
 
@@ -886,7 +886,7 @@ $application->match(
         return new Response(implode('', $output));
     }
 )
-->before($before_statistics)
+->before($before_new_features)
 ->bind('ba_items')
 ->method('POST');
 
@@ -1204,7 +1204,7 @@ $application->match('/kns/single', function () use ($application) {
         'countries' => $countries,
     ));
 })
-->before($before_statistics)
+->before($before_new_features)
 ->bind('kns_single')
 ->method('GET');
 
@@ -1223,7 +1223,7 @@ $application->match(
         return new Response(implode('', $output));
     }
 )
-->before($before_statistics)
+->before($before_new_features)
 ->bind('kns_single_')
 ->method('POST');
 
@@ -1479,7 +1479,7 @@ $application->match(
         ));
     }
 )
-->before($before_statistics)
+->before($before_new_features)
 ->bind('ce_overview')
 ->method('GET');
 
@@ -1880,7 +1880,7 @@ EOD;
 
     return new Response(json_encode($contents, JSON_NUMERIC_CHECK));
 })
-->before($before_statistics)
+->before($before_new_features)
 ->bind('ce_xhr')
 ->method('POST');
 
@@ -1898,7 +1898,7 @@ $application->match(
         return new Response(implode('', $output));
     }
 )
-->before($before_statistics)
+->before($before_new_features)
 ->bind('suggested_keywords')
 ->method('POST');
 
@@ -2034,7 +2034,7 @@ EOD;
         ));
     }
 )
-->before($before_statistics)
+->before($before_new_features)
 ->bind('statistics')
 ->method('GET');
 
@@ -2046,7 +2046,7 @@ $application->match(
         ));
     }
 )
-->before($before_statistics)
+->before($before_new_features)
 ->bind('ps')
 ->method('GET');
 

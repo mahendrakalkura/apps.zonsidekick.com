@@ -85,28 +85,24 @@
                             </span>
                         </div>
                     </div>
-                    {% if has_statistics(user) %}
-                        <div class="control-group">
-                            <label class="control-label" for="country">
-                                Country
-                            </label>
-                            <div class="controls">
-                                <select
-                                    class="span12"
-                                    id="country"
-                                    name="country"
-                                    >
-                                    {% for key, value in countries %}
-                                        <option value="{{ key }}">
-                                            {{ value }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
+                    <div class="control-group">
+                        <label class="control-label" for="country">
+                            Country
+                        </label>
+                        <div class="controls">
+                            <select
+                                class="span12"
+                                id="country"
+                                name="country"
+                                >
+                                {% for key, value in countries %}
+                                    <option value="{{ key }}">
+                                        {{ value }}
+                                    </option>
+                                {% endfor %}
+                            </select>
                         </div>
-                    {% else %}
-                        <input name="country" type="hidden" value="com">
-                    {% endif %}
+                    </div>
                     <div class="form-actions">
                         <button
                             class="btn btn-success"

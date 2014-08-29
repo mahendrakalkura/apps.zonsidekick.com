@@ -52,7 +52,7 @@
                                 Dashboard
                             </a>
                         </li>
-                        {% if has_statistics(user) %}
+                        {% if has_new_features(user) %}
                             <li class="{% if nav == 'a' %}active{% endif %} dropdown">
                                 <a
                                     class="dropdown-toggle"
@@ -79,6 +79,8 @@
                                     </li>
                                 </ul>
                             </li>
+                        {% endif %}
+                        {% if has_kns(groups) %}
                             <li class="{% if nav == 'kns' %}active{% endif %} dropdown">
                                 <a
                                     class="dropdown-toggle"
@@ -98,22 +100,12 @@
                                     </li>
                                     <li>
                                         <a href="{{ url('kns_single') }}">
-                                            <i class="icon-tag icon-large">
-                                            </i>
+                                            <i class="icon-tag icon-large"></i>
                                             Single Keyword
                                         </a>
                                     </li>
                                 </ul>
                             </li>
-                        {% else %}
-                            {% if has_kns(groups) %}
-                                <li class="{% if nav == 'kns' %}active{% endif %}">
-                                    <a href="{{ url('kns_overview') }}">
-                                        <i class="icon-user-md icon-large"></i>
-                                        Kindle Niche Sidekick
-                                    </a>
-                                </li>
-                            {% endif %}
                         {% endif %}
                         {% if has_aks(groups) %}
                             <li class="{% if nav == 'aks' %}active{% endif %}">
@@ -123,13 +115,15 @@
                                 </a>
                             </li>
                         {% endif %}
-                        {% if has_statistics(user) %}
+                        {% if has_new_features(user) %}
                             <li class="{% if nav == 'ce' %}active{% endif %}">
                                 <a href="{{ url('ce_overview') }}">
                                     <i class="icon-key icon-large"></i>
                                     Top 100 Explorer
                                 </a>
                             </li>
+                        {% endif %}
+                        {% if has_new_features(user) %}
                             <li class="{% if nav == 'ps' %}active{% endif %}">
                                 <a href="{{ url('ps') }}">
                                     <i class="icon-search icon-large"></i>
@@ -167,7 +161,7 @@
                                         Profile
                                     </a>
                                 </li>
-                                {% if has_statistics(user) %}
+                                {% if has_new_features(user) %}
                                     <li>
                                         <a href="{{ url('statistics') }}">
                                             <i class="icon-bar-chart"></i>

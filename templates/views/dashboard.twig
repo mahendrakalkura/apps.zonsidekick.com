@@ -10,6 +10,18 @@
             <div class="page-header">
                 <h1>{{ module }}</h1>
             </div>
+            <div class="alert alert-info">
+                <strong>Notice (August 29th, 2014 @ 03:00 AM EST):</strong>
+                We are making the new tools available to you now, these will
+                continue to receive regular updates over the next few days as
+                we prepare for the full launch. Please report any issues you
+                may experience with them to us so that we may resolve them as
+                quickly as possible. Introduction videos are coming soon.
+                Enjoy!
+                <br>
+                New: Top 100 Explorer, Single Keyword Analyzer,
+                Popular Searches
+            </div>
             {#
             <div class="alert alert-info">
                 <strong>Notice (July 28th, 2014 @ 11:00 AM EST):</strong>
@@ -186,7 +198,7 @@
                                 </a>
                             {% endif %}
                         </p>
-                        {% if has_statistics(user) %}
+                        {% if has_new_features(user) %}
                             <p>
                                 <a
                                     class="btn btn-info btn-large"
@@ -213,7 +225,7 @@
                             <span class="icon-user"></span>
                             Profile
                         </a>
-                        {% if has_statistics(user) %}
+                        {% if has_new_features(user) %}
                             <a class="btn" href="{{ url('statistics') }}">
                                 <span class="icon-bar-chart"></span>
                                 Statistics
@@ -226,7 +238,7 @@
                     </div>
                 {% endif %}
             </center>
-            {% if has_statistics(user) %}
+            {% if has_new_features(user) %}
                 {% if popular_searches %}
                     <hr>
                     <p>
