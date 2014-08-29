@@ -579,14 +579,6 @@ EOD;
     );
 }
 
-function has_aks($groups) {
-    return has_groups($groups, array(2, 5));
-}
-
-function has_kns($groups) {
-    return has_groups($groups, array(3, 4, 5));
-}
-
 function has_groups($one, $two) {
     if (!empty($one)) {
         foreach ($one as $key => $value) {
@@ -599,7 +591,7 @@ function has_groups($one, $two) {
     return false;
 }
 
-function has_new_features($user) {
+function has_statistics($user) {
     return in_array($user['id'], array(1, 2, 3));
 }
 
@@ -707,34 +699,12 @@ $application->before(function (Request $request) use ($application) {
         'groups', $application['session']->get('groups')
     );
     $application['twig']->addFunction(
-        'has_aks', new \Twig_Function_Function('has_aks')
-    );
-    $application['twig']->addFunction(
-        'has_kns', new \Twig_Function_Function('has_kns')
-    );
-    $application['twig']->addFunction(
-        'has_new_features', new \Twig_Function_Function('has_new_features')
+        'has_statistics', new \Twig_Function_Function('has_statistics')
     );
 });
 
-$before_aks = function () use ($application) {
-    if (!has_aks($application['session']->get('groups'))) {
-        return $application->redirect(
-            $application['url_generator']->generate('dashboard')
-        );
-    }
-};
-
-$before_kns = function () use ($application) {
-    if (!has_kns($application['session']->get('groups'))) {
-        return $application->redirect(
-            $application['url_generator']->generate('dashboard')
-        );
-    }
-};
-
-$before_new_features = function () use ($application) {
-    if (!has_new_features($application['session']->get('user'))) {
+$before_statistics = function () use ($application) {
+    if (!has_statistics($application['session']->get('user'))) {
         return $application->redirect(
             $application['url_generator']->generate('dashboard')
         );
@@ -754,6 +724,7 @@ $application->match('/transfer/{id}', function ($id) use ($application) {
         $application['url_generator']->generate('dashboard')
     );
 })
+->before($before_statistics)
 ->bind('transfer')
 ->method('GET');
 
@@ -772,7 +743,6 @@ $application->match('/aa', function (Request $request) use ($application) {
         'url' => $request->get('url'),
     ));
 })
-->before($before_new_features)
 ->bind('aa')
 ->method('GET');
 
@@ -790,7 +760,6 @@ $application->match(
         return new Response(implode('', $output));
     }
 )
-->before($before_new_features)
 ->bind('aa_authors')
 ->method('POST');
 
@@ -808,7 +777,6 @@ $application->match(
         return new Response(implode('', $output));
     }
 )
-->before($before_new_features)
 ->bind('aa_author')
 ->method('POST');
 
@@ -817,7 +785,6 @@ $application->match('/ba', function (Request $request) use ($application) {
         'url' => $request->get('url'),
     ));
 })
-->before($before_new_features)
 ->bind('ba')
 ->method('GET');
 
@@ -835,7 +802,6 @@ $application->match(
         return new Response(implode('', $output));
     }
 )
-->before($before_new_features)
 ->bind('ba_books')
 ->method('POST');
 
@@ -853,7 +819,6 @@ $application->match(
         return new Response(implode('', $output));
     }
 )
-->before($before_new_features)
 ->bind('ba_book')
 ->method('POST');
 
@@ -886,7 +851,6 @@ $application->match(
         return new Response(implode('', $output));
     }
 )
-->before($before_new_features)
 ->bind('ba_items')
 ->method('POST');
 
@@ -898,7 +862,6 @@ $application->match('/kns/overview', function () use ($application) {
         'requests' => $requests,
     ));
 })
-->before($before_kns)
 ->bind('kns_overview')
 ->method('GET');
 
@@ -911,7 +874,6 @@ $application->match('/kns/add', function () use ($application) {
         'countries' => get_countries(),
     ));
 })
-->before($before_kns)
 ->bind('kns_add')
 ->method('GET');
 
@@ -949,7 +911,6 @@ $application->match(
         );
     }
 )
-->before($before_kns)
 ->bind('kns_process')
 ->method('POST');
 
@@ -975,7 +936,6 @@ $application->match(
         ));
     }
 )
-->before($before_kns)
 ->bind('kns_simple')
 ->method('GET');
 
@@ -1001,7 +961,6 @@ $application->match(
         ));
     }
 )
-->before($before_kns)
 ->bind('kns_detailed')
 ->method('GET');
 
@@ -1025,7 +984,6 @@ $application->match(
         ));
     }
 )
-->before($before_kns)
 ->bind('kns_csv')
 ->method('GET');
 
@@ -1051,7 +1009,6 @@ $application->match(
         ));
     }
 )
-->before($before_kns)
 ->bind('kns_pdf')
 ->method('GET');
 
@@ -1106,7 +1063,6 @@ $application->match(
         return new Response(json_encode($keywords));
     }
 )
-->before($before_kns)
 ->bind('kns_xhr')
 ->method('POST');
 
@@ -1155,7 +1111,6 @@ EOD;
         return new Response();
     }
 )
-->before($before_kns)
 ->bind('kns_email')
 ->method('POST');
 
@@ -1188,7 +1143,6 @@ $application->match(
         ));
     }
 )
-->before($before_kns)
 ->bind('kns_delete')
 ->method('GET|POST');
 
@@ -1204,7 +1158,6 @@ $application->match('/kns/single', function () use ($application) {
         'countries' => $countries,
     ));
 })
-->before($before_new_features)
 ->bind('kns_single')
 ->method('GET');
 
@@ -1223,7 +1176,6 @@ $application->match(
         return new Response(implode('', $output));
     }
 )
-->before($before_new_features)
 ->bind('kns_single_')
 ->method('POST');
 
@@ -1234,7 +1186,6 @@ $application->match('/logos/overview', function () use ($application) {
         'logos' => get_logos($application, $user),
     ));
 })
-->before($before_kns)
 ->bind('logos_overview')
 ->method('GET');
 
@@ -1255,7 +1206,6 @@ $application->match(
         ));
     }
 )
-->before($before_kns)
 ->bind('logos_view')
 ->method('GET');
 
@@ -1281,7 +1231,6 @@ $application->match(
         ));
     }
 )
-->before($before_kns)
 ->bind('logos_download')
 ->method('GET');
 
@@ -1327,7 +1276,6 @@ $application->match(
         ));
     }
 )
-->before($before_kns)
 ->bind('logos_add')
 ->method('GET|POST');
 
@@ -1357,7 +1305,6 @@ $application->match(
         );
     }
 )
-->before($before_kns)
 ->bind('logos_delete')
 ->method('GET|POST');
 
@@ -1415,7 +1362,6 @@ $application->match('/aks', function () use ($application) {;
         ),
     ));
 })
-->before($before_aks)
 ->bind('aks')
 ->method('GET');
 
@@ -1441,7 +1387,6 @@ $application->match(
         return new Response(implode('', $output));
     }
 )
-->before($before_aks)
 ->bind('aks_xhr')
 ->method('POST');
 
@@ -1463,7 +1408,6 @@ $application->match(
         ));
     }
 )
-->before($before_aks)
 ->bind('aks_download')
 ->method('POST');
 
@@ -1479,7 +1423,6 @@ $application->match(
         ));
     }
 )
-->before($before_new_features)
 ->bind('ce_overview')
 ->method('GET');
 
@@ -1880,7 +1823,6 @@ EOD;
 
     return new Response(json_encode($contents, JSON_NUMERIC_CHECK));
 })
-->before($before_new_features)
 ->bind('ce_xhr')
 ->method('POST');
 
@@ -1898,7 +1840,6 @@ $application->match(
         return new Response(implode('', $output));
     }
 )
-->before($before_new_features)
 ->bind('suggested_keywords')
 ->method('POST');
 
@@ -2034,7 +1975,7 @@ EOD;
         ));
     }
 )
-->before($before_new_features)
+->before($before_statistics)
 ->bind('statistics')
 ->method('GET');
 
@@ -2046,7 +1987,6 @@ $application->match(
         ));
     }
 )
-->before($before_new_features)
 ->bind('ps')
 ->method('GET');
 

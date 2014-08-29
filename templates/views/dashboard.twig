@@ -76,40 +76,16 @@
                         </p>
                     </div>
                 </div>
-                <p class="center">
-                    {% if has_kns(groups) %}
-                        <a class="btn" href="{{ url('logos_overview') }}">
-                            <span class="icon-picture"></span>
-                            Logos
-                        </a>
-                    {% endif %}
-                    <a class="btn" href="{{ url('feedback') }}">
-                        <span class="icon-comments-alt"></span>
-                        Feedback
-                    </a>
-                    <a class="btn" href="{{ url('profile') }}">
-                        <span class="icon-user"></span>
-                        Profile
-                    </a>
-                    {% if has_new_features(user) %}
-                        <a class="btn" href="{{ url('statistics') }}">
-                            <span class="icon-bar-chart"></span>
-                            Statistics
-                        </a>
-                    {% endif %}
-                </p>
-                {% if has_new_features(user) %}
-                    {% if popular_searches %}
-                        <hr>
-                        <p>
-                            {% include 'slots/how_do_we_know_this.twig' %}
-                            Kindle shoppers want to read more books like:
-                        </p>
-                        {% include 'slots/ps.twig' %}
-                        <p class="text-right">
-                            <a href="{{ url('ps') }}">See More</a>
-                        </p>
-                    {% endif %}
+                {% if popular_searches %}
+                    <hr>
+                    <p>
+                        {% include 'slots/how_do_we_know_this.twig' %}
+                        Kindle shoppers want to read more books like:
+                    </p>
+                    {% include 'slots/ps.twig' %}
+                    <p class="text-right">
+                        <a href="{{ url('ps') }}">See More</a>
+                    </p>
                 {% endif %}
                 <hr>
                 <p>Current Version: <strong>3.1</strong></p>

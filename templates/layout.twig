@@ -52,85 +52,75 @@
                                 Dashboard
                             </a>
                         </li>
-                        {% if has_new_features(user) %}
-                            <li class="{% if nav == 'a' %}active{% endif %} dropdown">
-                                <a
-                                    class="dropdown-toggle"
-                                    data-toggle="dropdown"
-                                    >
-                                    <i class="icon-screenshot icon-large"></i>
-                                    Analyzers
-                                    <i class="caret"></i>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <a href="{{ url('aa') }}">
-                                            <i class="icon-user icon-large">
-                                            </i>
-                                            Author Analyzer
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="{{ url('ba') }}">
-                                            <i class="icon-book icon-large">
-                                            </i>
-                                            Book Analyzer
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                        {% endif %}
-                        {% if has_aks(groups) %}
-                            <li class="{% if nav == 'aks' %}active{% endif %}">
-                                <a href="{{ url('aks') }}">
-                                    <span class="icon-list icon-large"></span>
-                                    Zon Keyword Sidekick
-                                </a>
-                            </li>
-                        {% endif %}
-                        {% if has_kns(groups) %}
-                            <li class="{% if nav == 'kns' %}active{% endif %} dropdown">
-                                <a
-                                    class="dropdown-toggle"
-                                    data-toggle="dropdown"
-                                    >
-                                    <i class="icon-user-md icon-large"></i>
-                                    Kindle Niche Sidekick
-                                    <i class="caret"></i>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <a href="{{ url('kns_overview') }}">
-                                            <i class="icon-tags icon-large">
-                                            </i>
-                                            Multiple Keywords
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="{{ url('kns_single') }}">
-                                            <i class="icon-tag icon-large"></i>
-                                            Single Keyword
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                        {% endif %}
-                        {% if has_new_features(user) %}
-                            <li class="{% if nav == 'ce' %}active{% endif %}">
-                                <a href="{{ url('ce_overview') }}">
-                                    <i class="icon-key icon-large"></i>
-                                    Top 100 Explorer
-                                </a>
-                            </li>
-                        {% endif %}
-                        {% if has_new_features(user) %}
-                            <li class="{% if nav == 'ps' %}active{% endif %}">
-                                <a href="{{ url('ps') }}">
-                                    <i class="icon-search icon-large"></i>
-                                    Popular Searches
-                                </a>
-                            </li>
-                        {% endif %}
+                        <li class="{% if nav == 'ce' %}active{% endif %}">
+                            <a href="{{ url('ce_overview') }}">
+                                <i class="icon-key icon-large"></i>
+                                Top 100 Explorer
+                            </a>
+                        </li>
+                        <li class="{% if nav == 'aks' %}active{% endif %}">
+                            <a href="{{ url('aks') }}">
+                                <span class="icon-list icon-large"></span>
+                                Zon Keyword Sidekick
+                            </a>
+                        </li>
+                        <li class="{% if nav == 'kns' %}active{% endif %} dropdown">
+                            <a
+                                class="dropdown-toggle"
+                                data-toggle="dropdown"
+                                >
+                                <i class="icon-user-md icon-large"></i>
+                                Kindle Niche Sidekick
+                                <i class="caret"></i>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="{{ url('kns_overview') }}">
+                                        <i class="icon-tags icon-large">
+                                        </i>
+                                        Multiple Keywords
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ url('kns_single') }}">
+                                        <i class="icon-tag icon-large"></i>
+                                        Single Keyword
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="{% if nav == 'a' %}active{% endif %} dropdown">
+                            <a
+                                class="dropdown-toggle"
+                                data-toggle="dropdown"
+                                >
+                                <i class="icon-screenshot icon-large"></i>
+                                Analyzers
+                                <i class="caret"></i>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="{{ url('aa') }}">
+                                        <i class="icon-user icon-large">
+                                        </i>
+                                        Author Analyzer
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ url('ba') }}">
+                                        <i class="icon-book icon-large">
+                                        </i>
+                                        Book Analyzer
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="{% if nav == 'ps' %}active{% endif %}">
+                            <a href="{{ url('ps') }}">
+                                <i class="icon-search icon-large"></i>
+                                Popular Searches
+                            </a>
+                        </li>
                         <li class="{% if nav == 'others' %}active{% endif %} dropdown">
                             <a
                                 class="dropdown-toggle"
@@ -141,14 +131,12 @@
                                 <i class="caret"></i>
                             </a>
                             <ul class="dropdown-menu">
-                                {% if has_kns(groups) %}
-                                    <li>
-                                        <a href="{{ url('logos_overview') }}">
-                                            <i class="icon-picture"></i>
-                                            Logos
-                                        </a>
-                                    </li>
-                                {% endif %}
+                                <li>
+                                    <a href="{{ url('logos_overview') }}">
+                                        <i class="icon-picture"></i>
+                                        Logos
+                                    </a>
+                                </li>
                                 <li>
                                     <a href="{{ url('feedback') }}">
                                         <i class="icon-comments-alt"></i>
@@ -161,7 +149,7 @@
                                         Profile
                                     </a>
                                 </li>
-                                {% if has_new_features(user) %}
+                                {% if has_statistics(user) %}
                                     <li>
                                         <a href="{{ url('statistics') }}">
                                             <i class="icon-bar-chart"></i>
