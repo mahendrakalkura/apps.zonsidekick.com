@@ -1070,7 +1070,7 @@ $application->match(
     '/kns/{id}/email',
     function (Request $request, $id) use ($application, $variables) {
         $user = $application['session']->get('user');
-        $subject = 'Your Kindle Niche Sidekick report is ready!';
+        $subject = 'Your Keyword Analyzer report is ready!';
         $body = <<<EOD
 We have attached your report in simple and detailed formats. The detailed
 report includes our recommendations along with important information about each
@@ -1865,8 +1865,7 @@ $application->match(
                             ))
                             ->setSubject($subject)
                             ->setTo(array(
-                                'ncroan@gmail.com',
-                                'mahendrakalkura@gmail.com',
+                                'support@perfectsidekick.com',
                             ));
                         $application['mailer']->send($message);
                     } catch (Exception $exception ) {

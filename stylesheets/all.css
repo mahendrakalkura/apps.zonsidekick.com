@@ -660,12 +660,20 @@ a {
     margin-bottom: 30px;
 }
 
+.modal {
+    width: 590px;
+}
+
 .modal-body {
     padding-bottom: 1px;
 }
 
 .modal-body p {
     margin-bottom: 10px;
+}
+
+.modal-body p .video {
+    margin: 0 auto;
 }
 
 .p {
