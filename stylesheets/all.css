@@ -486,6 +486,10 @@ a {
     margin: 0;
 }
 
+#middle .container-fluid .page-header .btn + .btn {
+    margin-right: 27px;
+}
+
 #middle .container-fluid .row-fluid [class^="icon-"] {
     text-decoration: none;
     margin: 0 2.5px;
