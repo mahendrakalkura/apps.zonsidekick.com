@@ -597,7 +597,7 @@ a {
 #middle .container-fluid #dashboard .video {
     display: block;
     height: 230px;
-    margin-bottom: 10px;
+    margin: 0 auto 10px auto;
     width: 408px;
 }
 
