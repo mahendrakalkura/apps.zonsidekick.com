@@ -37,7 +37,7 @@ def get_suggested_keywords(original_keywords):
             if ' ' not in keyword:
                 continue
             words = keyword.split(' ')
-            if all(word in original_keywords for word in words):
+            if len([word for word in words if word in original_keywords]) >= 2:
                 if keyword not in suggested_keywords:
                     suggested_keywords.append(keyword)
     return suggested_keywords
