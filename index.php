@@ -469,7 +469,7 @@ EOD;
             $interval = $old->diff($new);
             $requests[$key]['expires_in'] = $interval->format('%R%a days');
             $status = $application['db']->fetchAssoc(
-                $query_status, array($value['id'])
+                $query_status, array($requests[$key]['id'])
             );
             $requests[$key]['status'] =
                 $status['count']? 'In Progress': 'Completed';
