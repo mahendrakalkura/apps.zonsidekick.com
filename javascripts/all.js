@@ -163,7 +163,7 @@ application.filter('label', function () {
     }
 });
 
-app.filter('slice', function () {
+application.filter('slice', function () {
     return function (list, start, stop) {
         return list.slice(start, stop);
     };
