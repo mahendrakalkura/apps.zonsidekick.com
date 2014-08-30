@@ -1004,7 +1004,7 @@ application.controller('kns_simple', [
                     });
                 }
             });
-            words = _.sortBy(words, function (word) {
+            words = _.sortBy(_.uniq(words), function (word) {
                 return word[1]
             }).reverse().slice(0, 10);
             return words;
