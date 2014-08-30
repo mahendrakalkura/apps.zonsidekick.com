@@ -209,18 +209,31 @@
                             </span>
                         </td>
                     </tr>
-                    <tr>
-                        <td>Top 10 words in titles</td>
-                        <td class="details narrow">
-                            <ul>
-                                <li ng-repeat="word in contents.words">
-                                    [! word[0] !] ([! word[1] !])
-                                </li>
-                            </ul>
-                        </td>
-                    </tr>
                 </tbody>
             </table>
+            <p><strong>Top 10 words</strong></p>
+            <div class="row-fluid">
+                <div
+                    class="span6"
+                    ng-repeat="words in contents.words|slice:0:5"
+                    >
+                    <ul>
+                        <li ng-repeat="word in words">
+                            [! word[0] !] ([! word[1] !])
+                        </li>
+                    </ul>
+                </div>
+                <div
+                    class="span6"
+                    ng-repeat="words in contents.words|slice:5:10"
+                    >
+                    <ul>
+                        <li ng-repeat="word in words">
+                            [! word[0] !] ([! word[1] !])
+                        </li>
+                    </ul>
+                </div>
+            </div>
             <table class="table table-hover table-striped">
                 <tr>
                     <th
