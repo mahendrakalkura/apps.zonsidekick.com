@@ -70,6 +70,33 @@ class mutators_dict(Mutable, dict):
         self.changed()
 
 
+class mutators_list(Mutable, list):
+
+    @classmethod
+    def coerce(class_, key, value):
+        if not isinstance(value, mutators_list):
+            if isinstance(value, list):
+                return mutators_list(value)
+            return Mutable.coerce(key, value)
+        return value
+
+    def append(self, value):
+        list.append(self, value)
+        self.changed()
+
+    def __add__(self, value):
+        list.__add__(self, value)
+        self.changed()
+
+    def __delitem__(self, index):
+        list.__delitem__(self, index)
+        self.changed()
+
+    def __setitem__(self, key, value):
+        list.__setitem__(self, key, value)
+        self.changed()
+
+
 def get_amazon_best_sellers_rank(selector):
     amazon_best_sellers_rank = {}
     try:

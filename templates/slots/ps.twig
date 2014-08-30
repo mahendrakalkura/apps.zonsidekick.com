@@ -61,6 +61,14 @@
                                 </li>
                             {% endfor %}
                         </ul>
+                        {% if popular_search.keywords|length > 0 %}
+                            <p><strong>Keywords:</strong></p>
+                            <ul>
+                                {% for keyword in popular_search.keywords %}
+                                    <li>{{ keyword }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
                     </div>
                 </div>
             </div>

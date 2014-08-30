@@ -22,6 +22,7 @@ from utilities import (
     is_development,
     json,
     mutators_dict,
+    mutators_list,
 )
 
 
@@ -40,6 +41,8 @@ class trend(base):
         'autoload': True,
     }
 
+    keywords = Column(mutators_list.as_mutable(json))
+
     book = relationship(
         'book', backref=backref('trends', cascade='all', lazy='dynamic'),
     )
@@ -49,6 +52,10 @@ if __name__ == '__main__':
     session = get_mysql_session()()
     items = []
     date_and_time = datetime.now().strftime('%Y-%m-%d %H:00:00')
+    qs = [
+        'books like',
+        'books similar to',
+    ]
     urls = [
         furl(
             'http://completion.amazon.com/search/complete'
@@ -62,10 +69,7 @@ if __name__ == '__main__':
             'xcat': '2',
         }).url
         for alphabet in lowercase
-        for q in [
-            'books like',
-            'books similar to',
-        ]
+        for q in qs
     ]
     if is_development():
         urls = urls[0:5]
@@ -80,9 +84,11 @@ if __name__ == '__main__':
         if not contents:
             continue
         for keyword in contents[1]:
-            if not keyword.startswith(q):
+            if not len([q for q in qs if keyword.startswith(q)]):
                 continue
-            keyword = get_string(keyword.replace(q, ''))
+            for q in qs:
+                keyword = keyword.replace(q, '')
+            keyword = get_string(keyword)
             response = get_response(
                 furl(
                     'http://www.amazon.com/s/'
@@ -154,6 +160,7 @@ if __name__ == '__main__':
                 items.append({
                     'amazon_best_sellers_rank': amazon_best_sellers_rank,
                     'book_cover_image': book_cover_image,
+                    'keyword': keyword,
                     'title': title,
                     'url': url,
                 })
@@ -171,16 +178,22 @@ if __name__ == '__main__':
         b.book_cover_image = item['book_cover_image']
         b.amazon_best_sellers_rank = item['amazon_best_sellers_rank']
         session.add(b)
-        if not session.query(
+        t = session.query(
             trend,
         ).filter(
             trend.book == b,
             trend.date_and_time == date_and_time,
-        ).count():
-            session.add(trend(**{
+        ).first()
+        if not t:
+            t = trend(**{
                 'book': b,
                 'date_and_time': date_and_time,
-            }))
+            })
+        if not t.keywords:
+            t.keywords = []
+        if not keyword in t.keywords:
+            t.keywords.append(item['keyword'])
+        session.add(t)
     try:
         session.commit()
     except DBAPIError:

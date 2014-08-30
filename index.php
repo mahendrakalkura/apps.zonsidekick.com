@@ -367,6 +367,9 @@ EOD;
         asort(
             $popular_searches[$key]['amazon_best_sellers_rank'], SORT_NUMERIC
         );
+        $popular_searches[$key]['keywords'] = json_decode(
+            $popular_searches[$key]['keywords']
+        );
         $query = <<<EOD
 SELECT COUNT(DISTINCT DATE(`date_and_time`)) AS `count`
 FROM `tools_ps_trends`
