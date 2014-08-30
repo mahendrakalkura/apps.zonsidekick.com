@@ -13,7 +13,7 @@ var get_parameter = function (name) {
     );
 };
 
-var is_development = function(){
+var is_development = function () {
     if(window.location.port == '5000'){
         return true;
     }
@@ -36,7 +36,7 @@ application.directive('datepicker', function () {
             jQuery(element).datepicker({
                 format: 'yyyy-mm-dd'
             }).on('changeDate', function (event) {
-                scope.$apply(function() {
+                scope.$apply(function () {
                     ngModel.$setViewValue(moment(
                         new Date(event.date)
                     ).format('YYYY-MM-DD'));
@@ -571,37 +571,90 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
 
     $scope.mode = 'table';
 
-    $scope.reset = function() {
-        $scope.category = get_parameter('category_id') || $scope.categories[1][0];
-        $scope.section = $scope.sections[0][0];
-        $scope.print_length_1 = $scope.print_lengths[0];
-        $scope.print_length_2 = 0;
-        $scope.print_length_3 = 0;
-        $scope.print_length_4 = 0;
-        $scope.price_1 = $scope.prices[0];
-        $scope.price_2 = 0;
-        $scope.price_3 = 0;
-        $scope.price_4 = 0;
-        $scope.publication_date_1 = $scope.publication_dates[0];
-        $scope.publication_date_2 = '';
-        $scope.publication_date_3 = '';
-        $scope.publication_date_4 = '';
-        $scope.amazon_best_sellers_rank_1 = $scope.amazon_best_sellers_ranks[0];
-        $scope.amazon_best_sellers_rank_2 = 0;
-        $scope.amazon_best_sellers_rank_3 = 0;
-        $scope.amazon_best_sellers_rank_4 = 0;
-        $scope.review_average_1 = $scope.review_averages[0];
-        $scope.review_average_2 = 0;
-        $scope.review_average_3 = 0;
-        $scope.review_average_4 = 0;
-        $scope.appearance_1 = $scope.appearances[0];
-        $scope.appearance_2 = 0;
-        $scope.appearance_3 = 0;
-        $scope.appearance_4 = 0;
-        $scope.count = $scope.counts[0];
+    $scope.process = function (category_id) {
+        var fields = [];
+        jQuery.each({
+            amazon_best_sellers_rank_1: $scope.amazon_best_sellers_rank_1,
+            amazon_best_sellers_rank_2: $scope.amazon_best_sellers_rank_2,
+            amazon_best_sellers_rank_3: $scope.amazon_best_sellers_rank_3,
+            amazon_best_sellers_rank_4: $scope.amazon_best_sellers_rank_4,
+            category_id: category_id,
+            count: $scope.count,
+            print_length_1: $scope.print_length_1,
+            print_length_2: $scope.print_length_2,
+            print_length_3: $scope.print_length_3,
+            print_length_4: $scope.print_length_4,
+            appearance_1: $scope.appearance_1,
+            appearance_2: $scope.appearance_2,
+            appearance_3: $scope.appearance_3,
+            appearance_4: $scope.appearance_4,
+            price_1: $scope.price_1,
+            price_2: $scope.price_2,
+            price_3: $scope.price_3,
+            price_4: $scope.price_4,
+            publication_date_1: $scope.publication_date_1,
+            publication_date_2: $scope.publication_date_2,
+            publication_date_3: $scope.publication_date_3,
+            publication_date_4: $scope.publication_date_4,
+            review_average_1: $scope.review_average_1,
+            review_average_2: $scope.review_average_2,
+            review_average_3: $scope.review_average_3,
+            review_average_4: $scope.review_average_4,
+            section_id: $scope.section_id
+        }, function (name, val) {
+            fields.push(jQuery('<input/>', {
+                'name': name,
+                'type': 'hidden',
+                'val': val
+            }))
+        });
+        jQuery('<form/>', {
+            target: '_blank',
+            method: 'POST'
+        }).append(fields).submit();
+    };
 
-        jQuery('#category').select2('val', $scope.category);
-        jQuery('#section').select2('val', $scope.section);
+    $scope.reset = function () {
+        console.log($attrs);
+        $scope.category_id = $attrs.categoryId || $scope.categories[1][0];
+        $scope.section_id = $attrs.sectionId || $scope.sections[0][0];
+        $scope.print_length_1
+            = $attrs.printLength1 || $scope.print_lengths[0];
+        $scope.print_length_2 = parseInt($attrs.printLength2, 10) || 0;
+        $scope.print_length_3 = parseInt($attrs.printLength3, 10) || 0;
+        $scope.print_length_4 = parseInt($attrs.printLength4, 10) || 0;
+        $scope.price_1 = $attrs.price1 || $scope.prices[0];
+        $scope.price_2 = parseInt($attrs.price2, 10) || 0;
+        $scope.price_3 = parseInt($attrs.price3, 10) || 0;
+        $scope.price_4 = parseInt($attrs.price4, 10) || 0;
+        $scope.publication_date_1
+            = $attrs.publicationDate1 || $scope.publication_dates[0];
+        $scope.publication_date_2 = $attrs.publicationDate2 || '';
+        $scope.publication_date_3 = $attrs.publicationDate3 || '';
+        $scope.publication_date_4 = $attrs.publicationDate4 || '';
+        $scope.amazon_best_sellers_rank_1 =
+            $attrs.amazonBestSellersRank1
+            ||
+            $scope.amazon_best_sellers_ranks[0];
+        $scope.amazon_best_sellers_rank_2
+            = parseInt($attrs.amazonBestSellersRank2, 10) || 0;
+        $scope.amazon_best_sellers_rank_3
+            = parseInt($attrs.amazonBestSellersRank3, 10) || 0;
+        $scope.amazon_best_sellers_rank_4
+            = parseInt($attrs.amazonBestSellersRank4, 10) || 0;
+        $scope.review_average_1
+            = $attrs.reviewAverage1 || $scope.review_averages[0];
+        $scope.review_average_2 = parseInt($attrs.reviewAverage2, 10) || 0;
+        $scope.review_average_3 = parseInt($attrs.reviewAverage3, 10) || 0;
+        $scope.review_average_4 = parseInt($attrs.reviewAverage4, 10) || 0;
+        $scope.appearance_1 = $attrs.appearance1 || $scope.appearances[0];
+        $scope.appearance_2 = parseInt($attrs.appearance2, 10) || 0;
+        $scope.appearance_3 = parseInt($attrs.appearance3, 10) || 0;
+        $scope.appearance_4 = parseInt($attrs.appearance4, 10) || 0;
+        $scope.count = parseInt($attrs.count, 10) || $scope.counts[0];
+
+        jQuery('#category_id').select2('val', $scope.category_id);
+        jQuery('#section_id').select2('val', $scope.section_id);
         jQuery('#print_length').select2('val', $scope.print_length_1);
         jQuery('#price').select2('val', $scope.price_1);
         jQuery('#publication_date').select2('val', $scope.publication_date_1);
@@ -625,7 +678,7 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
                 amazon_best_sellers_rank_2: $scope.amazon_best_sellers_rank_2,
                 amazon_best_sellers_rank_3: $scope.amazon_best_sellers_rank_3,
                 amazon_best_sellers_rank_4: $scope.amazon_best_sellers_rank_4,
-                category_id: $scope.category,
+                category_id: $scope.category_id,
                 count: $scope.count,
                 print_length_1: $scope.print_length_1,
                 print_length_2: $scope.print_length_2,
@@ -647,7 +700,7 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
                 review_average_2: $scope.review_average_2,
                 review_average_3: $scope.review_average_3,
                 review_average_4: $scope.review_average_4,
-                section_id: $scope.section
+                section_id: $scope.section_id
             }),
             method: 'POST',
             url: $attrs.url
@@ -789,7 +842,8 @@ application.controller('kns_simple', [
 
         $scope.books_1 = $scope.books[0];
         $scope.books_2 = 0;
-        $scope.amazon_best_sellers_rank_1 = $scope.amazon_best_sellers_ranks[0];
+        $scope.amazon_best_sellers_rank_1
+            = $scope.amazon_best_sellers_ranks[0];
         $scope.amazon_best_sellers_rank_2 = 0;
         $scope.count = $scope.counts[0];
 

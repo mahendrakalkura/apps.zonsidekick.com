@@ -6,7 +6,34 @@
 {% block content %}
 <div
     ng-controller="ce"
+    data-amazon_best_sellers_rank_1="{{ filters.amazon_best_sellers_rank_1 }}"
+    data-amazon_best_sellers_rank_2="{{ filters.amazon_best_sellers_rank_2 }}"
+    data-amazon_best_sellers_rank_3="{{ filters.amazon_best_sellers_rank_3 }}"
+    data-amazon_best_sellers_rank_4="{{ filters.amazon_best_sellers_rank_4 }}"
+    data-appearance_1="{{ filters.appearance_1 }}"
+    data-appearance_2="{{ filters.appearance_2 }}"
+    data-appearance_3="{{ filters.appearance_3 }}"
+    data-appearance_4="{{ filters.appearance_4 }}"
     data-categories="{{ categories|json_encode()|e('html') }}"
+    data-category_id="{{ filters.category_id }}"
+    data-count="{{ filters.count }}"
+    data-price_1="{{ filters.price_1 }}"
+    data-price_2="{{ filters.price_2 }}"
+    data-price_3="{{ filters.price_3 }}"
+    data-price_4="{{ filters.price_4 }}"
+    data-print_length_1="{{ filters.print_length_1 }}"
+    data-print_length_2="{{ filters.print_length_2 }}"
+    data-print_length_3="{{ filters.print_length_3 }}"
+    data-print_length_4="{{ filters.print_length_4 }}"
+    data-publication_date_1="{{ filters.publication_date_1 }}"
+    data-publication_date_2="{{ filters.publication_date_2 }}"
+    data-publication_date_3="{{ filters.publication_date_3 }}"
+    data-publication_date_4="{{ filters.publication_date_4 }}"
+    data-review_average_1="{{ filters.review_average_1 }}"
+    data-review_average_2="{{ filters.review_average_2 }}"
+    data-review_average_3="{{ filters.review_average_3 }}"
+    data-review_average_4="{{ filters.review_average_4 }}"
+    data-section_id="{{ filters.section_id }}"
     data-sections="{{ sections|json_encode()|e('html') }}"
     data-url="{{ url('ce_xhr') }}"
     >
@@ -20,14 +47,15 @@
                 <div class="row-fluid">
                     <div class="span12">
                         <div class="control-group">
-                            <label class="control-label" for="category">
+                            <label class="control-label" for="category_id">
                                 Category
                             </label>
                             <div class="controls">
                                 <select
                                     class="select2 span12"
-                                    id="category"
-                                    ng-model="category"
+                                    id="category_id"
+                                    name="category_id"
+                                    ng-model="category_id"
                                     ng-options="category[0] as category[1] for category in categories"
                                     ></select>
                             </div>
@@ -37,14 +65,15 @@
                 <div class="row-fluid">
                     <div class="span4">
                         <div class="control-group">
-                            <label class="control-label" for="section">
+                            <label class="control-label" for="section_id">
                                 Section
                             </label>
                             <div class="controls">
                                 <select
                                     class="select2 span12"
-                                    id="section"
-                                    ng-model="section"
+                                    id="section_id"
+                                    name="section_id"
+                                    ng-model="section_id"
                                     ng-options="section[0] as section[1] for section in sections"
                                     ></select>
                             </div>
@@ -57,6 +86,7 @@
                                 <select
                                     class="select2 span12"
                                     id="count"
+                                    name="count"
                                     ng-model="count"
                                     ng-options="count as count for count in counts"
                                     ></select>
@@ -72,6 +102,7 @@
                                 <select
                                     class="select2 span12"
                                     id="print_length"
+                                    name="print_length_1"
                                     ng-model="print_length_1"
                                     ng-options="print_length as print_length for print_length in print_lengths"
                                     ></select>
@@ -79,6 +110,7 @@
                                     class="span12"
                                     max="999999999"
                                     min="0"
+                                    name="print_length_2"
                                     ng-model="print_length_2"
                                     ng-show="print_length_1 == 'Less Than' || print_length_1 == 'More Than'"
                                     type="number"
@@ -92,6 +124,7 @@
                                             class="span12"
                                             max="999999999"
                                             min="0"
+                                            name="print_length_3"
                                             ng-model="print_length_3"
                                             type="number"
                                             >
@@ -101,6 +134,7 @@
                                             class="span12"
                                             max="999999999"
                                             min="0"
+                                            name="print_length_4"
                                             ng-model="print_length_4"
                                             type="number"
                                             >
@@ -116,6 +150,7 @@
                                 <select
                                     class="select2 span12"
                                     id="price"
+                                    name="price_1"
                                     ng-model="price_1"
                                     ng-options="price as price for price in prices"
                                     ></select>
@@ -123,6 +158,7 @@
                                     class="span12"
                                     max="999999999"
                                     min="0"
+                                    name="price_2"
                                     ng-model="price_2"
                                     ng-show="price_1 == 'Less Than' || price_1 == 'More Than'"
                                     step="any"
@@ -137,6 +173,7 @@
                                             class="span12"
                                             max="999999999"
                                             min="0"
+                                            name="price_3"
                                             ng-model="price_3"
                                             type="number"
                                             >
@@ -146,6 +183,7 @@
                                             class="span12"
                                             max="999999999"
                                             min="0"
+                                            name="price_4"
                                             ng-model="price_4"
                                             type="number"
                                             >
@@ -162,6 +200,7 @@
                                 <select
                                     class="select2 span12"
                                     id="publication_date"
+                                    name="publication_date_1"
                                     ng-model="publication_date_1"
                                     ng-options="publication_date as publication_date for publication_date in publication_dates"
                                     ></select>
@@ -172,6 +211,7 @@
                                     <input
                                         class="span12"
                                         datepicker
+                                        name="publication_date_2"
                                         ng-model="publication_date_2"
                                         type="text"
                                         >
@@ -187,6 +227,7 @@
                                         <input
                                             class="span12"
                                             datepicker
+                                            name="publication_date_3"
                                             ng-model="publication_date_3"
                                             type="text"
                                             >
@@ -198,6 +239,7 @@
                                         <input
                                             class="span12"
                                             datepicker
+                                            name="publication_date_4"
                                             ng-model="publication_date_4"
                                             type="text"
                                             >
@@ -219,6 +261,7 @@
                                 <select
                                     class="select2 span12"
                                     id="amazon_best_sellers_rank"
+                                    name="amazon_best_sellers_rank_1"
                                     ng-model="amazon_best_sellers_rank_1"
                                     ng-options="amazon_best_sellers_rank as amazon_best_sellers_rank for amazon_best_sellers_rank in amazon_best_sellers_ranks"
                                     ></select>
@@ -226,6 +269,7 @@
                                     class="span12"
                                     max="999999999"
                                     min="0"
+                                    name="amazon_best_sellers_rank_2"
                                     ng-model="amazon_best_sellers_rank_2"
                                     ng-show="amazon_best_sellers_rank_1 == 'Less Than' || amazon_best_sellers_rank_1 == 'More Than'"
                                     type="number"
@@ -239,6 +283,7 @@
                                             class="span12"
                                             max="999999999"
                                             min="0"
+                                            name="amazon_best_sellers_rank_3"
                                             ng-model="amazon_best_sellers_rank_3"
                                             type="number"
                                             >
@@ -248,6 +293,7 @@
                                             class="span12"
                                             max="999999999"
                                             min="0"
+                                            name="amazon_best_sellers_rank_4"
                                             ng-model="amazon_best_sellers_rank_4"
                                             type="number"
                                             >
@@ -263,6 +309,7 @@
                                 <select
                                     class="select2 span12"
                                     id="review_average"
+                                    name="review_average_1"
                                     ng-model="review_average_1"
                                     ng-options="review_average as review_average for review_average in review_averages"
                                     ></select>
@@ -270,6 +317,7 @@
                                     class="span12"
                                     max="5.0"
                                     min="0.0"
+                                    name="review_average_2"
                                     ng-model="review_average_2"
                                     ng-show="review_average_1 == 'Less Than' || review_average_1 == 'More Than'"
                                     step="any"
@@ -284,6 +332,7 @@
                                             class="span12"
                                             max="5.0"
                                             min="0.0"
+                                            name="review_average_3"
                                             ng-model="review_average_3"
                                             type="number"
                                             >
@@ -293,6 +342,7 @@
                                             class="span12"
                                             max="5.0"
                                             min="0.0"
+                                            name="review_average_4"
                                             ng-model="review_average_4"
                                             type="number"
                                             >
@@ -308,6 +358,7 @@
                                 <select
                                     class="select2 span12"
                                     id="appearance"
+                                    name="appearance_1"
                                     ng-model="appearance_1"
                                     ng-options="appearance as appearance for appearance in appearances"
                                     ></select>
@@ -315,6 +366,7 @@
                                     class="span12"
                                     max="7"
                                     min="1"
+                                    name="appearance_2"
                                     ng-model="appearance_2"
                                     ng-show="appearance_1 == 'Less Than' || appearance_1 == 'More Than'"
                                     step="any"
@@ -329,6 +381,7 @@
                                             class="span12"
                                             max="7"
                                             min="1"
+                                            name="appearance_3"
                                             ng-model="appearance_3"
                                             type="number"
                                             >
@@ -338,6 +391,7 @@
                                             class="span12"
                                             max="7"
                                             min="1"
+                                            name="appearance_4"
                                             ng-model="appearance_4"
                                             type="number"
                                             >
@@ -533,9 +587,8 @@
                                 >
                                 <td>
                                     <a
+                                        ng-click="process(category.id)"
                                         ng-show="category.id > 0"
-                                        href="{{ url('ce_overview') }}?category_id=[! category.id !]"
-                                        target="_blank"
                                         >
                                         [! category.title !]
                                     </a>

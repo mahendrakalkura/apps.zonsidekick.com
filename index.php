@@ -1425,12 +1425,49 @@ $application->match(
                 array(array(-1, 'All')),
                 get_categories($application, 0, array())
             ),
+            'filters' => array(
+                'amazon_best_sellers_rank_1'
+                    => $request->get('amazon_best_sellers_rank_1', ''),
+                'amazon_best_sellers_rank_2'
+                    => $request->get('amazon_best_sellers_rank_2', ''),
+                'amazon_best_sellers_rank_3'
+                    => $request->get('amazon_best_sellers_rank_3', ''),
+                'amazon_best_sellers_rank_4'
+                    => $request->get('amazon_best_sellers_rank_4', ''),
+                'appearance_1' => $request->get('appearance_1', ''),
+                'appearance_2' => $request->get('appearance_2', ''),
+                'appearance_3' => $request->get('appearance_3', ''),
+                'appearance_4' => $request->get('appearance_4', ''),
+                'category_id' => $request->get('category_id', ''),
+                'count' => $request->get('count', ''),
+                'price_1' => $request->get('price_1', ''),
+                'price_2' => $request->get('price_2', ''),
+                'price_3' => $request->get('price_3', ''),
+                'price_4' => $request->get('price_4', ''),
+                'print_length_1' => $request->get('print_length_1', ''),
+                'print_length_2' => $request->get('print_length_2', ''),
+                'print_length_3' => $request->get('print_length_3', ''),
+                'print_length_4' => $request->get('print_length_4', ''),
+                'publication_date_1'
+                    => $request->get('publication_date_1', ''),
+                'publication_date_2'
+                    => $request->get('publication_date_2', ''),
+                'publication_date_3'
+                    => $request->get('publication_date_3', ''),
+                'publication_date_4'
+                    => $request->get('publication_date_4', ''),
+                'review_average_1' => $request->get('review_average_1', ''),
+                'review_average_2' => $request->get('review_average_2', ''),
+                'review_average_3' => $request->get('review_average_3', ''),
+                'review_average_4' => $request->get('review_average_4', ''),
+                'section_id' => $request->get('section_id', ''),
+            ),
             'sections' => get_sections($application),
         ));
     }
 )
 ->bind('ce_overview')
-->method('GET');
+->method('GET|POST');
 
 $application->match('/ce/xhr', function (Request $request) use ($application) {
     $contents = array(
