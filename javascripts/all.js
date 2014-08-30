@@ -785,6 +785,7 @@ application.controller('kns_simple', [
 
         $scope.keywords = [];
         $scope.order_by = [];
+        $scope.order_by_ = ['title[0]', 0];
         $scope.user_email = $attrs.userEmail;
 
         $scope.statuses = {};
@@ -918,6 +919,19 @@ application.controller('kns_simple', [
             );
         };
 
+        $scope.get_order_by_ = function () {
+            return $scope.order_by_[1]? 'desc': 'asc';
+        };
+
+        $scope.set_order_by_ = function (th) {
+            if ($scope.order_by_[0] == th) {
+                $scope.order_by_[1] = !$scope.order_by_[1];
+            } else {
+                $scope.order_by_[0] = th;
+                $scope.order_by_[1] = false;
+            }
+        };
+
         $scope.is_finished = function () {
             var status = true;
             for (var index in $scope.keywords) {
@@ -954,9 +968,13 @@ application.controller(
     'kns_single',
     function ($attrs, $http, $rootScope, $scope) {
         $scope.countries = jQuery.parseJSON($attrs.countries);
+
         $scope.keyword = '';
         $scope.country = $scope.countries[0][0];
+
         $scope.contents = '';
+        $scope.order_by = [];
+
         $scope.spinner = false;
 
         $scope.process = function () {
@@ -1000,6 +1018,19 @@ application.controller(
                     });
                 }
             });
+        };
+
+        $scope.get_order_by = function () {
+            return $scope.order_by[1]? 'desc': 'asc';
+        };
+
+        $scope.set_order_by = function (th) {
+            if ($scope.order_by[0] == th) {
+                $scope.order_by[1] = !$scope.order_by[1];
+            } else {
+                $scope.order_by[0] = th;
+                $scope.order_by[1] = false;
+            }
         };
     }
 );
