@@ -995,6 +995,19 @@ application.controller('kns_simple', [
             }
         };
 
+        $scope.get_words = function () {
+            var words = [];
+            jQuery.each($scope.keywords, function () {
+                jQuery.each(this.contents.words, function () {
+                    words.push(this);
+                });
+            });
+            words = _.sortBy(words, function (word) {
+                return word[1]
+            }).reverse().slice(0, 10);
+            return words;
+        };
+
         $scope.is_finished = function () {
             var status = true;
             for (var index in $scope.keywords) {
@@ -1131,18 +1144,15 @@ application.controller('suggested_keywords', function ($attrs, $http, $scope) {
     $scope.spinner = false;
     $scope.error = false;
 
-    $scope.process = function () {
+    $scope.process = function (words) {
         $scope.items = [];
         $scope.spinner = true;
         $scope.error = false;
         $http({
             data: jQuery.param({
-                keywords: _.map(
-                    $scope.$parent.contents.glance.words,
-                    function (word) {
-                        return word[0];
-                    }
-                ).join(',')
+                keywords: _.map(words, function (word) {
+                    return word[0];
+                }).join(',')
             }),
             method: 'POST',
             url: $attrs.url

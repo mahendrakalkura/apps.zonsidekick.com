@@ -112,6 +112,34 @@
                 </div>
             </div>
             <hr ng-show="is_finished()">
+            <div
+                data-url="{{ url('suggested_keywords') }}"
+                ng-controller="suggested_keywords"
+                ng-show="is_finished()"
+                >
+                <p>
+                    <a ng-click="process($parent.get_words())">
+                        Click here to compile a list of
+                        suggested keywords
+                    </a>
+                </p>
+                <p ng-show="spinner">
+                    <span class="icon-spinner icon-spin icon-2x">
+                    </span>
+                </p>
+                <p ng-show="items.length > 0">
+                    <ul>
+                        <li ng-repeat="item in items">
+                            [! item !]
+                        </li>
+                    </ul>
+                </p>
+                <p class="text-error" ng-show="error">
+                    Your query did not yield any results.
+                    Please try again after a while.
+                </p>
+            </div>
+            <hr ng-show="is_finished()">
         </div>
     </div>
     <form class="form-horizontal" ng-show="is_finished()">
