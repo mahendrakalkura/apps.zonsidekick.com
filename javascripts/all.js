@@ -615,7 +615,6 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
     };
 
     $scope.reset = function () {
-        console.log($attrs);
         $scope.category_id = $attrs.categoryId || $scope.categories[1][0];
         $scope.section_id = $attrs.sectionId || $scope.sections[0][0];
         $scope.print_length_1
