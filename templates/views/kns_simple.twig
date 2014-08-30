@@ -464,22 +464,17 @@
                         <td class="details" colspan="9">
                             <p><strong>Top 10 words</strong></p>
                             <div class="row-fluid">
-                                <div
-                                    class="span6"
-                                    ng-repeat="words in keyword['contents']['words']|slice:0:5"
-                                    >
+                                <div class="span6">
                                     <ul>
-                                        <li ng-repeat="word in words">
+                                        <li ng-repeat="word in keyword['contents']['words']|slice:0:5">
                                             [! word[0] !] ([! word[1] !])
                                         </li>
                                     </ul>
                                 </div>
-                                <div
-                                    class="span6"
-                                    ng-repeat="words in keyword['contents']['words']|slice:5:10"
-                                    >
+                                <div class="span6">
                                     <ul>
-                                        <li ng-repeat="word in words">
+                                        <li ng-repeat="word in keyword['contents']['words']|slice:5:10">
+                                            [! words !]
                                             [! word[0] !] ([! word[1] !])
                                         </li>
                                     </ul>

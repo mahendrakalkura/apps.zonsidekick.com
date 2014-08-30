@@ -165,6 +165,10 @@ application.filter('label', function () {
 
 application.filter('slice', function () {
     return function (list, start, stop) {
+        if (typeof(list) == 'undefined') {
+            return [];
+        }
+
         return list.slice(start, stop);
     };
 });
