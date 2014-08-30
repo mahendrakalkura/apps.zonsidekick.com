@@ -997,10 +997,10 @@ application.controller('kns_simple', [
 
         $scope.get_words = function () {
             var words = [];
-            jQuery.each($scope.keywords, function (keyword) {
-                if (typeof(keyword.contents.words) !== 'undefined') {
-                    jQuery.each(keyword.contents.words, function () {
-                        words.push(this);
+            jQuery.each($scope.keywords, function (key, value) {
+                if (typeof(value.contents.words) !== 'undefined') {
+                    jQuery.each(value.contents.words, function (k, v) {
+                        words.push(v);
                     });
                 }
             });
