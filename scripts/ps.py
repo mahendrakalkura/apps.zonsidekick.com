@@ -191,8 +191,9 @@ if __name__ == '__main__':
             })
         if not t.keywords:
             t.keywords = []
-        if not keyword in t.keywords:
+        if not item['keyword'] in t.keywords:
             t.keywords.append(item['keyword'])
+        t.keywords = sorted(set(t.keywords))
         session.add(t)
     try:
         session.commit()
