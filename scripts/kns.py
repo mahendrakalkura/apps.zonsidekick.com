@@ -12,7 +12,7 @@ from datetime import date, datetime
 from locale import LC_ALL, format, setlocale
 from math import sqrt
 from os.path import dirname, join
-from re import compile, sub
+from re import compile, split, sub
 from sys import argv
 
 from dateutil import relativedelta
@@ -311,6 +311,7 @@ def get_contents(keyword, country):
                 'optimization': [-1, 'N/A'],
                 'score': [-1, 'N/A'],
                 'spend': [[-1, 'N/A'], 'N/A'],
+                'words': [],
             }
         try:
             breadcrumb = Selector(text=response.text).xpath(
@@ -724,6 +725,7 @@ def get_contents(keyword, country):
             buyer_behavior, competition, optimization, popularity, spend,
         ) if price else (-1, 'N/A'),
         'spend': spend,
+        'words': get_words(items),
     }
 
 
@@ -957,6 +959,15 @@ def get_url(country, keyword, page):
         },
         'version': 2,
     }).url
+
+
+def get_words(items):
+    return Counter([
+        word
+        for item in items
+        for word in split(r'[^A-Za-z0-9]', item['title'][0])
+        if len(word) > 3
+    ]).most_common(10)
 
 if __name__ == '__main__':
     if len(argv) == 3:

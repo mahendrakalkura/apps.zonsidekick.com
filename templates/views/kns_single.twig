@@ -209,6 +209,16 @@
                             </span>
                         </td>
                     </tr>
+                    <tr>
+                        <td>Top 10 words in titles</td>
+                        <td class="details narrow">
+                            <ul>
+                                <li ng-repeat="word in contents.words">
+                                    [! word[0] !] ([! word[1] !])
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
             <table class="table table-hover table-striped">

@@ -582,6 +582,33 @@ EOD;
     );
 }
 
+function get_words_from_title($title) {
+    $words = array();
+    $items = preg_split('/[^A-Za-z0-9]/', $title);
+    if ($items) {
+        foreach ($items as $item) {
+            if (strlen($item) > 3) {
+                $words[] = $item;
+            }
+        }
+    }
+
+    return $words;
+}
+
+function get_words_from_words($words_) {
+    $words = array();
+    $words_ = array_count_values($words_);
+    arsort($words_);
+    $words_ = array_slice($words_, 0, 10);
+    if ($words_) {
+        foreach ($words_ as $key => $value) {
+            $words[] = array($key, $value);
+        }
+    }
+    return $words;
+}
+
 function has_groups($one, $two) {
     if (!empty($one)) {
         foreach ($one as $key => $value) {
@@ -1026,30 +1053,6 @@ $application->match(
         if ($keywords) {
             foreach ($keywords as $key => $value) {
                 if ($keywords[$key]['contents']) {
-                    $words = array();
-                    if ($keywords[$key]['contents']['items']) {
-                        foreach (
-                            $keywords[$key]['contents']['items'] as $item
-                        ) {
-                            $ws = preg_split(
-                                '/[^A-Za-z0-9]/', $item['title'][0]
-                            );
-                            if ($ws) {
-                                foreach ($ws as $w) {
-                                    if (strlen($w) > 3) {
-                                        $words[] = strtolower($w);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    $words = array_count_values($words);
-                    arsort($words);
-                    $words = array_keys($words);
-                    $keywords[$key]['contents']['top_10_words'] = array(
-                        array_slice($words, 0, 5),
-                        array_slice($words, 5, 5),
-                    );
                     if ($keywords[$key]['contents']['score'][1] !== 'N/A') {
                         $keywords[$key]['position'] = 1;
                     } else {
@@ -1761,14 +1764,10 @@ EOD;
             ]['total_number_of_reviews'] += $book['total_number_of_reviews'];
             $contents['glance']['review_average'] += $book['review_average'];
             $contents['glance']['print_length'] += $book['print_length'];
-            $words = preg_split('/[^A-Za-z0-9]/', $book['title']);
-            if ($words) {
-                foreach ($words as $word) {
-                    if (strlen($word) > 3) {
-                        $contents['glance']['words'][] = $word;
-                    }
-                }
-            }
+            $contents['glance']['words'] = array_merge(
+                $contents['glance']['words'],
+                get_words_from_title($book['title'])
+            );
             if ($book['amazon_best_sellers_rank']) {
                 foreach ($book['amazon_best_sellers_rank'] as $key => $value) {
                     if (
@@ -1808,20 +1807,7 @@ EOD;
         $contents['glance']['total_number_of_reviews']  /= $count;
         $contents['glance']['review_average'] /= $count;
         $contents['glance']['print_length'] /= $count;
-        $contents['glance']['words'] = array_count_values(
-            $contents['glance']['words']
-        );
-        arsort($contents['glance']['words']);
-        $words = array();
-        $contents['glance']['words'] = array_slice(
-            $contents['glance']['words'], 0, 10
-        );
-        if ($contents['glance']['words']) {
-            foreach ($contents['glance']['words'] as $key => $value) {
-                $words[] = array($key, $value);
-            }
-        }
-        $contents['glance']['words'] = $words;
+        $contents['glance']['words'] = get_words_from_words($contents['glance']['words']);
     }
 
     return new Response(json_encode($contents, JSON_NUMERIC_CHECK));
