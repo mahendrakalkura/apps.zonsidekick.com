@@ -1859,9 +1859,7 @@ $application->match(
                         $message = \Swift_Message::newInstance()
                             ->setBody(trim($request->get('body')))
                             ->setFrom(array(
-                                'reports@perfectsidekick.com'
-                                =>
-                                'Zon Sidekick',
+                                $user['email'],
                             ))
                             ->setSubject($subject)
                             ->setTo(array(
