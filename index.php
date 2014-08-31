@@ -1327,7 +1327,7 @@ $application->match('/aks', function (Request $request) use ($application) {
             'de' => 'Germany',
             'co.jp' => 'Japan',
         ),
-        'keywords' => $request->get('keywords', '[]'),
+        'keywords' => $request->get('keywords', ''),
         'search_aliases' => array(
             'aps' => 'All Departments',
             'digital-text' => 'Kindle Store',
