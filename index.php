@@ -1314,7 +1314,7 @@ $application->match(
 ->bind('logos_delete')
 ->method('GET|POST');
 
-$application->match('/aks', function () use ($application) {;
+$application->match('/aks', function (Request $request) use ($application) {
     return $application['twig']->render('views/aks.twig', array(
         'countries' => array(
             'com' => 'US',
@@ -1327,6 +1327,7 @@ $application->match('/aks', function () use ($application) {;
             'de' => 'Germany',
             'co.jp' => 'Japan',
         ),
+        'keywords' => $request->get('keywords', '[]'),
         'search_aliases' => array(
             'aps' => 'All Departments',
             'digital-text' => 'Kindle Store',
@@ -1369,7 +1370,7 @@ $application->match('/aks', function () use ($application) {;
     ));
 })
 ->bind('aks')
-->method('GET');
+->method('GET|POST');
 
 $application->match(
     '/aks/xhr',

@@ -523,6 +523,11 @@ application.controller(
         });
 
         $scope.reset();
+
+        if ($attrs.keywords.length) {
+            $scope.keywords = $attrs.keywords;
+            $scope.submit();
+        }
     }
 );
 
@@ -721,7 +726,7 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
                 section_id: $scope.section_id
             }),
             method: 'POST',
-            url: $attrs.url
+            url: $attrs.urlsCe
         }).
         error(function (data, status, headers, config) {
             $scope.spinner = false;
@@ -758,6 +763,20 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
         });
 
         return;
+    };
+
+    $scope.get_more_suggestions = function (words) {
+        jQuery('<form/>', {
+            action: $attrs.urlsAks,
+            target: '_blank',
+            method: 'POST'
+        }).append(
+            jQuery('<input/>', {
+                'name': 'keywords',
+                'type': 'hidden',
+                'val': words.join('\n')
+            })
+        ).submit();
     };
 
     $scope.get_order_by = function (key) {
