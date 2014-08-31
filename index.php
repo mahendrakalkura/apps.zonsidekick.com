@@ -1400,12 +1400,13 @@ $application->match(
     '/aks/download',
     function (Request $request) use ($application) {
         $json = json_decode($request->get('json'), true);
+        $json['suggestions'] = implode("\n", $json['suggestions']);
         $stream = function () use ($json) {
-            echo implode("\n", $json['suggestions']);
+            echo $json['suggestions'];
         };
         return $application->stream($stream, 200, array(
             'Content-Disposition' => sprintf(
-                'attachment; filename="%s.csv"', $json['keyword']
+                'attachment; filename="keywords_suggester.csv"'
             ),
             'Content-Length' => strlen($json['suggestions']),
             'Content-Type' => 'text/csv',

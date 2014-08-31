@@ -334,6 +334,10 @@ a {
     position: relative;
 }
 
+#middle .container-fluid [type="checkbox"] {
+    margin-top: -2px;
+}
+
 #middle .container-fluid form {
     margin-bottom: 30px;
 }
@@ -572,11 +576,11 @@ a {
 }
 
 #middle .container-fluid #aks #keywords {
-    height: 250px;
+    height: 150px;
 }
 
 #middle .container-fluid #aks #suggestions {
-    height: 180px;
+    height: 300px;
 }
 
 #middle .container-fluid #back-to-dashboard {

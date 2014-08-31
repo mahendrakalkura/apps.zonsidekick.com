@@ -21,7 +21,9 @@ var is_development = function () {
     return false;
 };
 
-var application = angular.module('application', ['duScroll', 'rt.encodeuri']);
+var application = angular.module('application', [
+    'duScroll', 'ngQueue', 'rt.encodeuri',
+]);
 
 application.config(function ($httpProvider, $interpolateProvider) {
     $httpProvider.defaults.headers.post[
@@ -416,96 +418,113 @@ application.controller(
     }
 );
 
-application.controller('aks', function ($attrs, $http, $rootScope, $scope) {
-    $scope.checkbox = false;
-    $scope.country = 'com';
-    $scope.keyword = '';
-    $scope.focus = {
-        keyword: true,
-        suggestions: false
-    };
-    $scope.level = '1';
-    $scope.mode = '1';
-    $scope.search_alias = 'digital-text';
-    $scope.spinner = false;
-    $scope.suggestions = [];
-
-    $scope.download = function () {
-        $rootScope.$broadcast('download', {
-            action: $attrs.urlDownload,
-            json: JSON.stringify({
-                keyword: $scope.keyword,
-                suggestions: $scope.suggestions
-            })
-        });
-    };
-
-    $scope.process = function () {
-        $scope.suggestions = [];
-        if (!$scope.keyword.length) {
-            $rootScope.$broadcast('open', {
-                top: $attrs.error1Top,
-                middle: $attrs.error1Middle
+application.controller(
+    'aks',
+    function ($attrs, $http, $queue, $rootScope, $scope) {
+        $scope.download = function () {
+            $rootScope.$broadcast('download', {
+                action: $attrs.urlDownload,
+                json: JSON.stringify({
+                    suggestions: $scope.suggestions
+                })
             });
+        };
 
-            return;
-        }
-        if ($scope.level == 2) {
-            if ($scope.keyword.indexOf(' ') !== -1) {
+        $scope.reset = function () {
+            $scope.checkbox = false;
+            $scope.country = 'com';
+            $scope.keywords = '';
+            $scope.rows = '';
+            $scope.statuses = {};
+            $scope.focus = {
+                keywords: true,
+                suggestions: false
+            };
+            $scope.level = '1';
+            $scope.mode = '1';
+            $scope.search_alias = 'digital-text';
+            $scope.spinner = false;
+            $scope.suggestions = [];
+            window.clearInterval($scope.interval);
+        };
+
+        $scope.submit = function () {
+            $scope.suggestions = [];
+            if (!$scope.keywords.length) {
                 $rootScope.$broadcast('open', {
-                    top: $attrs.error2Top,
-                    middle: $attrs.error2Middle
+                    top: $attrs.error1Top,
+                    middle: $attrs.error1Middle
                 });
 
                 return;
             }
-        }
-        $scope.spinner = true;
-        $http({
-            data: jQuery.param({
-                country: $scope.country,
-                keyword: $scope.keyword,
-                level: $scope.level,
-                mode: $scope.mode,
-                search_alias: $scope.search_alias
-            }),
-            method: 'POST',
-            url: $attrs.urlXhr
-        }).
-        error(function (data, status, headers, config) {
-            $scope.spinner = false;
-            $rootScope.$broadcast('open', {
-                top: $attrs.error3Top,
-                middle: $attrs.error3Middle
-            });
-        }).
-        success(function (data, status, headers, config) {
-            $scope.spinner = false;
-            if (data.length > 0) {
-                $scope.suggestions = data;
-                $scope.focus['suggestions'] = true;
-                if ($scope.checkbox) {
-                    $scope.download();
-                }
-            } else {
-                $rootScope.$broadcast('open', {
-                    top: $attrs.error3Top,
-                    middle: $attrs.error3Middle
+
+            $scope.spinner = true;
+            var queue = $queue.queue(function (keyword) {
+                $http({
+                    data: jQuery.param({
+                        country: $scope.country,
+                        keyword: keyword,
+                        level: $scope.level,
+                        mode: $scope.mode,
+                        search_alias: $scope.search_alias
+                    }),
+                    method: 'POST',
+                    url: $attrs.urlXhr
+                }).
+                error(function (data, status, headers, config) {
+                    $scope.statuses[keyword] = -1;
+                }).
+                success(function (data, status, headers, config) {
+                    jQuery.each(data, function (key, value) {
+                        $scope.suggestions.push(value);
+                    });
+                    $scope.suggestions = _.uniq($scope.suggestions);
+                    $scope.suggestions.sort();
+                    $scope.statuses[keyword] = 1;
                 });
-            }
+            }, {
+                complete: function () {},
+                delay: 0,
+                paused: true
+            });
+            $scope.rows = _.uniq(_.filter(
+                $scope.keywords.split('\n'), function (keyword) {
+                    return jQuery.trim(keyword).length;
+                }
+            ));
+            $scope.statuses = {};
+            jQuery.each($scope.rows, function (key, value) {
+                queue.add(value);
+                $scope.statuses[value] = 0;
+            });
+            queue.start();
+            $scope.interval = window.setInterval(function () {
+                if (_.values($scope.statuses).indexOf(0) === -1) {
+                    window.clearInterval($scope.interval);
+                    if ($scope.suggestions.length) {
+                        $scope.focus['suggestions'] = true;
+                        if ($scope.checkbox) {
+                            $scope.download();
+                        }
+                        return;
+                    }
+                    $rootScope.$broadcast('open', {
+                        top: $attrs.error3Top,
+                        middle: $attrs.error3Middle
+                    });
+                }
+            }, 1000);
+        };
+
+        $scope.$on('focus', function () {
+            $scope.focus['keywords'] = true;
+            $scope.focus['suggestions'] = false;
         });
-    };
 
-    $scope.$on('focus', function () {
-        $scope.focus['keyword'] = true;
-        $scope.focus['suggestions'] = false;
-    });
-
-    if (is_development()) {
-        $scope.keyword = '1';
-        $scope.process();
+        $scope.reset();
     }
-});
+);
 
 application.controller('amazon_best_sellers_rank', function ($scope) {
     $scope.status = false;
