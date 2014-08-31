@@ -391,13 +391,8 @@ a {
 }
 
 #middle .container-fluid .btn + .btn,
-#middle .container-fluid .btn + .hide,
 #middle .container-fluid .btn + .tooltip,
-#middle .container-fluid .hide + .btn,
-#middle .container-fluid .hide + .tooltip,
-#middle .container-fluid .hide + .hide,
 #middle .container-fluid .tooltip + .btn,
-#middle .container-fluid .tooltip + .hide,
 #middle .container-fluid .tooltip + .tooltip {
     margin-left: 17px;
 }
