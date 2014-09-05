@@ -526,7 +526,6 @@ application.controller(
 
         if ($attrs.keywords.length) {
             $scope.keywords = $attrs.keywords;
-            $scope.submit();
         }
     }
 );
