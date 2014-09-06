@@ -42,6 +42,14 @@
         <div class="span12">
             <div class="page-header">
                 {% include 'slots/feedback.twig' %}
+                <div
+                    class="btn btn-primary pull-right"
+                    data-target="#cei"
+                    data-toggle="modal"
+                    >
+                    <span class="icon-info-sign"></span>
+                    Information
+                </div>
                 <h1>{{ module }}</h1>
             </div>
             <form class="form-horizontal" name="form" ng-submit="submit()">
