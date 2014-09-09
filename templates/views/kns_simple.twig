@@ -524,6 +524,10 @@
                                         ng-click="set_order_by_('title[1]')"
                                         >KW In Title</th>
                                     <th
+                                        class="narrow center header [! order_by_[0] == 'author.name' && get_order_by_() || '' !]"
+                                        ng-click="set_order_by_('author.name')"
+                                        >Author</th>
+                                    <th
                                         class="narrow right header [! order_by_[0] == 'best_sellers_rank[0]' && get_order_by_() || '' !]"
                                         ng-click="set_order_by_('best_sellers_rank[0]')"
                                         >Best Seller Rank</th>
@@ -554,6 +558,23 @@
                                     </td>
                                     <td class="narrow center">
                                         [! item.title[1] !]
+                                    </td>
+                                    <td class="narrow">
+                                        <a
+                                            class="pull-right"
+                                            href="[! item.author.url !]"
+                                            ng-show="item.author.url.length > 0"
+                                            rel="noreferrer"
+                                            target="_blank"
+                                            ><i class="icon-external-link"></i></a>
+                                        <a
+                                            href="{{ url('aa') }}?url=[! item.author.url|encodeUri !]"
+                                            ng-show="item.author.url.length > 0"
+                                            target="_blank"
+                                            >[! item.author.name !]</a>
+                                        <span ng-show="item.author.url.length == 0">
+                                            [! item.author.name !]
+                                        </span>
                                     </td>
                                     <td class="narrow right">
                                         [! item.best_sellers_rank[0]|number:0 !]

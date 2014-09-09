@@ -409,6 +409,38 @@ def get_contents(keyword, country):
             )
         except IndexError:
             pass
+        author = {
+            'name': '',
+            'url': '',
+        }
+        try:
+            author['name'] = get_string(selector.xpath(
+                '//span[@class="contributorNameTrigger"]/a/text()'
+            ).extract()[0])
+        except IndexError:
+            try:
+                author['name'] = get_string(selector.xpath(
+                    '//h1[@class="parseasinTitle "]/following-sibling::span/a/'
+                    'text()'
+                ).extract()[0])
+            except IndexError:
+                pass
+        try:
+            author['url'] = get_string(selector.xpath(
+                '//span[@class="contributorNameTrigger"]/a/@href'
+            ).extract()[0])
+        except IndexError:
+            try:
+                author['url'] = get_string(
+                    'http://www.amazon.com/%(href)s' % {
+                        'href': selector.xpath(
+                            '//h1[@class="parseasinTitle "]/'
+                            'following-sibling::span/a/@href'
+                        ).extract()[0]
+                    }
+                )
+            except IndexError:
+                pass
         best_sellers_rank = 0
         try:
             best_sellers_rank = int(
@@ -681,6 +713,7 @@ def get_contents(keyword, country):
             items.append({
                 'age': age,
                 'asin': asin,
+                'author': author,
                 'best_sellers_rank': best_sellers_rank,
                 'description': description,
                 'pages': pages,
