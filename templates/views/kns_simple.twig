@@ -560,20 +560,22 @@
                                         [! item.title[1] !]
                                     </td>
                                     <td class="narrow">
-                                        <a
-                                            class="pull-right"
-                                            href="[! item.author.url !]"
-                                            ng-show="item.author.url.length > 0"
-                                            rel="noreferrer"
-                                            target="_blank"
-                                            ><i class="icon-external-link"></i></a>
-                                        <a
-                                            href="{{ url('aa') }}?url=[! item.author.url|encodeUri !]"
-                                            ng-show="item.author.url.length > 0"
-                                            target="_blank"
-                                            >[! item.author.name !]</a>
-                                        <span ng-show="item.author.url.length == 0">
-                                            [! item.author.name !]
+                                        <span ng-hide="item.author == undefined">
+                                            <a
+                                                class="pull-right"
+                                                href="[! item.author.url !]"
+                                                ng-show="item.author.url.length > 0"
+                                                rel="noreferrer"
+                                                target="_blank"
+                                                ><i class="icon-external-link"></i></a>
+                                            <a
+                                                href="{{ url('aa') }}?url=[! item.author.url|encodeUri !]"
+                                                ng-show="item.author.url.length > 0"
+                                                target="_blank"
+                                                >[! item.author.name !]</a>
+                                            <span ng-show="item.author.url.length == 0">
+                                                [! item.author.name !]
+                                            </span>
                                         </span>
                                     </td>
                                     <td class="narrow right">

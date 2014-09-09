@@ -23,7 +23,12 @@ from scrapy.selector import Selector
 from simplejson import dumps, JSONDecodeError, loads
 
 from utilities import (
-    get_mysql_connection, get_response, get_responses, get_string, get_sales,
+    get_mysql_connection,
+    get_response,
+    get_responses,
+    get_string,
+    get_sales,
+    get_url as get_url_,
 )
 
 setlocale(LC_ALL, 'en_US.UTF-8')
@@ -426,19 +431,19 @@ def get_contents(keyword, country):
             except IndexError:
                 pass
         try:
-            author['url'] = get_string(selector.xpath(
+            author['url'] = get_url(get_string(selector.xpath(
                 '//span[@class="contributorNameTrigger"]/a/@href'
-            ).extract()[0])
+            ).extract()[0]))
         except IndexError:
             try:
-                author['url'] = get_string(
+                author['url'] = get_url(get_string(
                     'http://www.amazon.com/%(href)s' % {
                         'href': selector.xpath(
                             '//h1[@class="parseasinTitle "]/'
                             'following-sibling::span/a/@href'
                         ).extract()[0]
                     }
-                )
+                ))
             except IndexError:
                 pass
         best_sellers_rank = 0
