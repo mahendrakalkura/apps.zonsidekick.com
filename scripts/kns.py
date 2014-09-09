@@ -431,12 +431,12 @@ def get_contents(keyword, country):
             except IndexError:
                 pass
         try:
-            author['url'] = get_url(get_string(selector.xpath(
+            author['url'] = get_url_(get_string(selector.xpath(
                 '//span[@class="contributorNameTrigger"]/a/@href'
             ).extract()[0]))
         except IndexError:
             try:
-                author['url'] = get_url(get_string(
+                author['url'] = get_url_(get_string(
                     'http://www.amazon.com/%(href)s' % {
                         'href': selector.xpath(
                             '//h1[@class="parseasinTitle "]/'
