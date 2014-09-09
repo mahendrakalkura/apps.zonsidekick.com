@@ -35,8 +35,7 @@
     data-review_average_4="{{ filters.review_average_4 }}"
     data-section_id="{{ filters.section_id }}"
     data-sections="{{ sections|json_encode()|e('html') }}"
-    data-urls-aks="{{ url('aks') }}"
-    data-urls-ce="{{ url('ce_xhr') }}"
+    data-url="{{ url('ce_xhr') }}"
     >
     <div class="row-fluid">
         <div class="span12">
@@ -510,7 +509,8 @@
                     </div>
                     <div
                         class="span4"
-                        data-url="{{ url('suggested_keywords') }}"
+                        data-urls-aks="{{ url('aks') }}"
+                        data-urls-suggested-keywords="{{ url('suggested_keywords') }}"
                         ng-controller="suggested_keywords"
                         >
                         <table class="table table-hover table-striped">
