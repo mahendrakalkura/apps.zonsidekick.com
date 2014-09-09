@@ -238,27 +238,46 @@
                         data-url="{{ url('suggested_keywords') }}"
                         ng-controller="suggested_keywords"
                         >
-                        <p>
-                            <a ng-click="process(contents.words)">
-                                Click here to compile a list of
-                                suggested keywords
-                            </a>
-                        </p>
-                        <p ng-show="spinner">
-                            <span class="icon-spinner icon-spin icon-2x">
-                            </span>
-                        </p>
-                        <p ng-show="items.length > 0">
-                            <ul>
-                                <li ng-repeat="item in items">
-                                    [! item !]
-                                </li>
-                            </ul>
-                        </p>
-                        <p class="text-error" ng-show="error">
-                            Your query did not yield any results.
-                            Please try again after a while.
-                        </p>
+                        <table class="table table-hover table-striped">
+                            <tr>
+                                <td>
+                                    <a ng-click="process(contents.words)">
+                                        Click here to compile a list of
+                                        suggested keywords
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr ng-show="spinner">
+                                <td>
+                                    <span class="icon-spinner icon-spin icon-2x">
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr ng-show="items.length > 0">
+                                <td class="details">
+                                    <ul>
+                                        <li ng-repeat="item in items">
+                                            [! item !]
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                            <tr ng-show="items.length > 0">
+                                <td class="details">
+                                    <p>
+                                        <a ng-click="get_more_suggestions(items)">
+                                            Get more suggestions
+                                        </a>
+                                    </p>
+                                </td>
+                            </tr>
+                            <tr ng-show="error">
+                                <td class="text-error">
+                                    Your query did not yield any results.
+                                    Please try again after a while.
+                                </td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
             </div>
