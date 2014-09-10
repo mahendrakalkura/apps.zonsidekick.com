@@ -477,10 +477,10 @@ EOD;
             $interval = $old->diff($new);
             $requests[$key]['expires_in'] = $interval->format('%R%a days');
             $total = $application['db']->fetchAssoc(
-                $total, array($value['id'])
+                $query_total, array($value['id'])
             );
             $completed = $application['db']->fetchAssoc(
-                $completed, array($value['id'])
+                $query_completed, array($value['id'])
             );
             $requests[$key]['progress'] = (
                 $completed['count'] / $total['count']
