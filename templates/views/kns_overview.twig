@@ -45,6 +45,7 @@
                             <th>Report #</th>
                             <th class="right small">Keywords</th>
                             <th class="right small">Expires In</th>
+                            <th class="right small">Progress</th>
                             <th class="center small">Status</th>
                             <th class="center small">Actions</th>
                         </tr>
@@ -59,6 +60,9 @@
                                 </td>
                                 <td class="right small">
                                     {{ request.expires_in }}
+                                </td>
+                                <td class="right small">
+                                    {{ request.progress|number_format(2, '.', ',') }}%
                                 </td>
                                 <td class="center small">
                                     {% if request.status == 'Completed' %}
