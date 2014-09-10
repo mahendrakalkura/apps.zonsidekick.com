@@ -434,17 +434,12 @@ WHERE (
     `tools_kns_requests`.`timestamp` < (NOW() - INTERVAL 5 HOUR)
 )
 EOD;
-        $query_status = <<<EOD
-SELECT COUNT(`id`) AS `count`
-FROM `tools_kns_keywords`
-WHERE `request_id` = ? AND `contents` IS NULL
-EOD;
-        $total = <<<EOD
+        $query_total = <<<EOD
 SELECT COUNT(`id`) AS `count`
 FROM `tools_kns_keywords`
 WHERE `request_id` = ?
 EOD;
-        $completed = <<<EOD
+        $query_completed = <<<EOD
 SELECT COUNT(`id`) AS `count`
 FROM `tools_kns_keywords`
 WHERE `request_id` = ? AND `contents` IS NOT NULL
@@ -481,17 +476,14 @@ EOD;
             $new->add(new DateInterval('P30D'));
             $interval = $old->diff($new);
             $requests[$key]['expires_in'] = $interval->format('%R%a days');
-            $status = $application['db']->fetchAssoc(
-                $query_status, array($value['id'])
-            );
-            $completed_ = $application['db']->fetchAssoc(
-                $completed, array($value['id'])
-            );
-            $total_ = $application['db']->fetchAssoc(
+            $total = $application['db']->fetchAssoc(
                 $total, array($value['id'])
             );
+            $completed = $application['db']->fetchAssoc(
+                $completed, array($value['id'])
+            );
             $requests[$key]['progress'] = (
-                $completed_['count'] / $total_['count']
+                $completed['count'] / $total['count']
             ) * 100.00;
             if ($requests[$key]['progress'] == 100.00) {
                 $requests[$key]['status'] = 'Completed';
