@@ -439,6 +439,16 @@ SELECT COUNT(`id`) AS `count`
 FROM `tools_kns_keywords`
 WHERE `request_id` = ? AND `contents` IS NULL
 EOD;
+        $total = <<<EOD
+SELECT COUNT(`id`) AS `count`
+FROM `tools_kns_keywords`
+WHERE `request_id` = ?
+EOD;
+        $completed = <<<EOD
+SELECT COUNT(`id`) AS `count`
+FROM `tools_kns_keywords`
+WHERE `request_id` = ? AND `contents` IS NOT NULL
+EOD;
         foreach ($requests as $key => $value) {
             $requests[$key]['preview'] = array();
             $records = $application['db']->fetchAll(
@@ -474,8 +484,28 @@ EOD;
             $status = $application['db']->fetchAssoc(
                 $query_status, array($value['id'])
             );
-            $requests[$key]['status'] =
-                $status['count']? 'In Progress': 'Completed';
+            $completed_ = $application['db']->fetchAssoc(
+                $completed, array($value['id'])
+            );
+            $total_ = $application['db']->fetchAssoc(
+                $total, array($value['id'])
+            );
+            $requests[$key]['progress'] = (
+                $completed_['count'] / $total_['count']
+            ) * 100.00;
+            if ($requests[$key]['progress'] == 100.00) {
+                $requests[$key]['status'] = 'Completed';
+            }
+            if ($requests[$key]['progress'] == 0.00) {
+                $requests[$key]['status'] = 'Waiting';
+            }
+            if (
+                $requests[$key]['progress'] > 0.00
+                AND
+                $requests[$key]['progress'] < 100.00
+            ) {
+                $requests[$key]['status'] = 'In Progress';
+            }
         }
     }
 

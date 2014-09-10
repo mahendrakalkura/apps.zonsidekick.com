@@ -66,6 +66,11 @@
                                             {{ request.status }}
                                         </span>
                                     {% endif %}
+                                    {% if request.status == 'Waiting' %}
+                                        <span class="label label-warning">
+                                            {{ request.status }}
+                                        </span>
+                                    {% endif %}
                                     {% if request.status == 'In Progress' %}
                                         <span class="label label-success">
                                             {{ request.status }}
