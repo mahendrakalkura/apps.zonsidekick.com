@@ -518,6 +518,15 @@
                                     </ul>
                                 </div>
                             </div>
+                            <p
+                                ng-show="keyword.contents.words && keyword.contents.words.length > 0"
+                                data-urls-aks="{{ url('aks') }}"
+                                ng-controller="suggested_keywords"
+                                >
+                                <a ng-click="get_more_suggestions(get_words(
+                                    keyword.contents.words
+                                ))">Get more suggestions</a>
+                            </p>
                             <table class="table table-hover table-striped">
                                 <tr>
                                     <th

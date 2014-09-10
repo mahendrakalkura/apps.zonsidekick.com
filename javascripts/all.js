@@ -1209,6 +1209,12 @@ application.controller('suggested_keywords', function ($attrs, $http, $scope) {
             })
         ).submit();
     };
+
+    $scope.get_words = function (words) {
+        return _.map(words, function (word) {
+            return word[0];
+        });
+    };
 });
 
 jQuery.ajaxSetup({
