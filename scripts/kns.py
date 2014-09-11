@@ -20,12 +20,11 @@ from dateutil.parser import parse
 from furl import furl
 from numpy import mean
 from scrapy.selector import Selector
-from simplejson import dumps, JSONDecodeError, loads
+from simplejson import dumps
 
 from utilities import (
     get_mysql_connection,
     get_popularity,
-    get_response,
     get_responses,
     get_string,
     get_sales,

@@ -13,7 +13,7 @@ from MySQLdb.cursors import DictCursor
 from requests import get
 from requests.exceptions import RequestException
 from scrapy.selector import Selector
-from simplejson import dumps, loads
+from simplejson import dumps, JSONDecodeError, loads
 from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
 from sqlalchemy.ext.declarative import declarative_base
