@@ -64,6 +64,24 @@
                         </div>
                     </div>
                     <div class="control-group">
+                        <label class="control-label" for="country">
+                            Country
+                        </label>
+                        <div class="controls">
+                            <select
+                                class="span12"
+                                id="country"
+                                ng-model="country"
+                                >
+                                {% for key, value in countries %}
+                                    <option value="{{ key }}">
+                                        {{ value }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="control-group">
                         <label class="control-label" for="search_alias">
                             Department
                         </label>
@@ -82,21 +100,7 @@
                         </div>
                     </div>
                     <div class="control-group">
-                        <label class="control-label" for="country">
-                            Country
-                        </label>
                         <div class="controls">
-                            <select
-                                class="span12"
-                                id="country"
-                                ng-model="country"
-                                >
-                                {% for key, value in countries %}
-                                    <option value="{{ key }}">
-                                        {{ value }}
-                                    </option>
-                                {% endfor %}
-                            </select>
                             <label class="control-label" class="checkbox">
                                 <input
                                     type="checkbox"

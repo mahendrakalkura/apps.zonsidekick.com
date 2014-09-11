@@ -1397,7 +1397,7 @@ $application->match('/aks', function (Request $request) use ($application) {
 $application->match(
     '/aks/xhr',
     function (Request $request) use ($application, $variables) {
-        if (is_development() AND 0) {
+        if (is_development()) {
             $output = array('["1", "2", "3"]');
         } else {
             ignore_user_abort(true);
