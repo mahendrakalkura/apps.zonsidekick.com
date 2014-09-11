@@ -431,18 +431,27 @@ application.controller(
         };
 
         $scope.reset = function () {
-            $scope.checkbox = false;
-            $scope.country = 'com';
+            $scope.modes = [
+                'Suggest',
+                'Combine',
+            ];
+
             $scope.keywords = '';
-            $scope.rows = '';
-            $scope.statuses = {};
+            $scope.country = 'com';
+            $scope.mode = $scope.modes[0];
+            $scope.search_alias = 'digital-text';
+
+            $scope.checkbox = false;
             $scope.focus = {
                 keywords: true,
                 suggestions: false
             };
-            $scope.search_alias = 'digital-text';
+
             $scope.spinner = false;
+            $scope.rows = '';
+            $scope.statuses = {};
             $scope.suggestions = [];
+
             window.clearInterval($scope.interval);
         };
 
@@ -473,7 +482,20 @@ application.controller(
                 }).
                 success(function (data, status, headers, config) {
                     jQuery.each(data, function (key, value) {
-                        $scope.suggestions.push(value);
+                        if ($scope.mode == 'Suggest') {
+                            $scope.suggestions.push(value);
+                        }
+                        if ($scope.mode == 'Combine') {
+                            var count = 0;
+                            jQuery.each(value.split(' '), function (k, v) {
+                                if ($scope.keywords.indexOf(v) !== -1) {
+                                    count += 1;
+                                }
+                            });
+                            if (count >= 2) {
+                                $scope.suggestions.push(value);
+                            }
+                        }
                     });
                     $scope.suggestions = _.uniq($scope.suggestions);
                     $scope.suggestions.sort();
@@ -522,6 +544,9 @@ application.controller(
 
         if ($attrs.keywords.length) {
             $scope.keywords = $attrs.keywords;
+        }
+        if ($attrs.mode.length) {
+            $scope.mode = $attrs.mode;
         }
     }
 );
@@ -1202,6 +1227,12 @@ application.controller('suggested_keywords', function ($attrs, $http, $scope) {
                 'name': 'keywords',
                 'type': 'hidden',
                 'val': words.join('\n')
+            })
+        ).append(
+            jQuery('<input/>', {
+                'name': 'mode',
+                'type': 'hidden',
+                'val': 'Combine'
             })
         ).submit();
     };

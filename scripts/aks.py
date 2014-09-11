@@ -40,10 +40,6 @@ def get_params(mkt, q, search_alias):
 
 
 def get_results(q, country, search_alias):
-    return sorted(set(get_suggestions(q, country, search_alias)))
-
-
-def get_suggestions(q, country, search_alias):
     strings = []
     strings.append(q)
     alphabets = map(chr, range(97, 123))
@@ -71,7 +67,7 @@ def get_suggestions(q, country, search_alias):
         for suggestion in contents[1]:
             if suggestion not in strings:
                 strings.append(suggestion)
-    return strings
+    return sorted(set(strings))
 
 
 def get_url(sub_domain):

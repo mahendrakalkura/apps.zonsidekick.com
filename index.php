@@ -1350,6 +1350,7 @@ $application->match('/aks', function (Request $request) use ($application) {
             'co.jp' => 'Japan',
         ),
         'keywords' => $request->get('keywords', ''),
+        'mode' => $request->get('mode', 'Suggest'),
         'search_aliases' => array(
             'aps' => 'All Departments',
             'digital-text' => 'Kindle Store',

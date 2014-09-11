@@ -13,6 +13,7 @@
     data-error-3-top="Error #3"
     data-error-3-middle="<p>An unknown error has occurred. Please try again.</p>"
     data-keywords="{{ keywords }}"
+    data-mode="{{ mode }}"
     data-url-download="{{ url('aks_download') }}"
     data-url-xhr="{{ url('aks_xhr') }}"
     ng-controller="aks"
@@ -79,6 +80,19 @@
                                     </option>
                                 {% endfor %}
                             </select>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="mode">
+                            Mode
+                        </label>
+                        <div class="controls">
+                            <select
+                                class="span12"
+                                id="mode"
+                                ng-model="mode"
+                                ng-options="mode for mode in modes"
+                                ></select>
                         </div>
                     </div>
                     <div class="control-group">
