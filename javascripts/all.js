@@ -489,7 +489,7 @@ application.controller(
                             var count = 0;
                             jQuery.each(value.split(' '), function (k, v) {
                                 jQuery.each(
-                                    $scope.keywords.split(' '), function () {
+                                    $scope.keywords.split('\n'), function () {
                                         if (this == v) {
                                             count += 1;
                                         }
