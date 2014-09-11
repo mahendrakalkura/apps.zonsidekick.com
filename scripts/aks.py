@@ -39,55 +39,38 @@ def get_params(mkt, q, search_alias):
     }
 
 
-def get_results(country, level, mode, q, search_alias):
-    results = []
-    if mode == 1:
-        results = get_suggestions(country, level, q, search_alias)
-    if mode == 2:
-        qs = q.split(' ')
-        if len(qs) <= 10:
-            results = []
-            results += get_suggestions(country, level, q, search_alias)
-            for q in qs:
-                results += get_suggestions(country, level, q, search_alias)
-            results = [
-                result for result in results if all(q in result for q in qs)
-            ]
-        else:
-            results = get_suggestions(country, level, q, search_alias)
-    return sorted(set(results))
+def get_results(q, country, search_alias):
+    return sorted(set(get_suggestions(q, country, search_alias)))
 
 
-def get_suggestions(country, level, q, search_alias):
+def get_suggestions(q, country, search_alias):
     strings = []
     strings.append(q)
     alphabets = map(chr, range(97, 123))
-    while level:
-        qs = []
-        for string in strings:
-            for alphabet in alphabets:
-                qs.append('%(string)s %(alphabet)s' % {
-                    'alphabet': alphabet,
-                    'string': string,
-                })
-        urls = []
-        for q in qs:
-            mkt, url = get_mkt_and_url(country)
-            urls.append(furl(url).add(get_params(mkt, q, search_alias)).url)
-        for response in get_responses(urls):
-            if not response:
-                continue
-            contents = ''
-            try:
-                contents = loads(response.text)
-            except JSONDecodeError:
-                pass
-            if not contents:
-                continue
-            for suggestion in contents[1]:
-                if suggestion not in strings:
-                    strings.append(suggestion)
-        level -= 1
+    qs = []
+    for string in strings:
+        for alphabet in alphabets:
+            qs.append('%(string)s %(alphabet)s' % {
+                'alphabet': alphabet,
+                'string': string,
+            })
+    urls = []
+    for q in qs:
+        mkt, url = get_mkt_and_url(country)
+        urls.append(furl(url).add(get_params(mkt, q, search_alias)).url)
+    for response in get_responses(urls):
+        if not response:
+            continue
+        contents = ''
+        try:
+            contents = loads(response.text)
+        except JSONDecodeError:
+            pass
+        if not contents:
+            continue
+        for suggestion in contents[1]:
+            if suggestion not in strings:
+                strings.append(suggestion)
     return strings
 
 
@@ -97,6 +80,4 @@ def get_url(sub_domain):
     }
 
 if __name__ == '__main__':
-    print dumps(get_results(
-        argv[1], int(argv[2]), int(argv[3]), argv[4], argv[5]
-    ))
+    print dumps(get_results(argv[1], argv[2], argv[3]))

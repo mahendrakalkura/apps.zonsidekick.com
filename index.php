@@ -1397,19 +1397,17 @@ $application->match('/aks', function (Request $request) use ($application) {
 $application->match(
     '/aks/xhr',
     function (Request $request) use ($application, $variables) {
-        if (is_development()) {
+        if (is_development() AND 0) {
             $output = array('["1", "2", "3"]');
         } else {
             ignore_user_abort(true);
             set_time_limit(0);
             exec(sprintf(
-                '%s/python %s/scripts/aks.py %s %s %s %s %s 2>/dev/null',
+                '%s/python %s/scripts/aks.py %s %s %s 2>/dev/null',
                 $variables['virtualenv'],
                 __DIR__,
-                escapeshellarg($request->get('country')),
-                escapeshellarg($request->get('level')),
-                escapeshellarg($request->get('mode')),
                 escapeshellarg($request->get('keyword')),
+                escapeshellarg($request->get('country')),
                 escapeshellarg($request->get('search_alias'))
             ), $output, $return_var);
         }

@@ -440,8 +440,6 @@ application.controller(
                 keywords: true,
                 suggestions: false
             };
-            $scope.level = '1';
-            $scope.mode = '1';
             $scope.search_alias = 'digital-text';
             $scope.spinner = false;
             $scope.suggestions = [];
@@ -465,8 +463,6 @@ application.controller(
                     data: jQuery.param({
                         country: $scope.country,
                         keyword: keyword,
-                        level: $scope.level,
-                        mode: $scope.mode,
                         search_alias: $scope.search_alias
                     }),
                     method: 'POST',
