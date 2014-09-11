@@ -488,9 +488,13 @@ application.controller(
                         if ($scope.mode == 'Combine') {
                             var count = 0;
                             jQuery.each(value.split(' '), function (k, v) {
-                                if ($scope.keywords.indexOf(v) !== -1) {
-                                    count += 1;
-                                }
+                                jQuery.each(
+                                    $scope.keywords.split(' '), function () {
+                                        if (this == v) {
+                                            count += 1;
+                                        }
+                                    }
+                                );
                             });
                             if (count >= 2) {
                                 $scope.suggestions.push(value);
