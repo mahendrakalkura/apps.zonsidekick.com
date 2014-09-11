@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from collections import OrderedDict
+from furl import furl
 from os.path import dirname, join
 from random import choice, randint
 from re import compile, sub
@@ -322,6 +323,71 @@ def get_number(number):
     number = sub(r'[^0-9\.]', '', number)
     number = number.strip()
     return number
+
+
+def get_popularity(keyword):
+    kps = 0.00
+    sp = 0
+    src = 0
+    trb = 0
+    spr = 0
+    length = len(keyword)
+    for index in range(0, length):
+        keywords = {
+            'premium': [],
+            'non-premium': [],
+        }
+        response = get_response(
+            furl(
+                'http://completion.amazon.com/search/complete'
+            ).add({
+                'mkt': '1',
+                'q': keyword[0:index + 1],
+                'search-alias': 'digital-text',
+                'xcat': '2',
+            }).url
+        )
+        if not response:
+            continue
+        contents = []
+        try:
+            contents = loads(response.text)
+        except JSONDecodeError:
+            pass
+        if not contents:
+            continue
+        for i, item in enumerate(contents[2]):
+            key = 'non-premium'
+            if isinstance(item, dict) and 'nodes'in item and item['nodes']:
+                key = 'premium'
+            keywords[key].append(contents[1][i])
+        if not kps and not sp and not src:
+            if keyword in keywords['non-premium']:
+                kps = ((index + 1) * 100.00) / (length * 1.00)
+                src = len(keywords['non-premium'])
+                sp = contents[1].index(keyword)
+        if not trb:
+            total = len(keywords['premium'])
+            if total:
+                if keyword in keywords['premium']:
+                    rank = contents[1].index(keyword)
+                    trb = (((total - rank) * 100.00) / (total * 1.00))
+        if kps and sp and src and trb:
+            break
+    if src:
+        spr = (((src - sp) * 100.00) / (src * 1.00))
+        if sp != 1:
+            spr = spr * 0.75
+    number = (kps * 0.80) + (spr * 0.10) + (trb * 0.10)
+    if number > 80.00:
+        return number, 'Very High'
+    if number > 60.00:
+        return number, 'High'
+    if number > 40.00:
+        return number, 'Medium'
+    if number > 20.00:
+        return number, 'Low'
+    return number, 'Very Low'
 
 
 def get_proxies():

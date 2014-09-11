@@ -357,7 +357,7 @@ WHERE `tools_ps_trends`.`date_and_time` IN (
     SELECT MAX(`date_and_time`)
     FROM `tools_ps_trends`
 )
-ORDER BY `tools_ps_books`.`title` ASC
+ORDER BY `tools_ps_trends`.`popularity` DESC, `tools_ps_books`.`title` ASC
 EOD;
     $popular_searches = $application['db']->fetchAll($query);
     foreach ($popular_searches as $key => $value) {

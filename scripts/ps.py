@@ -15,6 +15,7 @@ from utilities import (
     base,
     get_amazon_best_sellers_rank,
     get_mysql_session,
+    get_popularity,
     get_response,
     get_responses,
     get_string,
@@ -194,6 +195,7 @@ if __name__ == '__main__':
         if not item['keyword'] in t.keywords:
             t.keywords.append(item['keyword'])
         t.keywords = sorted(set(t.keywords))
+        t.popularity = get_popularity(item['keyword'])[0]
         session.add(t)
     try:
         session.commit()
