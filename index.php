@@ -60,10 +60,10 @@ function usort_logos($one, $two)
 
 function usort_popular_searches($one, $two)
 {
-    $one = intval(array_sum(array_values($one['keywords'])));
-    $two = intval(array_sum(array_values($two['keywords'])));
+    $one = array_sum(array_values($one['keywords']));
+    $two = array_sum(array_values($two['keywords']));
     if ($one != $two) {
-        return ($one < $two) ? -1 : 1;
+        return ($one > $two) ? -1 : 1;
     }
 
     return 0;
