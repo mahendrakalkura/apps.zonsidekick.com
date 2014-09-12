@@ -23,7 +23,6 @@ from utilities import (
     is_development,
     json,
     mutators_dict,
-    mutators_list,
 )
 
 
@@ -42,7 +41,7 @@ class trend(base):
         'autoload': True,
     }
 
-    keywords = Column(mutators_list.as_mutable(json))
+    keywords = Column(mutators_dict.as_mutable(json))
 
     book = relationship(
         'book', backref=backref('trends', cascade='all', lazy='dynamic'),
@@ -191,11 +190,9 @@ if __name__ == '__main__':
                 'date_and_time': date_and_time,
             })
         if not t.keywords:
-            t.keywords = []
+            t.keywords = {}
         if not item['keyword'] in t.keywords:
-            t.keywords.append(item['keyword'])
-        t.keywords = sorted(set(t.keywords))
-        t.popularity = get_popularity(item['keyword'])[0]
+            t.keywords[item['keyword']] = get_popularity(item['keyword'])[0]
         session.add(t)
     try:
         session.commit()

@@ -58,6 +58,17 @@ function usort_logos($one, $two)
     return ($one < $two) ? -1 : 1;
 }
 
+function usort_popular_searches($one, $two)
+{
+    $one = intval(array_sum(array_values($one['keywords'])));
+    $two = intval(array_sum(array_values($two['keywords'])));
+    if ($one != $two) {
+        return ($one < $two) ? -1 : 1;
+    }
+
+    return 0;
+}
+
 function get_category($application, $category_id) {
     $categories = array();
     while (true) {
@@ -357,7 +368,7 @@ WHERE `tools_ps_trends`.`date_and_time` IN (
     SELECT MAX(`date_and_time`)
     FROM `tools_ps_trends`
 )
-ORDER BY `tools_ps_trends`.`popularity` DESC, `tools_ps_books`.`title` ASC
+ORDER BY `tools_ps_books`.`title` ASC
 EOD;
     $popular_searches = $application['db']->fetchAll($query);
     foreach ($popular_searches as $key => $value) {
@@ -368,8 +379,9 @@ EOD;
             $popular_searches[$key]['amazon_best_sellers_rank'], SORT_NUMERIC
         );
         $popular_searches[$key]['keywords'] = json_decode(
-            $popular_searches[$key]['keywords']
+            $popular_searches[$key]['keywords'], true
         );
+        arsort($popular_searches[$key]['keywords'], SORT_NUMERIC);
         $query = <<<EOD
 SELECT COUNT(DISTINCT DATE(`date_and_time`)) AS `count`
 FROM `tools_ps_trends`
@@ -394,6 +406,8 @@ EOD;
             $popular_searches[$key]['url']
         );
     }
+
+    usort($popular_searches, 'usort_popular_searches');
 
     return $popular_searches;
 }
