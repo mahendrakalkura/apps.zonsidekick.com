@@ -489,7 +489,8 @@ application.controller(
                             var count = 0;
                             jQuery.each(value.split(' '), function (k, v) {
                                 jQuery.each(
-                                    $scope.keywords.split('\n'), function () {
+                                    $scope.keywords.toLowerCase().split('\n'),
+                                    function () {
                                         if (this == v) {
                                             count += 1;
                                         }
@@ -511,7 +512,7 @@ application.controller(
                 paused: true
             });
             $scope.rows = _.uniq(_.filter(
-                $scope.keywords.split('\n'), function (keyword) {
+                $scope.keywords.toLowerCase().split('\n'), function (keyword) {
                     return jQuery.trim(keyword).length;
                 }
             ));
