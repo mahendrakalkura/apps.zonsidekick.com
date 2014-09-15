@@ -745,30 +745,24 @@ $application->before(function (Request $request) use ($application) {
     if (!$user['id']) {
         return $application->redirect('http://zonsidekick.com/wp-login.php');
     }
+    $is_paying_customer = is_paying_customer($user);
     if ($request->get('_route') == '403') {
-        if (is_paying_customer($user)) {
+        if ($is_paying_customer) {
             return $application->redirect(
                 $application['url_generator']->generate('dashboard')
             );
         }
     } else {
-        if (!is_paying_customer($user)) {
+        if (!$is_paying_customer) {
             return $application->redirect(
                 $application['url_generator']->generate('403')
             );
         }
     }
     $application['session']->set('user', $user);
-    $application['twig']->addGlobal('application', $application);
-    $application['twig']->addGlobal(
-        'user', $application['session']->get('user')
-    );
-    $application['twig']->addFunction(
-        'has_statistics', new \Twig_Function_Function('has_statistics')
-    );
-    $application['twig']->addFunction(
-        'is_paying_customer', new \Twig_Function_Function('is_paying_customer')
-    );
+    $application['twig']->addGlobal('has_statistics', has_statistics($user));
+    $application['twig']->addGlobal('is_paying_customer', $is_paying_customer);
+    $application['twig']->addGlobal('user', $user);
 });
 
 $before_statistics = function () use ($application) {
