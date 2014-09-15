@@ -144,17 +144,7 @@ function get_count_and_keywords($application, $user, $keywords) {
         }
     }
     $keywords = array_unique($keywords);
-    $count = -1;
-    if (
-        $user['id'] != 2
-        &&
-        !in_array(3, $application['session']->get('groups'))
-        &&
-        !in_array(4, $application['session']->get('groups'))
-        &&
-        in_array(5, $application['session']->get('groups'))
-    ) {
-        $query = <<<EOD
+    $query = <<<EOD
 SELECT COUNT(`id`) AS `count`
 FROM `tools_kns_keywords`
 INNER JOIN `tools_kns_requests` ON `keywords`.`request_id` = `requests`.`id`
@@ -163,17 +153,16 @@ WHERE
     AND
     DATE(`tools_kns_requests`.`timestamp`) = ?
 EOD;
-        $record = $application['db']->fetchAssoc(
-            $query, array($user['id'], date('Y-m-d'))
-        );
-        $limit = 10;
-        if ($record['count'] >= $limit) {
-            $count = 0;
-            $keywords = array();
-        } else {
-            $keywords = array_slice($keywords, 0, $limit - $record['count']);
-            $count = $limit - $record['count'];
-        }
+    $record = $application['db']->fetchAssoc(
+        $query, array($user['id'], date('Y-m-d'))
+    );
+    $limit = 10;
+    if ($record['count'] >= $limit) {
+        $count = 0;
+        $keywords = array();
+    } else {
+        $keywords = array_slice($keywords, 0, $limit - $record['count']);
+        $count = $limit - $record['count'];
     }
 
     return array($count, $keywords);
@@ -259,22 +248,6 @@ function get_currency($country) {
     }
 
     return '$';
-}
-
-function get_groups($application) {
-    $array = array();
-    $user = $application['session']->get('user');
-    $records = $application['db']->fetchAll(
-        'SELECT `group_id` FROM `wp_groups_user_group` WHERE `user_id` = ?',
-        array($user['id'])
-    );
-    if (!empty($records)) {
-        foreach ($records as $record) {
-            $array[] = $record['group_id'];
-        }
-    }
-
-    return $array;
 }
 
 function get_logos($application, $user) {
@@ -645,24 +618,36 @@ function get_words_from_words($words_) {
     return $words;
 }
 
-function has_groups($one, $two) {
-    if (!empty($one)) {
-        foreach ($one as $key => $value) {
-            if (in_array($value, $two)) {
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
-
 function has_statistics($user) {
     return in_array($user['id'], array(1, 2, 3));
 }
 
 function is_development() {
     return $_SERVER['SERVER_PORT'] == '5000';
+}
+
+function is_paying_customer($application, $user) {
+    if (is_development()) {
+        return true;
+    }
+
+    if (has_statistics($user)) {
+        return true;
+    }
+
+    $query = <<<EOD
+SELECT COUNT(`umeta_id`) AS count
+FROM `wp_usermeta`
+WHERE `user_id` = ? AND `meta_key` = ? AND `meta_value` = ?
+EOD;
+    $record = $application['db']->fetchAssoc(
+        $query, array($user['id'], 'paying_customer', '1')
+    );
+    if (!empty($record) AND $record['count'] == 1) {
+        return true;
+    }
+
+    return false;
 }
 
 if (php_sapi_name() === 'cli-server') {
@@ -756,16 +741,33 @@ if ($application['debug']) {
 }
 
 $application->before(function (Request $request) use ($application) {
-    $application['session']->set('user', get_user($application));
-    $application['session']->set('groups', get_groups($application));
+    $user = get_user($application);
+    if (!$user['id']) {
+        return $application->redirect('http://zonsidekick.com/wp-login.php');
+    }
+    if ($request->get('_route') == '403') {
+        if (is_paying_customer($user)) {
+            return $application->redirect(
+                $application['url_generator']->generate('dashboard')
+            );
+        }
+    } else {
+        if (!is_paying_customer($user)) {
+            return $application->redirect(
+                $application['url_generator']->generate('403')
+            );
+        }
+    }
+    $application['session']->set('user', $user);
+    $application['twig']->addGlobal('application', $application);
     $application['twig']->addGlobal(
         'user', $application['session']->get('user')
     );
-    $application['twig']->addGlobal(
-        'groups', $application['session']->get('groups')
-    );
     $application['twig']->addFunction(
         'has_statistics', new \Twig_Function_Function('has_statistics')
+    );
+    $application['twig']->addFunction(
+        'is_paying_customer', new \Twig_Function_Function('is_paying_customer')
     );
 });
 
@@ -2048,6 +2050,12 @@ $application->match(
     }
 )
 ->bind('ps')
+->method('GET');
+
+$application->match('/403', function () use ($application) {
+    return $application['twig']->render('views/403.twig');
+})
+->bind('403')
 ->method('GET');
 
 $application->run();

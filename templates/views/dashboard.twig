@@ -11,163 +11,140 @@
                 {% include 'slots/feedback.twig' %}
                 <h1>{{ module }}</h1>
             </div>
-            {% if user.id %}
-                <div class="alert alert-info">
-                    <strong>Notice (August 29th, 2014 @ 03:00 AM EST):</strong>
-                    We are making the new tools available to you now, these
-                    will continue to receive regular updates over the next few
-                    days as we prepare for the full launch. Please report any
-                    issues you may experience with them to us so that we may
-                    resolve them as quickly as possible. Introduction videos
-                    are coming soon. Enjoy!
-                    <br>
-                    New: Top 100 Explorer, Single Keyword Analyzer,
-                    Popular Searches
+            <center>
+                <p>
+                    Featured tools are shown below. All tools are accessible
+                    from the navigation bar above.
+                </p>
+            </center>
+            <div class="row-fluid">
+                <div class="span4">
+                    <p class="center">
+                        <iframe
+                            class="video"
+                            allowfullscreen
+                            frameborder="0"
+                            height="230"
+                            src="//www.youtube.com/embed/Iwd5VJa-IPk"
+                            width="408"
+                        ></iframe>
+                        <a
+                            class="btn btn-info btn-large"
+                            href="{{ url('ce_overview') }}"
+                            >
+                            <span class="icon-key icon-large">
+                            </span>
+                            Top 100 Explorer
+                        </a>
+                    </p>
                 </div>
-                <center>
-                    <p>
-                        Featured tools are shown below. All tools are
-                        accessible from the navigation bar above.
+                <div class="span4">
+                    <p class="center">
+                        <iframe
+                            class="video"
+                            allowfullscreen
+                            frameborder="0"
+                            height="230"
+                            src="//www.youtube.com/embed/OSI7Ym1Xw0c"
+                            width="408"
+                        ></iframe>
+                        <a
+                            class="btn btn-info btn-large"
+                            href="{{ url('aks') }}"
+                            >
+                            <span class="icon-list icon-large"></span>
+                            Keywords Suggester
+                        </a>
                     </p>
-                </center>
-                <div class="row-fluid">
-                    <div class="span4">
-                        <p class="center">
-                            <iframe
-                                class="video"
-                                allowfullscreen
-                                frameborder="0"
-                                height="230"
-                                src="//www.youtube.com/embed/Iwd5VJa-IPk"
-                                width="408"
-                            ></iframe>
-                            <a
-                                class="btn btn-info btn-large"
-                                href="{{ url('ce_overview') }}"
-                                >
-                                <span class="icon-key icon-large">
-                                </span>
-                                Top 100 Explorer
-                            </a>
-                        </p>
-                    </div>
-                    <div class="span4">
-                        <p class="center">
-                            <iframe
-                                class="video"
-                                allowfullscreen
-                                frameborder="0"
-                                height="230"
-                                src="//www.youtube.com/embed/OSI7Ym1Xw0c"
-                                width="408"
-                            ></iframe>
-                            <a
-                                class="btn btn-info btn-large"
-                                href="{{ url('aks') }}"
-                                >
-                                <span class="icon-list icon-large"></span>
-                                Keywords Suggester
-                            </a>
-                        </p>
-                    </div>
-                    <div class="span4">
-                        <p class="center">
-                            <span class="video"></span>
-                            <a
-                                class="btn btn-info btn-large"
-                                href="{{ url('kns_overview') }}"
-                                >
-                                <i class="icon-tags icon-large"></i>
-                                Multiple Keyword Analyzer
-                            </a>
-                        </p>
-                    </div>
                 </div>
-                {% if popular_searches %}
-                    <hr>
-                    <p>
-                        {% include 'slots/how_do_we_know_this.twig' %}
-                        Kindle shoppers want to read more books like:
+                <div class="span4">
+                    <p class="center">
+                        <span class="video"></span>
+                        <a
+                            class="btn btn-info btn-large"
+                            href="{{ url('kns_overview') }}"
+                            >
+                            <i class="icon-tags icon-large"></i>
+                            Multiple Keyword Analyzer
+                        </a>
                     </p>
-                    {% include 'slots/ps.twig' %}
-                    <p class="text-right">
-                        <a href="{{ url('ps') }}">See More</a>
-                    </p>
-                {% endif %}
+                </div>
+            </div>
+            {% if popular_searches %}
                 <hr>
-                <p>Current Version: <strong>3.1</strong></p>
-                <ul>
-                    <li>
-                        Keyword Analyzer:
-                        <ul>
-                            <li>Performance improvements</li>
-                            {#<li>Support for multiple countries</li>#}
-                            <li>
-                                Results will now sort by highest score as
-                                default
-                            </li>
-                        </ul>
-                    </li>
-                    <li>
-                        Keywords Suggester:
-                        <ul>
-                            <li>
-                                Resolved an issue that prevented German queries
-                                from working correctly
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-                <div ng-controller="previous_versions">
-                    <p ng-show="!status">
-                        <a ng-click="status = true">Show Previous Versions</a>
-                    </p>
-                    <p ng-show="status">
-                        <a ng-click="status = false">Hide Previous Versions</a>
-                    </p>
-                    <div ng-show="status">
-                        <p>Version: <strong>3.0</strong></p>
-                        <ul>
-                            <li>
-                                Processing of keywords is now done entirely
-                                server-side
-                            </li>
-                            <li>
-                                Multiple Reports may now be run simultaneously
-                            </li>
-                            <li>Framework improvements to enhance speed</li>
-                            <li>
-                                Changed mail server to improve email
-                                deliverability
-                            </li>
-                            <li>
-                                Reports are now safely stored in full for up to
-                                30 days
-                            </li>
-                            <li>
-                                Partial reports may now be downloaded during
-                                analysis
-                            </li>
-                        </ul>
-                        <p>Version: <strong>2.0</strong>
-                        <ul>
-                            <li>
-                                Fixed a problem that caused some keywords to
-                                "hang" during the processing of extremely large
-                                lists
-                            </li>
-                            <li>Added guide for new users</li>
-                            <li>Added feedback form</li>
-                        </ul>
-                    </div>
-                </div>
-            {% else %}
-                <div class="alert alert-error">
-                    You are not signed in.
-                    <a href="http://zonsidekick.com/my-account">Click here</a>
-                    to sign in now.
-                </div>
+                <p>
+                    {% include 'slots/how_do_we_know_this.twig' %}
+                    Kindle shoppers want to read more books like:
+                </p>
+                {% include 'slots/ps.twig' %}
+                <p class="text-right">
+                    <a href="{{ url('ps') }}">See More</a>
+                </p>
             {% endif %}
+            <hr>
+            <p>Current Version: <strong>3.1</strong></p>
+            <ul>
+                <li>
+                    Keyword Analyzer:
+                    <ul>
+                        <li>Performance improvements</li>
+                        {#<li>Support for multiple countries</li>#}
+                        <li>
+                            Results will now sort by highest score as default
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    Keywords Suggester:
+                    <ul>
+                        <li>
+                            Resolved an issue that prevented German queries
+                            from working correctly
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <div ng-controller="previous_versions">
+                <p ng-show="!status">
+                    <a ng-click="status = true">Show Previous Versions</a>
+                </p>
+                <p ng-show="status">
+                    <a ng-click="status = false">Hide Previous Versions</a>
+                </p>
+                <div ng-show="status">
+                    <p>Version: <strong>3.0</strong></p>
+                    <ul>
+                        <li>
+                            Processing of keywords is now done entirely
+                            server-side
+                        </li>
+                        <li>
+                            Multiple Reports may now be run simultaneously
+                        </li>
+                        <li>Framework improvements to enhance speed</li>
+                        <li>
+                            Changed mail server to improve email deliverability
+                        </li>
+                        <li>
+                            Reports are now safely stored in full for up to 30
+                            days
+                        </li>
+                        <li>
+                            Partial reports may now be downloaded during
+                            analysis
+                        </li>
+                    </ul>
+                    <p>Version: <strong>2.0</strong>
+                    <ul>
+                        <li>
+                            Fixed a problem that caused some keywords to "hang"
+                            during the processing of extremely large lists
+                        </li>
+                        <li>Added guide for new users</li>
+                        <li>Added feedback form</li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 </div>

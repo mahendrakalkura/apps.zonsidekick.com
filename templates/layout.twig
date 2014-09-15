@@ -43,119 +43,121 @@
     <body data-url="{{ app.request.getSchemeAndHttpHost() }}{{ app.request.baseUrl }}">
         <div id="top"></div>
         <div id="middle">
-            <div class="navbar">
-                <div class="navbar-inner">
-                    <ul class="nav">
-                        <li class="{% if nav == 'dashboard' %}active{% endif %}">
-                            <a href="{{ url('dashboard') }}">
-                                <i class="icon-home"></i>
-                                Dashboard
-                            </a>
-                        </li>
-                        <li class="{% if nav == 'ce' %}active{% endif %}">
-                            <a href="{{ url('ce_overview') }}">
-                                <i class="icon-key icon-large"></i>
-                                Top 100 Explorer
-                            </a>
-                        </li>
-                        <li class="{% if nav == 'aks' %}active{% endif %}">
-                            <a href="{{ url('aks') }}">
-                                <span class="icon-list icon-large"></span>
-                                Keywords Suggester
-                            </a>
-                        </li>
-                        <li class="{% if nav == 'kns' %}active{% endif %} dropdown">
-                            <a
-                                class="dropdown-toggle"
-                                data-toggle="dropdown"
-                                >
-                                <i class="icon-user-md icon-large"></i>
-                                Keyword Analyzers
-                                <i class="caret"></i>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a href="{{ url('kns_overview') }}">
-                                        <i class="icon-tags icon-large">
-                                        </i>
-                                        Multiple Keywords Analyzer
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ url('kns_single') }}">
-                                        <i class="icon-tag icon-large"></i>
-                                        Single Keyword Analyzer
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="{% if nav == 'a' %}active{% endif %} dropdown">
-                            <a
-                                class="dropdown-toggle"
-                                data-toggle="dropdown"
-                                >
-                                <i class="icon-screenshot icon-large"></i>
-                                Other Analyzers
-                                <i class="caret"></i>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a href="{{ url('aa') }}">
-                                        <i class="icon-user icon-large">
-                                        </i>
-                                        Author Analyzer
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ url('ba') }}">
-                                        <i class="icon-book icon-large">
-                                        </i>
-                                        Book Analyzer
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="{% if nav == 'ps' %}active{% endif %}">
-                            <a href="{{ url('ps') }}">
-                                <i class="icon-search icon-large"></i>
-                                Popular Searches
-                            </a>
-                        </li>
-                        <li class="{% if nav == 'others' %}active{% endif %} dropdown">
-                            <a
-                                class="dropdown-toggle"
-                                data-toggle="dropdown"
-                                >
-                                <i class="icon-cogs"></i>
-                                Others
-                                <i class="caret"></i>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a href="{{ url('logos_overview') }}">
-                                        <i class="icon-picture"></i>
-                                        Logos
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ url('profile') }}">
-                                        <i class="icon-user"></i>
-                                        Profile
-                                    </a>
-                                </li>
-                                {% if has_statistics(user) %}
+            {% if user.id and is_paying_customer(application, user) %}
+                <div class="navbar">
+                    <div class="navbar-inner">
+                        <ul class="nav">
+                            <li class="{% if nav == 'dashboard' %}active{% endif %}">
+                                <a href="{{ url('dashboard') }}">
+                                    <i class="icon-home"></i>
+                                    Dashboard
+                                </a>
+                            </li>
+                            <li class="{% if nav == 'ce' %}active{% endif %}">
+                                <a href="{{ url('ce_overview') }}">
+                                    <i class="icon-key icon-large"></i>
+                                    Top 100 Explorer
+                                </a>
+                            </li>
+                            <li class="{% if nav == 'aks' %}active{% endif %}">
+                                <a href="{{ url('aks') }}">
+                                    <span class="icon-list icon-large"></span>
+                                    Keywords Suggester
+                                </a>
+                            </li>
+                            <li class="{% if nav == 'kns' %}active{% endif %} dropdown">
+                                <a
+                                    class="dropdown-toggle"
+                                    data-toggle="dropdown"
+                                    >
+                                    <i class="icon-user-md icon-large"></i>
+                                    Keyword Analyzers
+                                    <i class="caret"></i>
+                                </a>
+                                <ul class="dropdown-menu">
                                     <li>
-                                        <a href="{{ url('statistics') }}">
-                                            <i class="icon-bar-chart"></i>
-                                            Statistics
+                                        <a href="{{ url('kns_overview') }}">
+                                            <i class="icon-tags icon-large">
+                                            </i>
+                                            Multiple Keywords Analyzer
                                         </a>
                                     </li>
-                                {% endif %}
-                            </ul>
-                        </li>
-                    </ul>
+                                    <li>
+                                        <a href="{{ url('kns_single') }}">
+                                            <i class="icon-tag icon-large"></i>
+                                            Single Keyword Analyzer
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="{% if nav == 'a' %}active{% endif %} dropdown">
+                                <a
+                                    class="dropdown-toggle"
+                                    data-toggle="dropdown"
+                                    >
+                                    <i class="icon-screenshot icon-large"></i>
+                                    Other Analyzers
+                                    <i class="caret"></i>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a href="{{ url('aa') }}">
+                                            <i class="icon-user icon-large">
+                                            </i>
+                                            Author Analyzer
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ url('ba') }}">
+                                            <i class="icon-book icon-large">
+                                            </i>
+                                            Book Analyzer
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="{% if nav == 'ps' %}active{% endif %}">
+                                <a href="{{ url('ps') }}">
+                                    <i class="icon-search icon-large"></i>
+                                    Popular Searches
+                                </a>
+                            </li>
+                            <li class="{% if nav == 'others' %}active{% endif %} dropdown">
+                                <a
+                                    class="dropdown-toggle"
+                                    data-toggle="dropdown"
+                                    >
+                                    <i class="icon-cogs"></i>
+                                    Others
+                                    <i class="caret"></i>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a href="{{ url('logos_overview') }}">
+                                            <i class="icon-picture"></i>
+                                            Logos
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ url('profile') }}">
+                                            <i class="icon-user"></i>
+                                            Profile
+                                        </a>
+                                    </li>
+                                    {% if has_statistics(user) %}
+                                        <li>
+                                            <a href="{{ url('statistics') }}">
+                                                <i class="icon-bar-chart"></i>
+                                                Statistics
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
+            {% endif %}
             <div class="container-fluid">
                 {% block content %}
                 {% endblock %}

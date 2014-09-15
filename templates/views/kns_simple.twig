@@ -53,41 +53,29 @@
                     <span class="icon-download icon-large"></span>
                     Download CSV
                 </a>
-                {% if 3 in groups and logos %}
-                    <div
-                        class="btn btn-info"
-                        title="Detailed Report - Brandable"
-                        data-toggle="tooltip"
-                        popover
-                        >
-                        <span class="icon-download icon-large"></span>
-                        Download PDF
-                        <div class="hide">
+                <div
+                    class="btn btn-info"
+                    title="Detailed Report - Brandable"
+                    data-toggle="tooltip"
+                    popover
+                    >
+                    <span class="icon-download icon-large"></span>
+                    Download PDF
+                    <div class="hide">
+                        <img
+                            class="img-polaroid popover-pdf"
+                            data-url="{{ url('kns_pdf', {'id': request.id}) }}"
+                            src="{{ app.request.getSchemeAndHttpHost() }}{{ app.request.baseUrl }}/images/logo.png"
+                            >
+                        {% for logo in logos %}
                             <img
                                 class="img-polaroid popover-pdf"
-                                data-url="{{ url('kns_pdf', {'id': request.id}) }}"
-                                src="{{ app.request.getSchemeAndHttpHost() }}{{ app.request.baseUrl }}/images/logo.png"
+                                data-url="{{ url('kns_pdf', {'id': request.id, 'logo': logo.file_name|e('url')}) }}"
+                                src="{{ url('logos_view', {'file_name': logo.file_name}) }}"
                                 >
-                            {% for logo in logos %}
-                                <img
-                                    class="img-polaroid popover-pdf"
-                                    data-url="{{ url('kns_pdf', {'id': request.id, 'logo': logo.file_name|e('url')}) }}"
-                                    src="{{ url('logos_view', {'file_name': logo.file_name}) }}"
-                                    >
-                            {% endfor %}
-                        </div>
+                        {% endfor %}
                     </div>
-                {% else %}
-                    <button
-                        class="btn btn-info popover-pdf"
-                        title="Detailed Report"
-                        data-toggle="tooltip"
-                        data-url="{{ url('kns_pdf', {'id': request.id}) }}"
-                        >
-                        <span class="icon-download icon-large"></span>
-                        Download PDF
-                    </button>
-                {% endif %}
+                </div>
                 <div
                     class="btn btn-info"
                     data-url="{{ url('kns_email', {'id': request.id}) }}"
