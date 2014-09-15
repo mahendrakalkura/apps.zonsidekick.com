@@ -745,7 +745,7 @@ $application->before(function (Request $request) use ($application) {
     if (!$user['id']) {
         return $application->redirect('http://zonsidekick.com/wp-login.php');
     }
-    $is_paying_customer = is_paying_customer($user);
+    $is_paying_customer = is_paying_customer($application, $user);
     if ($request->get('_route') == '403') {
         if ($is_paying_customer) {
             return $application->redirect(
