@@ -1237,7 +1237,7 @@ application.controller('suggested_keywords', function ($attrs, $http, $scope) {
             jQuery('<input/>', {
                 'name': 'mode',
                 'type': 'hidden',
-                'val': 'Combine'
+                'val': mode
             })
         ).submit();
     };
