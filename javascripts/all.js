@@ -1222,7 +1222,7 @@ application.controller('suggested_keywords', function ($attrs, $http, $scope) {
         return;
     };
 
-    $scope.get_more_suggestions = function (words) {
+    $scope.get_more_suggestions = function (keywords, mode) {
         jQuery('<form/>', {
             action: $attrs.urlsAks,
             target: '_blank',
@@ -1231,7 +1231,7 @@ application.controller('suggested_keywords', function ($attrs, $http, $scope) {
             jQuery('<input/>', {
                 'name': 'keywords',
                 'type': 'hidden',
-                'val': words.join('\n')
+                'val': keywords.join('\n')
             })
         ).append(
             jQuery('<input/>', {
