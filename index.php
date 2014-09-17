@@ -132,6 +132,7 @@ EOD;
 }
 
 function get_count_and_keywords($application, $user, $keywords) {
+    $count = -1;
     $keywords = explode("\n", $keywords);
     if (!empty($keywords)) {
         foreach ($keywords as $key => $value) {
@@ -144,26 +145,6 @@ function get_count_and_keywords($application, $user, $keywords) {
         }
     }
     $keywords = array_unique($keywords);
-    $query = <<<EOD
-SELECT COUNT(`id`) AS `count`
-FROM `tools_kns_keywords`
-INNER JOIN `tools_kns_requests` ON `keywords`.`request_id` = `requests`.`id`
-WHERE
-    `tools_kns_requests`.`user_id` = ?
-    AND
-    DATE(`tools_kns_requests`.`timestamp`) = ?
-EOD;
-    $record = $application['db']->fetchAssoc(
-        $query, array($user['id'], date('Y-m-d'))
-    );
-    $limit = 10;
-    if ($record['count'] >= $limit) {
-        $count = 0;
-        $keywords = array();
-    } else {
-        $keywords = array_slice($keywords, 0, $limit - $record['count']);
-        $count = $limit - $record['count'];
-    }
 
     return array($count, $keywords);
 }

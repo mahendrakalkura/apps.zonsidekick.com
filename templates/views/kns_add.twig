@@ -56,74 +56,63 @@
                 see dashboard for status updates. Thank you for your patience.
             </div>
             #}
-            {% if count == -1 or count %}
-                {% if count != -1 %}
-                    <div class="alert alert-success">
-                        You may query {{ count }} more keywords today.
+            <form
+                accept-charset="UTF-8"
+                action="{{ url('kns_process') }}"
+                class="form-horizontal"
+                method="POST"
+                >
+                <div class="control-group">
+                    <label class="control-label" for="keywords">
+                        Keywords
+                    </label>
+                    <div class="controls">
+                        <textarea
+                            class="span12"
+                            id="keywords"
+                            name="keywords"
+                            ng-model="keywords"
+                            ng-on-blur="focus['keywords'] = false"
+                            rows="15"
+                            ></textarea>
+                        <span ng-class="get_class()">
+                            [! count !] keywords remaining
+                        </span>
                     </div>
-                {% endif %}
-                <form
-                    accept-charset="UTF-8"
-                    action="{{ url('kns_process') }}"
-                    class="form-horizontal"
-                    method="POST"
-                    >
-                    <div class="control-group">
-                        <label class="control-label" for="keywords">
-                            Keywords
-                        </label>
-                        <div class="controls">
-                            <textarea
-                                class="span12"
-                                id="keywords"
-                                name="keywords"
-                                ng-model="keywords"
-                                ng-on-blur="focus['keywords'] = false"
-                                rows="15"
-                                ></textarea>
-                            <span ng-class="get_class()">
-                                [! count !] keywords remaining
-                            </span>
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="country">
-                            Country
-                        </label>
-                        <div class="controls">
-                            <select
-                                class="span12"
-                                id="country"
-                                name="country"
-                                >
-                                {% for key, value in countries %}
-                                    <option value="{{ key }}">
-                                        {{ value }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-actions">
-                        <button
-                            class="btn btn-success"
-                            ng-click="submit($event)"
-                            type="submit"
-                            >
-                            <span class="icon-info-sign icon-large"></span>
-                            Submit
-                        </button>
-                        <button class="btn btn-danger" type="reset">
-                            <span class="icon-trash icon-large"></span>
-                            Reset
-                        </button>
-                    </div>
-                </form>
-            {% else %}
-                <div class="alert alert-error">
-                    You may not query anymore keywords today.
                 </div>
-            {% endif %}
+                <div class="control-group">
+                    <label class="control-label" for="country">
+                        Country
+                    </label>
+                    <div class="controls">
+                        <select
+                            class="span12"
+                            id="country"
+                            name="country"
+                            >
+                            {% for key, value in countries %}
+                                <option value="{{ key }}">
+                                    {{ value }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button
+                        class="btn btn-success"
+                        ng-click="submit($event)"
+                        type="submit"
+                        >
+                        <span class="icon-info-sign icon-large"></span>
+                        Submit
+                    </button>
+                    <button class="btn btn-danger" type="reset">
+                        <span class="icon-trash icon-large"></span>
+                        Reset
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
