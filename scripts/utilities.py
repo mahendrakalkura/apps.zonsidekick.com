@@ -21,6 +21,7 @@ from sqlalchemy.ext.mutable import Mutable
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.schema import ThreadLocalMetaData
 from sqlalchemy.types import TEXT, TypeDecorator
+from urlparse import urlparse
 
 with open(join(dirname(__file__), '..', 'variables.json'), 'r') as resource:
     variables = loads(resource.read())
@@ -286,7 +287,8 @@ def get_book(response):
     }
 
 
-def get_headers():
+def get_headers(url):
+    netloc_ = urlparse(url).netloc
     return {
         'Accept': (
             'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
@@ -296,8 +298,10 @@ def get_headers():
         'Accept-Language': 'en-US,en;q=0.8',
         'Cache-Control': 'max-age=0',
         'Connection': 'keep-alive',
-        'Host': 'www.amazon.com',
-        'Referer': 'http://www.amazon.com',
+        'Host': netloc_,
+        'Referer': 'http://%(netloc)s' % {
+            'netloc': netloc_
+        },
         'User-Agent': get_user_agent(),
     }
 
@@ -413,7 +417,7 @@ def get_response(url):
             response = get(
                 url,
                 allow_redirects=True,
-                headers=get_headers(),
+                headers=get_headers(url),
                 proxies=get_proxies(),
                 timeout=get_timeout(),
                 verify=False,
@@ -447,7 +451,7 @@ def get_responses(urls):
             for response in map_(get_(
                 key,
                 allow_redirects=True,
-                headers=get_headers(),
+                headers=get_headers(key),
                 proxies=get_proxies(),
                 timeout=get_timeout(),
                 verify=False,
