@@ -6,6 +6,7 @@ from os.path import dirname, join
 from random import choice, randint
 from re import compile, sub
 from socket import timeout
+from urlparse import urlparse
 
 from grequests import get as get_, map as map_
 from MySQLdb import connect
@@ -21,7 +22,6 @@ from sqlalchemy.ext.mutable import Mutable
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.schema import ThreadLocalMetaData
 from sqlalchemy.types import TEXT, TypeDecorator
-from urlparse import urlparse
 
 with open(join(dirname(__file__), '..', 'variables.json'), 'r') as resource:
     variables = loads(resource.read())
@@ -288,7 +288,7 @@ def get_book(response):
 
 
 def get_headers(url):
-    netloc_ = urlparse(url).netloc
+    netloc = urlparse(url).netloc
     return {
         'Accept': (
             'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
@@ -298,9 +298,9 @@ def get_headers(url):
         'Accept-Language': 'en-US,en;q=0.8',
         'Cache-Control': 'max-age=0',
         'Connection': 'keep-alive',
-        'Host': netloc_,
+        'Host': netloc,
         'Referer': 'http://%(netloc)s' % {
-            'netloc': netloc_
+            'netloc': netloc,
         },
         'User-Agent': get_user_agent(),
     }

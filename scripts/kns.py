@@ -351,6 +351,27 @@ def get_contents(keyword, country):
                             ' '
                         )[0].replace(
                             ',', ''
+                        ).replace(
+                            u'件中', ''
+                        )
+                    )
+                except (IndexError, ValueError):
+                    pass
+            if not count:
+                try:
+                    count = int(
+                        Selector(
+                            text=response.text
+                        ).xpath(
+                            '//h2[@id="s-result-count"]'
+                        ).xpath(
+                            'string()'
+                        ).extract()[0].strip().split(
+                            ' '
+                        )[1].replace(
+                            ',', ''
+                        ).replace(
+                            u'件中', ''
                         )
                     )
                 except (IndexError, ValueError):
@@ -367,23 +388,6 @@ def get_contents(keyword, country):
                         ).extract()[0].strip().split(
                             ' '
                         )[2].replace(
-                            ',', ''
-                        )
-                    )
-                except (IndexError, ValueError):
-                    pass
-            if not count and country == 'co.jp':
-                try:
-                    count = int(
-                        Selector(
-                            text=response.text
-                        ).xpath(
-                            '//h2[@id="s-result-count"]'
-                        ).xpath(
-                            'string()'
-                        ).extract()[0].strip().split(
-                            ' '
-                        )[1].replace(
                             ',', ''
                         ).replace(
                             u'件中', ''
@@ -694,11 +698,13 @@ def get_contents(keyword, country):
         spend = (spend, get_float(spend))
         stars = 0.0
         try:
-            stars = float(get_string(
-                selector.xpath(
-                    '//div[@class="gry txtnormal acrRating"]/text()'
-                ).extract()[0]
-            ).split(' ')[0].replace(',', '').replace(u'つ星のうち', ''))
+            stars = float(
+                get_string(
+                    selector.xpath(
+                        '//div[@class="gry txtnormal acrRating"]/text()'
+                    ).extract()[0]
+                ).split(' ')[0].replace(',', '').replace(u'つ星のうち', '')
+            )
         except IndexError:
             try:
                 stars = float(get_string(
