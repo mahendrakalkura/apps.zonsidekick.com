@@ -446,7 +446,7 @@ def get_responses(urls):
             return responses.values()
         index += 1
         if index >= 5:
-            return responses.keys()
+            return responses.values()
         try:
             for response in map_(get_(
                 key,
