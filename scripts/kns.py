@@ -396,7 +396,19 @@ def get_contents(keyword, country):
                 except (IndexError, ValueError):
                     pass
     if not count:
-        return
+        return {
+            'average_length': [-1, 'N/A'],
+            'average_price': [-1, 'N/A'],
+            'buyer_behavior': [-1, 'N/A'],
+            'competition': [-1, 'N/A'],
+            'count': [0, '0'],
+            'items': [],
+            'matches': [0, 0],
+            'optimization': [-1, 'N/A'],
+            'score': [-1, 'N/A'],
+            'spend': [[-1, 'N/A'], 'N/A'],
+            'words': [],
+        }
     count = (count, get_int(count))
     urls = []
     if (
@@ -416,7 +428,19 @@ def get_contents(keyword, country):
                     }
                 urls.append(href)
     if not urls:
-        return
+        return {
+            'average_length': [-1, 'N/A'],
+            'average_price': [-1, 'N/A'],
+            'buyer_behavior': [-1, 'N/A'],
+            'competition': [-1, 'N/A'],
+            'count': [0, '0'],
+            'items': [],
+            'matches': [0, 0],
+            'optimization': [-1, 'N/A'],
+            'score': [-1, 'N/A'],
+            'spend': [[-1, 'N/A'], 'N/A'],
+            'words': [],
+        }
     responses = get_responses(urls[0:48])
     if not responses:
         return
@@ -757,7 +781,19 @@ def get_contents(keyword, country):
                 'url': response.url,
             })
     if not items:
-        return
+        return {
+            'average_length': [-1, 'N/A'],
+            'average_price': [-1, 'N/A'],
+            'buyer_behavior': [-1, 'N/A'],
+            'competition': [-1, 'N/A'],
+            'count': [0, '0'],
+            'items': [],
+            'matches': [0, 0],
+            'optimization': [-1, 'N/A'],
+            'score': [-1, 'N/A'],
+            'spend': [[-1, 'N/A'], 'N/A'],
+            'words': [],
+        }
     price = sum([item['price'][0] for item in items])
     average_length = mean([
         item['pages'][0] for item in items if item['pages'][0]
