@@ -30,7 +30,9 @@ def get_authors(keyword):
         for anchor in Selector(
             text=response.text
         ).xpath(
-            '//span[@class="ptBrand"]/a'
+            '//span[@class="a-size-small a-color-secondary"][text()="by "]/'
+            'following-sibling::span[@class="a-size-small a-color-secondary"]/'
+            'a[@class="a-link-normal a-text-normal"]'
         ):
             url = get_url('http://www.amazon.com%(href)s' % {
                 'href': anchor.xpath('.//@href').extract()[0],

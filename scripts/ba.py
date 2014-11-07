@@ -31,20 +31,19 @@ def get_books(keyword):
         for anchor in Selector(
             text=response.text
         ).xpath(
-            '//h3[@class="title"]/a[@class="title"]'
+            '//a[@class="a-link-normal s-access-detail-page a-text-normal"]'
         ):
             title = ''
             try:
-                title = get_string(anchor.xpath('.//span/@title').extract()[0])
+                title = get_string(anchor.xpath('.//@title').extract()[0])
             except IndexError:
                 try:
-                    title = get_string(anchor.xpath('.//text()').extract()[0])
+                    title = get_string(anchor.xpath('.//h2/text()').extract()[0])
                 except IndexError:
                     pass
             books.append({
                 'book_cover_image': anchor.xpath(
-                    './/../../../div[@class="image imageContainer"]/a/div/img/'
-                    '@src'
+                    './/../../../div/div/div/a/img/@src'
                 ).extract()[0],
                 'title': title,
                 'url': get_url(anchor.xpath('.//@href').extract()[0]),
