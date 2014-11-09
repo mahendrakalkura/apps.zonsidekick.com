@@ -419,8 +419,12 @@ def get_contents(keyword, country):
         (country == 'de' and breadcrumb == 'Kindle-Shop')
     ):
         for response in responses:
-            for href in Selector(text=response.text).xpath(
-                '//h3[@class="newaps"]/a/span[@class="lrg bold"]/../@href'
+            for href in Selector(
+                text=response.text
+            ).xpath(
+                '//a'
+                '[@class="a-link-normal s-access-detail-page a-text-normal"]/'
+                '@href'
             ).extract():
                 if not href.startswith('http'):
                     href = 'http://www.amazon.com%(href)s' % {
