@@ -696,9 +696,9 @@ application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
         $scope.review_average_3 = parseInt($attrs.reviewAverage3, 10) || 0;
         $scope.review_average_4 = parseInt($attrs.reviewAverage4, 10) || 0;
         $scope.appearance_1 = $attrs.appearance1 || $scope.appearances[0];
-        $scope.appearance_2 = parseInt($attrs.appearance2, 10) || 0;
-        $scope.appearance_3 = parseInt($attrs.appearance3, 10) || 0;
-        $scope.appearance_4 = parseInt($attrs.appearance4, 10) || 0;
+        $scope.appearance_2 = parseInt($attrs.appearance2, 10) || 1;
+        $scope.appearance_3 = parseInt($attrs.appearance3, 10) || 1;
+        $scope.appearance_4 = parseInt($attrs.appearance4, 10) || 1;
         $scope.count = parseInt($attrs.count, 10) || $scope.counts[0];
 
         jQuery('#category_id').select2('val', $scope.category_id);
