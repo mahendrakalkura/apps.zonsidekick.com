@@ -163,11 +163,7 @@ def sk_py():
 
 
 if __name__ == '__main__':
-    resource = SMTP(variables['smtp']['host'], variables['smtp']['port'])
-    resource.login(
-        variables['smtp']['username'], variables['smtp']['password']
-    )
-    message = MIMEText('\n'.join([
+    body = '\n'.join([
         'aa_py_get_authors: %(status)s' % {
             'status': 'Success' if aa_py_get_authors() else 'Failure'
         },
@@ -193,7 +189,12 @@ if __name__ == '__main__':
         'sk_py: %(status)s' % {
             'status': 'Success' if sk_py() else 'Failure'
         },
-    ]))
+    ])
+    resource = SMTP(variables['smtp']['host'], variables['smtp']['port'])
+    resource.login(
+        variables['smtp']['username'], variables['smtp']['password']
+    )
+    message = MIMEText(body)
     message['Subject'] = 'tests.py'
     message['From'] = 'reports@perfectsidekick.com'
     message['To'] = 'mahendrakalkura@gmail.com'
