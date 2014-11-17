@@ -8,7 +8,7 @@ from aks import get_results
 from ba import get_books, get_items
 from kns import get_contents
 from sk import get_suggested_keywords
-from utilities import get_book, get_response
+from utilities import get_book, get_response, variables
 
 
 def aa_py_get_authors():
@@ -23,8 +23,7 @@ def aa_py_get_authors():
         'url' in output[0]
     ):
         return True
-    else:
-        return False
+    return False
 
 
 def aa_py_get_author():
@@ -49,16 +48,14 @@ def aa_py_get_author():
         'twitter' in output
     ):
         return True
-    else:
-        return False
+    return False
 
 
 def aks_py():
     output = get_results('stephen king', 'com', 'digital-text')
     if type(output) == list and len(output) > 0:
         return True
-    else:
-        return False
+    return False
 
 
 def ba_py_get_books():
@@ -73,8 +70,7 @@ def ba_py_get_books():
         'url' in output[0]
     ):
         return True
-    else:
-        return False
+    return False
 
 
 def ba_py_get_book():
@@ -111,8 +107,7 @@ def ba_py_get_book():
         'url' in output
     ):
         return True
-    else:
-        return False
+    return False
 
 
 def ba_py_get_items():
@@ -122,8 +117,7 @@ def ba_py_get_items():
     )
     if type(output) == list and len(output) > 0:
         return True
-    else:
-        return False
+    return False
 
 
 def kns_py():
@@ -158,20 +152,22 @@ def kns_py():
         'words' in output
     ):
         return True
-    else:
-        return False
+    return False
 
 
 def sk_py():
     output = get_suggested_keywords(['stephen', 'king'])
     if type(output) == list and len(output) > 0:
         return True
-    else:
-        return False
+    return False
 
 
 if __name__ == '__main__':
-    body = '\n'.join([
+    resource = SMTP(variables['smtp']['host'], variables['smtp']['port'])
+    resource.login(
+        variables['smtp']['username'], variables['smtp']['password']
+    )
+    message = MIMEText('\n'.join([
         'aa_py_get_authors: %(status)s' % {
             'status': 'Success' if aa_py_get_authors() else 'Failure'
         },
@@ -197,18 +193,9 @@ if __name__ == '__main__':
         'sk_py: %(status)s' % {
             'status': 'Success' if sk_py() else 'Failure'
         },
-    ])
-    resource = SMTP(
-        'smtp.mandrillapp.com', 587
-    )
-    resource.login(
-        'ncroan', 'teFUcZodZBU6lAsr86irtA'
-    )
-    message = MIMEText(body)
-    message['Subject'] = 'Automated Testing'
-    message['From'] = 'ncroan@gmail.com'
+    ]))
+    message['Subject'] = 'tests.py'
+    message['From'] = 'reports@perfectsidekick.com'
     message['To'] = 'mahendrakalkura@gmail.com'
-    resource.sendmail(
-        message['From'], message['To'], message.as_string()
-    )
+    resource.sendmail(message['From'], message['To'], message.as_string())
     resource.quit()
