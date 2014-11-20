@@ -103,7 +103,9 @@ if __name__ == '__main__':
             url = ''
             try:
                 url = get_url(selector.xpath(
-                    '//div[@id="result_0"]/h3[@class="newaps"]/a/@href'
+                    '//a[@class="'
+                    'a-link-normal s-access-detail-page a-text-normal'
+                    '"]/@href'
                 ).extract()[0])
             except IndexError:
                 pass
