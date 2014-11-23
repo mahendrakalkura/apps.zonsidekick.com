@@ -1,0 +1,3 @@
+[submodule "vendor/pixeladmin"]
+	path = vendor/pixeladmin
+	url = git@bitbucket.org:mahendrakalkura/pixeladmin.git
