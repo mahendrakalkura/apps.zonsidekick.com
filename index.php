@@ -539,6 +539,7 @@ function get_user($application) {
         return array(
             'email' => 'administrator@administrator.com',
             'id' => 1,
+            'name' => 'Administrator',
         );
     }
     $user = $application['session']->get('user_');
@@ -553,6 +554,7 @@ function get_user($application) {
     return array(
         'email' => '',
         'id' => 0,
+        'name' => '',
     );
 }
 
@@ -749,7 +751,7 @@ $application->match(
             $password = $request->get('password');
             if (!empty($username) AND !empty($password)) {
                 $query = <<<EOD
-SELECT `id` , `user_email`
+SELECT `id` , `user_email` , `display_name`
 FROM `wp_users`
 WHERE `user_login` = ? AND `user_pass` = ?
 EOD;
@@ -761,6 +763,7 @@ EOD;
                     $application['session']->set('user', array(
                         'email' => $record['user_email'],
                         'id' => $record['id'],
+                        'name' => $record['display_name'],
                     ));
                     $application['session']->getFlashBag()->add(
                         'success',
@@ -775,7 +778,7 @@ EOD;
             $error = 'Invalid Username/Password';
         }
 
-        return $application['twig']->render('views/sign-in.twig', array(
+        return $application['twig']->render('views/sign_in.twig', array(
             'error' => $error,
         ));
     }
@@ -785,13 +788,15 @@ EOD;
 
 $application->match('/sign-out', function () use ($application) {
     $application['session']->set('user_', array(
-        'email' => $record['user_email'],
-        'id' => $record['id'],
+        'email' => '',
+        'id' => '',
+        'name' => '',
     ));
 
     $application['session']->set('user', array(
-        'email' => $record['user_email'],
-        'id' => $record['id'],
+        'email' => '',
+        'id' => '',
+        'name' => '',
     ));
 
     return $application->redirect(
@@ -2086,6 +2091,7 @@ EOD;
     $application['session']->set('user_', array(
         'email' => $record['user_email'],
         'id' => $record['id'],
+        'name' => $record['name'],
     ));
 
     return $application->redirect(

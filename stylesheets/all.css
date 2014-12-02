@@ -66,6 +66,14 @@ a {
     cursor: pointer;
 }
 
+.page-signin .signin-info {
+    text-align: center;
+}
+
+.theme-default #main-navbar .navbar-header {
+    text-align: center;
+}
+
 #middle {
     padding: 30px 30px 1px 30px;
 }
