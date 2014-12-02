@@ -1,4 +1,11 @@
+files/*
+!files/*.sql
+!files/.htaccess
+scripts/*.pyc
+tmp/*
+!tmp/.htaccess
+vendor/*
+!vendor/pixeladmin
 development.log
 error_log
-scripts/*.pyc
 variables.json
