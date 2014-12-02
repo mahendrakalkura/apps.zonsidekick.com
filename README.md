@@ -47,6 +47,17 @@ $ mkvirtualenv zonsidekick.com
 $ pip install -r requirements.txt
 ```
 
+Step 5
+------
+
+```
+$ cd zonsidekick.com/vendor/pixeladmin
+$ npm install
+$ grunt compile-js
+$ grunt compile-less
+$ grunt compile-sass
+```
+
 How to run?
 ===========
 
