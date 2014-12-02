@@ -77,11 +77,11 @@ SELECT `category_id`, `title`
 FROM `tools_ce_categories`
 WHERE `id` = ?
 EOD;
-        $row = $application['db']->fetchAssoc($query, array(
+        $record = $application['db']->fetchAssoc($query, array(
             $category_id,
         ));
-        $categories[] = $row['title'];
-        $category_id = $row['category_id'];
+        $categories[] = $record['title'];
+        $category_id = $record['category_id'];
         if (!$category_id) {
             break;
         }
@@ -110,20 +110,20 @@ WHERE `category_id` IS NULL
 ORDER BY `title` ASC
 EOD;
     }
-    $rows = $application['db']->fetchAll($query, array($category_id));
-    if ($rows) {
-        foreach ($rows as $row) {
+    $records = $application['db']->fetchAll($query, array($category_id));
+    if ($records) {
+        foreach ($records as $record) {
             $categories[] = array(
-                $row['id'],
+                $record['id'],
                 sprintf(
                     '%s%s',
                     implode(' > ', array_merge($prefixes, array(''))),
-                    $row['title']
+                    $record['title']
                 ),
             );
             $categories = array_merge($categories, get_categories(
-                $application, $row['id'],
-                array_merge($prefixes, array($row['title']))
+                $application, $record['id'],
+                array_merge($prefixes, array($record['title']))
             ));
         }
     }
@@ -131,7 +131,7 @@ EOD;
     return $categories;
 }
 
-function get_count_and_keywords($application, $user, $keywords) {
+function get_count_and_keywords($keywords) {
     $count = -1;
     $keywords = explode("\n", $keywords);
     if (!empty($keywords)) {
@@ -150,6 +150,7 @@ function get_count_and_keywords($application, $user, $keywords) {
 }
 
 function get_countries() {
+    // do not sort
     return array(
         'com' => 'US',
         'co.uk' => 'UK',
@@ -341,7 +342,7 @@ SELECT COUNT(DISTINCT DATE(`date_and_time`)) AS `count`
 FROM `tools_ps_trends`
 WHERE `book_id` = ? AND `date_and_time` >= NOW() - INTERVAL 7 DAY
 EOD;
-        $row_1 = $application['db']->fetchAssoc($query, array(
+        $record_1 = $application['db']->fetchAssoc($query, array(
             $popular_searches[$key]['book_id'],
         ));
         $query = <<<EOD
@@ -349,12 +350,12 @@ SELECT COUNT(DISTINCT DATE(`date_and_time`)) AS `count`
 FROM `tools_ps_trends`
 WHERE `book_id` = ? AND `date_and_time` >= NOW() - INTERVAL 30 DAY
 EOD;
-        $row_2 = $application['db']->fetchAssoc($query, array(
+        $record_2 = $application['db']->fetchAssoc($query, array(
             $popular_searches[$key]['book_id'],
         ));
         $popular_searches[$key]['appearances'] = array(
-            'last 7 days' => $row_1['count'],
-            'last 30 days' => $row_2['count'],
+            'last 7 days' => $record_1['count'],
+            'last 30 days' => $record_2['count'],
         );
         $popular_searches[$key]['url_'] = urlencode(
             $popular_searches[$key]['url']
@@ -515,10 +516,10 @@ SELECT *
 FROM `tools_ce_sections`
 ORDER BY `id` ASC
 EOD;
-    $rows = $application['db']->fetchAll($query);
-    if ($rows) {
-        foreach ($rows as $row) {
-            $sections[] = array($row['id'], $row['title']);
+    $records = $application['db']->fetchAll($query);
+    if ($records) {
+        foreach ($records as $record) {
+            $sections[] = array($record['id'], $record['title']);
         }
     }
 
@@ -540,30 +541,13 @@ function get_user($application) {
             'id' => 1,
         );
     }
-    if ($application['session']->get('transfer')) {
-        return array(
-            'email' => 'administrator@administrator.com',
-            'id' => $application['session']->get('transfer'),
-        );
+    $user = $application['session']->get('user_');
+    if ($user) {
+        return $user;
     }
-    if (!empty($_COOKIE)) {
-        foreach ($_COOKIE as $key => $value) {
-            $value = explode('|', $value);
-            if (strpos($key, 'wordpress_logged_in_') !== false) {
-                $query = <<<EOD
-SELECT `ID`, `user_email` FROM `wp_users` WHERE `user_login` = ?
-EOD;
-                $record = $application['db']->fetchAssoc(
-                    $query, array($value[0])
-                );
-                if (!empty($record)) {
-                    return array(
-                        'email' => $record['user_email'],
-                        'id' => $record['ID'],
-                    );
-                }
-            }
-        }
+    $user = $application['session']->get('user');
+    if ($user) {
+        return $user;
     }
 
     return array(
@@ -724,17 +708,19 @@ if ($application['debug']) {
 $application->before(function (Request $request) use ($application) {
     $user = get_user($application);
     if (!$user['id']) {
-        return $application->redirect('http://zonsidekick.com/wp-login.php');
+        return $application->redirect(
+            $application['url_generator']->generate('sign_in')
+        );
     }
     $is_paying_customer = is_paying_customer($application, $user);
-    if ($request->get('_route') == '403') {
-        if ($is_paying_customer) {
+    if ($is_paying_customer) {
+        if ($request->get('_route') == '403') {
             return $application->redirect(
                 $application['url_generator']->generate('dashboard')
             );
         }
     } else {
-        if (!$is_paying_customer) {
+        if ($request->get('_route') != '403') {
             return $application->redirect(
                 $application['url_generator']->generate('403')
             );
@@ -754,21 +740,72 @@ $before_statistics = function () use ($application) {
     }
 };
 
+$application->match(
+    '/sign-in',
+    function (Request $request) use ($application) {
+        $error = null;
+        if ($request->isMethod('POST')) {
+            $username = $request->get('username');
+            $password = $request->get('password');
+            if (!empty($username) AND !empty($password)) {
+                $query = <<<EOD
+SELECT `id` , `user_email`
+FROM `wp_users`
+WHERE `user_login` = ? AND `user_pass` = ?
+EOD;
+                $record = $application['db']->fetchAssoc($query, array(
+                    $username,
+                    md5($password),
+                ));
+                if ($record) {
+                    $application['session']->set('user', array(
+                        'email' => $record['user_email'],
+                        'id' => $record['id'],
+                    ));
+                    $application['session']->getFlashBag()->add(
+                        'success',
+                        array('You have been signed in successfully.')
+                    );
+
+                    return $application->redirect(
+                        $application['url_generator']->generate('dashboard')
+                    );
+                }
+            }
+            $error = 'Invalid Username/Password';
+        }
+
+        return $application['twig']->render('views/sign-in.twig', array(
+            'error' => $error,
+        ));
+    }
+)
+->bind('sign_in')
+->method('GET|POST');
+
+$application->match('/sign-out', function () use ($application) {
+    $application['session']->set('user_', array(
+        'email' => $record['user_email'],
+        'id' => $record['id'],
+    ));
+
+    $application['session']->set('user', array(
+        'email' => $record['user_email'],
+        'id' => $record['id'],
+    ));
+
+    return $application->redirect(
+        $application['url_generator']->generate('sign_in')
+    );
+})
+->bind('sign_out')
+->method('GET');
+
 $application->match('/', function () use ($application) {
     return $application->redirect(
         $application['url_generator']->generate('dashboard')
     );
 })
-->method('GET');
-
-$application->match('/transfer/{id}', function ($id) use ($application) {
-    $application['session']->set('transfer', intval($id));
-    return $application->redirect(
-        $application['url_generator']->generate('dashboard')
-    );
-})
-->before($before_statistics)
-->bind('transfer')
 ->method('GET');
 
 $application->match('/dashboard', function () use ($application) {
@@ -781,120 +818,543 @@ $application->match('/dashboard', function () use ($application) {
 ->bind('dashboard')
 ->method('GET');
 
-$application->match('/aa', function (Request $request) use ($application) {
-    return $application['twig']->render('views/aa.twig', array(
-        'url' => $request->get('url'),
+$application->match(
+    '/ce/overview',
+    function (Request $request) use ($application) {
+        return $application['twig']->render('views/ce_overview.twig', array(
+            'categories' => array_merge(
+                array(array(-1, 'All')),
+                get_categories($application, 0, array())
+            ),
+            'filters' => array(
+                'amazon_best_sellers_rank_1'
+                    => $request->get('amazon_best_sellers_rank_1', ''),
+                'amazon_best_sellers_rank_2'
+                    => $request->get('amazon_best_sellers_rank_2', ''),
+                'amazon_best_sellers_rank_3'
+                    => $request->get('amazon_best_sellers_rank_3', ''),
+                'amazon_best_sellers_rank_4'
+                    => $request->get('amazon_best_sellers_rank_4', ''),
+                'appearance_1' => $request->get('appearance_1', ''),
+                'appearance_2' => $request->get('appearance_2', ''),
+                'appearance_3' => $request->get('appearance_3', ''),
+                'appearance_4' => $request->get('appearance_4', ''),
+                'category_id' => $request->get('category_id', ''),
+                'count' => $request->get('count', ''),
+                'price_1' => $request->get('price_1', ''),
+                'price_2' => $request->get('price_2', ''),
+                'price_3' => $request->get('price_3', ''),
+                'price_4' => $request->get('price_4', ''),
+                'print_length_1' => $request->get('print_length_1', ''),
+                'print_length_2' => $request->get('print_length_2', ''),
+                'print_length_3' => $request->get('print_length_3', ''),
+                'print_length_4' => $request->get('print_length_4', ''),
+                'publication_date_1'
+                    => $request->get('publication_date_1', ''),
+                'publication_date_2'
+                    => $request->get('publication_date_2', ''),
+                'publication_date_3'
+                    => $request->get('publication_date_3', ''),
+                'publication_date_4'
+                    => $request->get('publication_date_4', ''),
+                'review_average_1' => $request->get('review_average_1', ''),
+                'review_average_2' => $request->get('review_average_2', ''),
+                'review_average_3' => $request->get('review_average_3', ''),
+                'review_average_4' => $request->get('review_average_4', ''),
+                'section_id' => $request->get('section_id', ''),
+            ),
+            'sections' => get_sections($application),
+        ));
+    }
+)
+->bind('ce_overview')
+->method('GET|POST');
+
+$application->match('/ce/xhr', function (Request $request) use ($application) {
+    $contents = array(
+        'books' => array(),
+        'categories' => array(),
+        'glance' => array(
+            'absr' => 0,
+            'estimated_sales_per_day' => 0,
+            'price' => 0.00,
+            'print_length' => 0,
+            'review_average' => 0.00,
+            'total_number_of_reviews' => 0,
+            'words' => array(),
+        ),
+        'date' => 'N/A',
+    );
+
+    $category_id = intval($request->get('category_id'));
+    $section_id = intval($request->get('section_id'));
+    $print_length_1 = $request->get('print_length_1');
+    $print_length_2 = intval($request->get('print_length_2'));
+    $print_length_3 = intval($request->get('print_length_3'));
+    $print_length_4 = intval($request->get('print_length_4'));
+    $price_1 = $request->get('price_1');
+    $price_2 = floatval($request->get('price_2'));
+    $price_3 = floatval($request->get('price_3'));
+    $price_4 = floatval($request->get('price_4'));
+    $publication_date_1 = $request->get('publication_date_1');
+    $publication_date_2 = $request->get('publication_date_2');
+    $publication_date_3 = $request->get('publication_date_3');
+    $publication_date_4 = $request->get('publication_date_4');
+    $amazon_best_sellers_rank_1 = $request->get('amazon_best_sellers_rank_1');
+    $amazon_best_sellers_rank_2 = intval(
+        $request->get('amazon_best_sellers_rank_2')
+    );
+    $amazon_best_sellers_rank_3 = intval(
+        $request->get('amazon_best_sellers_rank_3')
+    );
+    $amazon_best_sellers_rank_4 = intval(
+        $request->get('amazon_best_sellers_rank_4')
+    );
+    $review_average_1 = $request->get('review_average_1');
+    $review_average_2 = floatval($request->get('review_average_2'));
+    $review_average_3 = floatval($request->get('review_average_3'));
+    $review_average_4 = floatval($request->get('review_average_4'));
+    $appearance_1 = $request->get('appearance_1');
+    $appearance_2 = floatval($request->get('appearance_2'));
+    $appearance_3 = floatval($request->get('appearance_3'));
+    $appearance_4 = floatval($request->get('appearance_4'));
+    $count = intval($request->get('count'));
+
+    if ($category_id == -1) {
+        $query = <<<EOD
+SELECT MAX(`date`) AS `date`
+FROM `tools_ce_trends`
+WHERE
+    `tools_ce_trends`.`category_id` > ?
+    AND
+    `tools_ce_trends`.`section_id` = ?
+EOD;
+    } else {
+        $query = <<<EOD
+SELECT MAX(`date`) AS `date`
+FROM `tools_ce_trends`
+WHERE
+    `tools_ce_trends`.`category_id` = ?
+    AND
+    `tools_ce_trends`.`section_id` = ?
+EOD;
+    }
+    $record = $application['db']->fetchAssoc($query, array(
+        $category_id,
+        $section_id,
     ));
-})
-->bind('aa')
-->method('GET');
+    $contents['date'] = $record['date'];
 
-$application->match(
-    '/aa/authors',
-    function (Request $request) use ($application, $variables) {
-        ignore_user_abort(true);
-        set_time_limit(0);
-        exec(sprintf(
-            '%s/python %s/scripts/aa.py get_authors %s 2>/dev/null',
-            $variables['virtualenv'],
-            __DIR__,
-            escapeshellarg($request->get('keyword'))
-        ), $output, $return_var);
-        return new Response(implode('', $output));
+    $query = <<<EOD
+SELECT *
+FROM `tools_ce_books`
+INNER JOIN
+    `tools_ce_trends` ON `tools_ce_books`.`id` = `tools_ce_trends`.`book_id`
+WHERE %s
+ORDER BY `tools_ce_trends`.`rank` ASC, `tools_ce_trends`.`category_id` ASC
+LIMIT %d OFFSET 0
+EOD;
+    $conditions = array();
+    $parameters = array();
+    switch ($print_length_1) {
+        case 'More Than':
+            $conditions[] = '`tools_ce_books`.`print_length` > ?';
+            $parameters[] = $print_length_2;
+            break;
+        case 'Less Than':
+            $conditions[] = '`tools_ce_books`.`print_length` < ?';
+            $parameters[] = $print_length_2;
+            break;
+        case 'Between':
+            $conditions[] = <<<EOD
+`tools_ce_books`.`print_length` >= ? AND `tools_ce_books`.`print_length` <= ?
+EOD;
+            $parameters[] = $print_length_3;
+            $parameters[] = $print_length_4;
+            break;
     }
-)
-->bind('aa_authors')
-->method('POST');
-
-$application->match(
-    '/aa/author',
-    function (Request $request) use ($application, $variables) {
-        ignore_user_abort(true);
-        set_time_limit(0);
-        exec(sprintf(
-            '%s/python %s/scripts/aa.py get_author %s 2>/dev/null',
-            $variables['virtualenv'],
-            __DIR__,
-            escapeshellarg($request->get('url'))
-        ), $output, $return_var);
-        return new Response(implode('', $output));
+    switch ($price_1) {
+        case 'More Than':
+            $conditions[] = '`tools_ce_books`.`price` > ?';
+            $parameters[] = $price_2;
+            break;
+        case 'Less Than':
+            $conditions[] = '`tools_ce_books`.`price` < ?';
+            $parameters[] = $price_2;
+            break;
+        case 'Between':
+            $conditions[] = <<<EOD
+`tools_ce_books`.`price` >= ? AND `tools_ce_books`.`price` <= ?
+EOD;
+            $parameters[] = $price_3;
+            $parameters[] = $price_4;
+            break;
     }
-)
-->bind('aa_author')
-->method('POST');
-
-$application->match('/ba', function (Request $request) use ($application) {
-    return $application['twig']->render('views/ba.twig', array(
-        'url' => $request->get('url'),
-    ));
-})
-->bind('ba')
-->method('GET');
-
-$application->match(
-    '/ba/books',
-    function (Request $request) use ($application, $variables) {
-        ignore_user_abort(true);
-        set_time_limit(0);
-        exec(sprintf(
-            '%s/python %s/scripts/ba.py get_books %s 2>/dev/null',
-            $variables['virtualenv'],
-            __DIR__,
-            escapeshellarg($request->get('keyword'))
-        ), $output, $return_var);
-        return new Response(implode('', $output));
+    switch ($publication_date_1) {
+        case 'More Than':
+            $conditions[] = '`tools_ce_books`.`publication_date` > ?';
+            $parameters[] = $publication_date_2;
+            break;
+        case 'Less Than':
+            $conditions[] = '`tools_ce_books`.`publication_date` < ?';
+            $parameters[] = $publication_date_2;
+            break;
+        case 'Between':
+            $conditions[] = <<<EOD
+`tools_ce_books`.`publication_date` >= ?
+AND
+`tools_ce_books`.`publication_date` <= ?
+EOD;
+            $parameters[] = $publication_date_3;
+            $parameters[] = $publication_date_4;
+            break;
     }
-)
-->bind('ba_books')
-->method('POST');
-
-$application->match(
-    '/ba/book',
-    function (Request $request) use ($application, $variables) {
-        ignore_user_abort(true);
-        set_time_limit(0);
-        exec(sprintf(
-            '%s/python %s/scripts/ba.py get_book %s 2>/dev/null',
-            $variables['virtualenv'],
-            __DIR__,
-            escapeshellarg($request->get('url'))
-        ), $output, $return_var);
-        return new Response(implode('', $output));
+    switch ($review_average_1) {
+        case 'More Than':
+            $conditions[] = '`tools_ce_books`.`review_average` > ?';
+            $parameters[] = $review_average_2;
+            break;
+        case 'Less Than':
+            $conditions[] = '`tools_ce_books`.`review_average` < ?';
+            $parameters[] = $review_average_2;
+            break;
+        case 'Between':
+            $conditions[] = <<<EOD
+`tools_ce_books`.`review_average` >= ?
+AND
+`tools_ce_books`.`review_average` <= ?
+EOD;
+            $parameters[] = $review_average_3;
+            $parameters[] = $review_average_4;
+            break;
     }
-)
-->bind('ba_book')
-->method('POST');
-
-$application->match(
-    '/ba/items',
-    function (Request $request) use ($application, $variables) {
-        $keywords = $request->get('keywords');
-        $keywords = strtolower($keywords);
-        $keywords = explode("\n", $keywords);
-        if (!empty($keywords)) {
-            foreach ($keywords as $key => $value) {
-                $value = trim($value);
-                if (!empty($value)) {
-                    $keywords[$key] = $value;
-                } else {
-                    unset($keywords[$key]);
+    if ($category_id !== -1) {
+        $conditions[] = '`tools_ce_trends`.`category_id` = ?';
+        $parameters[] = $category_id;
+    }
+    $conditions[] = '`tools_ce_trends`.`section_id` = ?';
+    $parameters[] = $section_id;
+    $conditions[] = '`tools_ce_trends`.`date` = ?';
+    $parameters[] = $contents['date'];
+    $conditions = implode(' AND ', $conditions);
+    $query = sprintf($query, $conditions, $count);
+    $books = $application['db']->fetchAll($query, $parameters);
+    if ($books) {
+        foreach ($books as $book) {
+            if ($category_id == -1) {
+                $query = <<<EOD
+SELECT COUNT(DISTINCT `date`) AS `count`
+FROM `tools_ce_trends`
+WHERE
+    `category_id` > ?
+    AND
+    `section_id` = ?
+    AND
+    `book_id` = ?
+    AND
+    `date` >= CURDATE() - INTERVAL 7 DAY
+EOD;
+            } else {
+                $query = <<<EOD
+SELECT COUNT(DISTINCT `date`) AS `count`
+FROM `tools_ce_trends`
+WHERE
+    `category_id` = ?
+    AND
+    `section_id` = ?
+    AND
+    `book_id` = ?
+    AND
+    `date` >= CURDATE() - INTERVAL 7 DAY
+EOD;
+            }
+            $record_1 = $application['db']->fetchAssoc($query, array(
+                $category_id,
+                $section_id,
+                $book['book_id'],
+            ));
+            if ($category_id == -1) {
+                $query = <<<EOD
+SELECT COUNT(DISTINCT `date`) AS `count`
+FROM `tools_ce_trends`
+WHERE
+    `category_id` > ?
+    AND
+    `section_id` = ?
+    AND
+    `book_id` = ?
+    AND
+    `date` >= CURDATE() - INTERVAL 30 DAY
+EOD;
+            } else {
+                $query = <<<EOD
+SELECT COUNT(DISTINCT `date`) AS `count`
+FROM `tools_ce_trends`
+WHERE
+    `category_id` = ?
+    AND
+    `section_id` = ?
+    AND
+    `book_id` = ?
+    AND
+    `date` >= CURDATE() - INTERVAL 30 DAY
+EOD;
+            }
+            $record_2 = $application['db']->fetchAssoc($query, array(
+                $category_id,
+                $section_id,
+                $book['book_id'],
+            ));
+            $book['appearances'] = array(
+                'last 7 days' => $record_1['count'],
+                'last 30 days' => $record_2['count'],
+            );
+            $book['amazon_best_sellers_rank'] = json_decode(
+                $book['amazon_best_sellers_rank'], true
+            );
+            asort($book['amazon_best_sellers_rank'], SORT_NUMERIC);
+            if ($amazon_best_sellers_rank_1 == 'More Than') {
+                if (empty(
+                    $book['amazon_best_sellers_rank']['Paid in Kindle Store']
+                )) {
+                    continue;
+                }
+                if (
+                    $book['amazon_best_sellers_rank']['Paid in Kindle Store']
+                    <=
+                    $amazon_best_sellers_rank_2
+                ) {
+                    continue;
+                }
+            }
+            if ($amazon_best_sellers_rank_1 == 'Less Than') {
+                if (empty(
+                    $book['amazon_best_sellers_rank']['Paid in Kindle Store']
+                )) {
+                    continue;
+                }
+                if (
+                    $book['amazon_best_sellers_rank']['Paid in Kindle Store']
+                    >=
+                    $amazon_best_sellers_rank_2
+                ) {
+                    continue;
+                }
+            }
+            if ($amazon_best_sellers_rank_1 == 'Between') {
+                if (empty(
+                    $book['amazon_best_sellers_rank']['Paid in Kindle Store']
+                )) {
+                    continue;
+                }
+                if (!(
+                    $book['amazon_best_sellers_rank']['Paid in Kindle Store']
+                    >=
+                    $amazon_best_sellers_rank_3
+                    AND
+                    $book['amazon_best_sellers_rank']['Paid in Kindle Store']
+                    <=
+                    $amazon_best_sellers_rank_4
+                )) {
+                    continue;
+                }
+            }
+            if ($appearance_1 == 'More Than') {
+                if ($book['appearances']['last 7 days'] <= $appearance_2) {
+                    continue;
+                }
+            }
+            if ($appearance_1 == 'Less Than') {
+                if ($book['appearances']['last 7 days'] >= $appearance_2) {
+                    continue;
+                }
+            }
+            if ($appearance_1 == 'Between') {
+                if (!(
+                    $book['appearances']['last 7 days'] >= $appearance_3
+                    AND
+                    $book['appearances']['last 7 days'] <= $appearance_4
+                )) {
+                    continue;
+                }
+            }
+            $book['amazon_best_sellers_rank_'] = 0;
+            if (!empty(
+                $book['amazon_best_sellers_rank']['Paid in Kindle Store']
+            )) {
+                $book[
+                    'amazon_best_sellers_rank_'
+                ] = $book['amazon_best_sellers_rank']['Paid in Kindle Store'];
+                if ($book['amazon_best_sellers_rank_'] <= 25000) {
+                    $contents['glance']['absr'] += 1;
+                }
+            }
+            $book['category'] = get_category(
+                $application, $book['category_id']
+            );
+            $contents['books'][] = $book;
+            $contents['glance']['price'] += $book['price'];
+            $contents[
+                'glance'
+            ]['estimated_sales_per_day'] += $book['estimated_sales_per_day'];
+            $contents[
+                'glance'
+            ]['total_number_of_reviews'] += $book['total_number_of_reviews'];
+            $contents['glance']['review_average'] += $book['review_average'];
+            $contents['glance']['print_length'] += $book['print_length'];
+            $contents['glance']['words'] = array_merge(
+                $contents['glance']['words'],
+                get_words_from_title($book['title'])
+            );
+            if ($book['amazon_best_sellers_rank']) {
+                foreach ($book['amazon_best_sellers_rank'] as $key => $value) {
+                    if (
+                        !preg_match('/^Paid in Kindle Store/', $key)
+                        AND
+                        !preg_match('/^Kindle Store > Kindle eBooks/', $key)
+                    ) {
+                        continue;
+                    }
+                    $key = str_replace('Kindle Store > ', '', $key);
+                    if (empty($contents['categories'][$key])) {
+                        $contents['categories'][$key] = 0;
+                    }
+                    $contents['categories'][$key] += 1;
                 }
             }
         }
-        $keywords = array_unique($keywords);
-        ignore_user_abort(true);
-        set_time_limit(0);
-        exec(sprintf(
-            '%s/python %s/scripts/ba.py get_items %s %s 2>/dev/null',
-            $variables['virtualenv'],
-            __DIR__,
-            escapeshellarg($request->get('url')),
-            escapeshellarg(json_encode($keywords))
-        ), $output, $return_var);
+    }
+    $cs = array();
+    if ($contents['categories']) {
+        foreach ($contents['categories'] as $key => $value) {
+            if ($value > 1) {
+                $cs[] = array(
+                    'frequency' => $value,
+                    'title' => $key,
+                );
+            }
+        }
+    }
+    $contents['categories'] = $cs;
+    usort($contents['categories'], 'usort_categories');
+
+    $count = count($contents['books']);
+    if ($count) {
+        $contents['glance']['price'] /= $count;
+        $contents['glance']['estimated_sales_per_day'] /= $count;
+        $contents['glance']['total_number_of_reviews']  /= $count;
+        $contents['glance']['review_average'] /= $count;
+        $contents['glance']['print_length'] /= $count;
+        $contents['glance']['words'] = get_words_from_words($contents['glance']['words']);
+    }
+
+    return new Response(json_encode($contents, JSON_NUMERIC_CHECK));
+})
+->bind('ce_xhr')
+->method('POST');
+
+$application->match('/aks', function (Request $request) use ($application) {
+    return $application['twig']->render('views/aks.twig', array(
+        'countries' => array(
+            'com' => 'US',
+            'co.uk' => 'UK',
+            'es' => 'Spain',
+            'fr' => 'France',
+            'it' => 'Italy',
+            'com.br' => 'Brazil',
+            'ca' => 'Canada',
+            'de' => 'Germany',
+            'co.jp' => 'Japan',
+        ),
+        'keywords' => $request->get('keywords', ''),
+        'mode' => $request->get('mode', 'Suggest'),
+        'search_aliases' => array(
+            'aps' => 'All Departments',
+            'digital-text' => 'Kindle Store',
+            'instant-video' => 'Amazon Instant Video',
+            'appliances' => 'Appliances',
+            'mobile-apps' => 'Apps for Android',
+            'arts-crafts' => 'Arts, Crafts &amp; Sewing',
+            'automotive' => 'Automotive',
+            'baby-products' => 'Baby',
+            'beauty' => 'Beauty',
+            'stripbooks' => 'Books',
+            'mobile' => 'Cell Phones &amp; Accessories',
+            'apparel' => 'Clothing &amp; Accessories',
+            'collectibles' => 'Collectibles',
+            'computers' => 'Computers',
+            'financial' => 'Credit Cards',
+            'electronics' => 'Electronics',
+            'gift-cards' => 'Gift Cards Store',
+            'grocery' => 'Grocery &amp; Gourmet Food',
+            'hpc' => 'Health &amp; Personal Care',
+            'garden' => 'Home &amp; Kitchen',
+            'industrial' => 'Industrial &amp; Scientific',
+            'jewelry' => 'Jewelry',
+            'magazines' => 'Magazine Subscriptions',
+            'movies-tv' => 'Movies &amp; TV',
+            'digital-music' => 'MP3 Music',
+            'popular' => 'Music',
+            'mi' => 'Musical Instruments',
+            'office-products' => 'Office Products',
+            'lawngarden' => 'Patio, Lawn &amp; Garden',
+            'pets' => 'Pet Supplies',
+            'shoes' => 'Shoes',
+            'software' => 'Software',
+            'sporting' => 'Sports &amp; Outdoors',
+            'tools' => 'Tools &amp; Home Improvement',
+            'toys-and-games' => 'Toys &amp; Games',
+            'videogames' => 'Video Games',
+            'watches' => 'Watches',
+        ),
+    ));
+})
+->bind('aks')
+->method('GET|POST');
+
+$application->match(
+    '/aks/xhr',
+    function (Request $request) use ($application, $variables) {
+        if (is_development()) {
+            $output = array('["1", "2", "3"]');
+        } else {
+            ignore_user_abort(true);
+            set_time_limit(0);
+            exec(sprintf(
+                '%s/python %s/scripts/aks.py %s %s %s 2>/dev/null',
+                $variables['virtualenv'],
+                __DIR__,
+                escapeshellarg($request->get('keyword')),
+                escapeshellarg($request->get('country')),
+                escapeshellarg($request->get('search_alias'))
+            ), $output, $return_var);
+        }
         return new Response(implode('', $output));
     }
 )
-->bind('ba_items')
+->bind('aks_xhr')
+->method('POST');
+
+$application->match(
+    '/aks/download',
+    function (Request $request) use ($application) {
+        $json = json_decode($request->get('json'), true);
+        $json['suggestions'] = implode("\n", $json['suggestions']);
+        $stream = function () use ($json) {
+            echo $json['suggestions'];
+        };
+        return $application->stream($stream, 200, array(
+            'Content-Disposition' => sprintf(
+                'attachment; filename="keywords_suggester.csv"'
+            ),
+            'Content-Length' => strlen($json['suggestions']),
+            'Content-Type' => 'text/csv',
+            'Expires' => '0',
+            'Pragma' => 'no-cache',
+        ));
+    }
+)
+->bind('aks_download')
 ->method('POST');
 
 $application->match('/kns/overview', function () use ($application) {
@@ -910,7 +1370,7 @@ $application->match('/kns/overview', function () use ($application) {
 
 $application->match('/kns/add', function () use ($application) {
     $user = $application['session']->get('user');
-    list($count, $_) = get_count_and_keywords($application, $user, '');
+    list($count, $_) = get_count_and_keywords('');
 
     return $application['twig']->render('views/kns_add.twig', array(
         'count' => $count,
@@ -925,7 +1385,7 @@ $application->match(
     function (Request $request) use ($application) {
         $user = $application['session']->get('user');
         list($count, $keywords) = get_count_and_keywords(
-            $application, $user, $request->get('keywords')
+            $request->get('keywords')
         );
         if (!$count OR !$keywords) {
             return $application->redirect(
@@ -1198,6 +1658,133 @@ $application->match(
 ->bind('kns_single_')
 ->method('POST');
 
+$application->match('/aa', function (Request $request) use ($application) {
+    return $application['twig']->render('views/aa.twig', array(
+        'url' => $request->get('url'),
+    ));
+})
+->bind('aa')
+->method('GET');
+
+$application->match(
+    '/aa/authors',
+    function (Request $request) use ($application, $variables) {
+        ignore_user_abort(true);
+        set_time_limit(0);
+        exec(sprintf(
+            '%s/python %s/scripts/aa.py get_authors %s 2>/dev/null',
+            $variables['virtualenv'],
+            __DIR__,
+            escapeshellarg($request->get('keyword'))
+        ), $output, $return_var);
+        return new Response(implode('', $output));
+    }
+)
+->bind('aa_authors')
+->method('POST');
+
+$application->match(
+    '/aa/author',
+    function (Request $request) use ($application, $variables) {
+        ignore_user_abort(true);
+        set_time_limit(0);
+        exec(sprintf(
+            '%s/python %s/scripts/aa.py get_author %s 2>/dev/null',
+            $variables['virtualenv'],
+            __DIR__,
+            escapeshellarg($request->get('url'))
+        ), $output, $return_var);
+        return new Response(implode('', $output));
+    }
+)
+->bind('aa_author')
+->method('POST');
+
+$application->match('/ba', function (Request $request) use ($application) {
+    return $application['twig']->render('views/ba.twig', array(
+        'url' => $request->get('url'),
+    ));
+})
+->bind('ba')
+->method('GET');
+
+$application->match(
+    '/ba/books',
+    function (Request $request) use ($application, $variables) {
+        ignore_user_abort(true);
+        set_time_limit(0);
+        exec(sprintf(
+            '%s/python %s/scripts/ba.py get_books %s 2>/dev/null',
+            $variables['virtualenv'],
+            __DIR__,
+            escapeshellarg($request->get('keyword'))
+        ), $output, $return_var);
+        return new Response(implode('', $output));
+    }
+)
+->bind('ba_books')
+->method('POST');
+
+$application->match(
+    '/ba/book',
+    function (Request $request) use ($application, $variables) {
+        ignore_user_abort(true);
+        set_time_limit(0);
+        exec(sprintf(
+            '%s/python %s/scripts/ba.py get_book %s 2>/dev/null',
+            $variables['virtualenv'],
+            __DIR__,
+            escapeshellarg($request->get('url'))
+        ), $output, $return_var);
+        return new Response(implode('', $output));
+    }
+)
+->bind('ba_book')
+->method('POST');
+
+$application->match(
+    '/ba/items',
+    function (Request $request) use ($application, $variables) {
+        $keywords = $request->get('keywords');
+        $keywords = strtolower($keywords);
+        $keywords = explode("\n", $keywords);
+        if (!empty($keywords)) {
+            foreach ($keywords as $key => $value) {
+                $value = trim($value);
+                if (!empty($value)) {
+                    $keywords[$key] = $value;
+                } else {
+                    unset($keywords[$key]);
+                }
+            }
+        }
+        $keywords = array_unique($keywords);
+        ignore_user_abort(true);
+        set_time_limit(0);
+        exec(sprintf(
+            '%s/python %s/scripts/ba.py get_items %s %s 2>/dev/null',
+            $variables['virtualenv'],
+            __DIR__,
+            escapeshellarg($request->get('url')),
+            escapeshellarg(json_encode($keywords))
+        ), $output, $return_var);
+        return new Response(implode('', $output));
+    }
+)
+->bind('ba_items')
+->method('POST');
+
+$application->match(
+    '/ps',
+    function (Request $request) use ($application) {
+        return $application['twig']->render('views/ps.twig', array(
+            'popular_searches' => get_popular_searches($application),
+        ));
+    }
+)
+->bind('ps')
+->method('GET');
+
 $application->match('/logos/overview', function () use ($application) {
     $user = $application['session']->get('user');
 
@@ -1327,608 +1914,6 @@ $application->match(
 ->bind('logos_delete')
 ->method('GET|POST');
 
-$application->match('/aks', function (Request $request) use ($application) {
-    return $application['twig']->render('views/aks.twig', array(
-        'countries' => array(
-            'com' => 'US',
-            'co.uk' => 'UK',
-            'es' => 'Spain',
-            'fr' => 'France',
-            'it' => 'Italy',
-            'com.br' => 'Brazil',
-            'ca' => 'Canada',
-            'de' => 'Germany',
-            'co.jp' => 'Japan',
-        ),
-        'keywords' => $request->get('keywords', ''),
-        'mode' => $request->get('mode', 'Suggest'),
-        'search_aliases' => array(
-            'aps' => 'All Departments',
-            'digital-text' => 'Kindle Store',
-            'instant-video' => 'Amazon Instant Video',
-            'appliances' => 'Appliances',
-            'mobile-apps' => 'Apps for Android',
-            'arts-crafts' => 'Arts, Crafts &amp; Sewing',
-            'automotive' => 'Automotive',
-            'baby-products' => 'Baby',
-            'beauty' => 'Beauty',
-            'stripbooks' => 'Books',
-            'mobile' => 'Cell Phones &amp; Accessories',
-            'apparel' => 'Clothing &amp; Accessories',
-            'collectibles' => 'Collectibles',
-            'computers' => 'Computers',
-            'financial' => 'Credit Cards',
-            'electronics' => 'Electronics',
-            'gift-cards' => 'Gift Cards Store',
-            'grocery' => 'Grocery &amp; Gourmet Food',
-            'hpc' => 'Health &amp; Personal Care',
-            'garden' => 'Home &amp; Kitchen',
-            'industrial' => 'Industrial &amp; Scientific',
-            'jewelry' => 'Jewelry',
-            'magazines' => 'Magazine Subscriptions',
-            'movies-tv' => 'Movies &amp; TV',
-            'digital-music' => 'MP3 Music',
-            'popular' => 'Music',
-            'mi' => 'Musical Instruments',
-            'office-products' => 'Office Products',
-            'lawngarden' => 'Patio, Lawn &amp; Garden',
-            'pets' => 'Pet Supplies',
-            'shoes' => 'Shoes',
-            'software' => 'Software',
-            'sporting' => 'Sports &amp; Outdoors',
-            'tools' => 'Tools &amp; Home Improvement',
-            'toys-and-games' => 'Toys &amp; Games',
-            'videogames' => 'Video Games',
-            'watches' => 'Watches',
-        ),
-    ));
-})
-->bind('aks')
-->method('GET|POST');
-
-$application->match(
-    '/aks/xhr',
-    function (Request $request) use ($application, $variables) {
-        if (is_development()) {
-            $output = array('["1", "2", "3"]');
-        } else {
-            ignore_user_abort(true);
-            set_time_limit(0);
-            exec(sprintf(
-                '%s/python %s/scripts/aks.py %s %s %s 2>/dev/null',
-                $variables['virtualenv'],
-                __DIR__,
-                escapeshellarg($request->get('keyword')),
-                escapeshellarg($request->get('country')),
-                escapeshellarg($request->get('search_alias'))
-            ), $output, $return_var);
-        }
-        return new Response(implode('', $output));
-    }
-)
-->bind('aks_xhr')
-->method('POST');
-
-$application->match(
-    '/aks/download',
-    function (Request $request) use ($application) {
-        $json = json_decode($request->get('json'), true);
-        $json['suggestions'] = implode("\n", $json['suggestions']);
-        $stream = function () use ($json) {
-            echo $json['suggestions'];
-        };
-        return $application->stream($stream, 200, array(
-            'Content-Disposition' => sprintf(
-                'attachment; filename="keywords_suggester.csv"'
-            ),
-            'Content-Length' => strlen($json['suggestions']),
-            'Content-Type' => 'text/csv',
-            'Expires' => '0',
-            'Pragma' => 'no-cache',
-        ));
-    }
-)
-->bind('aks_download')
-->method('POST');
-
-$application->match(
-    '/ce/overview',
-    function (Request $request) use ($application) {
-        return $application['twig']->render('views/ce_overview.twig', array(
-            'categories' => array_merge(
-                array(array(-1, 'All')),
-                get_categories($application, 0, array())
-            ),
-            'filters' => array(
-                'amazon_best_sellers_rank_1'
-                    => $request->get('amazon_best_sellers_rank_1', ''),
-                'amazon_best_sellers_rank_2'
-                    => $request->get('amazon_best_sellers_rank_2', ''),
-                'amazon_best_sellers_rank_3'
-                    => $request->get('amazon_best_sellers_rank_3', ''),
-                'amazon_best_sellers_rank_4'
-                    => $request->get('amazon_best_sellers_rank_4', ''),
-                'appearance_1' => $request->get('appearance_1', ''),
-                'appearance_2' => $request->get('appearance_2', ''),
-                'appearance_3' => $request->get('appearance_3', ''),
-                'appearance_4' => $request->get('appearance_4', ''),
-                'category_id' => $request->get('category_id', ''),
-                'count' => $request->get('count', ''),
-                'price_1' => $request->get('price_1', ''),
-                'price_2' => $request->get('price_2', ''),
-                'price_3' => $request->get('price_3', ''),
-                'price_4' => $request->get('price_4', ''),
-                'print_length_1' => $request->get('print_length_1', ''),
-                'print_length_2' => $request->get('print_length_2', ''),
-                'print_length_3' => $request->get('print_length_3', ''),
-                'print_length_4' => $request->get('print_length_4', ''),
-                'publication_date_1'
-                    => $request->get('publication_date_1', ''),
-                'publication_date_2'
-                    => $request->get('publication_date_2', ''),
-                'publication_date_3'
-                    => $request->get('publication_date_3', ''),
-                'publication_date_4'
-                    => $request->get('publication_date_4', ''),
-                'review_average_1' => $request->get('review_average_1', ''),
-                'review_average_2' => $request->get('review_average_2', ''),
-                'review_average_3' => $request->get('review_average_3', ''),
-                'review_average_4' => $request->get('review_average_4', ''),
-                'section_id' => $request->get('section_id', ''),
-            ),
-            'sections' => get_sections($application),
-        ));
-    }
-)
-->bind('ce_overview')
-->method('GET|POST');
-
-$application->match('/ce/xhr', function (Request $request) use ($application) {
-    $contents = array(
-        'books' => array(),
-        'categories' => array(),
-        'glance' => array(
-            'absr' => 0,
-            'estimated_sales_per_day' => 0,
-            'price' => 0.00,
-            'print_length' => 0,
-            'review_average' => 0.00,
-            'total_number_of_reviews' => 0,
-            'words' => array(),
-        ),
-        'date' => 'N/A',
-    );
-
-    $category_id = intval($request->get('category_id'));
-    $section_id = intval($request->get('section_id'));
-    $print_length_1 = $request->get('print_length_1');
-    $print_length_2 = intval($request->get('print_length_2'));
-    $print_length_3 = intval($request->get('print_length_3'));
-    $print_length_4 = intval($request->get('print_length_4'));
-    $price_1 = $request->get('price_1');
-    $price_2 = floatval($request->get('price_2'));
-    $price_3 = floatval($request->get('price_3'));
-    $price_4 = floatval($request->get('price_4'));
-    $publication_date_1 = $request->get('publication_date_1');
-    $publication_date_2 = $request->get('publication_date_2');
-    $publication_date_3 = $request->get('publication_date_3');
-    $publication_date_4 = $request->get('publication_date_4');
-    $amazon_best_sellers_rank_1 = $request->get('amazon_best_sellers_rank_1');
-    $amazon_best_sellers_rank_2 = intval(
-        $request->get('amazon_best_sellers_rank_2')
-    );
-    $amazon_best_sellers_rank_3 = intval(
-        $request->get('amazon_best_sellers_rank_3')
-    );
-    $amazon_best_sellers_rank_4 = intval(
-        $request->get('amazon_best_sellers_rank_4')
-    );
-    $review_average_1 = $request->get('review_average_1');
-    $review_average_2 = floatval($request->get('review_average_2'));
-    $review_average_3 = floatval($request->get('review_average_3'));
-    $review_average_4 = floatval($request->get('review_average_4'));
-    $appearance_1 = $request->get('appearance_1');
-    $appearance_2 = floatval($request->get('appearance_2'));
-    $appearance_3 = floatval($request->get('appearance_3'));
-    $appearance_4 = floatval($request->get('appearance_4'));
-    $count = intval($request->get('count'));
-
-    if ($category_id == -1) {
-        $query = <<<EOD
-SELECT MAX(`date`) AS `date`
-FROM `tools_ce_trends`
-WHERE
-    `tools_ce_trends`.`category_id` > ?
-    AND
-    `tools_ce_trends`.`section_id` = ?
-EOD;
-    } else {
-        $query = <<<EOD
-SELECT MAX(`date`) AS `date`
-FROM `tools_ce_trends`
-WHERE
-    `tools_ce_trends`.`category_id` = ?
-    AND
-    `tools_ce_trends`.`section_id` = ?
-EOD;
-    }
-    $row = $application['db']->fetchAssoc($query, array(
-        $category_id,
-        $section_id,
-    ));
-    $contents['date'] = $row['date'];
-
-    $query = <<<EOD
-SELECT *
-FROM `tools_ce_books`
-INNER JOIN
-    `tools_ce_trends` ON `tools_ce_books`.`id` = `tools_ce_trends`.`book_id`
-WHERE %s
-ORDER BY `tools_ce_trends`.`rank` ASC, `tools_ce_trends`.`category_id` ASC
-LIMIT %d OFFSET 0
-EOD;
-    $conditions = array();
-    $parameters = array();
-    switch ($print_length_1) {
-        case 'More Than':
-            $conditions[] = '`tools_ce_books`.`print_length` > ?';
-            $parameters[] = $print_length_2;
-            break;
-        case 'Less Than':
-            $conditions[] = '`tools_ce_books`.`print_length` < ?';
-            $parameters[] = $print_length_2;
-            break;
-        case 'Between':
-            $conditions[] = <<<EOD
-`tools_ce_books`.`print_length` >= ? AND `tools_ce_books`.`print_length` <= ?
-EOD;
-            $parameters[] = $print_length_3;
-            $parameters[] = $print_length_4;
-            break;
-    }
-    switch ($price_1) {
-        case 'More Than':
-            $conditions[] = '`tools_ce_books`.`price` > ?';
-            $parameters[] = $price_2;
-            break;
-        case 'Less Than':
-            $conditions[] = '`tools_ce_books`.`price` < ?';
-            $parameters[] = $price_2;
-            break;
-        case 'Between':
-            $conditions[] = <<<EOD
-`tools_ce_books`.`price` >= ? AND `tools_ce_books`.`price` <= ?
-EOD;
-            $parameters[] = $price_3;
-            $parameters[] = $price_4;
-            break;
-    }
-    switch ($publication_date_1) {
-        case 'More Than':
-            $conditions[] = '`tools_ce_books`.`publication_date` > ?';
-            $parameters[] = $publication_date_2;
-            break;
-        case 'Less Than':
-            $conditions[] = '`tools_ce_books`.`publication_date` < ?';
-            $parameters[] = $publication_date_2;
-            break;
-        case 'Between':
-            $conditions[] = <<<EOD
-`tools_ce_books`.`publication_date` >= ?
-AND
-`tools_ce_books`.`publication_date` <= ?
-EOD;
-            $parameters[] = $publication_date_3;
-            $parameters[] = $publication_date_4;
-            break;
-    }
-    switch ($review_average_1) {
-        case 'More Than':
-            $conditions[] = '`tools_ce_books`.`review_average` > ?';
-            $parameters[] = $review_average_2;
-            break;
-        case 'Less Than':
-            $conditions[] = '`tools_ce_books`.`review_average` < ?';
-            $parameters[] = $review_average_2;
-            break;
-        case 'Between':
-            $conditions[] = <<<EOD
-`tools_ce_books`.`review_average` >= ?
-AND
-`tools_ce_books`.`review_average` <= ?
-EOD;
-            $parameters[] = $review_average_3;
-            $parameters[] = $review_average_4;
-            break;
-    }
-    if ($category_id !== -1) {
-        $conditions[] = '`tools_ce_trends`.`category_id` = ?';
-        $parameters[] = $category_id;
-    }
-    $conditions[] = '`tools_ce_trends`.`section_id` = ?';
-    $parameters[] = $section_id;
-    $conditions[] = '`tools_ce_trends`.`date` = ?';
-    $parameters[] = $contents['date'];
-    $conditions = implode(' AND ', $conditions);
-    $query = sprintf($query, $conditions, $count);
-    $books = $application['db']->fetchAll($query, $parameters);
-    if ($books) {
-        foreach ($books as $book) {
-            if ($category_id == -1) {
-                $query = <<<EOD
-SELECT COUNT(DISTINCT `date`) AS `count`
-FROM `tools_ce_trends`
-WHERE
-    `category_id` > ?
-    AND
-    `section_id` = ?
-    AND
-    `book_id` = ?
-    AND
-    `date` >= CURDATE() - INTERVAL 7 DAY
-EOD;
-            } else {
-                $query = <<<EOD
-SELECT COUNT(DISTINCT `date`) AS `count`
-FROM `tools_ce_trends`
-WHERE
-    `category_id` = ?
-    AND
-    `section_id` = ?
-    AND
-    `book_id` = ?
-    AND
-    `date` >= CURDATE() - INTERVAL 7 DAY
-EOD;
-            }
-            $row_1 = $application['db']->fetchAssoc($query, array(
-                $category_id,
-                $section_id,
-                $book['book_id'],
-            ));
-            if ($category_id == -1) {
-                $query = <<<EOD
-SELECT COUNT(DISTINCT `date`) AS `count`
-FROM `tools_ce_trends`
-WHERE
-    `category_id` > ?
-    AND
-    `section_id` = ?
-    AND
-    `book_id` = ?
-    AND
-    `date` >= CURDATE() - INTERVAL 30 DAY
-EOD;
-            } else {
-                $query = <<<EOD
-SELECT COUNT(DISTINCT `date`) AS `count`
-FROM `tools_ce_trends`
-WHERE
-    `category_id` = ?
-    AND
-    `section_id` = ?
-    AND
-    `book_id` = ?
-    AND
-    `date` >= CURDATE() - INTERVAL 30 DAY
-EOD;
-            }
-            $row_2 = $application['db']->fetchAssoc($query, array(
-                $category_id,
-                $section_id,
-                $book['book_id'],
-            ));
-            $book['appearances'] = array(
-                'last 7 days' => $row_1['count'],
-                'last 30 days' => $row_2['count'],
-            );
-            $book['amazon_best_sellers_rank'] = json_decode(
-                $book['amazon_best_sellers_rank'], true
-            );
-            asort($book['amazon_best_sellers_rank'], SORT_NUMERIC);
-            if ($amazon_best_sellers_rank_1 == 'More Than') {
-                if (empty(
-                    $book['amazon_best_sellers_rank']['Paid in Kindle Store']
-                )) {
-                    continue;
-                }
-                if (
-                    $book['amazon_best_sellers_rank']['Paid in Kindle Store']
-                    <=
-                    $amazon_best_sellers_rank_2
-                ) {
-                    continue;
-                }
-            }
-            if ($amazon_best_sellers_rank_1 == 'Less Than') {
-                if (empty(
-                    $book['amazon_best_sellers_rank']['Paid in Kindle Store']
-                )) {
-                    continue;
-                }
-                if (
-                    $book['amazon_best_sellers_rank']['Paid in Kindle Store']
-                    >=
-                    $amazon_best_sellers_rank_2
-                ) {
-                    continue;
-                }
-            }
-            if ($amazon_best_sellers_rank_1 == 'Between') {
-                if (empty(
-                    $book['amazon_best_sellers_rank']['Paid in Kindle Store']
-                )) {
-                    continue;
-                }
-                if (!(
-                    $book['amazon_best_sellers_rank']['Paid in Kindle Store']
-                    >=
-                    $amazon_best_sellers_rank_3
-                    AND
-                    $book['amazon_best_sellers_rank']['Paid in Kindle Store']
-                    <=
-                    $amazon_best_sellers_rank_4
-                )) {
-                    continue;
-                }
-            }
-            if ($appearance_1 == 'More Than') {
-                if ($book['appearances']['last 7 days'] <= $appearance_2) {
-                    continue;
-                }
-            }
-            if ($appearance_1 == 'Less Than') {
-                if ($book['appearances']['last 7 days'] >= $appearance_2) {
-                    continue;
-                }
-            }
-            if ($appearance_1 == 'Between') {
-                if (!(
-                    $book['appearances']['last 7 days'] >= $appearance_3
-                    AND
-                    $book['appearances']['last 7 days'] <= $appearance_4
-                )) {
-                    continue;
-                }
-            }
-            $book['amazon_best_sellers_rank_'] = 0;
-            if (!empty(
-                $book['amazon_best_sellers_rank']['Paid in Kindle Store']
-            )) {
-                $book[
-                    'amazon_best_sellers_rank_'
-                ] = $book['amazon_best_sellers_rank']['Paid in Kindle Store'];
-                if ($book['amazon_best_sellers_rank_'] <= 25000) {
-                    $contents['glance']['absr'] += 1;
-                }
-            }
-            $book['category'] = get_category(
-                $application, $book['category_id']
-            );
-            $contents['books'][] = $book;
-            $contents['glance']['price'] += $book['price'];
-            $contents[
-                'glance'
-            ]['estimated_sales_per_day'] += $book['estimated_sales_per_day'];
-            $contents[
-                'glance'
-            ]['total_number_of_reviews'] += $book['total_number_of_reviews'];
-            $contents['glance']['review_average'] += $book['review_average'];
-            $contents['glance']['print_length'] += $book['print_length'];
-            $contents['glance']['words'] = array_merge(
-                $contents['glance']['words'],
-                get_words_from_title($book['title'])
-            );
-            if ($book['amazon_best_sellers_rank']) {
-                foreach ($book['amazon_best_sellers_rank'] as $key => $value) {
-                    if (
-                        !preg_match('/^Paid in Kindle Store/', $key)
-                        AND
-                        !preg_match('/^Kindle Store > Kindle eBooks/', $key)
-                    ) {
-                        continue;
-                    }
-                    $key = str_replace('Kindle Store > ', '', $key);
-                    if (empty($contents['categories'][$key])) {
-                        $contents['categories'][$key] = 0;
-                    }
-                    $contents['categories'][$key] += 1;
-                }
-            }
-        }
-    }
-    $cs = array();
-    if ($contents['categories']) {
-        foreach ($contents['categories'] as $key => $value) {
-            if ($value > 1) {
-                $cs[] = array(
-                    'frequency' => $value,
-                    'title' => $key,
-                );
-            }
-        }
-    }
-    $contents['categories'] = $cs;
-    usort($contents['categories'], 'usort_categories');
-
-    $count = count($contents['books']);
-    if ($count) {
-        $contents['glance']['price'] /= $count;
-        $contents['glance']['estimated_sales_per_day'] /= $count;
-        $contents['glance']['total_number_of_reviews']  /= $count;
-        $contents['glance']['review_average'] /= $count;
-        $contents['glance']['print_length'] /= $count;
-        $contents['glance']['words'] = get_words_from_words($contents['glance']['words']);
-    }
-
-    return new Response(json_encode($contents, JSON_NUMERIC_CHECK));
-})
-->bind('ce_xhr')
-->method('POST');
-
-$application->match(
-    '/suggested_keywords',
-    function (Request $request) use ($application, $variables) {
-        ignore_user_abort(true);
-        set_time_limit(0);
-        exec(sprintf(
-            '%s/python %s/scripts/sk.py %s 2>/dev/null',
-            $variables['virtualenv'],
-            __DIR__,
-            escapeshellarg($request->get('keywords'))
-        ), $output, $return_var);
-        return new Response(implode('', $output));
-    }
-)
-->bind('suggested_keywords')
-->method('POST');
-
-$application->match(
-    '/feedback',
-    function (Request $request) use ($application) {
-        $error = '';
-        if ($request->isMethod('POST')) {
-            $body = $request->get('body');
-            if (!empty($body)) {
-                if (!is_development()) {
-                    $user = $application['session']->get('user');
-                    $subject = sprintf(
-                        'ZonSidekick Feedback from %s', $user['email']
-                    );
-                    try {
-                        $message = \Swift_Message::newInstance()
-                            ->setBody(trim($request->get('body')))
-                            ->setFrom(array(
-                                $user['email'],
-                            ))
-                            ->setSubject($subject)
-                            ->setTo(array(
-                                'support@perfectsidekick.com',
-                            ));
-                        $application['mailer']->send($message);
-                    } catch (Exception $exception ) {
-                    }
-                }
-                $application['session']->getFlashBag()->add(
-                    'success',
-                    array('Your feedback has been sent successfully.')
-                );
-                return $application->redirect(
-                    $application['url_generator']->generate('feedback')
-                );
-            } else {
-                $error = 'Invalid Message';
-            }
-        }
-
-        return $application['twig']->render('views/feedback.twig', array(
-            'error' => $error,
-        ));
-    }
-)
-->bind('feedback')
-->method('GET|POST');
-
 $application->match(
     '/profile',
     function (Request $request) use ($application) {
@@ -2017,14 +2002,98 @@ EOD;
 ->method('GET');
 
 $application->match(
-    '/ps',
+    '/suggested_keywords',
+    function (Request $request) use ($application, $variables) {
+        ignore_user_abort(true);
+        set_time_limit(0);
+        exec(sprintf(
+            '%s/python %s/scripts/sk.py %s 2>/dev/null',
+            $variables['virtualenv'],
+            __DIR__,
+            escapeshellarg($request->get('keywords'))
+        ), $output, $return_var);
+        return new Response(implode('', $output));
+    }
+)
+->bind('suggested_keywords')
+->method('POST');
+
+$application->match(
+    '/feedback',
     function (Request $request) use ($application) {
-        return $application['twig']->render('views/ps.twig', array(
-            'popular_searches' => get_popular_searches($application),
+        $error = '';
+        if ($request->isMethod('POST')) {
+            $body = $request->get('body');
+            if (!empty($body)) {
+                if (!is_development()) {
+                    $user = $application['session']->get('user');
+                    $subject = sprintf(
+                        'ZonSidekick Feedback from %s', $user['email']
+                    );
+                    try {
+                        $message = \Swift_Message::newInstance()
+                            ->setBody(trim($request->get('body')))
+                            ->setFrom(array(
+                                $user['email'],
+                            ))
+                            ->setSubject($subject)
+                            ->setTo(array(
+                                'support@perfectsidekick.com',
+                            ));
+                        $application['mailer']->send($message);
+                    } catch (Exception $exception ) {
+                    }
+                }
+                $application['session']->getFlashBag()->add(
+                    'success',
+                    array('Your feedback has been sent successfully.')
+                );
+                return $application->redirect(
+                    $application['url_generator']->generate('feedback')
+                );
+            } else {
+                $error = 'Invalid Message';
+            }
+        }
+
+        return $application['twig']->render('views/feedback.twig', array(
+            'error' => $error,
         ));
     }
 )
-->bind('ps')
+->bind('feedback')
+->method('GET|POST');
+
+$application->match('/transfer/{id}', function ($id) use ($application) {
+    if (!has_statistics($application['session']->get('user'))) {
+        return $application->redirect(
+            $application['url_generator']->generate('403')
+        );
+    }
+    $query = <<<EOD
+SELECT `user_email`
+FROM `wp_users`
+WHERE `ID` = ?
+EOD;
+    $record = $application['db']->fetchAssoc($query, array(
+        $id,
+    ));
+    if (!$record) {
+        return $application->redirect(
+            $application['url_generator']->generate('403')
+        );
+    }
+    $application['session']->set('user_', array(
+        'email' => $record['user_email'],
+        'id' => $record['id'],
+    ));
+
+    return $application->redirect(
+        $application['url_generator']->generate('dashboard')
+    );
+})
+->before($before_statistics)
+->bind('transfer')
 ->method('GET');
 
 $application->match('/403', function () use ($application) {
