@@ -1,4 +1,4 @@
-{% set types = ['error', 'success'] %}
+{% set types = ['danger', 'info', 'success', 'warning'] %}
 {% if app.session.flashBag is defined %}
     {% for type in types %}
         {% for items in app.session.flashBag.get(type) %}
