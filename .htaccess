@@ -4,6 +4,11 @@ RedirectMatch 404 /\.gitignore
 RedirectMatch 404 /\.gitkeep
 RedirectMatch 404 /\.gitmodules
 
+<Files development.log>
+    Order allow,deny
+    Deny from all
+</Files>
+
 <Files error_log>
     Order allow,deny
     Deny from all
@@ -22,7 +27,7 @@ RedirectMatch 404 /\.gitmodules
 <IfModule mod_rewrite.c>
     Options -MultiViews
     RewriteEngine On
-    RewriteBase /tools/current
+    RewriteBase /
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [QSA,L]
 </IfModule>
