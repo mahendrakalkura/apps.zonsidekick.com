@@ -109,7 +109,7 @@ application.filter('label', function () {
                     );
                 case 'Low':
                     return (
-                        '<span class="label label-important">'
+                        '<span class="label label-danger">'
                         +
                         two
                         +
@@ -117,7 +117,7 @@ application.filter('label', function () {
                     );
                 case 'Very Low':
                     return (
-                        '<span class="label label-important">'
+                        '<span class="label label-danger">'
                         +
                         two
                         +
@@ -130,7 +130,7 @@ application.filter('label', function () {
             switch (one) {
                 case 'Very High':
                     return (
-                        '<span class="label label-important">'
+                        '<span class="label label-danger">'
                         +
                         two
                         +
@@ -138,7 +138,7 @@ application.filter('label', function () {
                     );
                 case 'High':
                     return (
-                        '<span class="label label-important">'
+                        '<span class="label label-danger">'
                         +
                         two
                         +
@@ -1254,51 +1254,6 @@ jQuery.ajaxSetup({
     timeout: 600000
 });
 
-var body = function (context) {
-    var keywords = jQuery('#keywords');
-    if (!keywords.length) {
-        return ;
-    }
-
-    var body = jQuery('#body');
-    if (!body.length) {
-        return ;
-    }
-
-    var get_bottom = function (context) {
-        return parseInt(context.position().top + context.height(), 10);
-    }
-
-    one = get_bottom(keywords);
-    two = get_bottom(body);
-    if (one != two) {
-        body.css('height', body.height() - (two - one) + 10);
-    }
-};
-
-var ui = function () {
-    if (is_development()) {
-        return;
-    }
-    jQuery.ajax({
-        dataType: 'html',
-        error: function (jqXHR, textStatus, errorThrown) {
-            ui();
-        },
-        success: function (data, textStatus, jqXHR) {
-            var context = jQuery(data);
-            jQuery('#top').append(context.find('.banner'));
-            context.find('#content_area').find('#le_body_row_1').remove();
-            jQuery('#bottom').append(
-                context.find('#content_area').fadeIn('slow')
-            );
-            jQuery('#bottom').append(context.find('.footer').fadeIn('slow'));
-        },
-        type: 'GET',
-        url: 'http://zonsidekick.com/toolspage/'
-    });
-};
-
 var zclip = function () {
     var refresh = function () {
         if (element.is(':hidden')) {
@@ -1349,7 +1304,5 @@ jQuery(function () {
     if (jQuery.cookie('aks-qsg') != 'Yes') {
         jQuery('[data-target="#aks-qsg"]').click();
     }
-    body();
-    ui();
     zclip();
 });
