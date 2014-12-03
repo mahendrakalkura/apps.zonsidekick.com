@@ -449,31 +449,31 @@
                 <table class="table table-bordered table-hover table-striped">
                     <tr>
                         <td>Average Price</td>
-                        <td class="small text-right">
+                        <td class="narrow text-right">
                             $[! contents.glance.price|number:2 !]
                         </td>
                     </tr>
                     <tr>
                         <td>Average Sales Per Day</td>
-                        <td class="small text-right">
+                        <td class="narrow text-right">
                             [! contents.glance.estimated_sales_per_day|number:2 !]
                         </td>
                     </tr>
                     <tr>
                         <td>Average Number of Reviews</td>
-                        <td class="small text-right">
+                        <td class="narrow text-right">
                             [! contents.glance.total_number_of_reviews|number:0 !]
                         </td>
                     </tr>
                     <tr>
                         <td>Average Review Score</td>
-                        <td class="small text-right">
+                        <td class="narrow text-right">
                             [! contents.glance.review_average|number:2 !]
                         </td>
                     </tr>
                     <tr>
                         <td>Average Book Length</td>
-                        <td class="small text-right">
+                        <td class="narrow text-right">
                             [! contents.glance.print_length|number:0 !]
                         </td>
                     </tr>
@@ -481,7 +481,7 @@
                         <td>
                             Books with 25k BSR or better (lower)
                         </td>
-                        <td class="small text-right">
+                        <td class="narrow text-right">
                             [! contents.glance.absr|number:0 !]
                         </td>
                     </tr>
@@ -610,7 +610,7 @@
                                 [! category.title !]
                             </span>
                         </td>
-                        <td class="small text-right">
+                        <td class="narrow text-right">
                             [! category.frequency|number:0 !]
                         </td>
                     </tr>
@@ -654,7 +654,7 @@
             >
             <thead>
                 <th
-                    class="header small text-right [! order_by['books'][0] == 'rank' && get_order_by('books') || '' !]"
+                    class="header narrow text-right [! order_by['books'][0] == 'rank' && get_order_by('books') || '' !]"
                     ng-click="set_order_by('books', 'rank')"
                     >Rank</th>
                 <th
@@ -666,27 +666,27 @@
                     ng-click="set_order_by('books', 'author_name')"
                     >Author</th>
                 <th
-                    class="header small text-right [! order_by['books'][0] == 'price' && get_order_by('books') || '' !]"
+                    class="header narrow text-right [! order_by['books'][0] == 'price' && get_order_by('books') || '' !]"
                     ng-click="set_order_by('books', 'price')"
                     >Price ($)</th>
                 <th
-                    class="header small text-right [! order_by['books'][0] == 'print_length' && get_order_by('books') || '' !]"
+                    class="header narrow text-right [! order_by['books'][0] == 'print_length' && get_order_by('books') || '' !]"
                     ng-click="set_order_by('books', 'print_length')"
                     >Print Length</th>
                 <th
-                    class="header small text-right [! order_by['books'][0] == 'total_number_of_reviews' && get_order_by('books') || '' !]"
+                    class="header narrow text-right [! order_by['books'][0] == 'total_number_of_reviews' && get_order_by('books') || '' !]"
                     ng-click="set_order_by('books', 'total_number_of_reviews')"
                     >Reviews</th>
                 <th
-                    class="header small text-right [! order_by['books'][0] == 'review_average' && get_order_by('books') || '' !]"
+                    class="header narrow text-right [! order_by['books'][0] == 'review_average' && get_order_by('books') || '' !]"
                     ng-click="set_order_by('books', 'review_average')"
                     >Review Average</th>
                 <th
-                    class="header small text-right [! order_by['books'][0] == 'amazon_best_sellers_rank_' && get_order_by('books') || '' !]"
+                    class="header narrow text-right [! order_by['books'][0] == 'amazon_best_sellers_rank_' && get_order_by('books') || '' !]"
                     ng-click="set_order_by('books', 'amazon_best_sellers_rank_')"
                     >Amazon BSR</th>
                 <th
-                    class="header small text-right [! order_by['books'][0] == 'days_in_the_top_100' && get_order_by('books') || '' !]"
+                    class="header narrow text-right [! order_by['books'][0] == 'days_in_the_top_100' && get_order_by('books') || '' !]"
                     ng-click="set_order_by('books', 'days_in_the_top_100')"
                     ng-show="category == 1"
                     >Days in the Top 100</th>
@@ -696,7 +696,7 @@
                 ng-repeat="book in contents.books|orderBy:order_by['books'][0]:order_by['books'][1]"
                 >
                 <tr>
-                    <td class="small text-right">
+                    <td class="narrow text-right">
                         [! book.rank|number:0 !]
                     </td>
                     <td>
@@ -737,19 +737,19 @@
                             [! book.author_name !]
                         </span>
                     </td>
-                    <td class="small text-right">
+                    <td class="narrow text-right">
                         [! book.price|number:2 !]
                     </td>
-                    <td class="small text-right">
+                    <td class="narrow text-right">
                         [! book.print_length|number:0 !]
                     </td>
-                    <td class="small text-right">
+                    <td class="narrow text-right">
                         [! book.total_number_of_reviews|number:0 !]
                     </td>
-                    <td class="small text-right">
+                    <td class="narrow text-right">
                         [! book.review_average|number:2 !]
                     </td>
-                    <td class="small text-right">
+                    <td class="narrow text-right">
                         <span ng-show="book.amazon_best_sellers_rank['Paid in Kindle Store']">
                             [! book.amazon_best_sellers_rank['Paid in Kindle Store']|number:0 !]
                         </span>
@@ -758,7 +758,7 @@
                         </span>
                     </td>
                     <td
-                        class="small text-right"
+                        class="narrow text-right"
                         ng-show="category == 1"
                         >
                         <span ng-show="book.days_in_the_top_100 > 0">

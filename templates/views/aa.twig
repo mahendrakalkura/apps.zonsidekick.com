@@ -143,13 +143,13 @@
         <table class="table table-bordered table-hover table-striped">
             <thead>
                 <th>Title</th>
-                <th class="small text-right">Publication Date</th>
-                <th class="small text-right">Price (in $)</th>
-                <th class="small text-right">Print Length</th>
-                <th class="small text-right">Reviews</th>
-                <th class="small text-right">Review Average</th>
-                <th class="small text-right">Daily Revenue</th>
-                <th class="small text-right">Amazon BSR</th>
+                <th class="narrow text-right">Publication Date</th>
+                <th class="narrow text-right">Price (in $)</th>
+                <th class="narrow text-right">Print Length</th>
+                <th class="narrow text-right">Reviews</th>
+                <th class="narrow text-right">Review Average</th>
+                <th class="narrow text-right">Daily Revenue</th>
+                <th class="narrow text-right">Amazon BSR</th>
             </thead>
             <tbody>
                 <tr ng-repeat="book in author.contents.books|orderBy:'publication_date':true">
@@ -165,25 +165,25 @@
                             target="_blank"
                             >[! book.title !]</a>
                     </td>
-                    <td class="small text-right">
+                    <td class="narrow text-right">
                         [! book.publication_date !]
                     </td>
-                    <td class="small text-right">
+                    <td class="narrow text-right">
                         [! book.price|number:2 !]
                     </td>
-                    <td class="small text-right">
+                    <td class="narrow text-right">
                         [! book.print_length|number:0 !]
                     </td>
-                    <td class="small text-right">
+                    <td class="narrow text-right">
                         [! book.total_number_of_reviews|number:0 !]
                     </td>
-                    <td class="small text-right">
+                    <td class="narrow text-right">
                         [! book.review_average|number:2 !]
                     </td>
-                    <td class="small text-right">
+                    <td class="narrow text-right">
                         [! book.earnings_per_day|number:2 !]
                     </td>
-                    <td class="small text-right">
+                    <td class="narrow text-right">
                         <span ng-show="book.amazon_best_sellers_rank['Paid in Kindle Store']">
                             [! book.amazon_best_sellers_rank['Paid in Kindle Store']|number:0 !]
                         </span>

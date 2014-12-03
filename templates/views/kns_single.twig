@@ -33,326 +33,318 @@
             <div class="panel-body">
                 <div class="form-group">
                     <label class="control-label" for="keyword">Keyword</label>
-                    <div class="controls">
-                        <input
-                            class="col-xs-12"
-                            id="keyword"
-                            placeholder="Keyword"
-                            type="text"
-                            value=""
-                            ng-model="keyword"
-                            >
-                    </div>
+                    <input
+                        class="col-xs-12 form-control"
+                        id="keyword"
+                        placeholder="Keyword"
+                        type="text"
+                        value=""
+                        ng-model="keyword"
+                        >
                 </div>
                 <div class="form-group">
                     <label class="control-label" for="country">Country</label>
-                    <div class="controls">
-                        <select
-                            class="col-xs-12"
-                            id="country"
-                            ng-model="country"
-                            ng-options="country[0] as country[1] for country in countries"
-                            ></select>
-                    </div>
-                </div>
-                <div class="form-actions">
-                    <button class="btn btn-success" type="submit">
-                        <span class="fa fa-fw fa-info-sign fa-lg"></span>
-                        Submit
-                    </button>
-                    <button class="btn btn-danger" type="reset">
-                        <span class="fa fa-fw fa-trash fa-lg"></span>
-                        Reset
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-    <div class="row-fluid">
-        <p class="text-center col-xs-12 hide [! spinner == true && 'show' || 'hide' !]">
-            <span class="fa fa-fw fa-spinner fa-spin fa-2x"></span>
-        </p>
-    </div>
-    <div class="row-fluid">
-        <div class="col-xs-12 hide [! contents != '' > 0 && 'show' || 'hide' !]">
-            <table class="table table-hover table-striped">
-                <tbody>
-                    <tr>
-                        <td>Buyer Behavior</td>
-                        <td class="narrow right">
-                            <span ng-switch on="contents['buyer_behavior'][1]">
-                                <span
-                                    class="text-error"
-                                    ng-switch-when="N/A"
-                                    >
-                                    <strong>
-                                        [! contents['buyer_behavior'][1] !]
-                                    </strong>
-                                </span>
-                                <span ng-switch-default ng-bind-html="contents['buyer_behavior'][1]|label:contents['buyer_behavior'][1]:true|html"></span>
-                            </span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Competition</td>
-                        <td class="narrow right">
-                            <span ng-switch on="contents['competition'][1]">
-                                <span
-                                    class="text-error"
-                                    ng-switch-when="N/A"
-                                    >
-                                    <strong>
-                                        [! contents['competition'][1] !]
-                                    </strong>
-                                </span>
-                                <span ng-switch-default ng-bind-html="contents['competition'][1]|label:contents['competition'][1]:false|html"></span>
-                            </span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Optimization</td>
-                        <td class="narrow right">
-                            <span ng-switch on="contents['optimization'][1]">
-                                <span
-                                    class="text-error"
-                                    ng-switch-when="N/A"
-                                    >
-                                    <strong>
-                                        [! contents['optimization'][1] !]
-                                    </strong>
-                                </span>
-                                <span ng-switch-default ng-bind-html="contents['optimization'][1]|label:contents['optimization'][1]:false|html"></span>
-                            </span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Popularity</td>
-                        <td class="narrow right">
-                            <span ng-switch on="contents['popularity'][1]">
-                                <span
-                                    class="text-error"
-                                    ng-switch-when="N/A"
-                                    >
-                                    <strong>
-                                        [! contents['popularity'][1] !]
-                                    </strong>
-                                </span>
-                                <span ng-switch-default ng-bind-html="contents['popularity'][1]|label:contents['popularity'][1]:true|html"></span>
-                            </span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Spend ($)</td>
-                        <td class="narrow right">
-                            <span ng-switch on="contents['spend'][1]">
-                                <span
-                                    class="text-error"
-                                    ng-switch-when="N/A"
-                                    >
-                                    <strong>
-                                        [! contents['spend'][1] !]
-                                    </strong>
-                                </span>
-                                <span ng-switch-default ng-bind-html="contents['spend'][1]|label:contents['spend'][1]:true|html"></span>
-                            </span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Avg. Price ($)</td>
-                        <td class="narrow right">
-                            <span ng-switch on="contents['average_price'][1]">
-                                <span
-                                    class="text-error"
-                                    ng-switch-when="N/A"
-                                    >
-                                    <strong>
-                                        [! contents['average_price'][1] !]
-                                    </strong>
-                                </span>
-                                <span ng-switch-default>
-                                    [! contents['average_price'][1] !]
-                                </span>
-                            </span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Avg. Length</td>
-                        <td class="narrow right">
-                            <span ng-switch on="contents['average_length'][1]">
-                                <span
-                                    class="text-error"
-                                    ng-switch-when="N/A"
-                                    >
-                                    <strong>
-                                        [! contents['average_length'][1] !]
-                                    </strong>
-                                </span>
-                                <span ng-switch-default>
-                                    [! contents['average_length'][1] !]
-                                </span>
-                            </span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Score</td>
-                        <td class="narrow right">
-                            <span ng-switch on="contents['score'][1]">
-                                <span
-                                    class="text-error"
-                                    ng-switch-when="N/A"
-                                    >
-                                    <strong>
-                                        [! contents['score'][1] !]
-                                    </strong>
-                                </span>
-                                <span ng-switch-default>
-                                    [! contents['score'][1] !]
-                                </span>
-                            </span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div ng-show="contents.words && contents.words.length > 0">
-                <div class="row-fluid">
-                    <div class="col-xs-8">
-                        <p><strong>Top 10 words</strong></p>
-                        <div class="row-fluid">
-                            <div class="col-xs-6">
-                                <ul>
-                                    <li ng-repeat="word in contents.words|slice:0:5">
-                                        [! word[0] !] ([! word[1] !])
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="col-xs-6">
-                                <ul>
-                                    <li ng-repeat="word in contents.words|slice:5:10">
-                                        [! words !]
-                                        [! word[0] !] ([! word[1] !])
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div
-                        class="col-xs-4"
-                        data-urls-aks="{{ url('aks') }}"
-                        data-urls-suggested-keywords="{{ url('suggested_keywords') }}"
-                        ng-controller="suggested_keywords"
-                        >
-                        <p>
-                            <a ng-click="process(contents.words)">
-                                Click here to compile a list of suggested
-                                keywords
-                            </a>
-                        </p>
-                        <p ng-show="spinner">
-                            <span class="fa fa-fw fa-spinner fa-spin fa-2x">
-                            </span>
-                        </p>
-                        <p ng-show="items.length > 0">
-                            <ul>
-                                <li ng-repeat="item in items">
-                                    [! item !]
-                                </li>
-                            </ul>
-                        </p>
-                        <p ng-show="items.length > 0">
-                            <a ng-click="get_more_suggestions(items, 'Combine')">
-                                Get more suggestions
-                            </a>
-                        </p>
-                        <p class="text-error" ng-show="error">
-                            Your query did not yield any results.
-                            Please try again after a while.
-                        </p>
-                    </div>
+                    <select
+                        class="col-xs-12 form-control"
+                        id="country"
+                        ng-model="country"
+                        ng-options="country[0] as country[1] for country in countries"
+                        ></select>
                 </div>
             </div>
-            <table class="table table-hover table-striped">
+            <div class="clearfix panel-footer text-right">
+                <button class="btn btn-success pull-right" type="submit">
+                    <span class="fa fa-lg fa-fw fa-thumbs-up"></span>
+                    Submit
+                </button>
+                <button class="btn btn-danger pull-right" type="reset">
+                    <span class="fa fa-lg fa-fw fa-thumbs-down"></span>
+                    Reset
+                </button>
+            </div>
+        </div>
+    </form>
+    <p class="text-center hide [! spinner == true && 'show' || 'hide' !]">
+        <span class="fa fa-fw fa-spinner fa-spin fa-2x"></span>
+    </p>
+    <div class="hide [! contents != '' > 0 && 'show' || 'hide' !]">
+        <table class="table table-bordered table-hover table-striped">
+            <tbody>
                 <tr>
-                    <th
-                        class="header [! order_by[0] == 'title[0]' && get_order_by() || '' !]"
-                        ng-click="set_order_by('title[0]')"
-                        >Title</th>
-                    <th
-                        class="narrow center header [! order_by[0] == 'title[1]' && get_order_by() || '' !]"
-                        ng-click="set_order_by('title[1]')"
-                        >KW In Title</th>
-                    <th
-                        class="narrow header [! order_by_[0] == 'author.name' && get_order_by_() || '' !]"
-                        ng-click="set_order_by_('author.name')"
-                        >Author</th>
-                    <th
-                        class="narrow right header [! order_by[0] == 'best_sellers_rank[0]' && get_order_by() || '' !]"
-                        ng-click="set_order_by('best_sellers_rank[0]')"
-                        >Best Seller Rank</th>
-                    <th
-                        class="narrow right header [! order_by[0] == 'price[0]' && get_order_by() || '' !]"
-                        ng-click="set_order_by('price[0]')"
-                        >Price ($)</th>
-                    <th
-                        class="narrow right header [! order_by[0] == 'pages[0]' && get_order_by() || '' !]"
-                        ng-click="set_order_by('pages[0]')"
-                        >Print Length</th>
-                    <th
-                        class="narrow right header [! order_by[0] == 'publication_date' && get_order_by() || '' !]"
-                        ng-click="set_order_by('publication_date')"
-                        >Date Published</th>
-                    <th
-                        class="narrow right header [! order_by[0] == 'stars[0]' && get_order_by() || '' !]"
-                        ng-click="set_order_by('stars[0]')"
-                        >Average Review</th>
+                    <td>Buyer Behavior</td>
+                    <td class="narrow text-right">
+                        <span ng-switch on="contents['buyer_behavior'][1]">
+                            <span
+                                class="text-error"
+                                ng-switch-when="N/A"
+                                >
+                                <strong>
+                                    [! contents['buyer_behavior'][1] !]
+                                </strong>
+                            </span>
+                            <span ng-switch-default ng-bind-html="contents['buyer_behavior'][1]|label:contents['buyer_behavior'][1]:true|html"></span>
+                        </span>
+                    </td>
                 </tr>
-                <tr ng-repeat="item in contents['items']|orderBy:order_by[0]:order_by[1]">
-                    <td>
-                        <a
-                            href="[! item.url !]"
-                            rel="noreferrer"
-                            target="_blank"
-                            >[! item.title[0] !]</a>
+                <tr>
+                    <td>Competition</td>
+                    <td class="narrow text-right">
+                        <span ng-switch on="contents['competition'][1]">
+                            <span
+                                class="text-error"
+                                ng-switch-when="N/A"
+                                >
+                                <strong>
+                                    [! contents['competition'][1] !]
+                                </strong>
+                            </span>
+                            <span ng-switch-default ng-bind-html="contents['competition'][1]|label:contents['competition'][1]:false|html"></span>
+                        </span>
                     </td>
-                    <td class="narrow center">
-                        [! item.title[1] !]
+                </tr>
+                <tr>
+                    <td>Optimization</td>
+                    <td class="narrow text-right">
+                        <span ng-switch on="contents['optimization'][1]">
+                            <span
+                                class="text-error"
+                                ng-switch-when="N/A"
+                                >
+                                <strong>
+                                    [! contents['optimization'][1] !]
+                                </strong>
+                            </span>
+                            <span ng-switch-default ng-bind-html="contents['optimization'][1]|label:contents['optimization'][1]:false|html"></span>
+                        </span>
                     </td>
-                    <td class="narrow">
-                        <span ng-hide="item.author == undefined">
-                            <a
-                                class="pull-right"
-                                href="[! item.author.url !]"
-                                ng-show="item.author.url.length > 0"
-                                rel="noreferrer"
-                                target="_blank"
-                                ><i class="fa fa-fw fa-external-link"></i></a>
-                            <a
-                                href="{{ url('aa') }}?url=[! item.author.url|encodeUri !]"
-                                ng-show="item.author.url.length > 0"
-                                target="_blank"
-                                >[! item.author.name !]</a>
-                            <span ng-show="item.author.url.length == 0">
-                                [! item.author.name !]
+                </tr>
+                <tr>
+                    <td>Popularity</td>
+                    <td class="narrow text-right">
+                        <span ng-switch on="contents['popularity'][1]">
+                            <span
+                                class="text-error"
+                                ng-switch-when="N/A"
+                                >
+                                <strong>
+                                    [! contents['popularity'][1] !]
+                                </strong>
+                            </span>
+                            <span ng-switch-default ng-bind-html="contents['popularity'][1]|label:contents['popularity'][1]:true|html"></span>
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Spend ($)</td>
+                    <td class="narrow text-right">
+                        <span ng-switch on="contents['spend'][1]">
+                            <span
+                                class="text-error"
+                                ng-switch-when="N/A"
+                                >
+                                <strong>
+                                    [! contents['spend'][1] !]
+                                </strong>
+                            </span>
+                            <span ng-switch-default ng-bind-html="contents['spend'][1]|label:contents['spend'][1]:true|html"></span>
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Avg. Price ($)</td>
+                    <td class="narrow text-right">
+                        <span ng-switch on="contents['average_price'][1]">
+                            <span
+                                class="text-error"
+                                ng-switch-when="N/A"
+                                >
+                                <strong>
+                                    [! contents['average_price'][1] !]
+                                </strong>
+                            </span>
+                            <span ng-switch-default>
+                                [! contents['average_price'][1] !]
                             </span>
                         </span>
                     </td>
-                    <td class="narrow right">
-                        [! item.best_sellers_rank[0]|number:0 !]
-                    </td>
-                    <td class="narrow right">
-                        [! item.price[0]|number:2 !]
-                    </td>
-                    <td class="narrow right">
-                        [! item.pages[0]|number:0 !]
-                    </td>
-                    <td class="narrow right">
-                        [! item.publication_date !]
-                    </td>
-                    <td class="narrow right">
-                        [! item.stars[0]|number:2 !]
+                </tr>
+                <tr>
+                    <td>Avg. Length</td>
+                    <td class="narrow text-right">
+                        <span ng-switch on="contents['average_length'][1]">
+                            <span
+                                class="text-error"
+                                ng-switch-when="N/A"
+                                >
+                                <strong>
+                                    [! contents['average_length'][1] !]
+                                </strong>
+                            </span>
+                            <span ng-switch-default>
+                                [! contents['average_length'][1] !]
+                            </span>
+                        </span>
                     </td>
                 </tr>
-            </table>
+                <tr>
+                    <td>Score</td>
+                    <td class="narrow text-right">
+                        <span ng-switch on="contents['score'][1]">
+                            <span
+                                class="text-error"
+                                ng-switch-when="N/A"
+                                >
+                                <strong>
+                                    [! contents['score'][1] !]
+                                </strong>
+                            </span>
+                            <span ng-switch-default>
+                                [! contents['score'][1] !]
+                            </span>
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div ng-show="contents.words && contents.words.length > 0">
+            <div class="row">
+                <div class="col-xs-8">
+                    <p><strong>Top 10 words</strong></p>
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <ul>
+                                <li ng-repeat="word in contents.words|slice:0:5">
+                                    [! word[0] !] ([! word[1] !])
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-xs-6">
+                            <ul>
+                                <li ng-repeat="word in contents.words|slice:5:10">
+                                    [! words !]
+                                    [! word[0] !] ([! word[1] !])
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="col-xs-4"
+                    data-urls-aks="{{ url('aks') }}"
+                    data-urls-suggested-keywords="{{ url('suggested_keywords') }}"
+                    ng-controller="suggested_keywords"
+                    >
+                    <p>
+                        <a ng-click="process(contents.words)">
+                            Click here to compile a list of suggested
+                            keywords
+                        </a>
+                    </p>
+                    <p ng-show="spinner">
+                        <span class="fa fa-fw fa-spinner fa-spin fa-2x">
+                        </span>
+                    </p>
+                    <p ng-show="items.length > 0">
+                        <ul>
+                            <li ng-repeat="item in items">
+                                [! item !]
+                            </li>
+                        </ul>
+                    </p>
+                    <p ng-show="items.length > 0">
+                        <a ng-click="get_more_suggestions(items, 'Combine')">
+                            Get more suggestions
+                        </a>
+                    </p>
+                    <p class="text-error" ng-show="error">
+                        Your query did not yield any results.
+                        Please try again after a while.
+                    </p>
+                </div>
+            </div>
         </div>
+        <table class="table table-bordered table-hover table-striped">
+            <tr>
+                <th
+                    class="header [! order_by[0] == 'title[0]' && get_order_by() || '' !]"
+                    ng-click="set_order_by('title[0]')"
+                    >Title</th>
+                <th
+                    class="narrow text-center header [! order_by[0] == 'title[1]' && get_order_by() || '' !]"
+                    ng-click="set_order_by('title[1]')"
+                    >KW In Title</th>
+                <th
+                    class="narrow header [! order_by_[0] == 'author.name' && get_order_by_() || '' !]"
+                    ng-click="set_order_by_('author.name')"
+                    >Author</th>
+                <th
+                    class="narrow text-right header [! order_by[0] == 'best_sellers_rank[0]' && get_order_by() || '' !]"
+                    ng-click="set_order_by('best_sellers_rank[0]')"
+                    >Best Seller Rank</th>
+                <th
+                    class="narrow text-right header [! order_by[0] == 'price[0]' && get_order_by() || '' !]"
+                    ng-click="set_order_by('price[0]')"
+                    >Price ($)</th>
+                <th
+                    class="narrow text-right header [! order_by[0] == 'pages[0]' && get_order_by() || '' !]"
+                    ng-click="set_order_by('pages[0]')"
+                    >Print Length</th>
+                <th
+                    class="narrow text-right header [! order_by[0] == 'publication_date' && get_order_by() || '' !]"
+                    ng-click="set_order_by('publication_date')"
+                    >Date Published</th>
+                <th
+                    class="narrow text-right header [! order_by[0] == 'stars[0]' && get_order_by() || '' !]"
+                    ng-click="set_order_by('stars[0]')"
+                    >Average Review</th>
+            </tr>
+            <tr ng-repeat="item in contents['items']|orderBy:order_by[0]:order_by[1]">
+                <td>
+                    <a
+                        href="[! item.url !]"
+                        rel="noreferrer"
+                        target="_blank"
+                        >[! item.title[0] !]</a>
+                </td>
+                <td class="narrow text-center">
+                    [! item.title[1] !]
+                </td>
+                <td class="narrow">
+                    <span ng-hide="item.author == undefined">
+                        <a
+                            class="pull-right"
+                            href="[! item.author.url !]"
+                            ng-show="item.author.url.length > 0"
+                            rel="noreferrer"
+                            target="_blank"
+                            ><i class="fa fa-fw fa-external-link"></i></a>
+                        <a
+                            href="{{ url('aa') }}?url=[! item.author.url|encodeUri !]"
+                            ng-show="item.author.url.length > 0"
+                            target="_blank"
+                            >[! item.author.name !]</a>
+                        <span ng-show="item.author.url.length == 0">
+                            [! item.author.name !]
+                        </span>
+                    </span>
+                </td>
+                <td class="narrow text-right">
+                    [! item.best_sellers_rank[0]|number:0 !]
+                </td>
+                <td class="narrow text-right">
+                    [! item.price[0]|number:2 !]
+                </td>
+                <td class="narrow text-right">
+                    [! item.pages[0]|number:0 !]
+                </td>
+                <td class="narrow text-right">
+                    [! item.publication_date !]
+                </td>
+                <td class="narrow text-right">
+                    [! item.stars[0]|number:2 !]
+                </td>
+            </tr>
+        </table>
     </div>
 </div>
 {% endblock %}

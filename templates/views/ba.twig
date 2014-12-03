@@ -214,15 +214,15 @@
             <thead>
                 <tr>
                     <th>Keyword</th>
-                    <th class="small text-right">Rank</th>
-                    <th class="small text-center">Optimization</th>
+                    <th class="narrow text-right">Rank</th>
+                    <th class="narrow text-center">Optimization</th>
                 </tr>
             </thead>
             <tbody>
                 <tr ng-repeat="item in items.contents">
                     <td>[! item.keyword !]</td>
-                    <td class="small text-right">[! item.rank|number:0 !]</td>
-                    <td class="small text-center">[! item.optimization !]</td>
+                    <td class="narrow text-right">[! item.rank|number:0 !]</td>
+                    <td class="narrow text-center">[! item.optimization !]</td>
                 </tr>
             </tbody>
         </table>

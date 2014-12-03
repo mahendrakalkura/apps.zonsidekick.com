@@ -24,27 +24,27 @@
         <thead>
             <tr>
                 <th>User</th>
-                <th class="small text-right">Reports</th>
-                <th class="small text-right">Total Keywords</th>
-                <th class="small text-right">Incomplete Keywords</th>
+                <th class="narrow text-right">Reports</th>
+                <th class="narrow text-right">Total Keywords</th>
+                <th class="narrow text-right">Incomplete Keywords</th>
             </tr>
         </thead>
         <tbody>
             {% for item in items %}
                 <tr>
                     <td>{{ item.id }}. {{ item.display_name }}</td>
-                    <td class="small text-right">{{ item.requests }}</td>
-                    <td class="small text-right">{{ item.keywords_1 }}</td>
-                    <td class="small text-right">{{ item.keywords_2 }}</td>
+                    <td class="narrow text-right">{{ item.requests }}</td>
+                    <td class="narrow text-right">{{ item.keywords_1 }}</td>
+                    <td class="narrow text-right">{{ item.keywords_2 }}</td>
                 </tr>
             {% endfor %}
         </tbody>
         <tfoot>
             <tr>
                 <th></th>
-                <th class="small text-right">{{ requests }}</th>
-                <th class="small text-right">{{ keywords_1 }}</th>
-                <th class="small text-right">{{ keywords_2 }}</th>
+                <th class="narrow text-right">{{ requests }}</th>
+                <th class="narrow text-right">{{ keywords_1 }}</th>
+                <th class="narrow text-right">{{ keywords_2 }}</th>
             </tr>
         </tfoot>
     </table>
