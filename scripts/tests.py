@@ -198,6 +198,6 @@ if __name__ == '__main__':
     message = MIMEText(body)
     message['Subject'] = 'tests.py'
     message['From'] = 'reports@perfectsidekick.com'
-    message['To'] = ['ncroan@gmail.com', 'mahendrakalkura@gmail.com']
+    message['To'] = 'ncroan@gmail.com,mahendrakalkura@gmail.com'
     resource.sendmail(message['From'], message['To'], message.as_string())
     resource.quit()
