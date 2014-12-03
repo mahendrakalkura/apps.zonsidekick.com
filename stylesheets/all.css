@@ -6,6 +6,11 @@ p {
     margin-bottom: 18px;
 }
 
+ul {
+    margin-bottom: 18px;
+    padding-left: 18px;
+}
+
 #content-wrapper {
     padding-bottom: 1px;
 }
@@ -23,6 +28,11 @@ p {
     padding-right: 11px;
 }
 
+.narrow {
+    white-space: nowrap;
+    width: 1px;
+}
+
 .page-header .row h1 .btn + .btn {
     margin-right: 18px;
 }
@@ -37,11 +47,6 @@ p {
 
 .panel-footer .btn + .btn {
     margin-right: 10px;
-}
-
-.small {
-    white-space: nowrap;
-    width: 1px;
 }
 
 .table > thead > tr > th {
