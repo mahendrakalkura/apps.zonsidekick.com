@@ -13,7 +13,15 @@
     <div class="row">
         <h1 class="col-xs-12">
             {% include 'slots/feedback.twig' %}
-            {% include 'slots/popular_searches_how_do_we_know_this.twig' %}
+            <a
+                class="btn pull-right"
+                data-target="#popular_searches_how_do_we_know_this"
+                data-toggle="modal"
+                id="how-do-we-know-this"
+                >
+                <span class="fa fa-fw fa-question-circle"></span>
+                How do we know this?
+            </a>
             <div
                 class="btn pull-right"
                 data-target="#popular_searches"
