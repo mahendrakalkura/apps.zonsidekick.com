@@ -33,7 +33,7 @@
             </p>
             <div class="form-actions">
                 <a class="btn btn-success" href="{{ url('kns_add') }}">
-                    <span class="fa fa-fw fa-plus-sign icon-large"></span>
+                    <span class="fa fa-fw fa-plus-sign fa-lg"></span>
                     Analyze Keywords
                 </a>
             </div>
@@ -83,14 +83,14 @@
                                 </td>
                                 <td class="center small">
                                     <a
-                                        class="fa fa-fw fa-tasks icon-large"
+                                        class="fa fa-fw fa-tasks fa-lg"
                                         href="{{ url('kns_simple', {'id': request.id}) }}"
                                         title="View Simple Report"
                                         data-placement="left"
                                         data-toggle="tooltip"
                                         ></a>
                                     <a
-                                        class="fa fa-fw fa-bar-chart icon-large"
+                                        class="fa fa-fw fa-bar-chart fa-lg"
                                         href="{{ url('kns_detailed', {'id': request.id}) }}"
                                         target="_blank"
                                         title="View Detailed Report (For very large reports this page could take a little while to complete. Please be patient.)"
@@ -98,21 +98,21 @@
                                         data-toggle="tooltip"
                                         ></a>
                                     <a
-                                        class="fa fa-fw fa-download icon-large"
+                                        class="fa fa-fw fa-download fa-lg"
                                         href="{{ url('kns_csv', {'id': request.id}) }}"
                                         title="Download CSV (Simple Report)"
                                         data-placement="left"
                                         data-toggle="tooltip"
                                         ></a>
                                     <a
-                                        class="fa fa-fw fa-download icon-large"
+                                        class="fa fa-fw fa-download fa-lg"
                                         href="{{ url('kns_pdf', {'id': request.id}) }}"
                                         title="Download PDF (Detailed Report)"
                                         data-placement="left"
                                         data-toggle="tooltip"
                                         ></a>
                                     <a
-                                        class="fa fa-fw fa-remove icon-large"
+                                        class="fa fa-fw fa-remove fa-lg"
                                         href="{{ url('kns_delete', {'id': request.id}) }}"
                                         title="Delete"
                                         data-placement="left"
