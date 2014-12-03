@@ -1,34 +1,41 @@
 {% extends 'layout.twig' %}
 
 {% set module = 'Multiple Keywords Analyzer - Delete' %}
-{% set nav = 'kns' %}
+{% set nav = 'keywords_analyzers_multiple' %}
 
 {% block content %}
-<div id="kns_delete">
+<ul class="breadcrumb breadcrumb-page">
+    <div class="breadcrumb-label text-light-gray">You are here:</div>
+    <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
+    <li class="active"><a href="{{ url('kns_single') }}">{{ module }}</a></li>
+</ul>
+<div class="page-header">
     <div class="row">
-        <div class="col-xs-12">
-            <div class="page-header">
-                {% include 'slots/feedback.twig' %}
-                <h1>{{ module }}</h1>
-            </div>
-            <form
-                accept-charset="UTF-8"
-                action="{{ url('kns_delete', {'id': id}) }}"
-                method="POST"
-                >
-                <p>Are you sure you want to delete this report?</p>
-                <div class="form-actions">
-                    <button class="btn btn-success" type="submit">
-                        <span class="fa fa-fw fa-thumbs-up fa-lg"></span>
-                        Yes
-                    </button>
-                    <a class="btn btn-danger" href="{{ url('kns_overview') }}">
-                        <span class="fa fa-fw fa-thumbs-down fa-lg"></span>
-                        No
-                    </a>
-                </div>
-            </form>
-        </div>
+        <h1 class="col-xs-12">
+            {% include 'slots/feedback.twig' %}
+            <i class="fa fa-fw fa-tags"></i> {{ module }}
+        </h1>
     </div>
 </div>
+{% include 'slots/alerts.twig' %}
+<p>Are you sure you want to delete this report?</p>
+<form
+    accept-charset="UTF-8"
+    action="{{ url('kns_delete', {'id': id}) }}"
+    method="POST"
+    >
+    <div class="panel">
+        <div class="panel-body text-right">
+            <button class="btn btn-success pull-right" type="submit">
+                <span class="fa fa-lg fa-fw fa-thumbs-up"></span> Yes
+            </button>
+            <a
+                class="btn btn-danger pull-right"
+                href="{{ url('kns_overview') }}"
+                >
+                <span class="fa fa-lg fa-fw fa-thumbs-down"></span> No
+            </a>
+        </div>
+    </div>
+</form>
 {% endblock %}

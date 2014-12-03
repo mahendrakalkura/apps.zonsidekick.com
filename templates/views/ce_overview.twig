@@ -662,7 +662,7 @@
                     ng-click="set_order_by('books', 'title')"
                     >Title</th>
                 <th
-                    class="header small [! order_by['books'][0] == 'author_name' && get_order_by('books') || '' !]"
+                    class="header narrow [! order_by['books'][0] == 'author_name' && get_order_by('books') || '' !]"
                     ng-click="set_order_by('books', 'author_name')"
                     >Author</th>
                 <th
@@ -720,7 +720,7 @@
                             target="_blank"
                             ><i class="fa fa-fw fa-external-link"></i></a>
                     </td>
-                    <td class="small">
+                    <td class="narrow">
                         <a
                             class="pull-right"
                             href="[! book.author_url !]"

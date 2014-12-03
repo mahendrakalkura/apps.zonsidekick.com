@@ -1,5 +1,73 @@
+@font-face {
+    font-family: 'Open Sans';
+    font-style: italic;
+    font-weight: 800;
+    src:
+        local('Open Sans'),
+        url('../fonts/PRmiXeptR36kaC0GEAetxkCDe67GEgBv_HnyvHTfdew.woff?')
+        format('woff');
+}
+
+@font-face {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 700;
+    src:
+        local('Open Sans'),
+        url('../fonts/k3k702ZOKiLJc3WVjuplzHhCUOGz7vYGh680lGh-uXM.woff')
+        format('woff');
+}
+
+@font-face {
+    font-family: 'Open Sans';
+    font-style: italic;
+    font-weight: 700;
+    src:
+        local('Open Sans'),
+        url('../fonts/PRmiXeptR36kaC0GEAetxjqR_3kx9_hJXbbyU8S6IN0.woff')
+        format('woff');
+}
+
+@font-face {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 600;
+    src:
+        local('Open Sans'),
+        url('../fonts/MTP_ySUJH_bn48VBG8sNSnhCUOGz7vYGh680lGh-uXM.woff')
+        format('woff');
+}
+
+@font-face {
+    font-family: 'Open Sans';
+    font-style: italic;
+    font-weight: 600;
+    src:
+        local('Open Sans'),
+        url('../fonts/PRmiXeptR36kaC0GEAetxn5HxGBcBvicCpTp6spHfNo.woff')
+        format('woff');
+}
+
+@font-face {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    src:
+        local('Open Sans'),
+        url('../fonts/cJZKeOuBrn4kERxqtaUH3T8E0i7KZn-EPnyo3HZu7kw.woff')
+        format('woff');
+}
+
+*, button, input, select, textarea {
+    font-family: 'Open Sans',sans-serif;
+}
+
 a {
     cursor: pointer;
+}
+
+hr {
+    margin-top: 0;
 }
 
 p {
@@ -46,6 +114,10 @@ ul {
     text-align: center;
 }
 
+.panel-body .btn + .btn {
+    margin-right: 20px;
+}
+
 .panel-footer {
     padding-right: 10px;
 }
@@ -65,7 +137,7 @@ ul {
 .video {
     display: block;
     height: 230px;
-    margin: 0 auto 10px auto;
+    margin: 0 auto 18px auto;
     width: 408px;
 }
 

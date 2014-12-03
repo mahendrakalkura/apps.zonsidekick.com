@@ -146,40 +146,40 @@
         <table>
             <tr>
                 <th>Keyword</th>
-                <th class="center small">Buyer Behavior</th>
-                <th class="center small">Competition</th>
-                <th class="center small">Optimization</th>
-                <th class="center small">Popularity</th>
-                <th class="right small">Spend ({{ currency }})</th>
-                <th class="right small">Avg. Price ({{ currency }})</th>
-                <th class="right small">Avg. Length</th>
-                <th class="right small">Score</th>
+                <th class="narrow text-center">Buyer Behavior</th>
+                <th class="narrow text-center">Competition</th>
+                <th class="narrow text-center">Optimization</th>
+                <th class="narrow text-center">Popularity</th>
+                <th class="narrow text-right">Spend ({{ currency }})</th>
+                <th class="narrow text-right">Avg. Price ({{ currency }})</th>
+                <th class="narrow text-right">Avg. Length</th>
+                <th class="narrow text-right">Score</th>
             </tr>
             {% for keyword in keywords %}
                 <tr>
                     <td>{{ loop.index }}. {{ keyword.string }}</td>
-                    <td class="center small">
+                    <td class="narrow text-center">
                         {{ keyword.contents? keyword.contents.buyer_behavior[1]: 'N/A' }}
                     </td>
-                    <td class="center small">
+                    <td class="narrow text-center">
                         {{ keyword.contents? keyword.contents.competition[1]: 'N/A' }}
                     </td>
-                    <td class="center small">
+                    <td class="narrow text-center">
                         {{ keyword.contents? keyword.contents.optimization[1]: 'N/A' }}
                     </td>
-                    <td class="center small">
+                    <td class="narrow text-center">
                         {{ keyword.contents? keyword.contents.popularity[1]: 'N/A' }}
                     </td>
-                    <td class="right small">
+                    <td class="narrow text-right">
                         {{ keyword.contents? keyword.contents.spend[0][1]: 'N/A' }}
                     </td>
-                    <td class="right small">
+                    <td class="narrow text-right">
                         {{ keyword.contents? keyword.contents.average_price[1]: 'N/A' }}
                     </td>
-                    <td class="right small">
+                    <td class="narrow text-right">
                         {{ keyword.contents? keyword.contents.average_length[1]: 'N/A' }}
                     </td>
-                    <td class="right small">
+                    <td class="narrow text-right">
                         {{ keyword.contents? keyword.contents.score[1]: 'N/A' }}
                     </td>
                 </tr>
@@ -192,12 +192,12 @@
                 <table>
                     <tr>
                         <th>Title</th>
-                        <th class="center small">KW Match</th>
-                        <th class="right small">Best Seller Rank</th>
-                        <th class="right small">Price ({{ currency }})</th>
-                        <th class="center small">Date Published</th>
-                        <th class="right small"><nobr>Age (days)</nobr></th>
-                        <th class="right small">Stars</th>
+                        <th class="narrow text-center">KW Match</th>
+                        <th class="narrow text-right">Best Seller Rank</th>
+                        <th class="narrow text-right">Price ({{ currency }})</th>
+                        <th class="narrow text-center">Date Published</th>
+                        <th class="narrow text-right"><nobr>Age (days)</nobr></th>
+                        <th class="narrow text-right">Stars</th>
                     </tr>
                     {% for item in keyword.contents.items %}
                         <tr>
@@ -206,16 +206,16 @@
                                     {{ loop.index }}. {{ item.title[0][0:35] }}
                                 </a>
                             </td>
-                            <td class="center small">{{ item.title[1] }}</td>
-                            <td class="right small">
+                            <td class="narrow text-center">{{ item.title[1] }}</td>
+                            <td class="narrow text-right">
                                 {{ item.best_sellers_rank[1] }}
                             </td>
-                            <td class="right small">{{ item.price[1] }}</td>
-                            <td class="center small">
+                            <td class="narrow text-right">{{ item.price[1] }}</td>
+                            <td class="narrow text-center">
                                 {{ item.publication_date }}
                             </td>
-                            <td class="right small">{{ item.age }}</td>
-                            <td class="right small">{{ item.stars[1] }}</td>
+                            <td class="narrow text-right">{{ item.age }}</td>
+                            <td class="narrow text-right">{{ item.stars[1] }}</td>
                         </tr>
                     {% endfor %}
                 </table>

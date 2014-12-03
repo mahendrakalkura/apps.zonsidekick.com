@@ -1,9 +1,31 @@
 {% extends 'layout.twig' %}
 
 {% set module = 'Multiple Keywords Analyzer- View' %}
-{% set nav = 'kns' %}
+{% set nav = 'keywords_analyzers_multiple' %}
 
 {% block content %}
+<ul class="breadcrumb breadcrumb-page">
+    <div class="breadcrumb-label text-light-gray">You are here:</div>
+    <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
+    <li class="active"><a href="{{ url('kns_single') }}">{{ module }}</a></li>
+</ul>
+<div class="page-header">
+    <div class="row">
+        <h1 class="col-xs-12">
+            {% include 'slots/feedback.twig' %}
+            <div
+                class="btn btn-primary pull-right qsg"
+                data-target="#kns-qsg"
+                data-toggle="modal"
+                >
+                <span class="fa fa-fw fa-thumbs-up"></span>
+                Information
+            </div>
+            <i class="fa fa-fw fa-tag"></i> {{ module }}
+        </h1>
+    </div>
+</div>
+{% include 'slots/alerts.twig' %}
 <div
     data-email-top="Email"
     data-email-middle="<p>The email has been queued for delivery successfully.</p>"
@@ -15,127 +37,107 @@
     data-url-xhr="{{ url('kns_xhr', {'id': request.id}) }}"
     ng-controller="kns_simple"
     >
-    <div class="row">
-        <div class="col-xs-12">
-            <div class="page-header">
-                {% include 'slots/feedback.twig' %}
-                <div
-                    class="btn btn-primary pull-right qsg"
-                    data-target="#kns-qsg"
-                    data-toggle="modal"
+    <div class="text-center">
+        <a
+            class="btn btn-info"
+            data-toggle="tooltip"
+            href="{{ url('kns_detailed', {'id': request.id}) }}"
+            target="_blank"
+            title="For very large reports this page could take a little while to complete. Please be patient."
+            >
+            <span class="fa fa-fw fa-bar-chart fa-lg"></span>
+            View Detailed Report
+        </a>
+        <a
+            class="btn btn-info"
+            href="{{ url('kns_csv', {'id': request.id}) }}"
+            title="Simple Report"
+            data-toggle="tooltip"
+            >
+            <span class="fa fa-fw fa-download fa-lg"></span>
+            Download CSV
+        </a>
+        <div
+            class="btn btn-info"
+            title="Detailed Report - Brandable"
+            data-toggle="tooltip"
+            popover
+            >
+            <span class="fa fa-fw fa-download fa-lg"></span>
+            Download PDF
+            <div class="hide">
+                <img
+                    class="img-polaroid popover-pdf"
+                    data-url="{{ url('kns_pdf', {'id': request.id}) }}"
+                    src="{{ app.request.getSchemeAndHttpHost() }}{{ app.request.baseUrl }}/images/logo.png"
                     >
-                    <span class="fa fa-fw fa-thumbs-up"></span>
-                    Information
-                </div>
-                <h1>{{ module }}</h1>
+                {% for logo in logos %}
+                    <img
+                        class="img-polaroid popover-pdf"
+                        data-url="{{ url('kns_pdf', {'id': request.id, 'logo': logo.file_name|e('url')}) }}"
+                        src="{{ url('logos_view', {'file_name': logo.file_name}) }}"
+                        >
+                {% endfor %}
+            </div>
+        </div>
+        <div
+            class="btn btn-info"
+            data-url="{{ url('kns_email', {'id': request.id}) }}"
+            title="Simple Report + Detailed Report"
+            data-toggle="tooltip"
+            popover
+            >
+            <span class="fa fa-fw fa-envelope fa-lg"></span>
+            Email
+            <div class="hide">
+                <form class="form-inline">
+                    <input type="text" value="{{ email }}">
+                    <button
+                        class="btn btn-success popover-email"
+                        type="button"
+                        >Submit</button>
+                    <button class="btn btn-warning" type="reset">
+                        Reset
+                    </button>
+                </form>
             </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-xs-12">
-            <div class="p text-center">
-                <a
-                    class="btn btn-info"
-                    data-toggle="tooltip"
-                    href="{{ url('kns_detailed', {'id': request.id}) }}"
-                    target="_blank"
-                    title="For very large reports this page could take a little while to complete. Please be patient."
-                    >
-                    <span class="fa fa-fw fa-bar-chart fa-lg"></span>
-                    View Detailed Report
-                </a>
-                <a
-                    class="btn btn-info"
-                    href="{{ url('kns_csv', {'id': request.id}) }}"
-                    title="Simple Report"
-                    data-toggle="tooltip"
-                    >
-                    <span class="fa fa-fw fa-download fa-lg"></span>
-                    Download CSV
-                </a>
-                <div
-                    class="btn btn-info"
-                    title="Detailed Report - Brandable"
-                    data-toggle="tooltip"
-                    popover
-                    >
-                    <span class="fa fa-fw fa-download fa-lg"></span>
-                    Download PDF
-                    <div class="hide">
-                        <img
-                            class="img-polaroid popover-pdf"
-                            data-url="{{ url('kns_pdf', {'id': request.id}) }}"
-                            src="{{ app.request.getSchemeAndHttpHost() }}{{ app.request.baseUrl }}/images/logo.png"
-                            >
-                        {% for logo in logos %}
-                            <img
-                                class="img-polaroid popover-pdf"
-                                data-url="{{ url('kns_pdf', {'id': request.id, 'logo': logo.file_name|e('url')}) }}"
-                                src="{{ url('logos_view', {'file_name': logo.file_name}) }}"
-                                >
-                        {% endfor %}
-                    </div>
-                </div>
-                <div
-                    class="btn btn-info"
-                    data-url="{{ url('kns_email', {'id': request.id}) }}"
-                    title="Simple Report + Detailed Report"
-                    data-toggle="tooltip"
-                    popover
-                    >
-                    <span class="fa fa-fw fa-envelope fa-lg"></span>
-                    Email
-                    <div class="hide">
-                        <form class="form-inline">
-                            <input type="text" value="{{ email }}">
-                            <button
-                                class="btn btn-success popover-email"
-                                type="button"
-                                >Submit</button>
-                            <button class="btn btn-warning" type="reset">
-                                Reset
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <hr ng-show="is_finished()">
-            <div
-                data-urls-aks="{{ url('aks') }}"
-                data-urls-suggested-keywords="{{ url('suggested_keywords') }}"
-                ng-controller="suggested_keywords"
-                ng-show="is_finished() && $parent.get_words().length > 0"
-                >
-                <p>
-                    <a ng-click="process($parent.get_words())">
-                        Click here to compile a list of suggested keywords
-                    </a>
-                </p>
-                <p ng-show="spinner">
-                    <span class="fa fa-fw fa-spinner fa-spin fa-2x">
-                    </span>
-                </p>
-                <p ng-show="items.length > 0">
-                    <ul>
-                        <li ng-repeat="item in items">
-                            [! item !]
-                        </li>
-                    </ul>
-                </p>
-                <p ng-show="items.length > 0">
-                    <a ng-click="get_more_suggestions(items, 'Combine')">
-                        Get more suggestions
-                    </a>
-                </p>
-                <p class="text-error" ng-show="error">
-                    Your query did not yield any results. Please try again
-                    after a while.
-                </p>
-            </div>
-            <hr ng-show="is_finished() && get_words().length > 0">
-        </div>
+    <hr ng-show="is_finished()">
+    <div
+        data-urls-aks="{{ url('aks') }}"
+        data-urls-suggested-keywords="{{ url('suggested_keywords') }}"
+        ng-controller="suggested_keywords"
+        ng-show="is_finished() && $parent.get_words().length > 0"
+        >
+        <p>
+            <a ng-click="process($parent.get_words())">
+                Click here to compile a list of suggested keywords
+            </a>
+        </p>
+        <p ng-show="spinner">
+            <span class="fa fa-2x fa-fw fa-spinner fa-spin">
+            </span>
+        </p>
+        <p ng-show="items.length > 0">
+            <ul>
+                <li ng-repeat="item in items">
+                    [! item !]
+                </li>
+            </ul>
+        </p>
+        <p ng-show="items.length > 0">
+            <a ng-click="get_more_suggestions(items, 'Combine')">
+                Get more suggestions
+            </a>
+        </p>
+        <p class="text-error" ng-show="error">
+            Your query did not yield any results. Please try again
+            after a while.
+        </p>
     </div>
-    <form class="form-horizontal" ng-show="is_finished()">
+    <hr>
+    <form ng-show="is_finished()">
         <div class="row">
             <div class="col-xs-4">
                 <div class="form-group kns">
@@ -601,14 +603,8 @@
             </table>
         </div>
     </div>
-    <div class="row" ng-show="!keywords.length">
-        <div class="col-xs-12">
-            <center>
-                <p>
-                    <span class="fa fa-fw fa-spinner fa-spin fa-2x"></span>
-                </p>
-            </center>
-        </div>
-    </div>
+    <p ng-show="!keywords.length">
+        <span class="fa fa-fw fa-spinner fa-spin fa-2x"></span>
+    </p>
 </div>
 {% endblock %}

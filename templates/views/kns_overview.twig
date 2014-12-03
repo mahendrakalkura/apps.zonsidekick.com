@@ -1,134 +1,134 @@
 {% extends 'layout.twig' %}
 
 {% set module = 'Multiple Keywords Analyzer - Overview' %}
-{% set nav = 'kns' %}
+{% set nav = 'keywords_analyzers_multiple' %}
 
 {% block content %}
-<div id="kns_overview">
+<ul class="breadcrumb breadcrumb-page">
+    <div class="breadcrumb-label text-light-gray">You are here:</div>
+    <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
+    <li class="active"><a href="{{ url('kns_single') }}">{{ module }}</a></li>
+</ul>
+<div class="page-header">
     <div class="row">
-        <div class="col-xs-12">
-            <div class="page-header">
-                {% include 'slots/feedback.twig' %}
-                <div
-                    class="btn btn-primary pull-right qsg"
-                    data-target="#kns-qsg"
-                    data-toggle="modal"
-                    >
-                    <span class="fa fa-fw fa-thumbs-up"></span>
-                    Information
-                </div>
-                <h1>{{ module }}</h1>
+        <h1 class="col-xs-12">
+            {% include 'slots/feedback.twig' %}
+            <div
+                class="btn btn-primary pull-right qsg"
+                data-target="#kns-qsg"
+                data-toggle="modal"
+                >
+                <span class="fa fa-fw fa-thumbs-up"></span>
+                Information
             </div>
-            <p>
-                This page will display all of your previously run reports that
-                are still available for viewing and/or download. When a report
-                begins, it will appear in the list below. You may close your
-                browser as a report is running and then return to the same view
-                by clicking View in the Actions column for the desired report.
-            </p>
-            <p>
-                <strong>Note:</strong> We will complete your oldest report
-                first. Additional (new) reports will be queued until your
-                others have finished.
-            </p>
-            <div class="form-actions">
-                <a class="btn btn-success" href="{{ url('kns_add') }}">
-                    <span class="fa fa-fw fa-plus-sign fa-lg"></span>
-                    Analyze Keywords
-                </a>
-            </div>
-            {% include 'slots/alerts.twig' %}
-            {% if requests %}
-                <table class="table table-bordered table-hover table-striped tablesorter">
-                    <thead>
-                        <tr>
-                            <th>Report #</th>
-                            <th class="right small">Keywords</th>
-                            <th class="right small">Expires In</th>
-                            <th class="right small">Progress</th>
-                            <th class="center small">Status</th>
-                            <th class="center small">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for request in requests %}
-                            <tr>
-                                <td>{{ request.id }}</td>
-                                <td class="right small">
-                                    {{ request.preview }}
-                                    ({{ request.keywords[1] }})
-                                </td>
-                                <td class="right small">
-                                    {{ request.expires_in }}
-                                </td>
-                                <td class="right small">
-                                    {{ request.progress|number_format(2, '.', ',') }}%
-                                </td>
-                                <td class="center small">
-                                    {% if request.status == 'Completed' %}
-                                        <span class="label label-info">
-                                            {{ request.status }}
-                                        </span>
-                                    {% endif %}
-                                    {% if request.status == 'Waiting' %}
-                                        <span class="label label-warning">
-                                            {{ request.status }}
-                                        </span>
-                                    {% endif %}
-                                    {% if request.status == 'In Progress' %}
-                                        <span class="label label-success">
-                                            {{ request.status }}
-                                        </span>
-                                    {% endif %}
-                                </td>
-                                <td class="center small">
-                                    <a
-                                        class="fa fa-fw fa-tasks fa-lg"
-                                        href="{{ url('kns_simple', {'id': request.id}) }}"
-                                        title="View Simple Report"
-                                        data-placement="left"
-                                        data-toggle="tooltip"
-                                        ></a>
-                                    <a
-                                        class="fa fa-fw fa-bar-chart fa-lg"
-                                        href="{{ url('kns_detailed', {'id': request.id}) }}"
-                                        target="_blank"
-                                        title="View Detailed Report (For very large reports this page could take a little while to complete. Please be patient.)"
-                                        data-placement="left"
-                                        data-toggle="tooltip"
-                                        ></a>
-                                    <a
-                                        class="fa fa-fw fa-download fa-lg"
-                                        href="{{ url('kns_csv', {'id': request.id}) }}"
-                                        title="Download CSV (Simple Report)"
-                                        data-placement="left"
-                                        data-toggle="tooltip"
-                                        ></a>
-                                    <a
-                                        class="fa fa-fw fa-download fa-lg"
-                                        href="{{ url('kns_pdf', {'id': request.id}) }}"
-                                        title="Download PDF (Detailed Report)"
-                                        data-placement="left"
-                                        data-toggle="tooltip"
-                                        ></a>
-                                    <a
-                                        class="fa fa-fw fa-remove fa-lg"
-                                        href="{{ url('kns_delete', {'id': request.id}) }}"
-                                        title="Delete"
-                                        data-placement="left"
-                                        data-toggle="tooltip"
-                                        ></a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            {% else %}
-                <div class="alert alert-error">
-                    You have not added any requests yet.
-                </div>
-            {% endif %}
-        </div>
+            <a class="btn btn-success pull-right" href="{{ url('kns_add') }}">
+                <span class="fa fa-fw fa-plus-sign fa-lg"></span>
+                Analyze Keywords
+            </a>
+            <i class="fa fa-fw fa-tag"></i> {{ module }}
+        </h1>
     </div>
 </div>
+{% include 'slots/alerts.twig' %}
+<p>
+    This page will display all of your previously run reports that are still
+    available for viewing and/or download. When a report begins, it will appear
+    in the list below. You may close your browser as a report is running and
+    then return to the same view by clicking View in the Actions column for the
+    desired report.
+</p>
+<p>
+    <strong>Note:</strong> We will complete your oldest report first.
+    Additional (new) reports will be queued until your others have finished.
+</p>
+{% if requests %}
+    <table class="table table-bordered table-hover table-striped tablesorter">
+        <thead>
+            <tr>
+                <th>Report #</th>
+                <th class="narrow text-right">Keywords</th>
+                <th class="narrow text-right">Expires In</th>
+                <th class="narrow text-right">Progress</th>
+                <th class="narrow text-center">Status</th>
+                <th class="narrow text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in requests %}
+                <tr>
+                    <td>{{ request.id }}</td>
+                    <td class="narrow text-right">
+                        {{ request.preview }}
+                        ({{ request.keywords[1] }})
+                    </td>
+                    <td class="narrow text-right">
+                        {{ request.expires_in }}
+                    </td>
+                    <td class="narrow text-right">
+                        {{ request.progress|number_format(2, '.', ',') }}%
+                    </td>
+                    <td class="narrow text-center">
+                        {% if request.status == 'Completed' %}
+                            <span class="label label-info">
+                                {{ request.status }}
+                            </span>
+                        {% endif %}
+                        {% if request.status == 'Waiting' %}
+                            <span class="label label-warning">
+                                {{ request.status }}
+                            </span>
+                        {% endif %}
+                        {% if request.status == 'In Progress' %}
+                            <span class="label label-success">
+                                {{ request.status }}
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td class="narrow text-center">
+                        <a
+                            class="fa fa-fw fa-tasks fa-lg"
+                            href="{{ url('kns_simple', {'id': request.id}) }}"
+                            title="View Simple Report"
+                            data-placement="left"
+                            data-toggle="tooltip"
+                            ></a>
+                        <a
+                            class="fa fa-fw fa-bar-chart fa-lg"
+                            href="{{ url('kns_detailed', {'id': request.id}) }}"
+                            target="_blank"
+                            title="View Detailed Report (For very large reports this page could take a little while to complete. Please be patient.)"
+                            data-placement="left"
+                            data-toggle="tooltip"
+                            ></a>
+                        <a
+                            class="fa fa-fw fa-download fa-lg"
+                            href="{{ url('kns_csv', {'id': request.id}) }}"
+                            title="Download CSV (Simple Report)"
+                            data-placement="left"
+                            data-toggle="tooltip"
+                            ></a>
+                        <a
+                            class="fa fa-fw fa-download fa-lg"
+                            href="{{ url('kns_pdf', {'id': request.id}) }}"
+                            title="Download PDF (Detailed Report)"
+                            data-placement="left"
+                            data-toggle="tooltip"
+                            ></a>
+                        <a
+                            class="fa fa-fw fa-remove fa-lg"
+                            href="{{ url('kns_delete', {'id': request.id}) }}"
+                            title="Delete"
+                            data-placement="left"
+                            data-toggle="tooltip"
+                            >d</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="alert alert-danger alert-dark">
+        You have not added any requests yet.
+    </div>
+{% endif %}
 {% endblock %}
