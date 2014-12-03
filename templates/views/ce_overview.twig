@@ -212,11 +212,11 @@
                                 ng-options="publication_date as publication_date for publication_date in publication_dates"
                                 ></select>
                             <div
-                                class="date input-append span12"
+                                class="date input-append col-xs-12"
                                 ng-show="publication_date_1 == 'Less Than' || publication_date_1 == 'More Than'"
                                 >
                                 <input
-                                    class="span12"
+                                    class="col-xs-12"
                                     datepicker
                                     name="publication_date_2"
                                     ng-model="publication_date_2"
@@ -230,9 +230,9 @@
                                 class="between"
                                 ng-show="publication_date_1 == 'Between'"
                                 >
-                                <div class="date input-append span6">
+                                <div class="date input-append col-xs-6">
                                     <input
-                                        class="span12"
+                                        class="col-xs-12"
                                         datepicker
                                         name="publication_date_3"
                                         ng-model="publication_date_3"
@@ -242,9 +242,9 @@
                                         <i class="icon-calendar"></i>
                                     </span>
                                 </div>
-                                <div class="date input-append span6">
+                                <div class="date input-append col-xs-6">
                                     <input
-                                        class="span12"
+                                        class="col-xs-12"
                                         datepicker
                                         name="publication_date_4"
                                         ng-model="publication_date_4"
@@ -271,7 +271,7 @@
                                 ng-options="amazon_best_sellers_rank as amazon_best_sellers_rank for amazon_best_sellers_rank in amazon_best_sellers_ranks"
                                 ></select>
                             <input
-                                class="span12"
+                                class="col-xs-12"
                                 max="999999999"
                                 min="0"
                                 name="amazon_best_sellers_rank_2"
@@ -283,9 +283,9 @@
                                 class="between"
                                 ng-show="amazon_best_sellers_rank_1 == 'Between'"
                                 >
-                                <div class="span6">
+                                <div class="col-xs-6">
                                     <input
-                                        class="span12"
+                                        class="col-xs-12"
                                         max="999999999"
                                         min="0"
                                         name="amazon_best_sellers_rank_3"
@@ -293,9 +293,9 @@
                                         type="number"
                                         >
                                 </div>
-                                <div class="span6">
+                                <div class="col-xs-6">
                                     <input
-                                        class="span12"
+                                        class="col-xs-12"
                                         max="999999999"
                                         min="0"
                                         name="amazon_best_sellers_rank_4"
@@ -317,7 +317,7 @@
                                 ng-options="review_average as review_average for review_average in review_averages"
                                 ></select>
                             <input
-                                class="span12"
+                                class="col-xs-12"
                                 max="5.0"
                                 min="0.0"
                                 name="review_average_2"
@@ -330,9 +330,9 @@
                                 class="between"
                                 ng-show="review_average_1 == 'Between'"
                                 >
-                                <div class="span6">
+                                <div class="col-xs-6">
                                     <input
-                                        class="span12"
+                                        class="col-xs-12"
                                         max="5.0"
                                         min="0.0"
                                         name="review_average_3"
@@ -340,9 +340,9 @@
                                         type="number"
                                         >
                                 </div>
-                                <div class="span6">
+                                <div class="col-xs-6">
                                     <input
-                                        class="span12"
+                                        class="col-xs-12"
                                         max="5.0"
                                         min="0.0"
                                         name="review_average_4"
@@ -364,7 +364,7 @@
                                 ng-options="appearance as appearance for appearance in appearances"
                                 ></select>
                             <input
-                                class="span12"
+                                class="col-xs-12"
                                 max="7"
                                 min="1"
                                 name="appearance_2"
@@ -377,9 +377,9 @@
                                 class="between"
                                 ng-show="appearance_1 == 'Between'"
                                 >
-                                <div class="span6">
+                                <div class="col-xs-6">
                                     <input
-                                        class="span12"
+                                        class="col-xs-12"
                                         max="7"
                                         min="1"
                                         name="appearance_3"
@@ -387,9 +387,9 @@
                                         type="number"
                                         >
                                 </div>
-                                <div class="span6">
+                                <div class="col-xs-6">
                                     <input
-                                        class="span12"
+                                        class="col-xs-12"
                                         max="7"
                                         min="1"
                                         name="appearance_4"
@@ -841,7 +841,7 @@
             ng-repeat="chunk in contents.chunks"
             ng-show="mode == 'tiles'"
             >
-            <div class="span4" ng-repeat="book in chunk">
+            <div class="col-xs-4" ng-repeat="book in chunk">
                 <div class="media well">
                     <div class="media-body">
                         <h4 class="media-heading">
