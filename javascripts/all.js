@@ -843,8 +843,9 @@ application.controller('kns_add', [
         };
 
         $scope.get_class = function () {
-            if ($scope.count > 500) {
-                return 'text-error';
+            console.log($scope.count);
+            if ($scope.count < 1) {
+                return 'text-danger';
             }
             return 'text-info';
         };

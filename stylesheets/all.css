@@ -15,6 +15,11 @@ ul {
     padding-bottom: 1px;
 }
 
+.breadcrumb-label {
+    margin-top: 0;
+    padding-right: 10px;
+}
+
 .media img {
     height: 100px;
 }

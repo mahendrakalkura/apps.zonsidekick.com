@@ -1,9 +1,39 @@
 {% extends 'layout.twig' %}
 
 {% set module = 'Multiple Keywords Analyzer - Add' %}
-{% set nav = 'kns' %}
+{% set nav = 'keywords_analyzers_multiple' %}
 
 {% block content %}
+<ul class="breadcrumb breadcrumb-page">
+    <div class="breadcrumb-label text-light-gray">You are here:</div>
+    <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
+    <li class="active"><a href="{{ url('kns_single') }}">{{ module }}</a></li>
+</ul>
+<div class="page-header">
+    <div class="row">
+        <h1 class="col-xs-12">
+            {% include 'slots/feedback.twig' %}
+            <div
+                class="btn btn-primary pull-right qsg"
+                data-target="#kns-qsg"
+                data-toggle="modal"
+                >
+                <span class="fa fa-fw fa-info-sign"></span>
+                Information
+            </div>
+            <i class="fa fa-fw fa-tag"></i> {{ module }}
+        </h1>
+    </div>
+</div>
+{% include 'slots/alerts.twig' %}
+<p>
+    To begin, simply add your list of keywords (one per line) and press Submit.
+    The process will begin immediately and you'll see your results come in as
+    they complete. Please be patient with larger lists as this research is
+    intense, keywords may take between 5 seconds and 1 minute to complete
+    depending on server utilization. You may close this window at any time, it
+    will not interrupt your keyword research.
+</p>
 <div
     data-error-top-1="Error #1"
     data-error-middle-1="<p>Please enter at least one valid keyword.</p>"
@@ -11,109 +41,61 @@
     data-error-middle-2="<p>You cannot enter more than 500 keywords.</p>"
     ng-controller="kns_add"
     >
-    <div class="row">
-        <div class="col-xs-12">
-            <div class="page-header">
-                {% include 'slots/feedback.twig' %}
-                <div
-                    class="btn btn-primary pull-right qsg"
-                    data-target="#kns-qsg"
-                    data-toggle="modal"
-                    >
-                    <span class="fa fa-fw fa-info-sign"></span>
-                    Information
-                </div>
-                <h1>{{ module }}</h1>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-xs-12">
-            <p>
-                To begin, simply add your list of keywords (one per line) and
-                press Submit. The process will begin immediately and you'll see
-                your results come in as they complete. Please be patient with
-                larger lists as this research is intense, keywords may take
-                between 5 seconds and 1 minute to complete depending on server
-                utilization. You may close this window at any time, it will not
-                interrupt your keyword research.
-            </p>
-            {#
-            <div class="alert alert-info">
-                <strong>Notice (July 11th, 2013 @ 02:00 AM EST):</strong>
-                Server migration has concluded successfully. Reports are
-                temporarily limited to 50 keywords and will begin to scale back
-                until this limitation is lifted. Thank you for your patience.
-            </div>
-            #}
-            {#
-            <div class="alert alert-info">
-                <strong>Notice (July 11th, 2013 @ 08:30 AM EST):</strong>
-                Reports are temporarily limited to 50 keywords while we
-                migrate. You may process multiple reports simultaneously in
-                separate browser tabs. This limitation will be removed when we
-                complete our server migration and application updates. Please
-                see dashboard for status updates. Thank you for your patience.
-            </div>
-            #}
-            <form
-                accept-charset="UTF-8"
-                action="{{ url('kns_process') }}"
-                class="form-horizontal"
-                method="POST"
-                >
+    <form
+        accept-charset="UTF-8"
+        action="{{ url('kns_process') }}"
+        method="POST"
+        >
+        <div class="panel">
+            <div class="panel-body">
                 <div class="form-group">
                     <label class="control-label" for="keywords">
                         Keywords
                     </label>
-                    <div class="controls">
-                        <textarea
-                            class="col-xs-12"
-                            id="keywords"
-                            name="keywords"
-                            ng-model="keywords"
-                            ng-on-blur="focus['keywords'] = false"
-                            rows="15"
-                            ></textarea>
-                        <span ng-class="get_class()">
-                            [! count !] keywords remaining
-                        </span>
+                    <textarea
+                        class="form-control"
+                        id="keywords"
+                        name="keywords"
+                        ng-model="keywords"
+                        ng-on-blur="focus['keywords'] = false"
+                        rows="15"
+                        ></textarea>
+                    <div class="help-block" ng-class="get_class()">
+                        [! count !] keywords remaining
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="control-label" for="country">
                         Country
                     </label>
-                    <div class="controls">
-                        <select
-                            class="col-xs-12"
-                            id="country"
-                            name="country"
-                            >
-                            {% for key, value in countries %}
-                                <option value="{{ key }}">
-                                    {{ value }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
-                <div class="form-actions">
-                    <button
-                        class="btn btn-success"
-                        ng-click="submit($event)"
-                        type="submit"
+                    <select
+                        class="form-control"
+                        id="country"
+                        name="country"
                         >
-                        <span class="fa fa-fw fa-info-sign fa-lg"></span>
-                        Submit
-                    </button>
-                    <button class="btn btn-danger" type="reset">
-                        <span class="fa fa-fw fa-trash fa-lg"></span>
-                        Reset
-                    </button>
+                        {% for key, value in countries %}
+                            <option value="{{ key }}">
+                                {{ value }}
+                            </option>
+                        {% endfor %}
+                    </select>
                 </div>
-            </form>
+            </div>
+            <div class="clearfix panel-footer text-right">
+                <button
+                    class="btn btn-success pull-right"
+                    ng-click="submit($event)"
+                    type="submit"
+                    >
+                    <span class="fa fa-fw fa-lg fa-info-sign"></span>
+                    Submit
+                </button>
+                <button class="btn btn-danger pull-right" type="reset">
+                    <span class="fa fa-fw fa-lg fa-trash"></span>
+                    Reset
+                </button>
+            </div>
         </div>
     </div>
-</div>
+</form>
 {% endblock %}
