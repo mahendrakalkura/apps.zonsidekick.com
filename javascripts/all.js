@@ -1296,15 +1296,23 @@ jQuery(function () {
     jQuery('select.select2').select2({
         placeholder: 'Select an option...'
     });
-    jQuery('.got-it').click(function () {
-        jQuery.cookie(jQuery(this).parents('.modal').attr('id'), 'Yes');
-    });
     if (jQuery.cookie('kns-qsg') != 'Yes') {
         jQuery('[data-target="#kns-qsg"]').click();
     }
     if (jQuery.cookie('aks-qsg') != 'Yes') {
         jQuery('[data-target="#aks-qsg"]').click();
     }
+    jQuery('.got-it').click(function () {
+        jQuery.cookie(jQuery(this).parents('.modal').attr('id'), 'Yes');
+    });
+    jQuery('.well').height(
+        Math.max.apply(
+            null,
+            jQuery('.well').map(function () {
+                return jQuery(this).height();
+            }).get()
+        )
+    );
     zclip();
     window.PixelAdmin.start([]);
 });
