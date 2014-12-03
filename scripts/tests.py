@@ -4,26 +4,11 @@ from email.mime.text import MIMEText
 from smtplib import SMTP
 
 from author_analyzer import get_author, get_authors
-from aks import get_results
-from ba import get_books, get_items
-from kns import get_contents
-from sk import get_suggested_keywords
+from keyword_suggester import get_results
+from book_analyzer import get_books, get_items
+from keyword_analyzer import get_contents
+from suggested_keywords import get_suggested_keywords
 from utilities import get_book, get_response, variables
-
-
-def author_analyzer_py_get_authors():
-    output = get_authors('stephen king')
-    if (
-        type(output) == list
-        and
-        output
-        and
-        'name' in output[0]
-        and
-        'url' in output[0]
-    ):
-        return True
-    return False
 
 
 def author_analyzer_py_get_author():
@@ -51,21 +36,14 @@ def author_analyzer_py_get_author():
     return False
 
 
-def aks_py():
-    output = get_results('stephen king', 'com', 'digital-text')
-    if type(output) == list and len(output) > 0:
-        return True
-    return False
-
-
-def ba_py_get_books():
-    output = get_books('mystery')
+def author_analyzer_py_get_authors():
+    output = get_authors('stephen king')
     if (
         type(output) == list
         and
         output
         and
-        'title' in output[0]
+        'name' in output[0]
         and
         'url' in output[0]
     ):
@@ -73,7 +51,7 @@ def ba_py_get_books():
     return False
 
 
-def ba_py_get_book():
+def book_analyzer_py_get_book():
     output = get_book(get_response(
         'http://www.amazon.com/Mystery-John-Nichols-ebook/dp/B00O0998GE'
     ))
@@ -110,7 +88,22 @@ def ba_py_get_book():
     return False
 
 
-def ba_py_get_items():
+def book_analyzer_py_get_books():
+    output = get_books('mystery')
+    if (
+        type(output) == list
+        and
+        output
+        and
+        'title' in output[0]
+        and
+        'url' in output[0]
+    ):
+        return True
+    return False
+
+
+def book_analyzer_py_get_items():
     output = get_items(
         'http://www.amazon.com/Mystery-John-Nichols-ebook/dp/B00O0998GE',
         ['mystery']
@@ -120,7 +113,7 @@ def ba_py_get_items():
     return False
 
 
-def kns_py():
+def keyword_analyzer_py():
     output = get_contents('stephen king', 'com')
     if (
         type(output) == dict
@@ -155,12 +148,18 @@ def kns_py():
     return False
 
 
-def sk_py():
-    output = get_suggested_keywords(['stephen', 'king'])
+def keyword_suggester_py():
+    output = get_results('stephen king', 'com', 'digital-text')
     if type(output) == list and len(output) > 0:
         return True
     return False
 
+
+def suggested_keywords_py():
+    output = get_suggested_keywords(['stephen', 'king'])
+    if type(output) == list and len(output) > 0:
+        return True
+    return False
 
 if __name__ == '__main__':
     body = '\n'.join([
@@ -172,24 +171,24 @@ if __name__ == '__main__':
             'status':
             'Success' if author_analyzer_py_get_author() else 'Failure'
         },
-        'aks_py: %(status)s' % {
-            'status': 'Success' if aks_py() else 'Failure'
+        'keyword_suggester_py: %(status)s' % {
+            'status': 'Success' if keyword_suggester_py() else 'Failure'
         },
-        'ba_py_get_books: %(status)s' % {
-            'status': 'Success' if ba_py_get_books() else 'Failure'
+        'book_analyzer_py_get_books: %(status)s' % {
+            'status': 'Success' if book_analyzer_py_get_books() else 'Failure'
         },
-        'ba_py_get_book: %(status)s' % {
-            'status': 'Success' if ba_py_get_book() else 'Failure'
+        'book_analyzer_py_get_book: %(status)s' % {
+            'status': 'Success' if book_analyzer_py_get_book() else 'Failure'
         },
-        'ba_py_get_items: %(status)s' % {
-            'status': 'Success' if ba_py_get_items() else 'Failure'
+        'book_analyzer_py_get_items: %(status)s' % {
+            'status': 'Success' if book_analyzer_py_get_items() else 'Failure'
         },
 
-        'kns_py: %(status)s' % {
-            'status': 'Success' if kns_py() else 'Failure'
+        'keyword_analyzer_py: %(status)s' % {
+            'status': 'Success' if keyword_analyzer_py() else 'Failure'
         },
-        'sk_py: %(status)s' % {
-            'status': 'Success' if sk_py() else 'Failure'
+        'suggested_keywords_py: %(status)s' % {
+            'status': 'Success' if suggested_keywords_py() else 'Failure'
         },
     ])
     resource = SMTP(variables['smtp']['host'], variables['smtp']['port'])
@@ -199,7 +198,6 @@ if __name__ == '__main__':
     message = MIMEText(body)
     message['Subject'] = 'tests.py'
     message['From'] = 'reports@perfectsidekick.com'
-    message['To'] = 'ncroan@gmail.com'
-    message['Cc'] = 'mahendrakalkura@gmail.com'
+    message['To'] = ['ncroan@gmail.com', 'mahendrakalkura@gmail.com']
     resource.sendmail(message['From'], message['To'], message.as_string())
     resource.quit()
