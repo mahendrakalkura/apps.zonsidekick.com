@@ -18,7 +18,7 @@
                 data-target="#aks-qsg"
                 data-toggle="modal"
                 >
-                <span class="icon-info-sign"></span>
+                <span class="fa fa-fw fa-info-sign"></span>
                 Information
             </div>
             <i class="fa fa-fw fa-list"></i> {{ module }}
@@ -133,15 +133,15 @@
                                     <td>[! row !]</td>
                                     <td class="narrow text-center">
                                         <span
-                                            class="icon-remove-sign"
+                                            class="fa fa-fw fa-remove-sign"
                                             ng-show="statuses[row] == -1"
                                             ></span>
                                         <span
-                                            class="icon-spinner icon-spin"
+                                            class="fa fa-fw fa-spinner icon-spin"
                                             ng-show="statuses[row] == 0"
                                             ></span>
                                         <span
-                                            class="icon-ok-sign"
+                                            class="fa fa-fw fa-ok-sign"
                                             ng-show="statuses[row] == 1"
                                             ></span>
                                     </td>
@@ -154,7 +154,7 @@
                                 type="submit"
                                 ng-show="!spinner"
                                 >
-                                <span class="icon-info-sign icon-large"></span>
+                                <span class="fa fa-fw fa-info-sign icon-large"></span>
                                 Submit
                             </button>
                             <button
@@ -163,7 +163,7 @@
                                 ng-show="spinner"
                                 type="button"
                                 >
-                                <span class="icon-trash icon-large"></span>
+                                <span class="fa fa-fw fa-trash icon-large"></span>
                                 Reset
                             </button>
                         </div>
@@ -198,7 +198,7 @@
                                 type="button"
                                 data-value="[! suggestions.join('\n') !]"
                                 >
-                                <span class="icon-copy icon-large"></span>
+                                <span class="fa fa-fw fa-copy icon-large"></span>
                                 Copy All
                             </button>
                             <button
@@ -206,7 +206,7 @@
                                 type="button"
                                 ng-click="download()"
                                 >
-                                <span class="icon-download icon-large"></span>
+                                <span class="fa fa-fw fa-download icon-large"></span>
                                 Download CSV
                             </button>
                         </div>

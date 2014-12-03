@@ -14,7 +14,7 @@
         <h1 class="col-xs-12">
             {% include 'slots/feedback.twig' %}
             <a class="btn btn-success pull-right" href="{{ url('logos_add') }}">
-                <span class="icon-plus-sign icon-large"></span>
+                <span class="fa fa-fw fa-plus-sign icon-large"></span>
                 Add
             </a>
             <i class="fa fa-fw fa-picture-o"></i> {{ module }}
@@ -52,13 +52,13 @@
                     <td class="narrow text-right">{{ logo.dimensions }}</td>
                     <td class="narrow text-center">
                         <a
-                            class="icon-download icon-large"
+                            class="fa fa-fw fa-download icon-large"
                             href="{{ url('logos_download', {'file_name': logo.file_name}) }}"
                             title="Download"
                             data-toggle="tooltip"
                             >D</a>
                         <a
-                            class="icon-remove-sign icon-large"
+                            class="fa fa-fw fa-remove-sign icon-large"
                             href="{{ url('logos_delete', {'file_name': logo.file_name}) }}"
                             title="Delete"
                             data-toggle="tooltip"

@@ -57,11 +57,11 @@
                 </div>
                 <div class="form-actions">
                     <button class="btn btn-success" type="submit">
-                        <span class="icon-info-sign icon-large"></span>
+                        <span class="fa fa-fw fa-info-sign icon-large"></span>
                         Submit
                     </button>
                     <button class="btn btn-danger" type="reset">
-                        <span class="icon-trash icon-large"></span>
+                        <span class="fa fa-fw fa-trash icon-large"></span>
                         Reset
                     </button>
                 </div>
@@ -70,7 +70,7 @@
     </div>
     <div class="row-fluid">
         <p class="text-center col-xs-12 hide [! spinner == true && 'show' || 'hide' !]">
-            <span class="icon-spinner icon-spin icon-2x"></span>
+            <span class="fa fa-fw fa-spinner icon-spin icon-2x"></span>
         </p>
     </div>
     <div class="row-fluid">
@@ -248,7 +248,7 @@
                             </a>
                         </p>
                         <p ng-show="spinner">
-                            <span class="icon-spinner icon-spin icon-2x">
+                            <span class="fa fa-fw fa-spinner icon-spin icon-2x">
                             </span>
                         </p>
                         <p ng-show="items.length > 0">
@@ -324,7 +324,7 @@
                                 ng-show="item.author.url.length > 0"
                                 rel="noreferrer"
                                 target="_blank"
-                                ><i class="icon-external-link"></i></a>
+                                ><i class="fa fa-fw fa-external-link"></i></a>
                             <a
                                 href="{{ url('aa') }}?url=[! item.author.url|encodeUri !]"
                                 ng-show="item.author.url.length > 0"

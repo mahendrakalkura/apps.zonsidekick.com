@@ -24,7 +24,7 @@
                     data-target="#kns-qsg"
                     data-toggle="modal"
                     >
-                    <span class="icon-info-sign"></span>
+                    <span class="fa fa-fw fa-info-sign"></span>
                     Information
                 </div>
                 <h1>{{ module }}</h1>
@@ -41,7 +41,7 @@
                     target="_blank"
                     title="For very large reports this page could take a little while to complete. Please be patient."
                     >
-                    <span class="icon-bar-chart icon-large"></span>
+                    <span class="fa fa-fw fa-bar-chart icon-large"></span>
                     View Detailed Report
                 </a>
                 <a
@@ -50,7 +50,7 @@
                     title="Simple Report"
                     data-toggle="tooltip"
                     >
-                    <span class="icon-download icon-large"></span>
+                    <span class="fa fa-fw fa-download icon-large"></span>
                     Download CSV
                 </a>
                 <div
@@ -59,7 +59,7 @@
                     data-toggle="tooltip"
                     popover
                     >
-                    <span class="icon-download icon-large"></span>
+                    <span class="fa fa-fw fa-download icon-large"></span>
                     Download PDF
                     <div class="hide">
                         <img
@@ -83,7 +83,7 @@
                     data-toggle="tooltip"
                     popover
                     >
-                    <span class="icon-envelope icon-large"></span>
+                    <span class="fa fa-fw fa-envelope icon-large"></span>
                     Email
                     <div class="hide">
                         <form class="form-inline">
@@ -112,7 +112,7 @@
                     </a>
                 </p>
                 <p ng-show="spinner">
-                    <span class="icon-spinner icon-spin icon-2x">
+                    <span class="fa fa-fw fa-spinner icon-spin icon-2x">
                     </span>
                 </p>
                 <p ng-show="items.length > 0">
@@ -309,7 +309,7 @@
                         <td class="center">
                             <span ng-switch on="keyword['contents']">
                                 <span
-                                    class="icon-spinner icon-spin"
+                                    class="fa fa-fw fa-spinner icon-spin"
                                     ng-switch-when="null"
                                     ></span>
                                 <span ng-switch-default>
@@ -330,7 +330,7 @@
                         <td class="center">
                             <span ng-switch on="keyword['contents']">
                                 <span
-                                    class="icon-spinner icon-spin"
+                                    class="fa fa-fw fa-spinner icon-spin"
                                     ng-switch-when="null"
                                     ></span>
                                 <span ng-switch-default>
@@ -351,7 +351,7 @@
                         <td class="center">
                             <span ng-switch on="keyword['contents']">
                                 <span
-                                    class="icon-spinner icon-spin"
+                                    class="fa fa-fw fa-spinner icon-spin"
                                     ng-switch-when="null"
                                     ></span>
                                 <span ng-switch-default>
@@ -372,7 +372,7 @@
                         <td class="center">
                             <span ng-switch on="keyword['contents']">
                                 <span
-                                    class="icon-spinner icon-spin"
+                                    class="fa fa-fw fa-spinner icon-spin"
                                     ng-switch-when="null"
                                     ></span>
                                 <span ng-switch-default>
@@ -393,7 +393,7 @@
                         <td class="right">
                             <span ng-switch on="keyword['contents']">
                                 <span
-                                    class="icon-spinner icon-spin"
+                                    class="fa fa-fw fa-spinner icon-spin"
                                     ng-switch-when="null"
                                     ></span>
                                 <span ng-switch-default>
@@ -414,7 +414,7 @@
                         <td class="right">
                             <span ng-switch on="keyword['contents']">
                                 <span
-                                    class="icon-spinner icon-spin"
+                                    class="fa fa-fw fa-spinner icon-spin"
                                     ng-switch-when="null"
                                     ></span>
                                 <span ng-switch-default>
@@ -437,7 +437,7 @@
                         <td class="right">
                             <span ng-switch on="keyword['contents']">
                                 <span
-                                    class="icon-spinner icon-spin"
+                                    class="fa fa-fw fa-spinner icon-spin"
                                     ng-switch-when="null"
                                     ></span>
                                 <span ng-switch-default>
@@ -460,7 +460,7 @@
                         <td class="right">
                             <span ng-switch on="keyword['contents']">
                                 <span
-                                    class="icon-spinner icon-spin"
+                                    class="fa fa-fw fa-spinner icon-spin"
                                     ng-switch-when="null"
                                     ></span>
                                 <span ng-switch-default>
@@ -567,7 +567,7 @@
                                                 ng-show="item.author.url.length > 0"
                                                 rel="noreferrer"
                                                 target="_blank"
-                                                ><i class="icon-external-link"></i></a>
+                                                ><i class="fa fa-fw fa-external-link"></i></a>
                                             <a
                                                 href="{{ url('aa') }}?url=[! item.author.url|encodeUri !]"
                                                 ng-show="item.author.url.length > 0"
@@ -605,7 +605,7 @@
         <div class="col-xs-12">
             <center>
                 <p>
-                    <span class="icon-spinner icon-spin icon-2x"></span>
+                    <span class="fa fa-fw fa-spinner icon-spin icon-2x"></span>
                 </p>
             </center>
         </div>
