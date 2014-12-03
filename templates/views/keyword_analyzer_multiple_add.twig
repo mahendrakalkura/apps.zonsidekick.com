@@ -7,7 +7,7 @@
 <ul class="breadcrumb breadcrumb-page">
     <div class="breadcrumb-label text-light-gray">You are here:</div>
     <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
-    <li class="active"><a href="{{ url('kns_single') }}">{{ module }}</a></li>
+    <li class="active"><a href="{{ url('keyword_analyzer_multiple_single') }}">{{ module }}</a></li>
 </ul>
 <div class="page-header">
     <div class="row">
@@ -39,11 +39,11 @@
     data-error-middle-1="<p>Please enter at least one valid keyword.</p>"
     data-error-top-2="Error #2"
     data-error-middle-2="<p>You cannot enter more than 500 keywords.</p>"
-    ng-controller="kns_add"
+    ng-controller="keyword_analyzer_multiple_add"
     >
     <form
         accept-charset="UTF-8"
-        action="{{ url('kns_process') }}"
+        action="{{ url('keyword_analyzer_multiple_process') }}"
         method="POST"
         >
         <div class="panel">

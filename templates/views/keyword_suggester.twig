@@ -7,7 +7,7 @@
 <ul class="breadcrumb breadcrumb-page">
     <div class="breadcrumb-label text-light-gray">You are here:</div>
     <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
-    <li class="active"><a href="{{ url('aks') }}">{{ module }}</a></li>
+    <li class="active"><a href="{{ url('keyword_suggester') }}">{{ module }}</a></li>
 </ul>
 <div class="page-header">
     <div class="row">
@@ -44,8 +44,8 @@
     data-error-3-middle="<p>An unknown error has occurred. Please try again.</p>"
     data-keywords="{{ keywords }}"
     data-mode="{{ mode }}"
-    data-url-download="{{ url('aks_download') }}"
-    data-url-xhr="{{ url('aks_xhr') }}"
+    data-url-download="{{ url('keyword_suggester_download') }}"
+    data-url-xhr="{{ url('keyword_suggester_xhr') }}"
     ng-controller="aks"
     >
     <div class="row">

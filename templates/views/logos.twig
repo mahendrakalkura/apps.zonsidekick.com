@@ -7,7 +7,7 @@
 <ul class="breadcrumb breadcrumb-page">
     <div class="breadcrumb-label text-light-gray">You are here:</div>
     <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
-    <li class="active"><a href="{{ url('logos_overview') }}">{{ module }}</a></li>
+    <li class="active"><a href="{{ url('logos') }}">{{ module }}</a></li>
 </ul>
 <div class="page-header">
     <div class="row">
@@ -46,7 +46,7 @@
                         </span>
                         <img
                             class="img-polaroid"
-                            src="{{ url('logos_view', {'file_name': logo.file_name}) }}"
+                            src="{{ url('logos_preview', {'file_name': logo.file_name}) }}"
                             >
                     </td>
                     <td class="narrow text-right">{{ logo.dimensions }}</td>

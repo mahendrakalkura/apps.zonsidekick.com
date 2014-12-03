@@ -143,13 +143,13 @@
                             </a>
                         </li>
                         <li class="{% if nav == 'top_100_explorer' %}active{% endif %}">
-                            <a href="{{ url('ce_overview') }}">
+                            <a href="{{ url('top_100_explorer') }}">
                                 <i class="menu-icon fa fa-fw fa-key"></i>
                                 <span class="mm-text">Top 100 Explorer</span>
                             </a>
                         </li>
                         <li class="{% if nav == 'keyword_suggester' %}active{% endif %}">
-                            <a href="{{ url('aks') }}">
+                            <a href="{{ url('keyword_suggester') }}">
                                 <span class="menu-icon fa fa-fw fa-list">
                                 </span>
                                 <span class="mm-text">Keywords Suggester</span>
@@ -162,14 +162,14 @@
                             </a>
                             <ul>
                                 <li class="{% if nav == 'keyword_analyzers_multiple' %}active{% endif %}">
-                                    <a href="{{ url('kns_overview') }}">
+                                    <a href="{{ url('keyword_analyzer_multiple') }}">
                                         <i class="menu-icon fa fa-fw fa-tags">
                                         </i>
                                         <span class="mm-text">Multiple</span>
                                     </a>
                                 </li>
                                 <li class="{% if nav == 'keyword_analyzers_single' %}active{% endif %}">
-                                    <a href="{{ url('kns_single') }}">
+                                    <a href="{{ url('keyword_analyzer_multiple_single') }}">
                                         <i class="menu-icon fa fa-fw fa-tag">
                                         </i>
                                         <span class="mm-text">Single</span>
@@ -194,7 +194,7 @@
                                     </a>
                                 </li>
                                 <li class="{% if nav == 'other_analyzers_book' %}active{% endif %}">
-                                    <a href="{{ url('ba') }}">
+                                    <a href="{{ url('book_analyzer') }}">
                                         <i class="menu-icon fa fa-fw fa-book">
                                         </i>
                                         <span class="mm-text">
@@ -217,7 +217,7 @@
                             </a>
                             <ul>
                                 <li class="{% if nav == 'others_logos' %}active{% endif %}">
-                                    <a href="{{ url('logos_overview') }}">
+                                    <a href="{{ url('logos') }}">
                                         <i class="menu-icon fa fa-fw fa-picture-o">
                                         </i>
                                         <span class="mm-text">Logos</span>

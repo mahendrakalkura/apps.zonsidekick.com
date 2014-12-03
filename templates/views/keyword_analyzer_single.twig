@@ -7,7 +7,7 @@
 <ul class="breadcrumb breadcrumb-page">
     <div class="breadcrumb-label text-light-gray">You are here:</div>
     <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
-    <li class="active"><a href="{{ url('kns_single') }}">{{ module }}</a></li>
+    <li class="active"><a href="{{ url('keyword_analyzer_single') }}">{{ module }}</a></li>
 </ul>
 <div class="page-header">
     <div class="row">
@@ -24,9 +24,9 @@
     data-error-1-top="Error #1"
     data-error-2-middle="<p>An unknown error has occurred. Please try again.</p>"
     data-error-2-top="Error #2"
-    data-url="{{ url('kns_single_') }}"
-    id="kns_single"
-    ng-controller="kns_single"
+    data-url="{{ url('keyword_analyzer_xhr') }}"
+    id="keyword_analyzer_single"
+    ng-controller="keyword_analyzer_single"
     >
     <form name="form" ng-submit="process()">
         <div class="panel">

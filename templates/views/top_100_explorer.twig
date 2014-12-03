@@ -7,7 +7,7 @@
 <ul class="breadcrumb breadcrumb-page">
     <div class="breadcrumb-label text-light-gray">You are here:</div>
     <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
-    <li class="active"><a href="{{ url('ce_overview') }}">{{ module }}</a></li>
+    <li class="active"><a href="{{ url('top_100_explorer') }}">{{ module }}</a></li>
 </ul>
 <div class="page-header">
     <div class="row">
@@ -57,7 +57,7 @@
     data-review_average_4="{{ filters.review_average_4 }}"
     data-section_id="{{ filters.section_id }}"
     data-sections="{{ sections|json_encode()|e('html') }}"
-    data-url="{{ url('ce_xhr') }}"
+    data-url="{{ url('top_100_explorer_xhr') }}"
     >
     <form name="form" ng-submit="submit()">
         <div class="panel">
@@ -505,7 +505,7 @@
             </div>
             <div
                 class="col-xs-4"
-                data-urls-aks="{{ url('aks') }}"
+                data-urls-aks="{{ url('keyword_suggester') }}"
                 data-urls-suggested-keywords="{{ url('suggested_keywords') }}"
                 ng-controller="suggested_keywords"
                 >
@@ -711,7 +711,7 @@
                             ng-show="status"
                             >Show Less</a>
                         <a
-                            href="{{ url('ba') }}?url=[! book.url|encodeUri !]"
+                            href="{{ url('book_analyzer') }}?url=[! book.url|encodeUri !]"
                             target="_blank"
                             >[! book.title !]</a>
                         <a
@@ -847,7 +847,7 @@
                         <h4 class="media-heading">
                             [! book.rank !].
                             <a
-                                href="{{ url('ba') }}?url=[! book.url|encodeUri !]"
+                                href="{{ url('book_analyzer') }}?url=[! book.url|encodeUri !]"
                                 target="_blank"
                                 >[! book.title !]</a>
                             <a

@@ -7,7 +7,7 @@
 <ul class="breadcrumb breadcrumb-page">
     <div class="breadcrumb-label text-light-gray">You are here:</div>
     <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
-    <li class="active"><a href="{{ url('kns_single') }}">{{ module }}</a></li>
+    <li class="active"><a href="{{ url('keyword_analyzer_multiple_single') }}">{{ module }}</a></li>
 </ul>
 <div class="page-header">
     <div class="row">
@@ -21,7 +21,7 @@
 <p>Are you sure you want to delete this report?</p>
 <form
     accept-charset="UTF-8"
-    action="{{ url('kns_delete', {'id': id}) }}"
+    action="{{ url('keyword_analyzer_multiple_delete', {'id': id}) }}"
     method="POST"
     >
     <div class="panel">
@@ -31,7 +31,7 @@
             </button>
             <a
                 class="btn btn-danger pull-right"
-                href="{{ url('kns_overview') }}"
+                href="{{ url('keyword_analyzer_multiple') }}"
                 >
                 <span class="fa fa-lg fa-fw fa-thumbs-down"></span> No
             </a>

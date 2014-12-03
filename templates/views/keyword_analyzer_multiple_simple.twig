@@ -7,7 +7,7 @@
 <ul class="breadcrumb breadcrumb-page">
     <div class="breadcrumb-label text-light-gray">You are here:</div>
     <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
-    <li class="active"><a href="{{ url('kns_single') }}">{{ module }}</a></li>
+    <li class="active"><a href="{{ url('keyword_analyzer_multiple_single') }}">{{ module }}</a></li>
 </ul>
 <div class="page-header">
     <div class="row">
@@ -31,17 +31,17 @@
     data-email-middle="<p>The email has been queued for delivery successfully.</p>"
     data-pdf-top="PDF"
     data-pdf-middle="<p>Your PDF report is being generated. This process could take up to 15 minutes depending on the size of your report. When ready, a download dialogue will appear.</p><p>NOTE: This report is limited to 100 pages. We'll display the top 100 keywords with 25 products in each keyword on your PDF. For the complete report please click &quot;View Detailed Report&quot;.</p>"
-    data-url-csv="{{ url('kns_csv', {'id': request.id}) }}"
-    data-url-email="{{ url('kns_email', {'id': request.id}) }}"
-    data-url-pdf="{{ url('kns_pdf', {'id': request.id}) }}"
-    data-url-xhr="{{ url('kns_xhr', {'id': request.id}) }}"
-    ng-controller="kns_simple"
+    data-url-csv="{{ url('keyword_analyzer_multiple_csv', {'id': request.id}) }}"
+    data-url-email="{{ url('keyword_analyzer_multiple_email', {'id': request.id}) }}"
+    data-url-pdf="{{ url('keyword_analyzer_multiple_pdf', {'id': request.id}) }}"
+    data-url-xhr="{{ url('keyword_analyzer_multiple_xhr', {'id': request.id}) }}"
+    ng-controller="keyword_analyzer_multiple_simple"
     >
     <div class="text-center">
         <a
             class="btn btn-info"
             data-toggle="tooltip"
-            href="{{ url('kns_detailed', {'id': request.id}) }}"
+            href="{{ url('keyword_analyzer_multiple_detailed', {'id': request.id}) }}"
             target="_blank"
             title="For very large reports this page could take a little while to complete. Please be patient."
             >
@@ -50,7 +50,7 @@
         </a>
         <a
             class="btn btn-info"
-            href="{{ url('kns_csv', {'id': request.id}) }}"
+            href="{{ url('keyword_analyzer_multiple_csv', {'id': request.id}) }}"
             title="Simple Report"
             data-toggle="tooltip"
             >
@@ -68,13 +68,13 @@
             <div class="hide">
                 <img
                     class="img-polaroid popover-pdf"
-                    data-url="{{ url('kns_pdf', {'id': request.id}) }}"
+                    data-url="{{ url('keyword_analyzer_multiple_pdf', {'id': request.id}) }}"
                     src="{{ app.request.getSchemeAndHttpHost() }}{{ app.request.baseUrl }}/images/logo.png"
                     >
                 {% for logo in logos %}
                     <img
                         class="img-polaroid popover-pdf"
-                        data-url="{{ url('kns_pdf', {'id': request.id, 'logo': logo.file_name|e('url')}) }}"
+                        data-url="{{ url('keyword_analyzer_multiple_pdf', {'id': request.id, 'logo': logo.file_name|e('url')}) }}"
                         src="{{ url('logos_view', {'file_name': logo.file_name}) }}"
                         >
                 {% endfor %}
@@ -82,7 +82,7 @@
         </div>
         <div
             class="btn btn-info"
-            data-url="{{ url('kns_email', {'id': request.id}) }}"
+            data-url="{{ url('keyword_analyzer_multiple_email', {'id': request.id}) }}"
             title="Simple Report + Detailed Report"
             data-toggle="tooltip"
             popover

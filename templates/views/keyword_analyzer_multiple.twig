@@ -7,7 +7,7 @@
 <ul class="breadcrumb breadcrumb-page">
     <div class="breadcrumb-label text-light-gray">You are here:</div>
     <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
-    <li class="active"><a href="{{ url('kns_single') }}">{{ module }}</a></li>
+    <li class="active"><a href="{{ url('keyword_analyzer_multiple') }}">{{ module }}</a></li>
 </ul>
 <div class="page-header">
     <div class="row">
@@ -15,13 +15,13 @@
             {% include 'slots/feedback.twig' %}
             <div
                 class="btn btn-primary pull-right qsg"
-                data-target="#kns-qsg"
+                data-target="#keyword-analyzer-multiple-qsg"
                 data-toggle="modal"
                 >
                 <span class="fa fa-fw fa-thumbs-up"></span>
                 Information
             </div>
-            <a class="btn btn-success pull-right" href="{{ url('kns_add') }}">
+            <a class="btn btn-success pull-right" href="{{ url('keyword_analyzer_multiple_add') }}">
                 <span class="fa fa-fw fa-plus-sign fa-lg"></span>
                 Analyze Keywords
             </a>
@@ -87,14 +87,14 @@
                     <td class="narrow text-center">
                         <a
                             class="fa fa-fw fa-tasks fa-lg"
-                            href="{{ url('kns_simple', {'id': request.id}) }}"
+                            href="{{ url('keyword_analyzer_multiple_simple', {'id': request.id}) }}"
                             title="View Simple Report"
                             data-placement="left"
                             data-toggle="tooltip"
                             ></a>
                         <a
                             class="fa fa-fw fa-bar-chart fa-lg"
-                            href="{{ url('kns_detailed', {'id': request.id}) }}"
+                            href="{{ url('keyword_analyzer_multiple_detailed', {'id': request.id}) }}"
                             target="_blank"
                             title="View Detailed Report (For very large reports this page could take a little while to complete. Please be patient.)"
                             data-placement="left"
@@ -102,21 +102,21 @@
                             ></a>
                         <a
                             class="fa fa-fw fa-download fa-lg"
-                            href="{{ url('kns_csv', {'id': request.id}) }}"
+                            href="{{ url('keyword_analyzer_multiple_csv', {'id': request.id}) }}"
                             title="Download CSV (Simple Report)"
                             data-placement="left"
                             data-toggle="tooltip"
                             ></a>
                         <a
                             class="fa fa-fw fa-download fa-lg"
-                            href="{{ url('kns_pdf', {'id': request.id}) }}"
+                            href="{{ url('keyword_analyzer_multiple_pdf', {'id': request.id}) }}"
                             title="Download PDF (Detailed Report)"
                             data-placement="left"
                             data-toggle="tooltip"
                             ></a>
                         <a
                             class="fa fa-fw fa-remove fa-lg"
-                            href="{{ url('kns_delete', {'id': request.id}) }}"
+                            href="{{ url('keyword_analyzer_multiple_delete', {'id': request.id}) }}"
                             title="Delete"
                             data-placement="left"
                             data-toggle="tooltip"
