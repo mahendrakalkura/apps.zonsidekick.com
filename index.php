@@ -719,18 +719,20 @@ $application->before(function (Request $request) use ($application) {
             );
         }
     }
-    $is_paying_customer = is_paying_customer($application, $user);
-    if ($is_paying_customer) {
-        if ($request->get('_route') == '403') {
-            # return $application->redirect(
-            #     $application['url_generator']->generate('dashboard')
-            # );
-        }
-    } else {
-        if ($request->get('_route') != '403') {
-            return $application->redirect(
-                $application['url_generator']->generate('403')
-            );
+    if ($request->get('_route') != 'sign_in') {
+        $is_paying_customer = is_paying_customer($application, $user);
+        if ($is_paying_customer) {
+            if ($request->get('_route') == '403') {
+                return $application->redirect(
+                    $application['url_generator']->generate('dashboard')
+                );
+            }
+        } else {
+            if ($request->get('_route') != '403') {
+                return $application->redirect(
+                    $application['url_generator']->generate('403')
+                );
+            }
         }
     }
     $application['session']->set('user', $user);
