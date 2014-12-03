@@ -73,18 +73,18 @@ crontab
 -------
 
 ```
-0 */6 * * * cd {{ path }} && {{ virtualenv }}/scrapy crawl ce
-*/30 * * * * cd {{ path }}/scripts && {{ virtualenv }}/python ps.py
+*/30 * * * * cd {{ path }}/scripts && {{ virtualenv }}/python popular_searches.py
+0 */6 * * * cd {{ path }} && {{ virtualenv }}/scrapy crawl top_100_explorer
 ```
 
 supervisor
 ----------
 
 ```
-[program:kns]
+[program:keyword_analyzer]
 autorestart=true
 autostart=true
-command={{ virtualenv }}/python kns.py
+command={{ virtualenv }}/python keyword_analyzer.py
 directory=cd {{ path }}/scripts
 startsecs=0
 ```
