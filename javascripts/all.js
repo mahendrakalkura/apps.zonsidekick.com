@@ -51,7 +51,6 @@ application.directive('datepicker', function () {
     };
 });
 
-
 application.directive('ngFocus', function ($timeout) {
     return {
         link: function (scope, element, attrs) {
@@ -78,7 +77,7 @@ application.directive('popover', function () {
                 container: 'body',
                 content: jQuery(element).find('div').contents(),
                 html: true,
-                placement: 'top'
+                placement: 'bottom'
             });
         },
         restrict: 'A'
@@ -176,7 +175,7 @@ application.filter('slice', function () {
 });
 
 application.controller(
-    'aa',
+    'author_analyzer',
     function ($attrs, $document, $http, $rootScope, $scope) {
         $scope.keyword = '';
         $scope.authors = {

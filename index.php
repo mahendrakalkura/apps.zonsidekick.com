@@ -1663,21 +1663,24 @@ $application->match(
 ->bind('kns_single_')
 ->method('POST');
 
-$application->match('/aa', function (Request $request) use ($application) {
-    return $application['twig']->render('views/aa.twig', array(
-        'url' => $request->get('url'),
-    ));
-})
-->bind('aa')
+$application->match(
+    '/author-analyzer',
+    function (Request $request) use ($application) {
+        return $application['twig']->render('views/author_analyzer.twig', array(
+            'url' => $request->get('url'),
+        ));
+    }
+)
+->bind('author_analyzer')
 ->method('GET');
 
 $application->match(
-    '/aa/authors',
+    '/author-analyzer/authors',
     function (Request $request) use ($application, $variables) {
         ignore_user_abort(true);
         set_time_limit(0);
         exec(sprintf(
-            '%s/python %s/scripts/aa.py get_authors %s 2>/dev/null',
+            '%s/python %s/scripts/author_analyzer.py get_authors %s 2>/dev/null',
             $variables['virtualenv'],
             __DIR__,
             escapeshellarg($request->get('keyword'))
@@ -1685,16 +1688,16 @@ $application->match(
         return new Response(implode('', $output));
     }
 )
-->bind('aa_authors')
+->bind('author_analyzer_authors')
 ->method('POST');
 
 $application->match(
-    '/aa/author',
+    '/author-analyzer/author',
     function (Request $request) use ($application, $variables) {
         ignore_user_abort(true);
         set_time_limit(0);
         exec(sprintf(
-            '%s/python %s/scripts/aa.py get_author %s 2>/dev/null',
+            '%s/python %s/scripts/author_analyzer.py get_author %s 2>/dev/null',
             $variables['virtualenv'],
             __DIR__,
             escapeshellarg($request->get('url'))
@@ -1702,7 +1705,7 @@ $application->match(
         return new Response(implode('', $output));
     }
 )
-->bind('aa_author')
+->bind('author_analyzer_author')
 ->method('POST');
 
 $application->match('/ba', function (Request $request) use ($application) {

@@ -124,7 +124,7 @@
                 <strong>Author:</strong>
                 <span ng-show="book.contents.author.url.length > 0">
                     <a
-                        href="{{ url('aa') }}?url=[! book.contents.author.url|encodeUri !]"
+                        href="{{ url('author_analyzer') }}?url=[! book.contents.author.url|encodeUri !]"
                         target="_blank"
                         >[! book.contents.author.name !]</a>
                     <a

@@ -7,7 +7,7 @@
 <ul class="breadcrumb breadcrumb-page">
     <div class="breadcrumb-label text-light-gray">You are here:</div>
     <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
-    <li class="active"><a href="{{ url('aa') }}">{{ module }}</a></li>
+    <li class="active"><a href="{{ url('author_analyzer') }}">{{ module }}</a></li>
 </ul>
 <div class="page-header">
     <div class="row">
@@ -30,11 +30,11 @@
     data-error-1-top="Error #1"
     data-error-2-middle="<p>An unknown error has occurred. Please try again.</p>"
     data-error-2-top="Error #2"
-    data-url-author="{{ url('aa_author') }}"
-    data-url-authors="{{ url('aa_authors') }}"
+    data-url-author="{{ url('author_analyzer_author') }}"
+    data-url-authors="{{ url('author_analyzer_authors') }}"
     data-url="{{ url }}"
-    id="aa"
-    ng-controller="aa"
+    id="author_analyzer"
+    ng-controller="author_analyzer"
     >
     <form name="form" ng-submit="get_authors()">
         <div class="panel">

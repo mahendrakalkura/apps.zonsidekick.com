@@ -3,7 +3,7 @@
 from email.mime.text import MIMEText
 from smtplib import SMTP
 
-from aa import get_author, get_authors
+from author_analyzer import get_author, get_authors
 from aks import get_results
 from ba import get_books, get_items
 from kns import get_contents
@@ -11,7 +11,7 @@ from sk import get_suggested_keywords
 from utilities import get_book, get_response, variables
 
 
-def aa_py_get_authors():
+def author_analyzer_py_get_authors():
     output = get_authors('stephen king')
     if (
         type(output) == list
@@ -26,7 +26,7 @@ def aa_py_get_authors():
     return False
 
 
-def aa_py_get_author():
+def author_analyzer_py_get_author():
     output = get_author('http://www.amazon.com/Stephen-King/e/B000AQ0842')
     if (
         type(output) == dict
@@ -164,11 +164,13 @@ def sk_py():
 
 if __name__ == '__main__':
     body = '\n'.join([
-        'aa_py_get_authors: %(status)s' % {
-            'status': 'Success' if aa_py_get_authors() else 'Failure'
+        'author_analyzer_py_get_authors: %(status)s' % {
+            'status':
+            'Success' if author_analyzer_py_get_authors() else 'Failure'
         },
-        'aa_py_get_author: %(status)s' % {
-            'status': 'Success' if aa_py_get_author() else 'Failure'
+        'author_analyzer_py_get_author: %(status)s' % {
+            'status':
+            'Success' if author_analyzer_py_get_author() else 'Failure'
         },
         'aks_py: %(status)s' % {
             'status': 'Success' if aks_py() else 'Failure'

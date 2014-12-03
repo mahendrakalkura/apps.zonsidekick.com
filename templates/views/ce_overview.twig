@@ -729,7 +729,7 @@
                             target="_blank"
                             ><i class="fa fa-fw fa-external-link"></i></a>
                         <a
-                            href="{{ url('aa') }}?url=[! book.author_url|encodeUri !]"
+                            href="{{ url('author_analyzer') }}?url=[! book.author_url|encodeUri !]"
                             ng-show="book.author_url.length > 0"
                             target="_blank"
                             >[! book.author_name !]</a>
@@ -859,7 +859,7 @@
                         <p>
                             <strong>Author:</strong>
                             <a
-                                href="{{ url('aa') }}?url=[! book.author_url|encodeUri !]"
+                                href="{{ url('author_analyzer') }}?url=[! book.author_url|encodeUri !]"
                                 ng-show="book.author_url.length > 0"
                                 target="_blank"
                                 >[! book.author_name !]</a>
