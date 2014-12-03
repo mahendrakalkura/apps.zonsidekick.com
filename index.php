@@ -713,9 +713,11 @@ if ($application['debug']) {
 $application->before(function (Request $request) use ($application) {
     $user = get_user($application);
     if (!$user['id']) {
-        return $application->redirect(
-            $application['url_generator']->generate('sign_in')
-        );
+        if ($request->get('_route') != 'sign_in') {
+            return $application->redirect(
+                $application['url_generator']->generate('sign_in')
+            );
+        }
     }
     $is_paying_customer = is_paying_customer($application, $user);
     if ($is_paying_customer) {
