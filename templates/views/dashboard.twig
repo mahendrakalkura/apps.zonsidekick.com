@@ -6,14 +6,15 @@
 {% block content %}
 <ul class="breadcrumb breadcrumb-page">
     <div class="breadcrumb-label text-light-gray">You are here:</div>
-    <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
+    <li><a href="{{ url('dashboard') }}">Home</a></li>
     <li class="active"><a href="{{ url('dashboard') }}">Dashboard</a></li>
 </ul>
 <div class="page-header">
     <div class="row">
         <h1 class="col-xs-12">
             {% include 'slots/feedback.twig' %}
-            <i class="fa fa-fw fa-dashboard page-header-icon"></i> {{ module }}
+            <i class="fa fa-fw fa-dashboard page-header-icon"></i>
+            {{ module }}
         </h1>
     </div>
 </div>
@@ -56,7 +57,7 @@
                 class="btn btn-info btn-large"
                 href="{{ url('keyword_suggester') }}"
                 >
-                <span class="fa fa-fw fa-list"></span> Keywords Suggester
+                <span class="fa fa-fw fa-list"></span> Keyword Suggester
             </a>
         </p>
     </div>
@@ -67,7 +68,7 @@
                 class="btn btn-info btn-large"
                 href="{{ url('keyword_analyzer_multiple') }}"
                 >
-                <i class="fa fa-fw fa-tags"></i> Multiple Keyword Analyzer
+                <i class="fa fa-fw fa-tags"></i> Keyword Analyzer - Multiple
             </a>
         </p>
     </div>
@@ -94,7 +95,7 @@
         </ul>
     </li>
     <li>
-        Keywords Suggester:
+        Keyword Suggester:
         <ul>
             <li>
                 Resolved an issue that prevented German queries

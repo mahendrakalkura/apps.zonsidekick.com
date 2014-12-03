@@ -6,14 +6,15 @@
 {% block content %}
 <ul class="breadcrumb breadcrumb-page">
     <div class="breadcrumb-label text-light-gray">You are here:</div>
-    <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
+    <li><a href="{{ url('dashboard') }}">Home</a></li>
     <li class="active"><a href="{{ url('profile') }}">Profile</a></li>
 </ul>
 <div class="page-header">
     <div class="row">
         <h1 class="col-xs-12">
             {% include 'slots/feedback.twig' %}
-            <i class="fa fa-fw fa-user page-header-icon"></i> {{ module }}
+            <i class="fa fa-fw fa-user page-header-icon"></i>
+            {{ module }}
         </h1>
     </div>
 </div>
@@ -44,16 +45,16 @@
                     <div class="help-block">{{ error }}</div>
                 {% endif %}
             </div>
-            <div class="text-right">
-                <button class="btn btn-danger" type="reset">
-                    <span class="fa fa-fw fa-thumbs-down fa-lg"></span>
-                    Reset
-                </button>
-                <button class="btn btn-success" type="submit">
-                    <span class="fa fa-fw fa-thumbs-up fa-lg"></span>
-                    Submit
-                </button>
-            </div>
+        </div>
+        <div class="clearfix panel-footer text-right">
+            <button class="btn btn-success pull-right" type="submit">
+                <span class="fa fa-lg fa-fw fa-thumbs-up"></span>
+                Submit
+            </button>
+            <button class="btn btn-danger pull-right" type="reset">
+                <span class="fa fa-lg fa-fw fa-thumbs-down"></span>
+                Reset
+            </button>
         </div>
     </div>
 </form>

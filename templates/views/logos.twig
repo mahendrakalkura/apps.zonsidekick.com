@@ -6,18 +6,23 @@
 {% block content %}
 <ul class="breadcrumb breadcrumb-page">
     <div class="breadcrumb-label text-light-gray">You are here:</div>
-    <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
-    <li class="active"><a href="{{ url('logos') }}">{{ module }}</a></li>
+    <li><a href="{{ url('dashboard') }}">Home</a></li>
+    <li><a href="{{ url('logos') }}">Logos</a></li>
+    <li class="active"><a href="{{ url('logos') }}">Overview</a></li>
 </ul>
 <div class="page-header">
     <div class="row">
         <h1 class="col-xs-12">
             {% include 'slots/feedback.twig' %}
-            <a class="btn btn-success pull-right" href="{{ url('logos_add') }}">
-                <span class="fa fa-fw fa-plus-sign fa-lg"></span>
+            <a
+                class="btn btn-success pull-right"
+                href="{{ url('logos_add') }}"
+                >
+                <span class="fa fa-lg fa-fw fa-plus-circle"></span>
                 Add
             </a>
-            <i class="fa fa-fw fa-picture-o"></i> {{ module }}
+            <i class="fa fa-fw fa-picture-o"></i>
+            {{ module }}
         </h1>
     </div>
 </div>
@@ -29,7 +34,7 @@
     reports.
 </p>
 {% if logos %}
-    <table class="table table-bordered table-hover table-striped tablesorter">
+    <table class="table table-bordered table-hover table-striped">
         <thead>
             <tr>
                 <th>Logo</th>
@@ -44,21 +49,18 @@
                         <span class="pull-right">
                             {{ logo.file_name }}
                         </span>
-                        <img
-                            class="img-polaroid"
-                            src="{{ url('logos_preview', {'file_name': logo.file_name}) }}"
-                            >
+                        <img src="{{ url('logos_preview', {'file_name': logo.file_name}) }}">
                     </td>
                     <td class="narrow text-right">{{ logo.dimensions }}</td>
                     <td class="narrow text-center">
                         <a
-                            class="fa fa-fw fa-download fa-lg"
+                            class="fa fa-lg fa-fw fa-download"
                             href="{{ url('logos_download', {'file_name': logo.file_name}) }}"
                             title="Download"
                             data-toggle="tooltip"
                             ></a>
                         <a
-                            class="fa fa-fw fa-remove-sign fa-lg"
+                            class="fa fa-lg fa-fw fa-times-circle"
                             href="{{ url('logos_delete', {'file_name': logo.file_name}) }}"
                             title="Delete"
                             data-toggle="tooltip"
@@ -69,7 +71,7 @@
         </tbody>
     </table>
 {% else %}
-    <div class="alert alert-danger alert-dark">
+    <div class="alert alert-dark alert-danger">
         You have not uploaded any logos yet.
     </div>
 {% endif %}

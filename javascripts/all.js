@@ -174,8 +174,19 @@ application.filter('slice', function () {
     };
 });
 
-application.controller(
-    'author_analyzer',
+application.controller('amazon_best_sellers_rank', [
+    '$scope',
+    function ($scope) {
+        $scope.status = false;
+    }
+]);
+
+application.controller('author_analyzer', [
+    '$attrs',
+    '$document',
+    '$http',
+    '$rootScope',
+    '$scope',
     function ($attrs, $document, $http, $rootScope, $scope) {
         $scope.keyword = '';
         $scope.authors = {
@@ -272,10 +283,21 @@ application.controller(
             $scope.get_author($attrs.url);
         }
     }
-);
+]);
 
-application.controller(
-    'ba',
+application.controller('book', [
+    '$scope',
+    function ($scope) {
+        $scope.status = false;
+    }
+]);
+
+application.controller('book_analyzer', [
+    '$attrs',
+    '$document',
+    '$http',
+    '$rootScope',
+    '$scope',
     function ($attrs, $document, $http, $rootScope, $scope) {
         $scope.keyword = '';
         $scope.books = {
@@ -415,409 +437,35 @@ application.controller(
             $scope.get_book($attrs.url);
         }
     }
-);
+]);
 
-application.controller(
-    'aks',
-    function ($attrs, $http, $queue, $rootScope, $scope) {
-        $scope.download = function () {
-            $rootScope.$broadcast('download', {
-                action: $attrs.urlDownload,
-                json: JSON.stringify({
-                    suggestions: $scope.suggestions
-                })
-            });
-        };
-
-        $scope.reset = function () {
-            $scope.modes = [
-                'Suggest',
-                'Combine',
-            ];
-
-            $scope.keywords = '';
-            $scope.country = 'com';
-            $scope.mode = $scope.modes[0];
-            $scope.search_alias = 'digital-text';
-
-            $scope.checkbox = false;
-            $scope.focus = {
-                keywords: true,
-                suggestions: false
-            };
-
-            $scope.spinner = false;
-            $scope.rows = '';
-            $scope.statuses = {};
-            $scope.suggestions = [];
-
-            window.clearInterval($scope.interval);
-        };
-
-        $scope.submit = function () {
-            $scope.suggestions = [];
-            if (!$scope.keywords.length) {
-                $rootScope.$broadcast('open', {
-                    top: $attrs.error1Top,
-                    middle: $attrs.error1Middle
-                });
-
-                return;
-            }
-
-            $scope.spinner = true;
-            var queue = $queue.queue(function (keyword) {
-                $http({
-                    data: jQuery.param({
-                        country: $scope.country,
-                        keyword: keyword,
-                        search_alias: $scope.search_alias
-                    }),
-                    method: 'POST',
-                    url: $attrs.urlXhr
-                }).
-                error(function (data, status, headers, config) {
-                    $scope.statuses[keyword] = -1;
-                }).
-                success(function (data, status, headers, config) {
-                    jQuery.each(data, function (key, value) {
-                        if ($scope.mode == 'Suggest') {
-                            $scope.suggestions.push(value);
-                        }
-                        if ($scope.mode == 'Combine') {
-                            var count = 0;
-                            jQuery.each(value.split(' '), function (k, v) {
-                                jQuery.each(
-                                    $scope.keywords.toLowerCase().split('\n'),
-                                    function () {
-                                        if (this == v) {
-                                            count += 1;
-                                        }
-                                    }
-                                );
-                            });
-                            if (count >= 2) {
-                                $scope.suggestions.push(value);
-                            }
-                        }
-                    });
-                    $scope.suggestions = _.uniq($scope.suggestions);
-                    $scope.suggestions.sort();
-                    $scope.statuses[keyword] = 1;
-                });
-            }, {
-                complete: function () {},
-                delay: 0,
-                paused: true
-            });
-            $scope.rows = _.uniq(_.filter(
-                $scope.keywords.toLowerCase().split('\n'), function (keyword) {
-                    return jQuery.trim(keyword).length;
-                }
-            ));
-            $scope.statuses = {};
-            jQuery.each($scope.rows, function (key, value) {
-                queue.add(value);
-                $scope.statuses[value] = 0;
-            });
-            queue.start();
-            $scope.interval = window.setInterval(function () {
-                if (_.values($scope.statuses).indexOf(0) === -1) {
-                    window.clearInterval($scope.interval);
-                    if ($scope.suggestions.length) {
-                        $scope.focus['suggestions'] = true;
-                        if ($scope.checkbox) {
-                            $scope.download();
-                        }
-                        return;
-                    }
-                    $rootScope.$broadcast('open', {
-                        top: $attrs.error3Top,
-                        middle: $attrs.error3Middle
-                    });
-                }
-            }, 1000);
-        };
-
-        $scope.$on('focus', function () {
-            $scope.focus['keywords'] = true;
-            $scope.focus['suggestions'] = false;
-        });
-
-        $scope.reset();
-
-        if ($attrs.keywords.length) {
-            $scope.keywords = $attrs.keywords;
-        }
-        if ($attrs.mode.length) {
-            $scope.mode = $attrs.mode;
-        }
+application.controller('category', [
+    '$scope',
+    function ($scope) {
+        $scope.status = false;
     }
-);
+]);
 
-application.controller('amazon_best_sellers_rank', function ($scope) {
-    $scope.status = false;
-});
+application.controller('download', [
+    '$element',
+    '$scope',
+    function ($element, $scope) {
+        $scope.action = '';
+        $scope.json = '';
 
-application.controller('book', function ($scope) {
-    $scope.status = false;
-});
-
-application.controller('category', function ($scope) {
-    $scope.status = false;
-});
-
-application.controller('ce', function ($attrs, $http, $rootScope, $scope) {
-    $scope.categories = jQuery.parseJSON($attrs.categories);
-    $scope.sections = jQuery.parseJSON($attrs.sections);
-    $scope.print_lengths = [
-        'Any',
-        'More Than',
-        'Less Than',
-        'Between',
-    ];
-    $scope.prices = [
-        'Any',
-        'More Than',
-        'Less Than',
-        'Between',
-    ];
-    $scope.publication_dates = [
-        'Any',
-        'More Than',
-        'Less Than',
-        'Between',
-    ];
-    $scope.amazon_best_sellers_ranks = [
-        'Any',
-        'More Than',
-        'Less Than',
-        'Between',
-    ];
-    $scope.review_averages = [
-        'Any',
-        'More Than',
-        'Less Than',
-        'Between',
-    ];
-    $scope.appearances = [
-        'Any',
-        'More Than',
-        'Less Than',
-        'Between',
-    ];
-    $scope.counts = _.range(100, 0, -10);
-
-    $scope.spinner = false;
-    $scope.error = false;
-    $scope.contents = {};
-
-    $scope.order_by = {
-        'books': ['rank', false],
-        'categories': ['frequency', true],
-    };
-
-    $scope.mode = 'table';
-
-    $scope.process = function (category_id) {
-        var fields = [];
-        jQuery.each({
-            amazon_best_sellers_rank_1: $scope.amazon_best_sellers_rank_1,
-            amazon_best_sellers_rank_2: $scope.amazon_best_sellers_rank_2,
-            amazon_best_sellers_rank_3: $scope.amazon_best_sellers_rank_3,
-            amazon_best_sellers_rank_4: $scope.amazon_best_sellers_rank_4,
-            category_id: category_id,
-            count: $scope.count,
-            print_length_1: $scope.print_length_1,
-            print_length_2: $scope.print_length_2,
-            print_length_3: $scope.print_length_3,
-            print_length_4: $scope.print_length_4,
-            appearance_1: $scope.appearance_1,
-            appearance_2: $scope.appearance_2,
-            appearance_3: $scope.appearance_3,
-            appearance_4: $scope.appearance_4,
-            price_1: $scope.price_1,
-            price_2: $scope.price_2,
-            price_3: $scope.price_3,
-            price_4: $scope.price_4,
-            publication_date_1: $scope.publication_date_1,
-            publication_date_2: $scope.publication_date_2,
-            publication_date_3: $scope.publication_date_3,
-            publication_date_4: $scope.publication_date_4,
-            review_average_1: $scope.review_average_1,
-            review_average_2: $scope.review_average_2,
-            review_average_3: $scope.review_average_3,
-            review_average_4: $scope.review_average_4,
-            section_id: $scope.section_id
-        }, function (name, val) {
-            fields.push(jQuery('<input/>', {
-                'name': name,
-                'type': 'hidden',
-                'val': val
-            }))
+        $scope.$on('download', function (event, options) {
+            jQuery($element).attr('action', options.action);
+            jQuery($element).find('[name="json"]').val(options.json);
+            jQuery($element).submit();
         });
-        jQuery('<form/>', {
-            target: '_blank',
-            method: 'POST'
-        }).append(fields).submit();
-    };
+    }
+]);
 
-    $scope.reset = function () {
-        $scope.category_id = $attrs.categoryId || $scope.categories[1][0];
-        $scope.section_id = $attrs.sectionId || $scope.sections[0][0];
-        $scope.print_length_1
-            = $attrs.printLength1 || $scope.print_lengths[0];
-        $scope.print_length_2 = parseInt($attrs.printLength2, 10) || 0;
-        $scope.print_length_3 = parseInt($attrs.printLength3, 10) || 0;
-        $scope.print_length_4 = parseInt($attrs.printLength4, 10) || 0;
-        $scope.price_1 = $attrs.price1 || $scope.prices[0];
-        $scope.price_2 = parseInt($attrs.price2, 10) || 0;
-        $scope.price_3 = parseInt($attrs.price3, 10) || 0;
-        $scope.price_4 = parseInt($attrs.price4, 10) || 0;
-        $scope.publication_date_1
-            = $attrs.publicationDate1 || $scope.publication_dates[0];
-        $scope.publication_date_2 = $attrs.publicationDate2 || '';
-        $scope.publication_date_3 = $attrs.publicationDate3 || '';
-        $scope.publication_date_4 = $attrs.publicationDate4 || '';
-        $scope.amazon_best_sellers_rank_1 =
-            $attrs.amazonBestSellersRank1
-            ||
-            $scope.amazon_best_sellers_ranks[0];
-        $scope.amazon_best_sellers_rank_2
-            = parseInt($attrs.amazonBestSellersRank2, 10) || 0;
-        $scope.amazon_best_sellers_rank_3
-            = parseInt($attrs.amazonBestSellersRank3, 10) || 0;
-        $scope.amazon_best_sellers_rank_4
-            = parseInt($attrs.amazonBestSellersRank4, 10) || 0;
-        $scope.review_average_1
-            = $attrs.reviewAverage1 || $scope.review_averages[0];
-        $scope.review_average_2 = parseInt($attrs.reviewAverage2, 10) || 0;
-        $scope.review_average_3 = parseInt($attrs.reviewAverage3, 10) || 0;
-        $scope.review_average_4 = parseInt($attrs.reviewAverage4, 10) || 0;
-        $scope.appearance_1 = $attrs.appearance1 || $scope.appearances[0];
-        $scope.appearance_2 = parseInt($attrs.appearance2, 10) || 1;
-        $scope.appearance_3 = parseInt($attrs.appearance3, 10) || 1;
-        $scope.appearance_4 = parseInt($attrs.appearance4, 10) || 1;
-        $scope.count = parseInt($attrs.count, 10) || $scope.counts[0];
-
-        jQuery('#category_id').select2('val', $scope.category_id);
-        jQuery('#section_id').select2('val', $scope.section_id);
-        jQuery('#print_length').select2('val', $scope.print_length_1);
-        jQuery('#price').select2('val', $scope.price_1);
-        jQuery('#publication_date').select2('val', $scope.publication_date_1);
-        jQuery(
-            '#amazon_best_sellers_rank'
-        ).select2('val', $scope.amazon_best_sellers_rank_1);
-        jQuery('#review_average').select2('val', $scope.review_average_1);
-        jQuery('#appearance').select2('val', $scope.appearance_1);
-        jQuery('#count').select2('val', $scope.count);
-
-        $scope.submit();
-    };
-
-    $scope.submit = function () {
-        $scope.spinner = true;
-        $scope.error = false;
-        $scope.contents = {};
-        $http({
-            data: jQuery.param({
-                amazon_best_sellers_rank_1: $scope.amazon_best_sellers_rank_1,
-                amazon_best_sellers_rank_2: $scope.amazon_best_sellers_rank_2,
-                amazon_best_sellers_rank_3: $scope.amazon_best_sellers_rank_3,
-                amazon_best_sellers_rank_4: $scope.amazon_best_sellers_rank_4,
-                category_id: $scope.category_id,
-                count: $scope.count,
-                print_length_1: $scope.print_length_1,
-                print_length_2: $scope.print_length_2,
-                print_length_3: $scope.print_length_3,
-                print_length_4: $scope.print_length_4,
-                appearance_1: $scope.appearance_1,
-                appearance_2: $scope.appearance_2,
-                appearance_3: $scope.appearance_3,
-                appearance_4: $scope.appearance_4,
-                price_1: $scope.price_1,
-                price_2: $scope.price_2,
-                price_3: $scope.price_3,
-                price_4: $scope.price_4,
-                publication_date_1: $scope.publication_date_1,
-                publication_date_2: $scope.publication_date_2,
-                publication_date_3: $scope.publication_date_3,
-                publication_date_4: $scope.publication_date_4,
-                review_average_1: $scope.review_average_1,
-                review_average_2: $scope.review_average_2,
-                review_average_3: $scope.review_average_3,
-                review_average_4: $scope.review_average_4,
-                section_id: $scope.section_id
-            }),
-            method: 'POST',
-            url: $attrs.url
-        }).
-        error(function (data, status, headers, config) {
-            $scope.spinner = false;
-            $scope.error = true;
-        }).
-        success(function (data, status, headers, config) {
-            $scope.spinner = false;
-            $scope.error = !data.books.length;
-            $scope.contents = data;
-            $scope.contents['chunks'] = $scope.contents['books'].get_chunks(3);
-            for (var index in $scope.contents['categories']) {
-                $scope.contents['categories'][index]['id'] = 0;
-                if (
-                    $scope.contents['categories'][index]['title']
-                    ==
-                    'Paid in Kindle Store'
-                ) {
-                    $scope.contents['categories'][index]['id'] = 1;
-                } else {
-                    for (var i in $scope.categories) {
-                        if (
-                            $scope.contents['categories'][index]['title']
-                            ==
-                            $scope.categories[i][1]
-                        ) {
-                            $scope.contents[
-                                'categories'
-                            ][index]['id'] = $scope.categories[i][0];
-                            break;
-                        }
-                    }
-                }
-            }
-        });
-
-        return;
-    };
-
-    $scope.get_order_by = function (key) {
-        return $scope.order_by[key][1]? 'desc': 'asc';
-    };
-
-    $scope.set_order_by = function (key, value) {
-        if ($scope.order_by[key][0] == value) {
-            $scope.order_by[key][1] = !$scope.order_by[key][1];
-        } else {
-            $scope.order_by[key][0] = value;
-            $scope.order_by[key][1] = false;
-        }
-    };
-
-    $scope.reset();
-});
-
-application.controller('download', function ($element, $scope) {
-    $scope.action = '';
-    $scope.json = '';
-
-    $scope.$on('download', function (event, options) {
-        jQuery($element).attr('action', options.action);
-        jQuery($element).find('[name="json"]').val(options.json);
-        jQuery($element).submit();
-    });
-});
-
-application.controller('kns_add', [
-    '$attrs', '$rootScope', '$scope', function ($attrs, $rootScope, $scope) {
+application.controller('keyword_analyzer_multiple_add', [
+    '$attrs',
+    '$rootScope',
+    '$scope',
+    function ($attrs, $rootScope, $scope) {
         $scope.count = 500;
         $scope.focus = {
             keywords: true
@@ -868,7 +516,7 @@ application.controller('kns_add', [
     }
 ]);
 
-application.controller('kns_simple', [
+application.controller('keyword_analyzer_multiple_simple', [
     '$attrs',
     '$filter',
     '$http',
@@ -1016,7 +664,8 @@ application.controller('kns_simple', [
         };
 
         $scope.get_order_by = function () {
-            return $scope.order_by[1]? 'desc': 'asc';
+            return $scope.order_by[1]?
+                'fa-sort-amount-desc': 'fa-sort-amount-asc';
         };
 
         $scope.set_order_by = function (th) {
@@ -1032,7 +681,8 @@ application.controller('kns_simple', [
         };
 
         $scope.get_order_by_ = function () {
-            return $scope.order_by_[1]? 'desc': 'asc';
+            return $scope.order_by_[1]?
+                'fa-sort-amount-desc': 'fa-sort-amount-asc';
         };
 
         $scope.set_order_by_ = function (th) {
@@ -1091,8 +741,11 @@ application.controller('kns_simple', [
     }
 ]);
 
-application.controller(
-    'kns_single',
+application.controller('keyword_analyzer_single', [
+    '$attrs',
+    '$http',
+    '$rootScope',
+    '$scope',
     function ($attrs, $http, $rootScope, $scope) {
         $scope.countries = jQuery.parseJSON($attrs.countries);
 
@@ -1148,7 +801,8 @@ application.controller(
         };
 
         $scope.get_order_by = function () {
-            return $scope.order_by[1]? 'desc': 'asc';
+            return $scope.order_by[1]?
+                'fa-sort-amount-desc': 'fa-sort-amount-asc';
         };
 
         $scope.set_order_by = function (th) {
@@ -1160,94 +814,501 @@ application.controller(
             }
         };
     }
-);
+]);
 
-application.controller('modal', function (
-    $attrs, $element, $rootScope, $scope
-) {
-    $scope.top = '';
-    $scope.middle = '';
+application.controller('keyword_suggester', [
+    '$attrs',
+    '$http',
+    '$queue',
+    '$rootScope',
+    '$scope',
+    function ($attrs, $http, $queue, $rootScope, $scope) {
+        $scope.download = function () {
+            $rootScope.$broadcast('download', {
+                action: $attrs.urlDownload,
+                json: JSON.stringify({
+                    suggestions: $scope.suggestions
+                })
+            });
+        };
 
-    $scope.click = function () {
-        jQuery($element).modal('hide');
+        $scope.reset = function () {
+            $scope.modes = [
+                'Suggest',
+                'Combine',
+            ];
+
+            $scope.keywords = '';
+            $scope.country = 'com';
+            $scope.mode = $scope.modes[0];
+            $scope.search_alias = 'digital-text';
+
+            $scope.checkbox = false;
+            $scope.focus = {
+                keywords: true,
+                suggestions: false
+            };
+
+            $scope.spinner = false;
+            $scope.rows = '';
+            $scope.statuses = {};
+            $scope.suggestions = [];
+
+            window.clearInterval($scope.interval);
+        };
+
+        $scope.submit = function () {
+            $scope.suggestions = [];
+            if (!$scope.keywords.length) {
+                $rootScope.$broadcast('open', {
+                    top: $attrs.error1Top,
+                    middle: $attrs.error1Middle
+                });
+
+                return;
+            }
+
+            $scope.spinner = true;
+            var queue = $queue.queue(function (keyword) {
+                $http({
+                    data: jQuery.param({
+                        country: $scope.country,
+                        keyword: keyword,
+                        search_alias: $scope.search_alias
+                    }),
+                    method: 'POST',
+                    url: $attrs.urlXhr
+                }).
+                error(function (data, status, headers, config) {
+                    $scope.statuses[keyword] = -1;
+                }).
+                success(function (data, status, headers, config) {
+                    jQuery.each(data, function (key, value) {
+                        if ($scope.mode == 'Suggest') {
+                            $scope.suggestions.push(value);
+                        }
+                        if ($scope.mode == 'Combine') {
+                            var count = 0;
+                            jQuery.each(value.split(' '), function (k, v) {
+                                jQuery.each(
+                                    $scope.keywords.toLowerCase().split('\n'),
+                                    function () {
+                                        if (this == v) {
+                                            count += 1;
+                                        }
+                                    }
+                                );
+                            });
+                            if (count >= 2) {
+                                $scope.suggestions.push(value);
+                            }
+                        }
+                    });
+                    $scope.suggestions = _.uniq($scope.suggestions);
+                    $scope.suggestions.sort();
+                    $scope.statuses[keyword] = 1;
+                });
+            }, {
+                complete: function () {},
+                delay: 0,
+                paused: true
+            });
+            $scope.rows = _.uniq(_.filter(
+                $scope.keywords.toLowerCase().split('\n'), function (keyword) {
+                    return jQuery.trim(keyword).length;
+                }
+            ));
+            $scope.statuses = {};
+            jQuery.each($scope.rows, function (key, value) {
+                queue.add(value);
+                $scope.statuses[value] = 0;
+            });
+            queue.start();
+            $scope.interval = window.setInterval(function () {
+                if (_.values($scope.statuses).indexOf(0) === -1) {
+                    window.clearInterval($scope.interval);
+                    if ($scope.suggestions.length) {
+                        $scope.focus['suggestions'] = true;
+                        if ($scope.checkbox) {
+                            $scope.download();
+                        }
+                        return;
+                    }
+                    $rootScope.$broadcast('open', {
+                        top: $attrs.error3Top,
+                        middle: $attrs.error3Middle
+                    });
+                }
+            }, 1000);
+        };
+
+        $scope.$on('focus', function () {
+            $scope.focus['keywords'] = true;
+            $scope.focus['suggestions'] = false;
+        });
+
+        $scope.reset();
+
+        if ($attrs.keywords.length) {
+            $scope.keywords = $attrs.keywords;
+        }
+        if ($attrs.mode.length) {
+            $scope.mode = $attrs.mode;
+        }
+    }
+]);
+
+application.controller('modal', [
+    '$attrs',
+    '$element',
+    '$rootScope',
+    '$scope',
+    function ($attrs, $element, $rootScope, $scope) {
         $scope.top = '';
         $scope.middle = '';
-        $rootScope.$broadcast('focus');
-        $rootScope.$emit('focus');
 
-        return false;
-    };
+        $scope.click = function () {
+            jQuery($element).modal('hide');
+            $scope.top = '';
+            $scope.middle = '';
+            $rootScope.$broadcast('focus');
+            $rootScope.$emit('focus');
 
-    $scope.$on('open', function (event, options) {
-        $scope.top = options.top;
-        $scope.middle = options.middle;
-        $rootScope.$$phase || $rootScope.$apply();
-        jQuery($element).modal('show');
-    });
-});
+            return false;
+        };
 
-application.controller('previous_versions', function ($scope) {
-    $scope.status = false;
-});
+        $scope.$on('open', function (event, options) {
+            $scope.top = options.top;
+            $scope.middle = options.middle;
+            $rootScope.$$phase || $rootScope.$apply();
+            jQuery($element).modal('show');
+        });
+    }
+]);
 
-application.controller('suggested_keywords', function ($attrs, $http, $scope) {
-    $scope.items = [];
-    $scope.spinner = false;
-    $scope.error = false;
+application.controller('previous_versions', [
+    '$scope',
+    function ($scope) {
+        $scope.status = false;
+    }
+]);
 
-    $scope.process = function (words) {
+application.controller('suggested_keywords', [
+    '$attrs',
+    '$http',
+    '$scope',
+    function ($attrs, $http, $scope) {
         $scope.items = [];
-        $scope.spinner = true;
+        $scope.spinner = false;
         $scope.error = false;
-        $http({
-            data: jQuery.param({
-                keywords: _.map(words, function (word) {
-                    return word[0];
-                }).join(',')
-            }),
-            method: 'POST',
-            url: $attrs.urlsSuggestedKeywords
-        }).
-        error(function (data, status, headers, config) {
+
+        $scope.process = function (words) {
             $scope.items = [];
-            $scope.spinner = false;
-            $scope.error = true;
-        }).
-        success(function (data, status, headers, config) {
-            $scope.items = data;
-            $scope.spinner = false;
+            $scope.spinner = true;
             $scope.error = false;
-        });
+            $http({
+                data: jQuery.param({
+                    keywords: _.map(words, function (word) {
+                        return word[0];
+                    }).join(',')
+                }),
+                method: 'POST',
+                url: $attrs.urlsSuggestedKeywords
+            }).
+            error(function (data, status, headers, config) {
+                $scope.items = [];
+                $scope.spinner = false;
+                $scope.error = true;
+            }).
+            success(function (data, status, headers, config) {
+                $scope.items = data;
+                $scope.spinner = false;
+                $scope.error = false;
+            });
 
-        return;
-    };
+            return;
+        };
 
-    $scope.get_more_suggestions = function (keywords, mode) {
-        jQuery('<form/>', {
-            action: $attrs.urlsAks,
-            target: '_blank',
-            method: 'POST'
-        }).append(
-            jQuery('<input/>', {
-                'name': 'keywords',
-                'type': 'hidden',
-                'val': keywords.join('\n')
-            })
-        ).append(
-            jQuery('<input/>', {
-                'name': 'mode',
-                'type': 'hidden',
-                'val': mode
-            })
-        ).submit();
-    };
+        $scope.get_more_suggestions = function (keywords, mode) {
+            jQuery('<form/>', {
+                action: $attrs.urlsKeywordSuggester,
+                target: '_blank',
+                method: 'POST'
+            }).append(
+                jQuery('<input/>', {
+                    'name': 'keywords',
+                    'type': 'hidden',
+                    'val': keywords.join('\n')
+                })
+            ).append(
+                jQuery('<input/>', {
+                    'name': 'mode',
+                    'type': 'hidden',
+                    'val': mode
+                })
+            ).submit();
+        };
 
-    $scope.get_words = function (words) {
-        return _.map(words, function (word) {
-            return word[0];
-        });
-    };
-});
+        $scope.get_words = function (words) {
+            return _.map(words, function (word) {
+                return word[0];
+            });
+        };
+    }
+]);
+
+application.controller('top_100_explorer', [
+    '$attrs',
+    '$http',
+    '$rootScope',
+    '$scope',
+    function ($attrs, $http, $rootScope, $scope) {
+        $scope.categories = jQuery.parseJSON($attrs.categories);
+        $scope.sections = jQuery.parseJSON($attrs.sections);
+        $scope.print_lengths = [
+            'Any',
+            'More Than',
+            'Less Than',
+            'Between',
+        ];
+        $scope.prices = [
+            'Any',
+            'More Than',
+            'Less Than',
+            'Between',
+        ];
+        $scope.publication_dates = [
+            'Any',
+            'More Than',
+            'Less Than',
+            'Between',
+        ];
+        $scope.amazon_best_sellers_ranks = [
+            'Any',
+            'More Than',
+            'Less Than',
+            'Between',
+        ];
+        $scope.review_averages = [
+            'Any',
+            'More Than',
+            'Less Than',
+            'Between',
+        ];
+        $scope.appearances = [
+            'Any',
+            'More Than',
+            'Less Than',
+            'Between',
+        ];
+        $scope.counts = _.range(100, 0, -10);
+
+        $scope.spinner = false;
+        $scope.error = false;
+        $scope.contents = {};
+
+        $scope.order_by = {
+            'books': ['rank', false],
+            'categories': ['frequency', true],
+        };
+
+        $scope.mode = 'table';
+
+        $scope.process = function (category_id) {
+            var fields = [];
+            jQuery.each({
+                amazon_best_sellers_rank_1: $scope.amazon_best_sellers_rank_1,
+                amazon_best_sellers_rank_2: $scope.amazon_best_sellers_rank_2,
+                amazon_best_sellers_rank_3: $scope.amazon_best_sellers_rank_3,
+                amazon_best_sellers_rank_4: $scope.amazon_best_sellers_rank_4,
+                category_id: category_id,
+                count: $scope.count,
+                print_length_1: $scope.print_length_1,
+                print_length_2: $scope.print_length_2,
+                print_length_3: $scope.print_length_3,
+                print_length_4: $scope.print_length_4,
+                appearance_1: $scope.appearance_1,
+                appearance_2: $scope.appearance_2,
+                appearance_3: $scope.appearance_3,
+                appearance_4: $scope.appearance_4,
+                price_1: $scope.price_1,
+                price_2: $scope.price_2,
+                price_3: $scope.price_3,
+                price_4: $scope.price_4,
+                publication_date_1: $scope.publication_date_1,
+                publication_date_2: $scope.publication_date_2,
+                publication_date_3: $scope.publication_date_3,
+                publication_date_4: $scope.publication_date_4,
+                review_average_1: $scope.review_average_1,
+                review_average_2: $scope.review_average_2,
+                review_average_3: $scope.review_average_3,
+                review_average_4: $scope.review_average_4,
+                section_id: $scope.section_id
+            }, function (name, val) {
+                fields.push(jQuery('<input/>', {
+                    'name': name,
+                    'type': 'hidden',
+                    'val': val
+                }))
+            });
+            jQuery('<form/>', {
+                target: '_blank',
+                method: 'POST'
+            }).append(fields).submit();
+        };
+
+        $scope.reset = function () {
+            $scope.category_id = $attrs.categoryId || $scope.categories[1][0];
+            $scope.section_id = $attrs.sectionId || $scope.sections[0][0];
+            $scope.print_length_1
+                = $attrs.printLength1 || $scope.print_lengths[0];
+            $scope.print_length_2 = parseInt($attrs.printLength2, 10) || 0;
+            $scope.print_length_3 = parseInt($attrs.printLength3, 10) || 0;
+            $scope.print_length_4 = parseInt($attrs.printLength4, 10) || 0;
+            $scope.price_1 = $attrs.price1 || $scope.prices[0];
+            $scope.price_2 = parseInt($attrs.price2, 10) || 0;
+            $scope.price_3 = parseInt($attrs.price3, 10) || 0;
+            $scope.price_4 = parseInt($attrs.price4, 10) || 0;
+            $scope.publication_date_1
+                = $attrs.publicationDate1 || $scope.publication_dates[0];
+            $scope.publication_date_2 = $attrs.publicationDate2 || '';
+            $scope.publication_date_3 = $attrs.publicationDate3 || '';
+            $scope.publication_date_4 = $attrs.publicationDate4 || '';
+            $scope.amazon_best_sellers_rank_1 =
+                $attrs.amazonBestSellersRank1
+                ||
+                $scope.amazon_best_sellers_ranks[0];
+            $scope.amazon_best_sellers_rank_2
+                = parseInt($attrs.amazonBestSellersRank2, 10) || 0;
+            $scope.amazon_best_sellers_rank_3
+                = parseInt($attrs.amazonBestSellersRank3, 10) || 0;
+            $scope.amazon_best_sellers_rank_4
+                = parseInt($attrs.amazonBestSellersRank4, 10) || 0;
+            $scope.review_average_1
+                = $attrs.reviewAverage1 || $scope.review_averages[0];
+            $scope.review_average_2 = parseInt($attrs.reviewAverage2, 10) || 0;
+            $scope.review_average_3 = parseInt($attrs.reviewAverage3, 10) || 0;
+            $scope.review_average_4 = parseInt($attrs.reviewAverage4, 10) || 0;
+            $scope.appearance_1 = $attrs.appearance1 || $scope.appearances[0];
+            $scope.appearance_2 = parseInt($attrs.appearance2, 10) || 1;
+            $scope.appearance_3 = parseInt($attrs.appearance3, 10) || 1;
+            $scope.appearance_4 = parseInt($attrs.appearance4, 10) || 1;
+            $scope.count = parseInt($attrs.count, 10) || $scope.counts[0];
+
+            jQuery('#category_id').select2('val', $scope.category_id);
+            jQuery('#section_id').select2('val', $scope.section_id);
+            jQuery('#print_length').select2('val', $scope.print_length_1);
+            jQuery('#price').select2('val', $scope.price_1);
+            jQuery(
+                '#publication_date'
+            ).select2('val', $scope.publication_date_1);
+            jQuery(
+                '#amazon_best_sellers_rank'
+            ).select2('val', $scope.amazon_best_sellers_rank_1);
+            jQuery('#review_average').select2('val', $scope.review_average_1);
+            jQuery('#appearance').select2('val', $scope.appearance_1);
+            jQuery('#count').select2('val', $scope.count);
+
+            $scope.submit();
+        };
+
+        $scope.submit = function () {
+            $scope.spinner = true;
+            $scope.error = false;
+            $scope.contents = {};
+            $http({
+                data: jQuery.param({
+                    amazon_best_sellers_rank_1:
+                    $scope.amazon_best_sellers_rank_1,
+                    amazon_best_sellers_rank_2:
+                    $scope.amazon_best_sellers_rank_2,
+                    amazon_best_sellers_rank_3:
+                    $scope.amazon_best_sellers_rank_3,
+                    amazon_best_sellers_rank_4:
+                    $scope.amazon_best_sellers_rank_4,
+                    category_id: $scope.category_id,
+                    count: $scope.count,
+                    print_length_1: $scope.print_length_1,
+                    print_length_2: $scope.print_length_2,
+                    print_length_3: $scope.print_length_3,
+                    print_length_4: $scope.print_length_4,
+                    appearance_1: $scope.appearance_1,
+                    appearance_2: $scope.appearance_2,
+                    appearance_3: $scope.appearance_3,
+                    appearance_4: $scope.appearance_4,
+                    price_1: $scope.price_1,
+                    price_2: $scope.price_2,
+                    price_3: $scope.price_3,
+                    price_4: $scope.price_4,
+                    publication_date_1: $scope.publication_date_1,
+                    publication_date_2: $scope.publication_date_2,
+                    publication_date_3: $scope.publication_date_3,
+                    publication_date_4: $scope.publication_date_4,
+                    review_average_1: $scope.review_average_1,
+                    review_average_2: $scope.review_average_2,
+                    review_average_3: $scope.review_average_3,
+                    review_average_4: $scope.review_average_4,
+                    section_id: $scope.section_id
+                }),
+                method: 'POST',
+                url: $attrs.url
+            }).
+            error(function (data, status, headers, config) {
+                $scope.spinner = false;
+                $scope.error = true;
+            }).
+            success(function (data, status, headers, config) {
+                $scope.spinner = false;
+                $scope.error = !data.books.length;
+                $scope.contents = data;
+                $scope.contents[
+                    'chunks'
+                ] = $scope.contents['books'].get_chunks(3);
+                for (var index in $scope.contents['categories']) {
+                    $scope.contents['categories'][index]['id'] = 0;
+                    if (
+                        $scope.contents['categories'][index]['title']
+                        ==
+                        'Paid in Kindle Store'
+                    ) {
+                        $scope.contents['categories'][index]['id'] = 1;
+                    } else {
+                        for (var i in $scope.categories) {
+                            if (
+                                $scope.contents['categories'][index]['title']
+                                ==
+                                $scope.categories[i][1]
+                            ) {
+                                $scope.contents[
+                                    'categories'
+                                ][index]['id'] = $scope.categories[i][0];
+                                break;
+                            }
+                        }
+                    }
+                }
+            });
+
+            return;
+        };
+
+        $scope.get_order_by = function (key) {
+            return $scope.order_by[key][1]?
+                'fa-sort-amount-desc': 'fa-sort-amount-asc';
+        };
+
+        $scope.set_order_by = function (key, value) {
+            if ($scope.order_by[key][0] == value) {
+                $scope.order_by[key][1] = !$scope.order_by[key][1];
+            } else {
+                $scope.order_by[key][0] = value;
+                $scope.order_by[key][1] = false;
+            }
+        };
+
+        $scope.reset();
+    }
+]);
 
 jQuery.ajaxSetup({
     cache: false,
@@ -1295,12 +1356,6 @@ jQuery(function () {
     jQuery('select.select2').select2({
         placeholder: 'Select an option...'
     });
-    if (jQuery.cookie('kns-qsg') != 'Yes') {
-        jQuery('[data-target="#kns-qsg"]').click();
-    }
-    if (jQuery.cookie('aks-qsg') != 'Yes') {
-        jQuery('[data-target="#aks-qsg"]').click();
-    }
     jQuery('.got-it').click(function () {
         jQuery.cookie(jQuery(this).parents('.modal').attr('id'), 'Yes');
     });
@@ -1312,6 +1367,12 @@ jQuery(function () {
             }).get()
         )
     );
+    if (jQuery.cookie('keyword_analyzer_multiple') != 'Yes') {
+        jQuery('[data-target="#modal-keyword-analyzer-multiple"]').click();
+    }
+    if (jQuery.cookie('keyword_suggester') != 'Yes') {
+        jQuery('[data-target="#modal-keyword-suggester"]').click();
+    }
     zclip();
     window.PixelAdmin.start([]);
 });

@@ -6,28 +6,30 @@
 {% block content %}
 <ul class="breadcrumb breadcrumb-page">
     <div class="breadcrumb-label text-light-gray">You are here:</div>
-    <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
-    <li class="active"><a href="{{ url('top_100_explorer') }}">{{ module }}</a></li>
+    <li><a href="{{ url('dashboard') }}">Home</a></li>
+    <li class="active">
+        <a href="{{ url('top_100_explorer') }}">{{ module }}</a>
+    </li>
 </ul>
 <div class="page-header">
     <div class="row">
         <h1 class="col-xs-12">
             {% include 'slots/feedback.twig' %}
             <div
-                class="btn btn-primary pull-right"
-                data-target="#cei"
+                class="btn pull-right"
+                data-target="#modal-top-100-explorer"
                 data-toggle="modal"
                 >
                 <span class="fa fa-fw fa-thumbs-up"></span>
                 Information
             </div>
-            <i class="fa fa-fw fa-key"></i> {{ module }}
+            <i class="fa fa-fw fa-key"></i>
+            {{ module }}
         </h1>
     </div>
 </div>
 {% include 'slots/alerts.twig' %}
 <div
-    ng-controller="ce"
     data-amazon_best_sellers_rank_1="{{ filters.amazon_best_sellers_rank_1 }}"
     data-amazon_best_sellers_rank_2="{{ filters.amazon_best_sellers_rank_2 }}"
     data-amazon_best_sellers_rank_3="{{ filters.amazon_best_sellers_rank_3 }}"
@@ -58,6 +60,7 @@
     data-section_id="{{ filters.section_id }}"
     data-sections="{{ sections|json_encode()|e('html') }}"
     data-url="{{ url('top_100_explorer_xhr') }}"
+    ng-controller="top_100_explorer"
     >
     <form name="form" ng-submit="submit()">
         <div class="panel">
@@ -127,7 +130,7 @@
                                 type="number"
                                 >
                             <div
-                                class="between"
+                                class="between row"
                                 ng-show="print_length_1 == 'Between'"
                                 >
                                 <div class="col-xs-6">
@@ -179,7 +182,7 @@
                                 >
                                 <div class="col-xs-6">
                                     <input
-                                        class="col-xs-12"
+                                        class="form-control"
                                         max="999999999"
                                         min="0"
                                         name="price_3"
@@ -189,7 +192,7 @@
                                 </div>
                                 <div class="col-xs-6">
                                     <input
-                                        class="col-xs-12"
+                                        class="form-control"
                                         max="999999999"
                                         min="0"
                                         name="price_4"
@@ -212,45 +215,45 @@
                                 ng-options="publication_date as publication_date for publication_date in publication_dates"
                                 ></select>
                             <div
-                                class="date input-append col-xs-12"
+                                class="col-xs-12 date input-group"
                                 ng-show="publication_date_1 == 'Less Than' || publication_date_1 == 'More Than'"
                                 >
                                 <input
-                                    class="col-xs-12"
+                                    class="form-control"
                                     datepicker
                                     name="publication_date_2"
                                     ng-model="publication_date_2"
                                     type="text"
                                     >
-                                <span class="add-on">
+                                <span class="input-group-addon">
                                     <i class="fa fa-fw fa-calendar"></i>
                                 </span>
                             </div>
                             <div
-                                class="between"
+                                class="between row"
                                 ng-show="publication_date_1 == 'Between'"
                                 >
-                                <div class="date input-append col-xs-6">
+                                <div class="col-xs-6 date input-group">
                                     <input
-                                        class="col-xs-12"
+                                        class="form-control"
                                         datepicker
                                         name="publication_date_3"
                                         ng-model="publication_date_3"
                                         type="text"
                                         >
-                                    <span class="add-on">
+                                    <span class="input-group-addon">
                                         <i class="fa fa-fw fa-calendar"></i>
                                     </span>
                                 </div>
-                                <div class="date input-append col-xs-6">
+                                <div class="col-xs-6 date input-group">
                                     <input
-                                        class="col-xs-12"
+                                        class="form-control"
                                         datepicker
                                         name="publication_date_4"
                                         ng-model="publication_date_4"
                                         type="text"
                                         >
-                                    <span class="add-on">
+                                    <span class="input-group-addon">
                                         <i class="fa fa-fw fa-calendar"></i>
                                     </span>
                                 </div>
@@ -271,7 +274,7 @@
                                 ng-options="amazon_best_sellers_rank as amazon_best_sellers_rank for amazon_best_sellers_rank in amazon_best_sellers_ranks"
                                 ></select>
                             <input
-                                class="col-xs-12"
+                                class="form-control"
                                 max="999999999"
                                 min="0"
                                 name="amazon_best_sellers_rank_2"
@@ -285,7 +288,7 @@
                                 >
                                 <div class="col-xs-6">
                                     <input
-                                        class="col-xs-12"
+                                        class="form-control"
                                         max="999999999"
                                         min="0"
                                         name="amazon_best_sellers_rank_3"
@@ -295,7 +298,7 @@
                                 </div>
                                 <div class="col-xs-6">
                                     <input
-                                        class="col-xs-12"
+                                        class="form-control"
                                         max="999999999"
                                         min="0"
                                         name="amazon_best_sellers_rank_4"
@@ -317,7 +320,7 @@
                                 ng-options="review_average as review_average for review_average in review_averages"
                                 ></select>
                             <input
-                                class="col-xs-12"
+                                class="form-control"
                                 max="5.0"
                                 min="0.0"
                                 name="review_average_2"
@@ -332,7 +335,7 @@
                                 >
                                 <div class="col-xs-6">
                                     <input
-                                        class="col-xs-12"
+                                        class="form-control"
                                         max="5.0"
                                         min="0.0"
                                         name="review_average_3"
@@ -342,7 +345,7 @@
                                 </div>
                                 <div class="col-xs-6">
                                     <input
-                                        class="col-xs-12"
+                                        class="form-control"
                                         max="5.0"
                                         min="0.0"
                                         name="review_average_4"
@@ -364,7 +367,7 @@
                                 ng-options="appearance as appearance for appearance in appearances"
                                 ></select>
                             <input
-                                class="col-xs-12"
+                                class="form-control"
                                 max="7"
                                 min="1"
                                 name="appearance_2"
@@ -379,7 +382,7 @@
                                 >
                                 <div class="col-xs-6">
                                     <input
-                                        class="col-xs-12"
+                                        class="form-control"
                                         max="7"
                                         min="1"
                                         name="appearance_3"
@@ -389,7 +392,7 @@
                                 </div>
                                 <div class="col-xs-6">
                                     <input
-                                        class="col-xs-12"
+                                        class="form-control"
                                         max="7"
                                         min="1"
                                         name="appearance_4"
@@ -401,36 +404,36 @@
                         </div>
                     </div>
                 </div>
-                <div class="text-right">
-                    <button
-                        class="btn btn-default pull-left"
-                        data-target="#filter_definitions"
-                        data-toggle="modal"
-                        type="button"
-                        >
-                        <span class="fa fa-fw fa-question-sign"></span>
-                        Filter Definitions
-                    </button>
-                    <button class="btn btn-success pull-right" type="submit">
-                        <span class="fa fa-fw fa-thumbs-up fa-lg"></span>
-                        Submit
-                    </button>
-                    <button
-                        class="btn btn-danger pull-right"
-                        ng-click="reset()"
-                        type="reset"
-                        >
-                        <span class="fa fa-fw fa-thumbs-down fa-lg"></span>
-                        Reset
-                    </button>
-                </div>
+            </div>
+            <div class="clearfix panel-footer text-right">
+                <button class="btn btn-success pull-right" type="submit">
+                    <span class="fa fa-lg fa-fw fa-thumbs-up"></span>
+                    Submit
+                </button>
+                <button
+                    class="btn btn-danger pull-right"
+                    ng-click="reset()"
+                    type="reset"
+                    >
+                    <span class="fa fa-lg fa-fw fa-thumbs-down"></span>
+                    Reset
+                </button>
+                <button
+                    class="btn btn-default pull-left"
+                    data-target="#modal-filter-definitions"
+                    data-toggle="modal"
+                    type="button"
+                    >
+                    <span class="fa fa-fw fa-question-circle"></span>
+                    Filter Definitions
+                </button>
             </div>
         </div>
     </form>
     <p class="text-center hide [! spinner == true && 'show' || 'hide' !]">
-        <span class="fa fa-fw fa-spinner fa-spin fa-2x"></span>
+        <span class="fa fa-2x fa-fw fa-spin fa-spinner"></span>
     </p>
-    <p class="alert alert-error" ng-show="error">
+    <p class="alert alert-dark alert-error" ng-show="error">
         Your query did not yield any results.
     </p>
     <div ng-show="contents.books.length">
@@ -439,11 +442,10 @@
             <strong>[! contents.date !].</strong>
         </p>
         <hr>
-        <div class="page-header">
-            <div class="row">
-                <h1 class="col-xs-12">At a Glance</h1>
-            </div>
+        <div class="page-header no-border-b no-padding-b">
+            <h1>At a Glance</h1>
         </div>
+        <hr>
         <div class="row">
             <div class="col-xs-4">
                 <table class="table table-bordered table-hover table-striped">
@@ -505,7 +507,7 @@
             </div>
             <div
                 class="col-xs-4"
-                data-urls-aks="{{ url('keyword_suggester') }}"
+                data-urls-keyword-suggester="{{ url('keyword_suggester') }}"
                 data-urls-suggested-keywords="{{ url('suggested_keywords') }}"
                 ng-controller="suggested_keywords"
                 >
@@ -520,7 +522,7 @@
                     </tr>
                     <tr ng-show="spinner">
                         <td>
-                            <span class="fa fa-fw fa-spinner fa-spin fa-2x">
+                            <span class="fa fa-2x fa-fw fa-spin fa-spinner">
                             </span>
                         </td>
                     </tr>
@@ -549,31 +551,30 @@
                 </table>
             </div>
         </div>
-        <hr>
         <div ng-controller="category">
-            <div class="page-header">
-                <div class="row">
-                    <button
-                        class="btn btn-default pull-right"
-                        ng-click="status = true"
-                        ng-show="!status"
-                        type="button"
-                        >
-                        <i class="fa fa-fw fa-plus-sign"></i>
-                        Show More
-                    </button>
-                    <button
-                        class="btn btn-default pull-right"
-                        ng-click="status = false"
-                        ng-show="status"
-                        type="button"
-                        >
-                        <i class="fa fa-fw fa-minus-sign"></i>
-                        Show Less
-                    </button>
-                    <h1 class="col-xs-12">Categories</h1>
-                </div>
+            <hr>
+            <div class="page-header no-border-b no-padding-b">
+                <button
+                    class="btn btn-default pull-right"
+                    ng-click="status = true"
+                    ng-show="!status"
+                    type="button"
+                    >
+                    <i class="fa fa-fw fa-plus-circle"></i>
+                    Show More
+                </button>
+                <button
+                    class="btn btn-default pull-right"
+                    ng-click="status = false"
+                    ng-show="status"
+                    type="button"
+                    >
+                    <i class="fa fa-fw fa-minus-circle"></i>
+                    Show Less
+                </button>
+                <h1>Categories</h1>
             </div>
+            <hr>
             <p>
                 Below you will find a breakdown of the exact categories
                 which contain books matching your criteria. Use this
@@ -587,11 +588,17 @@
                         <th
                             class="header [! order_by['categories'][0] == 'title' && get_order_by('categories') || '' !]"
                             ng-click="set_order_by('categories', 'title')"
-                            >Category</th>
+                            >
+                            <i class="fa fa-fw pull-right [! order_by['categories'][0] == 'title' && get_order_by('categories') || '' !]"></i>
+                            Category
+                            </th>
                         <th
-                            class="header right [! order_by['categories'][0] == 'frequency' && get_order_by('categories') || '' !]"
+                            class="header narrow text-right [! order_by['categories'][0] == 'frequency' && get_order_by('categories') || '' !]"
                             ng-click="set_order_by('categories', 'frequency')"
-                            >Frequency</th>
+                            >
+                            <i class="fa fa-fw pull-right [! order_by['categories'][0] == 'frequency' && get_order_by('categories') || '' !]"></i>
+                            Frequency
+                            </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -617,36 +624,31 @@
                 </tbody>
             </table>
         </div>
-        <hr>
-        <div class="page-header">
-            <div class="row">
-                <div
-                    class="btn-group pull-right"
-                    data-toggle="buttons-radio"
+        <div class="page-header no-border-b no-padding-b">
+            <div
+                class="btn-group pull-right"
+                data-toggle="buttons-radio"
+                >
+                <button
+                    class="btn btn-default"
+                    ng-class="mode == 'table' && 'active' || ''"
+                    ng-click="mode = 'table'"
+                    type="button"
                     >
-                    <button
-                        class="btn btn-default"
-                        ng-class="mode == 'table' && 'active' || ''"
-                        ng-click="mode = 'table'"
-                        type="button"
-                        >
-                        <i class="fa fa-fw fa-table"></i>
-                        Table
-                    </button>
-                    <button
-                        class="btn btn-default"
-                        ng-class="mode == 'tiles' && 'active' || ''"
-                        ng-click="mode = 'tiles'"
-                        type="button"
-                        >
-                        <i class="fa fa-fw fa-th-large"></i>
-                        Tiles
-                    </button>
-                </div>
-                <h1 class="col-xs-12">
-                    Books ([! contents.books.length|number:0 !])
-                </h1>
+                    <i class="fa fa-fw fa-table"></i>
+                    Table
+                </button>
+                <button
+                    class="btn btn-default"
+                    ng-class="mode == 'tiles' && 'active' || ''"
+                    ng-click="mode = 'tiles'"
+                    type="button"
+                    >
+                    <i class="fa fa-fw fa-th-large"></i>
+                    Tiles
+                </button>
             </div>
+            <h1>Books ([! contents.books.length|number:0 !])</h1>
         </div>
         <table
             class="table table-bordered table-hover table-striped"
@@ -656,40 +658,67 @@
                 <th
                     class="header narrow text-right [! order_by['books'][0] == 'rank' && get_order_by('books') || '' !]"
                     ng-click="set_order_by('books', 'rank')"
-                    >Rank</th>
+                    >
+                    <i class="fa fa-fw pull-right [! order_by['books'][0] == 'rank' && get_order_by('books') || '' !]"></i>
+                    Rank
+                </th>
                 <th
                     class="header [! order_by['books'][0] == 'title' && get_order_by('books') || '' !]"
                     ng-click="set_order_by('books', 'title')"
-                    >Title</th>
+                    >
+                    <i class="fa fa-fw pull-right [! order_by['books'][0] == 'title' && get_order_by('books') || '' !]"></i>
+                    Title
+                    </th>
                 <th
                     class="header narrow [! order_by['books'][0] == 'author_name' && get_order_by('books') || '' !]"
                     ng-click="set_order_by('books', 'author_name')"
-                    >Author</th>
+                    >
+                    <i class="fa fa-fw pull-right [! order_by['books'][0] == 'author_name' && get_order_by('books') || '' !]"></i>
+                    Author
+                    </th>
                 <th
                     class="header narrow text-right [! order_by['books'][0] == 'price' && get_order_by('books') || '' !]"
                     ng-click="set_order_by('books', 'price')"
-                    >Price ($)</th>
+                    >
+                    <i class="fa fa-fw pull-right [! order_by['books'][0] == 'price' && get_order_by('books') || '' !]"></i>
+                    Price ($)
+                    </th>
                 <th
                     class="header narrow text-right [! order_by['books'][0] == 'print_length' && get_order_by('books') || '' !]"
                     ng-click="set_order_by('books', 'print_length')"
-                    >Print Length</th>
+                    >
+                    <i class="fa fa-fw pull-right [! order_by['books'][0] == 'print_length' && get_order_by('books') || '' !]"></i>
+                    Print Length
+                    </th>
                 <th
                     class="header narrow text-right [! order_by['books'][0] == 'total_number_of_reviews' && get_order_by('books') || '' !]"
                     ng-click="set_order_by('books', 'total_number_of_reviews')"
-                    >Reviews</th>
+                    >
+                    <i class="fa fa-fw pull-right [! order_by['books'][0] == 'total_number_of_reviews' && get_order_by('books') || '' !]"></i>
+                    Reviews
+                    </th>
                 <th
                     class="header narrow text-right [! order_by['books'][0] == 'review_average' && get_order_by('books') || '' !]"
                     ng-click="set_order_by('books', 'review_average')"
-                    >Review Average</th>
+                    >
+                    <i class="fa fa-fw pull-right [! order_by['books'][0] == 'review_average' && get_order_by('books') || '' !]"></i>
+                    Review Average
+                    </th>
                 <th
                     class="header narrow text-right [! order_by['books'][0] == 'amazon_best_sellers_rank_' && get_order_by('books') || '' !]"
                     ng-click="set_order_by('books', 'amazon_best_sellers_rank_')"
-                    >Amazon BSR</th>
+                    >
+                    <i class="fa fa-fw pull-right [! order_by['books'][0] == 'amazon_best_sellers_rank_' && get_order_by('books') || '' !]"></i>
+                    Amazon BSR
+                    </th>
                 <th
                     class="header narrow text-right [! order_by['books'][0] == 'days_in_the_top_100' && get_order_by('books') || '' !]"
                     ng-click="set_order_by('books', 'days_in_the_top_100')"
                     ng-show="category == 1"
-                    >Days in the Top 100</th>
+                    >
+                    <i class="fa fa-fw pull-right [! order_by['books'][0] == 'days_in_the_top_100' && get_order_by('books') || '' !]"></i>
+                    Days in the Top 100
+                    </th>
             </thead>
             <tbody
                 ng-controller="book"

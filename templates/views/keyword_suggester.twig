@@ -1,27 +1,30 @@
 {% extends 'layout.twig' %}
 
-{% set module = 'Keywords Suggester' %}
-{% set nav = 'keywords_suggester' %}
+{% set module = 'Keyword Suggester' %}
+{% set nav = 'keyword_suggester' %}
 
 {% block content %}
 <ul class="breadcrumb breadcrumb-page">
     <div class="breadcrumb-label text-light-gray">You are here:</div>
-    <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
-    <li class="active"><a href="{{ url('keyword_suggester') }}">{{ module }}</a></li>
+    <li><a href="{{ url('dashboard') }}">Home</a></li>
+    <li class="active">
+        <a href="{{ url('keyword_suggester') }}">{{ module }}</a>
+    </li>
 </ul>
 <div class="page-header">
     <div class="row">
         <h1 class="col-xs-12">
             {% include 'slots/feedback.twig' %}
             <div
-                class="btn btn-primary pull-right qsg"
-                data-target="#aks-qsg"
+                class="btn pull-right"
+                data-target="#modal-keyword-suggester"
                 data-toggle="modal"
                 >
                 <span class="fa fa-fw fa-thumbs-up"></span>
                 Information
             </div>
-            <i class="fa fa-fw fa-list"></i> {{ module }}
+            <i class="fa fa-fw fa-list"></i>
+            {{ module }}
         </h1>
     </div>
 </div>
@@ -35,7 +38,6 @@
     use single word entries for this mode, and not long-tail keywords.
 </p>
 <div
-    id="aks"
     data-error-1-top="Error #1"
     data-error-1-middle="<p>Please enter a valid phrase.</p>"
     data-error-2-top="Error #2"
@@ -46,7 +48,7 @@
     data-mode="{{ mode }}"
     data-url-download="{{ url('keyword_suggester_download') }}"
     data-url-xhr="{{ url('keyword_suggester_xhr') }}"
-    ng-controller="aks"
+    ng-controller="keyword_suggester"
     >
     <div class="row">
         <div class="col-xs-6">
@@ -59,11 +61,12 @@
                                     Keywords
                                 </label>
                                 <textarea
-                                    class="form-control col-xs-12"
+                                    class="form-control"
                                     id="keywords"
                                     ng-focus="focus['keywords']"
                                     ng-model="keywords"
                                     ng-on-blur="focus['keywords'] = false"
+                                    rows="15"
                                     ></textarea>
                             </div>
                             <div class="form-group">
@@ -71,7 +74,7 @@
                                     Country
                                 </label>
                                 <select
-                                    class="form-control col-xs-12"
+                                    class="form-control"
                                     id="country"
                                     ng-model="country"
                                     >
@@ -87,18 +90,21 @@
                                     Mode
                                 </label>
                                 <select
-                                    class="form-control col-xs-12"
+                                    class="form-control"
                                     id="mode"
                                     ng-model="mode"
                                     ng-options="mode for mode in modes"
                                     ></select>
                             </div>
                             <div class="form-group">
-                                <label class="control-label" for="search_alias">
+                                <label
+                                    class="control-label"
+                                    for="search_alias"
+                                    >
                                     Department
                                 </label>
                                 <select
-                                    class="form-control col-xs-12"
+                                    class="form-control"
                                     id="search_alias"
                                     ng-model="search_alias"
                                     >
@@ -133,40 +139,40 @@
                                     <td>[! row !]</td>
                                     <td class="narrow text-center">
                                         <span
-                                            class="fa fa-fw fa-remove-sign"
+                                            class="fa fa-fw fa-times-circle"
                                             ng-show="statuses[row] == -1"
                                             ></span>
                                         <span
-                                            class="fa fa-fw fa-spinner fa-spin"
+                                            class="fa fa-fw fa-spin fa-spinner"
                                             ng-show="statuses[row] == 0"
                                             ></span>
                                         <span
-                                            class="fa fa-fw fa-ok-sign"
+                                            class="fa fa-fw fa-check-circle"
                                             ng-show="statuses[row] == 1"
                                             ></span>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
-                        <div class="text-right">
-                            <button
-                                class="btn btn-success pull-right"
-                                type="submit"
-                                ng-show="!spinner"
-                                >
-                                <span class="fa fa-fw fa-thumbs-up fa-lg"></span>
-                                Submit
-                            </button>
-                            <button
-                                class="btn btn-danger pull-right"
-                                ng-click="reset()"
-                                ng-show="spinner"
-                                type="button"
-                                >
-                                <span class="fa fa-fw fa-thumbs-down fa-lg"></span>
-                                Reset
-                            </button>
-                        </div>
+                    </div>
+                    <div class="clearfix panel-footer text-right">
+                        <button
+                            class="btn btn-success pull-right"
+                            ng-show="!spinner"
+                            type="submit"
+                            >
+                            <span class="fa fa-lg fa-fw fa-thumbs-up"></span>
+                            Submit
+                        </button>
+                        <button
+                            class="btn btn-danger pull-right"
+                            ng-click="reset()"
+                            ng-show="spinner"
+                            type="reset"
+                            >
+                            <span class="fa fa-lg fa-fw fa-thumbs-down"></span>
+                            Reset
+                        </button>
                     </div>
                 </div>
             </form>
@@ -182,34 +188,35 @@
                                 for="suggestions"
                                 >Suggestions</label>
                             <textarea
-                                class="form-control col-xs-12"
+                                class="form-control"
                                 id="suggestions"
                                 ng-focus="focus['suggestions']"
                                 ng-on-blur="focus['suggestions'] = false"
+                                rows="15"
                                 >[! suggestions.join('\n') !]</textarea>
                             <div class="help-block text-right">
                                 Total Number of Suggestions:
                                 <span>[! suggestions.length !]</span>
                             </div>
                         </div>
-                        <div class="text-right">
-                            <button
-                                class="btn btn-info copy-all"
-                                type="button"
-                                data-value="[! suggestions.join('\n') !]"
-                                >
-                                <span class="fa fa-fw fa-copy fa-lg"></span>
-                                Copy All
-                            </button>
-                            <button
-                                class="btn btn-success"
-                                type="button"
-                                ng-click="download()"
-                                >
-                                <span class="fa fa-fw fa-download fa-lg"></span>
-                                Download CSV
-                            </button>
-                        </div>
+                    </div>
+                    <div class="clearfix panel-footer text-right">
+                        <button
+                            class="btn btn-info copy-all pull-right"
+                            type="button"
+                            data-value="[! suggestions.join('\n') !]"
+                            >
+                            <span class="fa fa-lg fa-fw fa-copy"></span>
+                            Copy All
+                        </button>
+                        <button
+                            class="btn btn-success pull-right"
+                            type="button"
+                            ng-click="download()"
+                            >
+                            <span class="fa fa-lg fa-fw fa-download"></span>
+                            Download CSV
+                        </button>
                     </div>
                 </div>
             </form>

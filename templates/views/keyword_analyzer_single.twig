@@ -1,19 +1,23 @@
 {% extends 'layout.twig' %}
 
-{% set module = 'Single Keyword Analyzer' %}
+{% set module = 'Keywords Analyzers - Single' %}
 {% set nav = 'keyword_analyzers_single' %}
 
 {% block content %}
 <ul class="breadcrumb breadcrumb-page">
     <div class="breadcrumb-label text-light-gray">You are here:</div>
-    <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
-    <li class="active"><a href="{{ url('keyword_analyzer_single') }}">{{ module }}</a></li>
+    <li><a href="{{ url('dashboard') }}">Home</a></li>
+    <li><a href="{{ url('dashboard') }}">Keyword Analyzers</a></li>
+    <li class="active">
+        <a href="{{ url('keyword_analyzer_single') }}">Single</a>
+    </li>
 </ul>
 <div class="page-header">
     <div class="row">
         <h1 class="col-xs-12">
             {% include 'slots/feedback.twig' %}
-            <i class="fa fa-fw fa-tag"></i> {{ module }}
+            <i class="fa fa-fw fa-tag"></i>
+            {{ module }}
         </h1>
     </div>
 </div>
@@ -24,7 +28,7 @@
     data-error-1-top="Error #1"
     data-error-2-middle="<p>An unknown error has occurred. Please try again.</p>"
     data-error-2-top="Error #2"
-    data-url="{{ url('keyword_analyzer_xhr') }}"
+    data-url="{{ url('keyword_analyzer_single_xhr') }}"
     id="keyword_analyzer_single"
     ng-controller="keyword_analyzer_single"
     >
@@ -34,7 +38,7 @@
                 <div class="form-group">
                     <label class="control-label" for="keyword">Keyword</label>
                     <input
-                        class="col-xs-12 form-control"
+                        class="form-control"
                         id="keyword"
                         placeholder="Keyword"
                         type="text"
@@ -45,7 +49,7 @@
                 <div class="form-group">
                     <label class="control-label" for="country">Country</label>
                     <select
-                        class="col-xs-12 form-control"
+                        class="form-control"
                         id="country"
                         ng-model="country"
                         ng-options="country[0] as country[1] for country in countries"
@@ -230,7 +234,7 @@
                 </div>
                 <div
                     class="col-xs-4"
-                    data-urls-aks="{{ url('aks') }}"
+                    data-urls-keyword-suggester="{{ url('keyword_suggester') }}"
                     data-urls-suggested-keywords="{{ url('suggested_keywords') }}"
                     ng-controller="suggested_keywords"
                     >
@@ -268,35 +272,67 @@
                 <th
                     class="header [! order_by[0] == 'title[0]' && get_order_by() || '' !]"
                     ng-click="set_order_by('title[0]')"
-                    >Title</th>
+                    >
+                    <i class="fa fa-fw pull-right [! order_by[0] == 'title[0]' && get_order_by() || '' !]">
+                    </i>
+                    Title
+                    </th>
                 <th
                     class="narrow text-center header [! order_by[0] == 'title[1]' && get_order_by() || '' !]"
                     ng-click="set_order_by('title[1]')"
-                    >KW In Title</th>
+                    >
+                    <i class="fa fa-fw pull-right [! order_by[0] == 'title[1]' && get_order_by() || '' !]">
+                    </i>
+                    KW In Title
+                    </th>
                 <th
-                    class="narrow header [! order_by_[0] == 'author.name' && get_order_by_() || '' !]"
-                    ng-click="set_order_by_('author.name')"
-                    >Author</th>
+                    class="narrow header [! order_by[0] == 'author.name' && get_order_by() || '' !]"
+                    ng-click="set_order_by('author.name')"
+                    >
+                    <i class="fa fa-fw pull-right [! order_by[0] == 'author.name' && get_order_by() || '' !]">
+                    </i>
+                    Author
+                    </th>
                 <th
                     class="narrow text-right header [! order_by[0] == 'best_sellers_rank[0]' && get_order_by() || '' !]"
                     ng-click="set_order_by('best_sellers_rank[0]')"
-                    >Best Seller Rank</th>
+                    >
+                    <i class="fa fa-fw pull-right [! order_by[0] == 'best_sellers_rank[0]' && get_order_by() || '' !]">
+                    </i>
+                    Best Seller Rank
+                    </th>
                 <th
                     class="narrow text-right header [! order_by[0] == 'price[0]' && get_order_by() || '' !]"
                     ng-click="set_order_by('price[0]')"
-                    >Price ($)</th>
+                    >
+                    <i class="fa fa-fw pull-right [! order_by[0] == 'price[0]' && get_order_by() || '' !]">
+                    </i>
+                    Price ($)
+                    </th>
                 <th
                     class="narrow text-right header [! order_by[0] == 'pages[0]' && get_order_by() || '' !]"
                     ng-click="set_order_by('pages[0]')"
-                    >Print Length</th>
+                    >
+                    <i class="fa fa-fw pull-right [! order_by[0] == 'pages[0]' && get_order_by() || '' !]">
+                    </i>
+                    Print Length
+                    </th>
                 <th
                     class="narrow text-right header [! order_by[0] == 'publication_date' && get_order_by() || '' !]"
                     ng-click="set_order_by('publication_date')"
-                    >Date Published</th>
+                    >
+                    <i class="fa fa-fw pull-right [! order_by[0] == 'publication_date' && get_order_by() || '' !]">
+                    </i>
+                    Date Published
+                    </th>
                 <th
                     class="narrow text-right header [! order_by[0] == 'stars[0]' && get_order_by() || '' !]"
                     ng-click="set_order_by('stars[0]')"
-                    >Average Review</th>
+                    >
+                    <i class="fa fa-fw pull-right [! order_by[0] == 'stars[0]' && get_order_by() || '' !]">
+                    </i>
+                    Average Review
+                    </th>
             </tr>
             <tr ng-repeat="item in contents['items']|orderBy:order_by[0]:order_by[1]">
                 <td>

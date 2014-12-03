@@ -1311,10 +1311,10 @@ $application
 
 $application
 ->match(
-    '/keywords-suggester',
+    '/keyword-suggester',
     function (Request $request) use ($application) {
         return $application['twig']->render(
-            'views/keywords_suggester.twig',
+            'views/keyword_suggester.twig',
             array(
                 'countries' => array(
                     'com' => 'US',
@@ -1372,12 +1372,12 @@ $application
         );
     }
 )
-->bind('keywords_suggester')
+->bind('keyword_suggester')
 ->method('GET|POST');
 
 $application
 ->match(
-    '/keywords-suggester/download',
+    '/keyword-suggester/download',
     function (Request $request) use ($application) {
         $json = json_decode($request->get('json'), true);
         $json['suggestions'] = implode("\n", $json['suggestions']);
@@ -1386,7 +1386,7 @@ $application
         };
         return $application->stream($stream, 200, array(
             'Content-Disposition' => sprintf(
-                'attachment; filename="keywords_suggester.csv"'
+                'attachment; filename="keyword_suggester.csv"'
             ),
             'Content-Length' => strlen($json['suggestions']),
             'Content-Type' => 'text/csv',
@@ -1395,12 +1395,12 @@ $application
         ));
     }
 )
-->bind('keywords_suggester_download')
+->bind('keyword_suggester_download')
 ->method('POST');
 
 $application
 ->match(
-    '/keywords-suggester/xhr',
+    '/keyword-suggester/xhr',
     function (Request $request) use ($application, $variables) {
         if (is_development()) {
             $output = array('["1", "2", "3"]');
@@ -1408,7 +1408,7 @@ $application
             ignore_user_abort(true);
             set_time_limit(0);
             exec(sprintf(
-                '%s/python %s/scripts/keywords_suggester.py %s %s %s '.
+                '%s/python %s/scripts/keyword_suggester.py %s %s %s '.
                 '2>/dev/null',
                 $variables['virtualenv'],
                 __DIR__,
@@ -1420,7 +1420,7 @@ $application
         return new Response(implode('', $output));
     }
 )
-->bind('keywords_suggester_xhr')
+->bind('keyword_suggester_xhr')
 ->method('POST');
 
 $application

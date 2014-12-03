@@ -1,19 +1,23 @@
 {% extends 'layout.twig' %}
 
 {% set module = 'Author Analyzer' %}
-{% set nav = 'other_analyzers_author' %}
+{% set nav = 'author_analyzer' %}
 
 {% block content %}
 <ul class="breadcrumb breadcrumb-page">
     <div class="breadcrumb-label text-light-gray">You are here:</div>
-    <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
-    <li class="active"><a href="{{ url('author_analyzer') }}">{{ module }}</a></li>
+    <li><a href="{{ url('dashboard') }}">Home</a></li>
+    <li><a href="{{ url('dashboard') }}">Other Analyzers</a></li>
+    <li class="active">
+        <a href="{{ url('author_analyzer') }}">{{ module }}</a>
+    </li>
 </ul>
 <div class="page-header">
     <div class="row">
         <h1 class="col-xs-12">
             {% include 'slots/feedback.twig' %}
-            <i class="fa fa-fw fa-user"></i> {{ module }}
+            <i class="fa fa-fw fa-user"></i>
+            {{ module }}
         </h1>
     </div>
 </div>
@@ -33,7 +37,6 @@
     data-url-author="{{ url('author_analyzer_author') }}"
     data-url-authors="{{ url('author_analyzer_authors') }}"
     data-url="{{ url }}"
-    id="author_analyzer"
     ng-controller="author_analyzer"
     >
     <form name="form" ng-submit="get_authors()">
@@ -52,21 +55,21 @@
                         ng-model="keyword"
                         >
                 </div>
-                <div class="text-right">
-                    <button class="btn btn-danger" type="reset">
-                        <span class="fa fa-fw fa-thumbs-down fa-lg"></span>
-                        Reset
-                    </button>
-                    <button class="btn btn-success" type="submit">
-                        <span class="fa fa-fw fa-thumbs-up fa-lg"></span>
-                        Submit
-                    </button>
-                </div>
+            </div>
+            <div class="clearfix panel-footer text-right">
+                <button class="btn btn-success pull-right" type="submit">
+                    <span class="fa fa-lg fa-fw fa-thumbs-up"></span>
+                    Submit
+                </button>
+                <button class="btn btn-danger pull-right" type="reset">
+                    <span class="fa fa-lg fa-fw fa-thumbs-down"></span>
+                    Reset
+                </button>
             </div>
         </div>
     </form>
     <p class="text-center hide [! authors.spinner == true && 'show' || 'hide' !]">
-        <span class="fa fa-fw fa-spinner fa-spin fa-2x"></span>
+        <span class="fa fa-2x fa-fw fa-spin fa-spinner"></span>
     </p>
     <div class="hide [! authors.contents.length > 0 && 'show' || 'hide' !]">
         <table class="table table-bordered table-hover table-striped">
@@ -94,18 +97,18 @@
     </div>
     <div id="scroll">
         <p class="text-center hide [! author.spinner == true && 'show' || 'hide' !]">
-            <span class="fa fa-fw fa-spinner fa-spin fa-2x"></span>
+            <span class="fa fa-2x fa-fw fa-spin fa-spinner"></span>
         </p>
     </div>
     <div class="hide [! author.contents != '' && 'show' || 'hide' !]">
-        <div class="page-header">
-            <div class="row">
-                <h1 class="col-xs-12">[! author.contents.name !]</h1>
-            </div>
+        <hr>
+        <div class="page-header no-border-b no-margin-b">
+            <h1>[! author.contents.name !]</h1>
         </div>
+        <hr>
         <div class="clearfix">
             <img
-                class="img-polaroid pull-left"
+                class="author pull-left"
                 ng-show="author.contents.photo.length > 0"
                 src="[! author.contents.photo !]"
                 >
@@ -116,8 +119,9 @@
                 Estimated earnings per month:
                 $[! author.contents.earnings_per_month|number:2 !]
             </p>
+            {#
             <img
-                class="img-polaroid pull-left"
+                class="author pull-left"
                 ng-show="author.contents.twitter.profile_image_url.length > 0"
                 src="[! author.contents.twitter.profile_image_url !]"
                 >
@@ -131,10 +135,11 @@
             <p ng-show="author.contents.twitter.tweet.length > 0">
                 [! author.contents.twitter.tweet !]
             </p>
+            #}
         </div>
         <ul
             class="clearfix"
-            ng-show="author.contents.amazon_rank != {}"
+            ng-show="author.contents.amazon_rank"
             >
             <li ng-repeat="(key, value) in author.contents.amazon_rank">
                 <strong>#[! value|number:0 !]</strong> in [! key !]

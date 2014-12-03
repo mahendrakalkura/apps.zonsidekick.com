@@ -63,19 +63,19 @@ def get_author(url):
     selector = Selector(text=response.text)
     try:
         name = get_string(selector.xpath(
-            '//h1[@id="EntityName"]/b/text()'
+            '//div[@id="ap-author-name"]/h1/text()'
         ).extract()[0])
     except IndexError:
         pass
     try:
-        description = get_string(' '.join(selector.xpath(
-            '//div[contains(@class, "artistCentralBio")]/p/text()'
-        ).extract()).replace('Print this', ''))
+        description = get_string(''.join(selector.xpath(
+            '//div[@id="ap-bio"]/div/div/span/text()'
+        ).extract()))
     except IndexError:
         pass
     try:
         photo = get_string(selector.xpath(
-            '//img[@id="artistCentralGallery_image0"]/@src'
+            '//img[@class="ap-author-image"]/@src'
         ).extract()[0])
     except IndexError:
         pass
@@ -97,19 +97,19 @@ def get_author(url):
         pass
     try:
         twitter['screen_name'] = get_string(selector.xpath(
-            '//p[@class="tweetScreenName"]/a/text()'
-        ).extract()[0])
+            '//span[@class="ap-tweet-handle"]/text()'
+        ).extract()[0][1:])
     except IndexError:
         pass
     try:
         twitter['profile_image_url'] = get_string(selector.xpath(
-            '//a[@class="tweetProfileImage"]/img/@src'
+            '//img[@class="ap-tweet-image"]/@src'
         ).extract()[0])
     except IndexError:
         pass
     try:
         twitter['tweet'] = get_string(selector.xpath(
-            '//p[@class="tweetText"]'
+            '//div[@class="a-box-group ap-tweet-content"]/span'
         ).xpath('string()').extract()[0])
     except IndexError:
         pass

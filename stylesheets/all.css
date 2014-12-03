@@ -83,9 +83,33 @@ ul {
     padding-bottom: 1px;
 }
 
+.author {
+    margin-bottom: 18px;
+    margin-right: 18px;
+}
+
+.between {
+    margin: 10px -5px 0 -5px;
+}
+
+.between .col-xs-6 {
+    float: left !important;
+    padding: 0 5px;
+}
+
+.book {
+    margin-bottom: 18px;
+    margin-right: 18px;
+}
+
 .breadcrumb-label {
     margin-top: 0;
     padding-right: 10px;
+}
+
+.details p,
+.details ul {
+    margin: 0;
 }
 
 .media img {
@@ -114,20 +138,65 @@ ul {
     text-align: center;
 }
 
-.panel-body .btn + .btn {
-    margin-right: 20px;
+.panel-body {
+    padding-bottom: 5px;
 }
 
-.panel-footer {
-    padding-right: 10px;
+.panel-body .btn + .btn {
+    margin-right: 20px;
 }
 
 .panel-footer .btn + .btn {
     margin-right: 10px;
 }
 
+.popover-content input {
+    vertical-align: top;
+}
+
+.select2-search:after {
+    content: none;
+}
+
+.select2 + .form-control,
+.select2 + .input-group {
+    margin-top: 10px;
+}
+
+.table > tbody + tbody {
+    border-top-width: 0;
+}
+
 .table > thead > tr > th {
     border-bottom-width: 1px;
+}
+
+.table hr {
+    margin: 10px 0;
+}
+
+.table .header {
+    cursor: pointer;
+}
+
+.table .table {
+    margin-bottom: 0;
+}
+
+.table .header.fa-sort-amount-asc,
+.table .header.fa-sort-amount-desc {
+    padding-right: 21px;
+}
+
+.table .header.fa-sort-amount-asc:before,
+.table .header.fa-sort-amount-desc:before {
+    content: none;
+}
+
+.table .header.fa-sort-amount-asc i,
+.table .header.fa-sort-amount-desc i {
+    margin-top: 3px;
+    margin-right: -17px;
 }
 
 .theme-default #main-navbar .navbar-header {

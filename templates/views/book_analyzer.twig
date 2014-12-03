@@ -1,19 +1,23 @@
 {% extends 'layout.twig' %}
 
 {% set module = 'Book Analyzer' %}
-{% set nav = 'other_analyzers_book' %}
+{% set nav = 'book_analyzer' %}
 
 {% block content %}
 <ul class="breadcrumb breadcrumb-page">
     <div class="breadcrumb-label text-light-gray">You are here:</div>
-    <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
-    <li class="active"><a href="{{ url('book_analyzer') }}">{{ module }}</a></li>
+    <li><a href="{{ url('dashboard') }}">Home</a></li>
+    <li><a href="{{ url('dashboard') }}">Other Analyzers</a></li>
+    <li class="active">
+        <a href="{{ url('book_analyzer') }}">{{ module }}</a>
+    </li>
 </ul>
 <div class="page-header">
     <div class="row">
         <h1 class="col-xs-12">
             {% include 'slots/feedback.twig' %}
-            <i class="fa fa-fw fa-book"></i> {{ module }}
+            <i class="fa fa-fw fa-book"></i>
+            {{ module }}
         </h1>
     </div>
 </div>
@@ -35,8 +39,7 @@
     data-url-books="{{ url('book_analyzer_books') }}"
     data-url-items="{{ url('book_analyzer_items') }}"
     data-url="{{ url }}"
-    id="ba"
-    ng-controller="ba"
+    ng-controller="book_analyzer"
     >
     <form name="form" ng-submit="get_books()">
         <div class="panel">
@@ -54,21 +57,21 @@
                         ng-model="keyword"
                         >
                 </div>
-                <div class="text-right">
-                    <button class="btn btn-danger" type="reset">
-                        <span class="fa fa-fw fa-thumbs-down fa-lg"></span>
-                        Reset
-                    </button>
-                    <button class="btn btn-success" type="submit">
-                        <span class="fa fa-fw fa-thumbs-up fa-lg"></span>
-                        Submit
-                    </button>
-                </div>
+            </div>
+            <div class="clearfix panel-footer text-right">
+                <button class="btn btn-success pull-right" type="submit">
+                    <span class="fa fa-lg fa-fw fa-thumbs-up"></span>
+                    Submit
+                </button>
+                <button class="btn btn-danger pull-right" type="reset">
+                    <span class="fa fa-lg fa-fw fa-thumbs-down"></span>
+                    Reset
+                </button>
             </div>
         </div>
     </form>
     <p class="text-center hide [! books.spinner == true && 'show' || 'hide' !]">
-        <span class="fa fa-fw fa-spinner fa-spin fa-2x"></span>
+        <span class="fa fa-2x fa-fw fa-spin fa-spinner"></span>
     </p>
     <div class="hide [! books.contents.length > 0 && 'show' || 'hide' !]">
         <table class="table table-bordered table-hover table-striped">
@@ -81,15 +84,12 @@
                 <tr ng-repeat="book in books.contents">
                     <td class="book-cover-image">
                         <img
-                            class="img-polaroid"
                             ng-show="book.book_cover_image.length > 0"
                             src="[! book.book_cover_image !]"
                             >
                     </td>
                     <td>
-                        <a ng-click="get_book(book.url)">
-                            [! book.title !]
-                        </a>
+                        <a ng-click="get_book(book.url)">[! book.title !]</a>
                     </td>
                     <td class="narrow">
                         <a
@@ -104,18 +104,18 @@
     </div>
     <div id="scroll">
         <p class="text-center hide [! book.spinner == true && 'show' || 'hide' !]">
-            <span class="fa fa-fw fa-spinner fa-spin fa-2x"></span>
+            <span class="fa fa-2x fa-fw fa-spin fa-spinner"></span>
         </p>
     </div>
     <div class="hide [! book.contents != '' && 'show' || 'hide' !]">
-        <div class="page-header">
-            <div class="row">
-                <h1 class="col-xs-12">[! book.contents.title !]</h1>
-            </div>
+        <hr>
+        <div class="page-header no-border-b no-margin-b">
+            <h1>[! book.contents.title !]</h1>
         </div>
+        <hr>
         <div class="clearfix">
             <img
-                class="img-polaroid pull-right"
+                class="book pull-right"
                 ng-show="book.contents.book_cover_image.length > 0"
                 src="[! book.contents.book_cover_image !]"
                 width="200"
@@ -168,11 +168,10 @@
             </div>
         </div>
         <hr>
-        <div class="page-header">
-            <div class="row">
-                <h1>How does it rank?</h1>
-            </div>
+        <div class="page-header no-border-b no-margin-b">
+            <h1>How does it rank?</h1>
         </div>
+        <hr>
         <p>
             Enter up to five target keywords for this book. Press "Go" and
             we'll show you how this book ranks for them and where it could
@@ -196,20 +195,20 @@
                             rows="5"
                             ></textarea>
                     </div>
-                    <div class="text-right">
-                        <button class="btn btn-success" type="submit">
-                            <span class="fa fa-fw fa-thumbs-up fa-lg"></span>
-                            Go
-                        </button>
-                    </div>
+                </div>
+                <div class="clearfix panel-footer text-right">
+                    <button class="btn btn-success pull-right" type="submit">
+                        <span class="fa fa-lg fa-fw fa-thumbs-up"></span>
+                        Go
+                    </button>
                 </div>
             </div>
         </form>
     </div>
     <p class="text-center hide [! items.spinner == true && 'show' || 'hide' !]">
-        <span class="fa fa-fw fa-spinner fa-spin fa-2x"></span>
+        <span class="fa fa-2x fa-fw fa-spin fa-spinner"></span>
     </p>
-    <div class="col-xs-12 hide [! items.contents != '' && 'show' || 'hide' !]">
+    <div class="hide [! items.contents != '' && 'show' || 'hide' !]">
         <table class="table table-bordered table-hover table-striped">
             <thead>
                 <tr>

@@ -152,7 +152,7 @@
                             <a href="{{ url('keyword_suggester') }}">
                                 <span class="menu-icon fa fa-fw fa-list">
                                 </span>
-                                <span class="mm-text">Keywords Suggester</span>
+                                <span class="mm-text">Keyword Suggester</span>
                             </a>
                         </li>
                         <li class="mm-dropdown">
@@ -169,7 +169,7 @@
                                     </a>
                                 </li>
                                 <li class="{% if nav == 'keyword_analyzers_single' %}active{% endif %}">
-                                    <a href="{{ url('keyword_analyzer_multiple_single') }}">
+                                    <a href="{{ url('keyword_analyzer_single') }}">
                                         <i class="menu-icon fa fa-fw fa-tag">
                                         </i>
                                         <span class="mm-text">Single</span>
@@ -184,7 +184,7 @@
                                 <span class="mm-text">Other Analyzers</span>
                             </a>
                             <ul>
-                                <li class="{% if nav == 'other_analyzers_author' %}active{% endif %}">
+                                <li class="{% if nav == 'author_analyzer' %}active{% endif %}">
                                     <a href="{{ url('author_analyzer') }}">
                                         <i class="menu-icon fa fa-fw fa-user">
                                         </i>
@@ -193,7 +193,7 @@
                                         </span>
                                     </a>
                                 </li>
-                                <li class="{% if nav == 'other_analyzers_book' %}active{% endif %}">
+                                <li class="{% if nav == 'book_analyzer' %}active{% endif %}">
                                     <a href="{{ url('book_analyzer') }}">
                                         <i class="menu-icon fa fa-fw fa-book">
                                         </i>
@@ -216,7 +216,7 @@
                                 <span class="mm-text">Others</span>
                             </a>
                             <ul>
-                                <li class="{% if nav == 'others_logos' %}active{% endif %}">
+                                <li class="{% if nav == 'logos' %}active{% endif %}">
                                     <a href="{{ url('logos') }}">
                                         <i class="menu-icon fa fa-fw fa-picture-o">
                                         </i>
@@ -224,7 +224,7 @@
                                     </a>
                                 </li>
                                 {% if has_statistics %}
-                                    <li class="{% if nav == 'others_statistics' %}active{% endif %}">
+                                    <li class="{% if nav == 'statistics' %}active{% endif %}">
                                         <a href="{{ url('statistics') }}">
                                             <i class="menu-icon fa fa-fw fa-bar-chart-o">
                                             </i>

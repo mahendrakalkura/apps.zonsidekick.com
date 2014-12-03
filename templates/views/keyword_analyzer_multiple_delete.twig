@@ -1,19 +1,24 @@
 {% extends 'layout.twig' %}
 
-{% set module = 'Multiple Keywords Analyzer - Delete' %}
+{% set module = 'Keywords Analyzers - Multiple - Delete' %}
 {% set nav = 'keywords_analyzers_multiple' %}
 
 {% block content %}
 <ul class="breadcrumb breadcrumb-page">
     <div class="breadcrumb-label text-light-gray">You are here:</div>
-    <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
-    <li class="active"><a href="{{ url('keyword_analyzer_multiple_single') }}">{{ module }}</a></li>
+    <li><a href="{{ url('dashboard') }}">Home</a></li>
+    <li><a href="{{ url('dashboard') }}">Keyword Analyzers</a></li>
+    <li><a href="{{ url('keyword_analyzer_multiple') }}">Multiple</a></li>
+    <li class="active">
+        <a href="{{ url('keyword_analyzer_multiple') }}">Delete</a>
+    </li>
 </ul>
 <div class="page-header">
     <div class="row">
         <h1 class="col-xs-12">
             {% include 'slots/feedback.twig' %}
-            <i class="fa fa-fw fa-tags"></i> {{ module }}
+            <i class="fa fa-fw fa-tags"></i>
+            {{ module }}
         </h1>
     </div>
 </div>
@@ -25,15 +30,17 @@
     method="POST"
     >
     <div class="panel">
-        <div class="panel-body text-right">
+        <div class="clearfix no-border-t panel-footer text-right">
             <button class="btn btn-success pull-right" type="submit">
-                <span class="fa fa-lg fa-fw fa-thumbs-up"></span> Yes
+                <span class="fa fa-lg fa-fw fa-thumbs-up"></span>
+                Yes
             </button>
             <a
                 class="btn btn-danger pull-right"
                 href="{{ url('keyword_analyzer_multiple') }}"
                 >
-                <span class="fa fa-lg fa-fw fa-thumbs-down"></span> No
+                <span class="fa fa-lg fa-fw fa-thumbs-down"></span>
+                No
             </a>
         </div>
     </div>

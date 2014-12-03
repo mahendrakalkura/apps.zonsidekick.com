@@ -1,27 +1,24 @@
 {% extends 'layout.twig' %}
 
-{% set module = 'Multiple Keywords Analyzer - Add' %}
+{% set module = 'Keywords Analyzers - Multiple - Add' %}
 {% set nav = 'keywords_analyzers_multiple' %}
 
 {% block content %}
 <ul class="breadcrumb breadcrumb-page">
     <div class="breadcrumb-label text-light-gray">You are here:</div>
-    <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
-    <li class="active"><a href="{{ url('keyword_analyzer_multiple_single') }}">{{ module }}</a></li>
+    <li><a href="{{ url('dashboard') }}">Home</a></li>
+    <li><a href="{{ url('dashboard') }}">Keyword Analyzers</a></li>
+    <li><a href="{{ url('keyword_analyzer_multiple') }}">Multiple</a></li>
+    <li class="active">
+        <a href="{{ url('keyword_analyzer_multiple_add') }}">Add</a>
+    </li>
 </ul>
 <div class="page-header">
     <div class="row">
         <h1 class="col-xs-12">
             {% include 'slots/feedback.twig' %}
-            <div
-                class="btn btn-primary pull-right qsg"
-                data-target="#kns-qsg"
-                data-toggle="modal"
-                >
-                <span class="fa fa-fw fa-thumbs-up"></span>
-                Information
-            </div>
-            <i class="fa fa-fw fa-tag"></i> {{ module }}
+            <i class="fa fa-fw fa-tags"></i>
+            {{ module }}
         </h1>
     </div>
 </div>
@@ -87,11 +84,11 @@
                     ng-click="submit($event)"
                     type="submit"
                     >
-                    <span class="fa fa-fw fa-lg fa-thumbs-up"></span>
+                    <span class="fa fa-lg fa-fw fa-thumbs-up"></span>
                     Submit
                 </button>
                 <button class="btn btn-danger pull-right" type="reset">
-                    <span class="fa fa-fw fa-lg fa-thumbs-down"></span>
+                    <span class="fa fa-lg fa-fw fa-thumbs-down"></span>
                     Reset
                 </button>
             </div>

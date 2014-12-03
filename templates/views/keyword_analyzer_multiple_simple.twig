@@ -1,27 +1,24 @@
 {% extends 'layout.twig' %}
 
-{% set module = 'Multiple Keywords Analyzer- View' %}
+{% set module = 'Keywords Analyzers - Multiple - Simple' %}
 {% set nav = 'keywords_analyzers_multiple' %}
 
 {% block content %}
 <ul class="breadcrumb breadcrumb-page">
     <div class="breadcrumb-label text-light-gray">You are here:</div>
-    <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
-    <li class="active"><a href="{{ url('keyword_analyzer_multiple_single') }}">{{ module }}</a></li>
+    <li><a href="{{ url('dashboard') }}">Home</a></li>
+    <li><a href="{{ url('dashboard') }}">Keyword Analyzers</a></li>
+    <li><a href="{{ url('keyword_analyzer_multiple') }}">Multiple</a></li>
+    <li class="active">
+        <a href="{{ url('keyword_analyzer_multiple') }}">Simple</a>
+    </li>
 </ul>
 <div class="page-header">
     <div class="row">
         <h1 class="col-xs-12">
             {% include 'slots/feedback.twig' %}
-            <div
-                class="btn btn-primary pull-right qsg"
-                data-target="#kns-qsg"
-                data-toggle="modal"
-                >
-                <span class="fa fa-fw fa-thumbs-up"></span>
-                Information
-            </div>
-            <i class="fa fa-fw fa-tag"></i> {{ module }}
+            <i class="fa fa-fw fa-tag"></i>
+            {{ module }}
         </h1>
     </div>
 </div>
@@ -37,7 +34,7 @@
     data-url-xhr="{{ url('keyword_analyzer_multiple_xhr', {'id': request.id}) }}"
     ng-controller="keyword_analyzer_multiple_simple"
     >
-    <div class="text-center">
+    <div class="clearfix no-padding-t panel-padding text-center">
         <a
             class="btn btn-info"
             data-toggle="tooltip"
@@ -45,9 +42,10 @@
             target="_blank"
             title="For very large reports this page could take a little while to complete. Please be patient."
             >
-            <span class="fa fa-fw fa-bar-chart fa-lg"></span>
+            <span class="fa fa-lg fa-fw fa-bar-chart-o"></span>
             View Detailed Report
         </a>
+        &nbsp;
         <a
             class="btn btn-info"
             href="{{ url('keyword_analyzer_multiple_csv', {'id': request.id}) }}"
@@ -57,6 +55,7 @@
             <span class="fa fa-fw fa-download fa-lg"></span>
             Download CSV
         </a>
+        &nbsp;
         <div
             class="btn btn-info"
             title="Detailed Report - Brandable"
@@ -67,19 +66,22 @@
             Download PDF
             <div class="hide">
                 <img
-                    class="img-polaroid popover-pdf"
+                    class="popover-pdf"
                     data-url="{{ url('keyword_analyzer_multiple_pdf', {'id': request.id}) }}"
                     src="{{ app.request.getSchemeAndHttpHost() }}{{ app.request.baseUrl }}/images/logo.png"
+                    width="100"
                     >
                 {% for logo in logos %}
                     <img
                         class="img-polaroid popover-pdf"
                         data-url="{{ url('keyword_analyzer_multiple_pdf', {'id': request.id, 'logo': logo.file_name|e('url')}) }}"
-                        src="{{ url('logos_view', {'file_name': logo.file_name}) }}"
+                        src="{{ url('logos_preview', {'file_name': logo.file_name}) }}"
+                        width="100"
                         >
                 {% endfor %}
             </div>
         </div>
+        &nbsp;
         <div
             class="btn btn-info"
             data-url="{{ url('keyword_analyzer_multiple_email', {'id': request.id}) }}"
@@ -93,19 +95,16 @@
                 <form class="form-inline">
                     <input type="text" value="{{ email }}">
                     <button
-                        class="btn btn-success popover-email"
+                        class="btn btn-success btn-sm popover-email"
                         type="button"
                         >Submit</button>
-                    <button class="btn btn-warning" type="reset">
-                        Reset
-                    </button>
                 </form>
             </div>
         </div>
     </div>
     <hr ng-show="is_finished()">
     <div
-        data-urls-aks="{{ url('aks') }}"
+        data-urls-keyword-suggester="{{ url('keyword_suggester') }}"
         data-urls-suggested-keywords="{{ url('suggested_keywords') }}"
         ng-controller="suggested_keywords"
         ng-show="is_finished() && $parent.get_words().length > 0"
@@ -146,13 +145,13 @@
                     </label>
                     <div class="controls">
                         <select
-                            class="select2 col-xs-12"
+                            class="select2"
                             id="books"
                             ng-model="books_1"
                             ng-options="book as book for book in books"
                             ></select>
                         <input
-                            class="col-xs-12"
+                            class="form-control"
                             max="999999999"
                             min="0"
                             ng-model="books_2"
@@ -170,13 +169,13 @@
                     </label>
                     <div class="controls">
                         <select
-                            class="select2 col-xs-12"
+                            class="select2"
                             id="amazon_best_sellers_ranks"
                             ng-model="amazon_best_sellers_rank_1"
                             ng-options="amazon_best_sellers_rank as amazon_best_sellers_rank for amazon_best_sellers_rank in amazon_best_sellers_ranks"
                             ></select>
                         <input
-                            class="col-xs-12"
+                            class="form-control"
                             max="999999999"
                             min="0"
                             ng-model="amazon_best_sellers_rank_2"
@@ -193,7 +192,7 @@
                     </label>
                     <div class="controls">
                         <select
-                            class="select2 col-xs-12"
+                            class="select2"
                             id="count"
                             ng-model="count"
                             ng-options="count as count for count in counts"
@@ -206,7 +205,7 @@
     <div class="row">
         <div class="col-xs-12">
             <hr ng-show="is_finished()">
-            <p class="center">Mouse over headers for explanation</p>
+            <p class="text-center">Mouse over headers for explanation</p>
             <table class="table table-bordered table-hover table-striped">
                 <thead>
                     <tr>
@@ -214,42 +213,52 @@
                             class="header [! order_by[0] == 'string' && get_order_by() || '' !]"
                             ng-click="set_order_by('string')"
                             >
+                            <i class="fa fa-fw pull-right [! order_by[0] == 'string' && get_order_by() || '' !]">
+                            </i>
                             <span
                                 title="Keyword"
                                 data-toggle="tooltip"
                                 >Keyword</span>
                         </th>
                         <th
-                            class="center header [! order_by[0] == 'contents.buyer_behavior[0]' && get_order_by() || '' !]"
+                            class="text-center header [! order_by[0] == 'contents.buyer_behavior[0]' && get_order_by() || '' !]"
                             ng-click="set_order_by('contents.buyer_behavior[0]')"
                             >
+                            <i class="fa fa-fw pull-right [! order_by[0] == 'contents.buyer_behavior[0]' && get_order_by() || '' !]">
+                            </i>
                             <span
                                 title="The likelyhood of customers purchasing multiple books within this keyword"
                                 data-toggle="tooltip"
                                 >Buyer Behavior</span>
                         </th>
                         <th
-                            class="center header [! order_by[0] == 'contents.competition[0]' && get_order_by() || '' !]"
+                            class="text-center header [! order_by[0] == 'contents.competition[0]' && get_order_by() || '' !]"
                             ng-click="set_order_by('contents.competition[0]')"
                             >
+                            <i class="fa fa-fw pull-right [! order_by[0] == 'contents.competition[0]' && get_order_by() || '' !]">
+                            </i>
                             <span
                                 title="Ranked by our advanced market analysis algorithm."
                                 data-toggle="tooltip"
                                 >Competition</span>
                         </th>
                         <th
-                            class="center header [! order_by[0] == 'contents.optimization[0]' && get_order_by() || '' !]"
+                            class="text-center header [! order_by[0] == 'contents.optimization[0]' && get_order_by() || '' !]"
                             ng-click="set_order_by('contents.optimization[0]')"
                             >
+                            <i class="fa fa-fw pull-right [! order_by[0] == 'contents.optimization[0]' && get_order_by() || '' !]">
+                            </i>
                             <span
                                 title="Optimal keyword density and other factors on Titles and Descriptions (top competitors)."
                                 data-toggle="tooltip"
                                 >Optimization</span>
                         </th>
                         <th
-                            class="center header [! order_by[0] == 'contents.popularity[0]' && get_order_by() || '' !]"
+                            class="text-center header [! order_by[0] == 'contents.popularity[0]' && get_order_by() || '' !]"
                             ng-click="set_order_by('contents.popularity[0]')"
                             >
+                            <i class="fa fa-fw pull-right [! order_by[0] == 'contents.popularity[0]' && get_order_by() || '' !]">
+                            </i>
                             <span
                                 title="Popularity"
                                 data-toggle="tooltip"
@@ -259,6 +268,8 @@
                             class="right header [! order_by[0] == 'contents.spend[0][0]' && get_order_by() || '' !]"
                             ng-click="set_order_by('contents.spend[0][0]')"
                             >
+                            <i class="fa fa-fw pull-right [! order_by[0] == 'contents.spend[0][0]' && get_order_by() || '' !]">
+                            </i>
                             <span
                                 title="The estimated amount of money spent on products in the top 48 most relevant listings (per day; paid books only)."
                                 data-toggle="tooltip"
@@ -268,6 +279,8 @@
                             class="right header [! order_by[0] == 'contents.average_price[0]' && get_order_by() || '' !]"
                             ng-click="set_order_by('contents.average_price[0]')"
                             >
+                            <i class="fa fa-fw pull-right [! order_by[0] == 'contents.average_price[0]' && get_order_by() || '' !]">
+                            </i>
                             <span
                                 title="The average price of products in the top 48 most relevant listings (paid books only)."
                                 data-toggle="tooltip"
@@ -277,6 +290,8 @@
                             class="right header [! order_by[0] == 'contents.average_length[0]' && get_order_by() || '' !]"
                             ng-click="set_order_by('contents.average_length[0]')"
                             >
+                            <i class="fa fa-fw pull-right [! order_by[0] == 'contents.average_length[0]' && get_order_by() || '' !]">
+                            </i>
                             <span
                                 title="The average length of products in the top 48 most relevant listings (pages; paid books only)."
                                 data-toggle="tooltip"
@@ -286,6 +301,8 @@
                             class="right header [! order_by[0] == 'contents.score[0]' && get_order_by() || '' !]"
                             ng-click="set_order_by('contents.score[0]')"
                             >
+                            <i class="fa fa-fw pull-right [! order_by[0] == 'contents.score[0]' && get_order_by() || '' !]">
+                            </i>
                             <span
                                 title="Ranked by our advanced market analysis algorithm."
                                 data-toggle="tooltip"
@@ -308,7 +325,7 @@
                                 >Hide Details</a>
                             [! keyword['string'] !]
                         </td>
-                        <td class="center">
+                        <td class="text-center">
                             <span ng-switch on="keyword['contents']">
                                 <span
                                     class="fa fa-fw fa-spinner fa-spin"
@@ -329,7 +346,7 @@
                                 </span>
                             </span>
                         </td>
-                        <td class="center">
+                        <td class="text-center">
                             <span ng-switch on="keyword['contents']">
                                 <span
                                     class="fa fa-fw fa-spinner fa-spin"
@@ -350,7 +367,7 @@
                                 </span>
                             </span>
                         </td>
-                        <td class="center">
+                        <td class="text-center">
                             <span ng-switch on="keyword['contents']">
                                 <span
                                     class="fa fa-fw fa-spinner fa-spin"
@@ -371,7 +388,7 @@
                                 </span>
                             </span>
                         </td>
-                        <td class="center">
+                        <td class="text-center">
                             <span ng-switch on="keyword['contents']">
                                 <span
                                     class="fa fa-fw fa-spinner fa-spin"
@@ -510,45 +527,78 @@
                             </div>
                             <p
                                 ng-show="keyword.contents.words && keyword.contents.words.length > 0"
-                                data-urls-aks="{{ url('aks') }}"
+                                data-urls-keyword-suggester="{{ url('keyword_suggester') }}"
                                 ng-controller="suggested_keywords"
                                 >
                                 <a ng-click="get_more_suggestions(get_words(keyword.contents.words), 'Combine')">Get more suggestions</a>
                             </p>
+                            <hr>
                             <table class="table table-bordered table-hover table-striped">
                                 <tr>
                                     <th
                                         class="header [! order_by_[0] == 'title[0]' && get_order_by_() || '' !]"
                                         ng-click="set_order_by_('title[0]')"
-                                        >Title</th>
+                                        >
+                                        <i class="fa fa-fw pull-right [! order_by_[0] == 'title[0]' && get_order_by_() || '' !]">
+                                        </i>
+                                        Title
+                                        </th>
                                     <th
                                         class="narrow text-center header [! order_by_[0] == 'title[1]' && get_order_by_() || '' !]"
                                         ng-click="set_order_by_('title[1]')"
-                                        >KW In Title</th>
+                                        >
+                                        <i class="fa fa-fw pull-right [! order_by_[0] == 'title[1]' && get_order_by_() || '' !]">
+                                        </i>
+                                        KW In Title
+                                        </th>
                                     <th
                                         class="narrow header [! order_by_[0] == 'author.name' && get_order_by_() || '' !]"
                                         ng-click="set_order_by_('author.name')"
-                                        >Author</th>
+                                        >
+                                        <i class="fa fa-fw pull-right [! order_by_[0] == 'author.name' && get_order_by_() || '' !]">
+                                        </i>
+                                        Author
+                                        </th>
                                     <th
                                         class="narrow text-right header [! order_by_[0] == 'best_sellers_rank[0]' && get_order_by_() || '' !]"
                                         ng-click="set_order_by_('best_sellers_rank[0]')"
-                                        >Best Seller Rank</th>
+                                        >
+                                        <i class="fa fa-fw pull-right [! order_by_[0] == 'best_sellers_rank[0]' && get_order_by_() || '' !]">
+                                        </i>
+                                        Best Seller Rank
+                                        </th>
                                     <th
                                         class="narrow text-right header [! order_by_[0] == 'price[0]' && get_order_by_() || '' !]"
                                         ng-click="set_order_by_('price[0]')"
-                                        >Price ({{ currency }})</th>
+                                        >
+                                        <i class="fa fa-fw pull-right [! order_by_[0] == 'price[0]' && get_order_by_() || '' !]">
+                                        </i>
+                                        Price ({{ currency }})
+                                        </th>
                                     <th
                                         class="narrow text-right header [! order_by_[0] == 'pages[0]' && get_order_by_() || '' !]"
                                         ng-click="set_order_by_('pages[0]')"
-                                        >Print Length</th>
+                                        >
+                                        <i class="fa fa-fw pull-right [! order_by_[0] == 'pages[0]' && get_order_by_() || '' !]">
+                                        </i>
+                                        Print Length
+                                        </th>
                                     <th
                                         class="narrow text-right header [! order_by_[0] == 'publication_date' && get_order_by_() || '' !]"
                                         ng-click="set_order_by_('publication_date')"
-                                        >Date Published</th>
+                                        >
+                                        <i class="fa fa-fw pull-right [! order_by_[0] == 'publication_date' && get_order_by_() || '' !]">
+                                        </i>
+                                        Date Published
+                                        </th>
                                     <th
                                         class="narrow text-right header [! order_by_[0] == 'stars[0]' && get_order_by_() || '' !]"
                                         ng-click="set_order_by_('stars[0]')"
-                                        >Average Review</th>
+                                        >
+                                        <i class="fa fa-fw pull-right [! order_by_[0] == 'stars[0]' && get_order_by_() || '' !]">
+                                        </i>
+                                        Average Review
+                                        </th>
                                 </tr>
                                 <tr ng-repeat="item in keyword['contents']['items']|orderBy:order_by_[0]:order_by_[1]">
                                     <td>

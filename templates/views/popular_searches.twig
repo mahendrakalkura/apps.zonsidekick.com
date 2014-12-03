@@ -6,8 +6,10 @@
 {% block content %}
 <ul class="breadcrumb breadcrumb-page">
     <div class="breadcrumb-label text-light-gray">You are here:</div>
-    <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
-    <li class="active"><a href="{{ url('popular_searches') }}">Popular Searches</a></li>
+    <li><a href="{{ url('dashboard') }}">Home</a></li>
+    <li class="active">
+        <a href="{{ url('popular_searches') }}">Popular Searches</a>
+    </li>
 </ul>
 <div class="page-header">
     <div class="row">
@@ -15,7 +17,7 @@
             {% include 'slots/feedback.twig' %}
             <a
                 class="btn pull-right"
-                data-target="#popular_searches_how_do_we_know_this"
+                data-target="#modal-popular-searches-how-do-we-know-this"
                 data-toggle="modal"
                 id="how-do-we-know-this"
                 >
@@ -24,13 +26,14 @@
             </a>
             <div
                 class="btn pull-right"
-                data-target="#popular_searches"
+                data-target="#modal-popular-searches"
                 data-toggle="modal"
                 >
                 <span class="fa fa-fw fa-info-circle"></span>
                 Information
             </div>
-            <i class="fa fa-fw fa-search page-header-icon"></i> {{ module }}
+            <i class="fa fa-fw fa-search page-header-icon"></i>
+            {{ module }}
         </h1>
     </div>
 </div>

@@ -6,14 +6,16 @@
 {% block content %}
 <ul class="breadcrumb breadcrumb-page">
     <div class="breadcrumb-label text-light-gray">You are here:</div>
-    <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
-    <li class="active"><a href="{{ url('logos') }}">{{ module }}</a></li>
+    <li><a href="{{ url('dashboard') }}">Home</a></li>
+    <li><a href="{{ url('logos') }}">Logos</a></li>
+    <li class="active"><a href="{{ url('logos_add') }}">Add</a></li>
 </ul>
 <div class="page-header">
     <div class="row">
         <h1 class="col-xs-12">
             {% include 'slots/feedback.twig' %}
-            <i class="fa fa-fw fa-picture-o"></i> {{ module }}
+            <i class="fa fa-fw fa-picture-o"></i>
+            {{ module }}
         </h1>
     </div>
 </div>
@@ -32,9 +34,9 @@
                 {% if error is defined and error %}
                     <div class="help-block">{{ error }}</div>
                 {% endif %}
-            </div>
-            <div class="help-block">
-                Note: Logos must be uploaded in .png format.
+                <div class="help-block">
+                    Note: Logos must be uploaded in .png format.
+                </div>
             </div>
         </div>
         <div class="clearfix panel-footer text-right">
