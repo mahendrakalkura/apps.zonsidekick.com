@@ -1,75 +1,76 @@
 {% extends 'layout.twig' %}
 
 {% set module = 'Logos - Overview' %}
-{% set nav = 'others' %}
+{% set nav = 'others_logos' %}
 
 {% block content %}
-<div id="logos_overview">
-    <div class="row-fluid">
-        <div class="span12">
-            <div class="page-header">
-                {% include 'slots/feedback.twig' %}
-                <h1>{{ module }}</h1>
-            </div>
-            <div class="form-actions">
-                <a class="btn btn-success" href="{{ url('logos_add') }}">
-                    <span class="icon-plus-sign icon-large"></span>
-                    Add
-                </a>
-            </div>
-            <p>
-                To add custom logos to your detailed analysis reports, simply
-                press "Add" to upload your desired logo. You may store as many
-                logos as you'd like here and they will be available for
-                selection when you choose to download reports.
-            </p>
-            {% include 'slots/alerts.twig' %}
-            {% if logos %}
-                <table class="table table-hover table-striped tablesorter">
-                    <thead>
-                        <tr>
-                            <th>Logo</th>
-                            <th class="right small">Dimensions</th>
-                            <th class="center small">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for logo in logos %}
-                            <tr>
-                                <td>
-                                    <span class="pull-right">
-                                        {{ logo.file_name }}
-                                    </span>
-                                    <img
-                                        class="img-polaroid"
-                                        src="{{ url('logos_view', {'file_name': logo.file_name}) }}"
-                                        >
-                                </td>
-                                <td class="right small">{{ logo.dimensions }}</td>
-                                <td class="center small">
-                                    <a
-                                        class="icon-download icon-large"
-                                        href="{{ url('logos_download', {'file_name': logo.file_name}) }}"
-                                        title="Download"
-                                        data-toggle="tooltip"
-                                        ></a>
-                                    <a
-                                        class="icon-remove-sign icon-large"
-                                        href="{{ url('logos_delete', {'file_name': logo.file_name}) }}"
-                                        title="Delete"
-                                        data-toggle="tooltip"
-                                        ></a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            {% else %}
-                <div class="alert alert-error">
-                    You have not uploaded any logos yet.
-                </div>
-            {% endif %}
-        </div>
+<ul class="breadcrumb breadcrumb-page">
+    <div class="breadcrumb-label text-light-gray">You are here:</div>
+    <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
+    <li class="active"><a href="{{ url('logos_overview') }}">{{ module }}</a></li>
+</ul>
+<div class="page-header">
+    <div class="row">
+        <h1 class="col-xs-12">
+            {% include 'slots/feedback.twig' %}
+            <a class="btn btn-success pull-right" href="{{ url('logos_add') }}">
+                <span class="icon-plus-sign icon-large"></span>
+                Add
+            </a>
+            <i class="fa fa-fw fa-picture-o"></i> {{ module }}
+        </h1>
     </div>
 </div>
+{% include 'slots/alerts.twig' %}
+<p>
+    To add custom logos to your detailed analysis reports, simply press "Add"
+    to upload your desired logo. You may store as many logos as you'd like here
+    and they will be available for selection when you choose to download
+    reports.
+</p>
+{% if logos %}
+    <table class="table table-bordered table-hover table-striped tablesorter">
+        <thead>
+            <tr>
+                <th>Logo</th>
+                <th class="narrow text-right">Dimensions</th>
+                <th class="narrow text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for logo in logos %}
+                <tr>
+                    <td>
+                        <span class="pull-right">
+                            {{ logo.file_name }}
+                        </span>
+                        <img
+                            class="img-polaroid"
+                            src="{{ url('logos_view', {'file_name': logo.file_name}) }}"
+                            >
+                    </td>
+                    <td class="narrow text-right">{{ logo.dimensions }}</td>
+                    <td class="narrow text-center">
+                        <a
+                            class="icon-download icon-large"
+                            href="{{ url('logos_download', {'file_name': logo.file_name}) }}"
+                            title="Download"
+                            data-toggle="tooltip"
+                            >D</a>
+                        <a
+                            class="icon-remove-sign icon-large"
+                            href="{{ url('logos_delete', {'file_name': logo.file_name}) }}"
+                            title="Delete"
+                            data-toggle="tooltip"
+                            >D</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="alert alert-danger alert-dark">
+        You have not uploaded any logos yet.
+    </div>
+{% endif %}
 {% endblock %}

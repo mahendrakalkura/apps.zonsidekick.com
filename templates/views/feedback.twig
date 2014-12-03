@@ -1,60 +1,64 @@
 {% extends 'layout.twig' %}
 
 {% set module = 'Feedback' %}
-{% set nav = 'others' %}
+{% set nav = '' %}
 
 {% block content %}
-<div id="logos_add">
-    <div class="row-fluid">
-        <div class="span12">
-            <div class="page-header">
-                <h1>{{ module }}</h1>
-            </div>
-            <p>Share your thoughts, we're always listening!</p>
-            <p>
-                <strong>Note:</strong>
-                For support related issues please use
-                <a
-                    href="https://perfectsidekick.zendesk.com/hc/en-us/categories/200005513-Zon-Sidekick"
-                    target="_blank"
-                    >
-                    this
-                </a>
-                instead.
-            </p>
-            {% include 'slots/alerts.twig' %}
-            <form
-                accept-charset="UTF-8"
-                action="{{ url('feedback') }}"
-                class="form-horizontal"
-                method="POST"
-                >
-                <div class="control-group {{ error is defined and error? 'error': '' }}">
-                    <label class="control-label" for="body">Message</label>
-                    <div class="controls">
-                        <textarea
-                            class="span12"
-                            id="body"
-                            name="body"
-                            rows="15"
-                            ></textarea>
-                        {% if error is defined and error %}
-                            <span class="help-inline">{{ error }}</span>
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="form-actions">
-                    <button class="btn btn-success" type="submit">
-                        <span class="icon-info-sign icon-large"></span>
-                        Submit
-                    </button>
-                    <button class="btn btn-danger" type="reset">
-                        <span class="icon-trash icon-large"></span>
-                        Reset
-                    </button>
-                </div>
-            </form>
-        </div>
+<ul class="breadcrumb breadcrumb-page">
+    <div class="breadcrumb-label text-light-gray">You are here:</div>
+    <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
+    <li class="active"><a href="{{ url('feedback') }}">Feedback</a></li>
+</ul>
+<div class="page-header">
+    <div class="row">
+        <h1 class="col-xs-12">
+            <i class="fa fa-fw fa-comments"></i> {{ module }}
+        </h1>
     </div>
 </div>
+{% include 'slots/alerts.twig' %}
+<p>Share your thoughts, we're always listening!</p>
+<p>
+    <strong>Note:</strong>
+    For support related issues please use
+    <a
+        href="https://perfectsidekick.zendesk.com/hc/en-us/categories/200005513-Zon-Sidekick"
+        target="_blank"
+        >
+        this
+    </a>
+    instead.
+</p>
+<form
+    accept-charset="UTF-8"
+    action="{{ url('feedback') }}"
+    method="POST"
+    >
+    <div class="panel">
+        <div class="panel-body">
+            <div class="form-group {{ error is defined and error? 'has-error': '' }}">
+                <label class="control-label" for="body">Message</label>
+                <textarea
+                    class="form-control"
+                    id="body"
+                    name="body"
+                    rows="15"
+                    ></textarea>
+                {% if error is defined and error %}
+                    <div class="help-block">{{ error }}</div>
+                {% endif %}
+            </div>
+            <div class="text-right">
+                <button class="btn btn-danger" type="reset">
+                    <span class="icon-trash icon-large"></span>
+                    Reset
+                </button>
+                <button class="btn btn-success" type="submit">
+                    <span class="icon-info-sign icon-large"></span>
+                    Submit
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
 {% endblock %}

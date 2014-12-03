@@ -1,16 +1,25 @@
 {% extends 'layout.twig' %}
 
-{% set module = '403 - Forbidden' %}
-{% set nav = 'others' %}
+{% set module = '403' %}
+{% set nav = '' %}
 
 {% block content %}
-<div id="statistics">
-    <div class="row-fluid">
-        <div class="span12">
-            <div class="alert alert-error">
-                You do not have access to any tools.
-            </div>
-        </div>
+<ul class="breadcrumb breadcrumb-page">
+    <div class="breadcrumb-label text-light-gray">You are here:</div>
+    <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
+    <li class="active"><a href="{{ url('403') }}">403</a></li>
+</ul>
+<div class="page-header">
+    <div class="row">
+        <h1 class="col-xs-12">
+            {% include 'slots/feedback.twig' %}
+            <i class="fa fa-exclamation-triangle page-header-icon"></i>
+            {{ module }}
+        </h1>
     </div>
+</div>
+{% include 'slots/alerts.twig' %}
+<div class="alert alert-dark alert-danger">
+    You do not have access to any tools.
 </div>
 {% endblock %}

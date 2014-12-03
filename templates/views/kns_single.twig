@@ -1,9 +1,23 @@
 {% extends 'layout.twig' %}
 
 {% set module = 'Single Keyword Analyzer' %}
-{% set nav = 'kns' %}
+{% set nav = 'keyword_analyzers_single' %}
 
 {% block content %}
+<ul class="breadcrumb breadcrumb-page">
+    <div class="breadcrumb-label text-light-gray">You are here:</div>
+    <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
+    <li class="active"><a href="{{ url('kns_single') }}">{{ module }}</a></li>
+</ul>
+<div class="page-header">
+    <div class="row">
+        <h1 class="col-xs-12">
+            {% include 'slots/feedback.twig' %}
+            <i class="fa fa-fw fa-tag"></i> {{ module }}
+        </h1>
+    </div>
+</div>
+{% include 'slots/alerts.twig' %}
 <div
     data-countries="{{ countries|json_encode }}"
     data-error-1-middle="<p>Please enter a valid keyword.</p>"
@@ -14,21 +28,9 @@
     id="kns_single"
     ng-controller="kns_single"
     >
-    <div class="row-fluid">
-        <div class="span12">
-            <div class="page-header">
-                {% include 'slots/feedback.twig' %}
-                <h1>{{ module }}</h1>
-            </div>
-        </div>
-    </div>
-    <div class="row-fluid">
-        <div class="span12">
-            <form
-                class="form-horizontal"
-                name="form"
-                ng-submit="process()"
-                >
+    <form name="form" ng-submit="process()">
+        <div class="panel">
+            <div class="panel-body">
                 <div class="control-group">
                     <label class="control-label" for="keyword">Keyword</label>
                     <div class="controls">

@@ -1,9 +1,31 @@
 {% extends 'layout.twig' %}
 
 {% set module = 'Top 100 Explorer' %}
-{% set nav = 'ce' %}
+{% set nav = 'top_100_explorer' %}
 
 {% block content %}
+<ul class="breadcrumb breadcrumb-page">
+    <div class="breadcrumb-label text-light-gray">You are here:</div>
+    <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
+    <li class="active"><a href="{{ url('ce_overview') }}">{{ module }}</a></li>
+</ul>
+<div class="page-header">
+    <div class="row">
+        <h1 class="col-xs-12">
+            {% include 'slots/feedback.twig' %}
+            <div
+                class="btn btn-primary pull-right"
+                data-target="#cei"
+                data-toggle="modal"
+                >
+                <span class="icon-info-sign"></span>
+                Information
+            </div>
+            <i class="fa fa-fw fa-key"></i> {{ module }}
+        </h1>
+    </div>
+</div>
+{% include 'slots/alerts.twig' %}
 <div
     ng-controller="ce"
     data-amazon_best_sellers_rank_1="{{ filters.amazon_best_sellers_rank_1 }}"
@@ -37,379 +59,349 @@
     data-sections="{{ sections|json_encode()|e('html') }}"
     data-url="{{ url('ce_xhr') }}"
     >
-    <div class="row-fluid">
-        <div class="span12">
-            <div class="page-header">
-                {% include 'slots/feedback.twig' %}
-                <div
-                    class="btn btn-primary pull-right"
-                    data-target="#cei"
-                    data-toggle="modal"
-                    >
-                    <span class="icon-info-sign"></span>
-                    Information
-                </div>
-                <h1>{{ module }}</h1>
-            </div>
-            <form class="form-horizontal" name="form" ng-submit="submit()">
-                <div class="row-fluid">
-                    <div class="span12">
-                        <div class="control-group">
+    <form name="form" ng-submit="submit()">
+        <div class="panel">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="form-group">
                             <label class="control-label" for="category_id">
                                 Category
                             </label>
-                            <div class="controls">
-                                <select
-                                    class="select2 span12"
-                                    id="category_id"
-                                    name="category_id"
-                                    ng-model="category_id"
-                                    ng-options="category[0] as category[1] for category in categories"
-                                    ></select>
-                            </div>
+                            <select
+                                class="form-control select2"
+                                id="category_id"
+                                name="category_id"
+                                ng-model="category_id"
+                                ng-options="category[0] as category[1] for category in categories"
+                                ></select>
                         </div>
                     </div>
                 </div>
-                <div class="row-fluid">
-                    <div class="span4">
-                        <div class="control-group">
+                <div class="row">
+                    <div class="col-xs-4">
+                        <div class="form-group">
                             <label class="control-label" for="section_id">
                                 Section
                             </label>
-                            <div class="controls">
-                                <select
-                                    class="select2 span12"
-                                    id="section_id"
-                                    name="section_id"
-                                    ng-model="section_id"
-                                    ng-options="section[0] as section[1] for section in sections"
-                                    ></select>
-                            </div>
+                            <select
+                                class="form-control select2"
+                                id="section_id"
+                                name="section_id"
+                                ng-model="section_id"
+                                ng-options="section[0] as section[1] for section in sections"
+                                ></select>
                         </div>
-                        <div class="control-group">
+                        <div class="form-group">
                             <label class="control-label" for="count">
                                 Top
                             </label>
-                            <div class="controls">
-                                <select
-                                    class="select2 span12"
-                                    id="count"
-                                    name="count"
-                                    ng-model="count"
-                                    ng-options="count as count for count in counts"
-                                    ></select>
-                            </div>
+                            <select
+                                class="form-control select2"
+                                id="count"
+                                name="count"
+                                ng-model="count"
+                                ng-options="count as count for count in counts"
+                                ></select>
                         </div>
                     </div>
-                    <div class="span4">
-                        <div class="control-group">
+                    <div class="col-xs-4">
+                        <div class="form-group">
                             <label class="control-label" for="print_length">
                                 Print Length
                             </label>
-                            <div class="controls">
-                                <select
-                                    class="select2 span12"
-                                    id="print_length"
-                                    name="print_length_1"
-                                    ng-model="print_length_1"
-                                    ng-options="print_length as print_length for print_length in print_lengths"
-                                    ></select>
-                                <input
-                                    class="span12"
-                                    max="999999999"
-                                    min="0"
-                                    name="print_length_2"
-                                    ng-model="print_length_2"
-                                    ng-show="print_length_1 == 'Less Than' || print_length_1 == 'More Than'"
-                                    type="number"
-                                    >
-                                <div
-                                    class="between"
-                                    ng-show="print_length_1 == 'Between'"
-                                    >
-                                    <div class="span6">
-                                        <input
-                                            class="span12"
-                                            max="999999999"
-                                            min="0"
-                                            name="print_length_3"
-                                            ng-model="print_length_3"
-                                            type="number"
-                                            >
-                                    </div>
-                                    <div class="span6">
-                                        <input
-                                            class="span12"
-                                            max="999999999"
-                                            min="0"
-                                            name="print_length_4"
-                                            ng-model="print_length_4"
-                                            type="number"
-                                            >
-                                    </div>
+                            <select
+                                class="form-control select2"
+                                id="print_length"
+                                name="print_length_1"
+                                ng-model="print_length_1"
+                                ng-options="print_length as print_length for print_length in print_lengths"
+                                ></select>
+                            <input
+                                class="form-control"
+                                max="999999999"
+                                min="0"
+                                name="print_length_2"
+                                ng-model="print_length_2"
+                                ng-show="print_length_1 == 'Less Than' || print_length_1 == 'More Than'"
+                                type="number"
+                                >
+                            <div
+                                class="between"
+                                ng-show="print_length_1 == 'Between'"
+                                >
+                                <div class="col-xs-6">
+                                    <input
+                                        class="form-control"
+                                        max="999999999"
+                                        min="0"
+                                        name="print_length_3"
+                                        ng-model="print_length_3"
+                                        type="number"
+                                        >
+                                </div>
+                                <div class="col-xs-6">
+                                    <input
+                                        class="form-control"
+                                        max="999999999"
+                                        min="0"
+                                        name="print_length_4"
+                                        ng-model="print_length_4"
+                                        type="number"
+                                        >
                                 </div>
                             </div>
                         </div>
-                        <div class="control-group">
+                        <div class="form-group">
                             <label class="control-label" for="price">
                                 Price
                             </label>
-                            <div class="controls">
-                                <select
-                                    class="select2 span12"
-                                    id="price"
-                                    name="price_1"
-                                    ng-model="price_1"
-                                    ng-options="price as price for price in prices"
-                                    ></select>
-                                <input
-                                    class="span12"
-                                    max="999999999"
-                                    min="0"
-                                    name="price_2"
-                                    ng-model="price_2"
-                                    ng-show="price_1 == 'Less Than' || price_1 == 'More Than'"
-                                    step="any"
-                                    type="number"
-                                    >
-                                <div
-                                    class="between"
-                                    ng-show="price_1 == 'Between'"
-                                    >
-                                    <div class="span6">
-                                        <input
-                                            class="span12"
-                                            max="999999999"
-                                            min="0"
-                                            name="price_3"
-                                            ng-model="price_3"
-                                            type="number"
-                                            >
-                                    </div>
-                                    <div class="span6">
-                                        <input
-                                            class="span12"
-                                            max="999999999"
-                                            min="0"
-                                            name="price_4"
-                                            ng-model="price_4"
-                                            type="number"
-                                            >
-                                    </div>
+                            <select
+                                class="form-control select2"
+                                id="price"
+                                name="price_1"
+                                ng-model="price_1"
+                                ng-options="price as price for price in prices"
+                                ></select>
+                            <input
+                                class="form-control"
+                                max="999999999"
+                                min="0"
+                                name="price_2"
+                                ng-model="price_2"
+                                ng-show="price_1 == 'Less Than' || price_1 == 'More Than'"
+                                step="any"
+                                type="number"
+                                >
+                            <div
+                                class="between"
+                                ng-show="price_1 == 'Between'"
+                                >
+                                <div class="col-xs-6">
+                                    <input
+                                        class="col-xs-12"
+                                        max="999999999"
+                                        min="0"
+                                        name="price_3"
+                                        ng-model="price_3"
+                                        type="number"
+                                        >
+                                </div>
+                                <div class="col-xs-6">
+                                    <input
+                                        class="col-xs-12"
+                                        max="999999999"
+                                        min="0"
+                                        name="price_4"
+                                        ng-model="price_4"
+                                        type="number"
+                                        >
                                 </div>
                             </div>
                         </div>
-                        <div class="control-group">
+                        <div class="form-group">
                             <label
                                 class="control-label"
                                 for="publication_date"
                                 >Publication Date</label>
-                            <div class="controls">
-                                <select
-                                    class="select2 span12"
-                                    id="publication_date"
-                                    name="publication_date_1"
-                                    ng-model="publication_date_1"
-                                    ng-options="publication_date as publication_date for publication_date in publication_dates"
-                                    ></select>
-                                <div
-                                    class="date input-append span12"
-                                    ng-show="publication_date_1 == 'Less Than' || publication_date_1 == 'More Than'"
+                            <select
+                                class="form-control select2"
+                                id="publication_date"
+                                name="publication_date_1"
+                                ng-model="publication_date_1"
+                                ng-options="publication_date as publication_date for publication_date in publication_dates"
+                                ></select>
+                            <div
+                                class="date input-append span12"
+                                ng-show="publication_date_1 == 'Less Than' || publication_date_1 == 'More Than'"
+                                >
+                                <input
+                                    class="span12"
+                                    datepicker
+                                    name="publication_date_2"
+                                    ng-model="publication_date_2"
+                                    type="text"
                                     >
+                                <span class="add-on">
+                                    <i class="icon-calendar"></i>
+                                </span>
+                            </div>
+                            <div
+                                class="between"
+                                ng-show="publication_date_1 == 'Between'"
+                                >
+                                <div class="date input-append span6">
                                     <input
                                         class="span12"
                                         datepicker
-                                        name="publication_date_2"
-                                        ng-model="publication_date_2"
+                                        name="publication_date_3"
+                                        ng-model="publication_date_3"
                                         type="text"
                                         >
                                     <span class="add-on">
                                         <i class="icon-calendar"></i>
                                     </span>
                                 </div>
-                                <div
-                                    class="between"
-                                    ng-show="publication_date_1 == 'Between'"
-                                    >
-                                    <div class="date input-append span6">
-                                        <input
-                                            class="span12"
-                                            datepicker
-                                            name="publication_date_3"
-                                            ng-model="publication_date_3"
-                                            type="text"
-                                            >
-                                        <span class="add-on">
-                                            <i class="icon-calendar"></i>
-                                        </span>
-                                    </div>
-                                    <div class="date input-append span6">
-                                        <input
-                                            class="span12"
-                                            datepicker
-                                            name="publication_date_4"
-                                            ng-model="publication_date_4"
-                                            type="text"
-                                            >
-                                        <span class="add-on">
-                                            <i class="icon-calendar"></i>
-                                        </span>
-                                    </div>
+                                <div class="date input-append span6">
+                                    <input
+                                        class="span12"
+                                        datepicker
+                                        name="publication_date_4"
+                                        ng-model="publication_date_4"
+                                        type="text"
+                                        >
+                                    <span class="add-on">
+                                        <i class="icon-calendar"></i>
+                                    </span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="span4">
-                        <div class="control-group">
+                    <div class="col-xs-4">
+                        <div class="form-group">
                             <label
                                 class="control-label"
                                 for="amazon_best_sellers_rank"
                                 >Amazon BSR</label>
-                            <div class="controls">
-                                <select
-                                    class="select2 span12"
-                                    id="amazon_best_sellers_rank"
-                                    name="amazon_best_sellers_rank_1"
-                                    ng-model="amazon_best_sellers_rank_1"
-                                    ng-options="amazon_best_sellers_rank as amazon_best_sellers_rank for amazon_best_sellers_rank in amazon_best_sellers_ranks"
-                                    ></select>
-                                <input
-                                    class="span12"
-                                    max="999999999"
-                                    min="0"
-                                    name="amazon_best_sellers_rank_2"
-                                    ng-model="amazon_best_sellers_rank_2"
-                                    ng-show="amazon_best_sellers_rank_1 == 'Less Than' || amazon_best_sellers_rank_1 == 'More Than'"
-                                    type="number"
-                                    >
-                                <div
-                                    class="between"
-                                    ng-show="amazon_best_sellers_rank_1 == 'Between'"
-                                    >
-                                    <div class="span6">
-                                        <input
-                                            class="span12"
-                                            max="999999999"
-                                            min="0"
-                                            name="amazon_best_sellers_rank_3"
-                                            ng-model="amazon_best_sellers_rank_3"
-                                            type="number"
-                                            >
-                                    </div>
-                                    <div class="span6">
-                                        <input
-                                            class="span12"
-                                            max="999999999"
-                                            min="0"
-                                            name="amazon_best_sellers_rank_4"
-                                            ng-model="amazon_best_sellers_rank_4"
-                                            type="number"
-                                            >
-                                    </div>
+                            <select
+                                class="form-control select2"
+                                id="amazon_best_sellers_rank"
+                                name="amazon_best_sellers_rank_1"
+                                ng-model="amazon_best_sellers_rank_1"
+                                ng-options="amazon_best_sellers_rank as amazon_best_sellers_rank for amazon_best_sellers_rank in amazon_best_sellers_ranks"
+                                ></select>
+                            <input
+                                class="span12"
+                                max="999999999"
+                                min="0"
+                                name="amazon_best_sellers_rank_2"
+                                ng-model="amazon_best_sellers_rank_2"
+                                ng-show="amazon_best_sellers_rank_1 == 'Less Than' || amazon_best_sellers_rank_1 == 'More Than'"
+                                type="number"
+                                >
+                            <div
+                                class="between"
+                                ng-show="amazon_best_sellers_rank_1 == 'Between'"
+                                >
+                                <div class="span6">
+                                    <input
+                                        class="span12"
+                                        max="999999999"
+                                        min="0"
+                                        name="amazon_best_sellers_rank_3"
+                                        ng-model="amazon_best_sellers_rank_3"
+                                        type="number"
+                                        >
+                                </div>
+                                <div class="span6">
+                                    <input
+                                        class="span12"
+                                        max="999999999"
+                                        min="0"
+                                        name="amazon_best_sellers_rank_4"
+                                        ng-model="amazon_best_sellers_rank_4"
+                                        type="number"
+                                        >
                                 </div>
                             </div>
                         </div>
-                        <div class="control-group">
+                        <div class="form-group">
                             <label class="control-label" for="review_average">
                                 Review Average
                             </label>
-                            <div class="controls">
-                                <select
-                                    class="select2 span12"
-                                    id="review_average"
-                                    name="review_average_1"
-                                    ng-model="review_average_1"
-                                    ng-options="review_average as review_average for review_average in review_averages"
-                                    ></select>
-                                <input
-                                    class="span12"
-                                    max="5.0"
-                                    min="0.0"
-                                    name="review_average_2"
-                                    ng-model="review_average_2"
-                                    ng-show="review_average_1 == 'Less Than' || review_average_1 == 'More Than'"
-                                    step="any"
-                                    type="number"
-                                    >
-                                <div
-                                    class="between"
-                                    ng-show="review_average_1 == 'Between'"
-                                    >
-                                    <div class="span6">
-                                        <input
-                                            class="span12"
-                                            max="5.0"
-                                            min="0.0"
-                                            name="review_average_3"
-                                            ng-model="review_average_3"
-                                            type="number"
-                                            >
-                                    </div>
-                                    <div class="span6">
-                                        <input
-                                            class="span12"
-                                            max="5.0"
-                                            min="0.0"
-                                            name="review_average_4"
-                                            ng-model="review_average_4"
-                                            type="number"
-                                            >
-                                    </div>
+                            <select
+                                class="form-control select2"
+                                id="review_average"
+                                name="review_average_1"
+                                ng-model="review_average_1"
+                                ng-options="review_average as review_average for review_average in review_averages"
+                                ></select>
+                            <input
+                                class="span12"
+                                max="5.0"
+                                min="0.0"
+                                name="review_average_2"
+                                ng-model="review_average_2"
+                                ng-show="review_average_1 == 'Less Than' || review_average_1 == 'More Than'"
+                                step="any"
+                                type="number"
+                                >
+                            <div
+                                class="between"
+                                ng-show="review_average_1 == 'Between'"
+                                >
+                                <div class="span6">
+                                    <input
+                                        class="span12"
+                                        max="5.0"
+                                        min="0.0"
+                                        name="review_average_3"
+                                        ng-model="review_average_3"
+                                        type="number"
+                                        >
+                                </div>
+                                <div class="span6">
+                                    <input
+                                        class="span12"
+                                        max="5.0"
+                                        min="0.0"
+                                        name="review_average_4"
+                                        ng-model="review_average_4"
+                                        type="number"
+                                        >
                                 </div>
                             </div>
                         </div>
-                        <div class="control-group">
+                        <div class="form-group">
                             <label class="control-label" for="appearance">
                                 Prevalence (7 Days)
                             </label>
-                            <div class="controls">
-                                <select
-                                    class="select2 span12"
-                                    id="appearance"
-                                    name="appearance_1"
-                                    ng-model="appearance_1"
-                                    ng-options="appearance as appearance for appearance in appearances"
-                                    ></select>
-                                <input
-                                    class="span12"
-                                    max="7"
-                                    min="1"
-                                    name="appearance_2"
-                                    ng-model="appearance_2"
-                                    ng-show="appearance_1 == 'Less Than' || appearance_1 == 'More Than'"
-                                    step="any"
-                                    type="number"
-                                    >
-                                <div
-                                    class="between"
-                                    ng-show="appearance_1 == 'Between'"
-                                    >
-                                    <div class="span6">
-                                        <input
-                                            class="span12"
-                                            max="7"
-                                            min="1"
-                                            name="appearance_3"
-                                            ng-model="appearance_3"
-                                            type="number"
-                                            >
-                                    </div>
-                                    <div class="span6">
-                                        <input
-                                            class="span12"
-                                            max="7"
-                                            min="1"
-                                            name="appearance_4"
-                                            ng-model="appearance_4"
-                                            type="number"
-                                            >
-                                    </div>
+                            <select
+                                class="form-control select2"
+                                id="appearance"
+                                name="appearance_1"
+                                ng-model="appearance_1"
+                                ng-options="appearance as appearance for appearance in appearances"
+                                ></select>
+                            <input
+                                class="span12"
+                                max="7"
+                                min="1"
+                                name="appearance_2"
+                                ng-model="appearance_2"
+                                ng-show="appearance_1 == 'Less Than' || appearance_1 == 'More Than'"
+                                step="any"
+                                type="number"
+                                >
+                            <div
+                                class="between"
+                                ng-show="appearance_1 == 'Between'"
+                                >
+                                <div class="span6">
+                                    <input
+                                        class="span12"
+                                        max="7"
+                                        min="1"
+                                        name="appearance_3"
+                                        ng-model="appearance_3"
+                                        type="number"
+                                        >
+                                </div>
+                                <div class="span6">
+                                    <input
+                                        class="span12"
+                                        max="7"
+                                        min="1"
+                                        name="appearance_4"
+                                        ng-model="appearance_4"
+                                        type="number"
+                                        >
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="ce form-actions">
+                <div class="text-right">
                     <button
                         class="btn btn-default pull-left"
                         data-target="#filter_definitions"
@@ -432,475 +424,388 @@
                         Reset
                     </button>
                 </div>
-            </form>
-            <p class="text-center hide [! spinner == true && 'show' || 'hide' !]">
-                <span class="icon-spinner icon-spin icon-2x"></span>
-            </p>
-            <p class="alert alert-error" ng-show="error">
-                Your query did not yield any results.
-            </p>
-            <div ng-show="contents.books.length">
-                <p class="text-center">
-                    This section was last updated on
-                    <strong>[! contents.date !].</strong>
-                </p>
-                <hr>
-                <div class="page-header">
-                    <h2>At a Glance</h2>
-                </div>
-                <div class="row-fluid">
-                    <div class="span4">
-                        <table class="table table-hover table-striped">
-                            <tr>
-                                <td>Average Price</td>
-                                <td class="narrow right">
-                                    $[! contents.glance.price|number:2 !]
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Average Sales Per Day</td>
-                                <td class="narrow right">
-                                    [! contents.glance.estimated_sales_per_day|number:2 !]
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Average Number of Reviews</td>
-                                <td class="narrow right">
-                                    [! contents.glance.total_number_of_reviews|number:0 !]
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Average Review Score</td>
-                                <td class="narrow right">
-                                    [! contents.glance.review_average|number:2 !]
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Average Book Length</td>
-                                <td class="narrow right">
-                                    [! contents.glance.print_length|number:0 !]
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    Books with 25k BSR or better (lower)
-                                </td>
-                                <td class="narrow right">
-                                    [! contents.glance.absr|number:0 !]
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                    <div class="span4">
-                        <table class="table table-hover table-striped">
-                            <tr>
-                                <td>Top 10 words in titles</td>
-                            </tr>
-                            <tr>
-                                <td class="details">
-                                    <ul>
-                                        <li ng-repeat="word in contents.glance.words">
-                                            [! word[0] !] ([! word[1] !])
-                                        </li>
-                                    </ul>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                    <div
-                        class="span4"
-                        data-urls-aks="{{ url('aks') }}"
-                        data-urls-suggested-keywords="{{ url('suggested_keywords') }}"
-                        ng-controller="suggested_keywords"
+            </div>
+        </div>
+    </form>
+    <p class="text-center hide [! spinner == true && 'show' || 'hide' !]">
+        <span class="fa fa-fw fa-spinner fa-spin fa-2x"></span>
+    </p>
+    <p class="alert alert-error" ng-show="error">
+        Your query did not yield any results.
+    </p>
+    <div ng-show="contents.books.length">
+        <p class="text-center">
+            This section was last updated on
+            <strong>[! contents.date !].</strong>
+        </p>
+        <hr>
+        <div class="page-header">
+            <div class="row">
+                <h1 class="col-xs-12">At a Glance</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-4">
+                <table class="table table-bordered table-hover table-striped">
+                    <tr>
+                        <td>Average Price</td>
+                        <td class="small text-right">
+                            $[! contents.glance.price|number:2 !]
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Average Sales Per Day</td>
+                        <td class="small text-right">
+                            [! contents.glance.estimated_sales_per_day|number:2 !]
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Average Number of Reviews</td>
+                        <td class="small text-right">
+                            [! contents.glance.total_number_of_reviews|number:0 !]
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Average Review Score</td>
+                        <td class="small text-right">
+                            [! contents.glance.review_average|number:2 !]
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Average Book Length</td>
+                        <td class="small text-right">
+                            [! contents.glance.print_length|number:0 !]
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Books with 25k BSR or better (lower)
+                        </td>
+                        <td class="small text-right">
+                            [! contents.glance.absr|number:0 !]
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-xs-4">
+                <table class="table table-bordered table-hover table-striped">
+                    <tr>
+                        <td>Top 10 words in titles</td>
+                    </tr>
+                    <tr>
+                        <td class="details">
+                            <ul>
+                                <li ng-repeat="word in contents.glance.words">
+                                    [! word[0] !] ([! word[1] !])
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div
+                class="col-xs-4"
+                data-urls-aks="{{ url('aks') }}"
+                data-urls-suggested-keywords="{{ url('suggested_keywords') }}"
+                ng-controller="suggested_keywords"
+                >
+                <table class="table table-bordered table-hover table-striped">
+                    <tr>
+                        <td>
+                            <a ng-click="process(contents.glance.words)">
+                                Click here to compile a list of
+                                suggested keywords
+                            </a>
+                        </td>
+                    </tr>
+                    <tr ng-show="spinner">
+                        <td>
+                            <span class="fa fa-fw fa-spinner fa-spin fa-2x">
+                            </span>
+                        </td>
+                    </tr>
+                    <tr ng-show="items.length > 0">
+                        <td class="details">
+                            <ul>
+                                <li ng-repeat="item in items">
+                                    [! item !]
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr ng-show="items.length > 0">
+                        <td class="details">
+                            <a ng-click="get_more_suggestions(items, 'Suggest')">
+                                Get more suggestions
+                            </a>
+                        </td>
+                    </tr>
+                    <tr ng-show="error">
+                        <td class="text-error">
+                            Your query did not yield any results.
+                            Please try again after a while.
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <hr>
+        <div ng-controller="category">
+            <div class="page-header">
+                <div class="row">
+                    <button
+                        class="btn btn-default pull-right"
+                        ng-click="status = true"
+                        ng-show="!status"
+                        type="button"
                         >
-                        <table class="table table-hover table-striped">
-                            <tr>
-                                <td>
-                                    <a ng-click="process(contents.glance.words)">
-                                        Click here to compile a list of
-                                        suggested keywords
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr ng-show="spinner">
-                                <td>
-                                    <span class="icon-spinner icon-spin icon-2x">
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr ng-show="items.length > 0">
-                                <td class="details">
-                                    <ul>
-                                        <li ng-repeat="item in items">
-                                            [! item !]
-                                        </li>
-                                    </ul>
-                                </td>
-                            </tr>
-                            <tr ng-show="items.length > 0">
-                                <td class="details">
-                                    <p>
-                                        <a ng-click="get_more_suggestions(items, 'Suggest')">
-                                            Get more suggestions
-                                        </a>
-                                    </p>
-                                </td>
-                            </tr>
-                            <tr ng-show="error">
-                                <td class="text-error">
-                                    Your query did not yield any results.
-                                    Please try again after a while.
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
+                        <i class="icon-plus-sign"></i>
+                        Show More
+                    </button>
+                    <button
+                        class="btn btn-default pull-right"
+                        ng-click="status = false"
+                        ng-show="status"
+                        type="button"
+                        >
+                        <i class="icon-minus-sign"></i>
+                        Show Less
+                    </button>
+                    <h1 class="col-xs-12">Categories</h1>
                 </div>
-                <hr>
-                <div ng-controller="category">
-                    <div class="page-header">
-                        <button
-                            class="btn btn-default pull-right"
+            </div>
+            <p>
+                Below you will find a breakdown of the exact categories
+                which contain books matching your criteria. Use this
+                section to quickly identify a great category to base
+                your next book on. Click on a category to analyze it in
+                a new browser tab.
+            </p>
+            <table class="table table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th
+                            class="header [! order_by['categories'][0] == 'title' && get_order_by('categories') || '' !]"
+                            ng-click="set_order_by('categories', 'title')"
+                            >Category</th>
+                        <th
+                            class="header right [! order_by['categories'][0] == 'frequency' && get_order_by('categories') || '' !]"
+                            ng-click="set_order_by('categories', 'frequency')"
+                            >Frequency</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        ng-repeat="category in contents.categories|orderBy:order_by['categories'][0]:order_by['categories'][1]"
+                        ng-show="($index <= 4) || status"
+                        >
+                        <td>
+                            <a
+                                ng-click="process(category.id)"
+                                ng-show="category.id > 0"
+                                >
+                                [! category.title !]
+                            </a>
+                            <span ng-show="category.id == 0">
+                                [! category.title !]
+                            </span>
+                        </td>
+                        <td class="small text-right">
+                            [! category.frequency|number:0 !]
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <hr>
+        <div class="page-header">
+            <div class="row">
+                <div
+                    class="btn-group pull-right"
+                    data-toggle="buttons-radio"
+                    >
+                    <button
+                        class="btn btn-default"
+                        ng-class="mode == 'table' && 'active' || ''"
+                        ng-click="mode = 'table'"
+                        type="button"
+                        >
+                        <i class="icon-table"></i>
+                        Table
+                    </button>
+                    <button
+                        class="btn btn-default"
+                        ng-class="mode == 'tiles' && 'active' || ''"
+                        ng-click="mode = 'tiles'"
+                        type="button"
+                        >
+                        <i class="icon-th-large"></i>
+                        Tiles
+                    </button>
+                </div>
+                <h1 class="col-xs-12">
+                    Books ([! contents.books.length|number:0 !])
+                </h1>
+            </div>
+        </div>
+        <table
+            class="table table-bordered table-hover table-striped"
+            ng-show="mode == 'table'"
+            >
+            <thead>
+                <th
+                    class="header small text-right [! order_by['books'][0] == 'rank' && get_order_by('books') || '' !]"
+                    ng-click="set_order_by('books', 'rank')"
+                    >Rank</th>
+                <th
+                    class="header [! order_by['books'][0] == 'title' && get_order_by('books') || '' !]"
+                    ng-click="set_order_by('books', 'title')"
+                    >Title</th>
+                <th
+                    class="header small [! order_by['books'][0] == 'author_name' && get_order_by('books') || '' !]"
+                    ng-click="set_order_by('books', 'author_name')"
+                    >Author</th>
+                <th
+                    class="header small text-right [! order_by['books'][0] == 'price' && get_order_by('books') || '' !]"
+                    ng-click="set_order_by('books', 'price')"
+                    >Price ($)</th>
+                <th
+                    class="header small text-right [! order_by['books'][0] == 'print_length' && get_order_by('books') || '' !]"
+                    ng-click="set_order_by('books', 'print_length')"
+                    >Print Length</th>
+                <th
+                    class="header small text-right [! order_by['books'][0] == 'total_number_of_reviews' && get_order_by('books') || '' !]"
+                    ng-click="set_order_by('books', 'total_number_of_reviews')"
+                    >Reviews</th>
+                <th
+                    class="header small text-right [! order_by['books'][0] == 'review_average' && get_order_by('books') || '' !]"
+                    ng-click="set_order_by('books', 'review_average')"
+                    >Review Average</th>
+                <th
+                    class="header small text-right [! order_by['books'][0] == 'amazon_best_sellers_rank_' && get_order_by('books') || '' !]"
+                    ng-click="set_order_by('books', 'amazon_best_sellers_rank_')"
+                    >Amazon BSR</th>
+                <th
+                    class="header small text-right [! order_by['books'][0] == 'days_in_the_top_100' && get_order_by('books') || '' !]"
+                    ng-click="set_order_by('books', 'days_in_the_top_100')"
+                    ng-show="category == 1"
+                    >Days in the Top 100</th>
+            </thead>
+            <tbody
+                ng-controller="book"
+                ng-repeat="book in contents.books|orderBy:order_by['books'][0]:order_by['books'][1]"
+                >
+                <tr>
+                    <td class="small text-right">
+                        [! book.rank|number:0 !]
+                    </td>
+                    <td>
+                        <a
+                            class="pull-right"
                             ng-click="status = true"
                             ng-show="!status"
-                            type="button"
-                            >
-                            <i class="icon-plus-sign"></i>
-                            Show More
-                        </button>
-                        <button
-                            class="btn btn-default pull-right"
+                            >Show More</a>
+                        <a
+                            class="pull-right"
                             ng-click="status = false"
                             ng-show="status"
-                            type="button"
-                            >
-                            <i class="icon-minus-sign"></i>
-                            Show Less
-                        </button>
-                        <h2>Categories</h2>
-                    </div>
-                    <p>
-                        Below you will find a breakdown of the exact categories
-                        which contain books matching your criteria. Use this
-                        section to quickly identify a great category to base
-                        your next book on. Click on a category to analyze it in
-                        a new browser tab.
-                    </p>
-                    <table class="table table-hover table-striped">
-                        <thead>
-                            <tr>
-                                <th
-                                    class="header [! order_by['categories'][0] == 'title' && get_order_by('categories') || '' !]"
-                                    ng-click="set_order_by('categories', 'title')"
-                                    >Category</th>
-                                <th
-                                    class="header right [! order_by['categories'][0] == 'frequency' && get_order_by('categories') || '' !]"
-                                    ng-click="set_order_by('categories', 'frequency')"
-                                    >Frequency</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr
-                                ng-repeat="category in contents.categories|orderBy:order_by['categories'][0]:order_by['categories'][1]"
-                                ng-show="($index <= 4) || status"
-                                >
-                                <td>
-                                    <a
-                                        ng-click="process(category.id)"
-                                        ng-show="category.id > 0"
-                                        >
-                                        [! category.title !]
-                                    </a>
-                                    <span ng-show="category.id == 0">
-                                        [! category.title !]
-                                    </span>
-                                </td>
-                                <td class="narrow right">
-                                    [! category.frequency|number:0 !]
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <hr>
-                <div class="page-header">
-                    <div
-                        class="btn-group pull-right"
-                        data-toggle="buttons-radio"
+                            >Show Less</a>
+                        <a
+                            href="{{ url('ba') }}?url=[! book.url|encodeUri !]"
+                            target="_blank"
+                            >[! book.title !]</a>
+                        <a
+                            href="[! book.url !]"
+                            rel="noreferrer"
+                            target="_blank"
+                            ><i class="icon-external-link"></i></a>
+                    </td>
+                    <td class="small">
+                        <a
+                            class="pull-right"
+                            href="[! book.author_url !]"
+                            ng-show="book.author_url.length > 0"
+                            rel="noreferrer"
+                            target="_blank"
+                            ><i class="icon-external-link"></i></a>
+                        <a
+                            href="{{ url('aa') }}?url=[! book.author_url|encodeUri !]"
+                            ng-show="book.author_url.length > 0"
+                            target="_blank"
+                            >[! book.author_name !]</a>
+                        <span ng-show="book.author_url.length == 0">
+                            [! book.author_name !]
+                        </span>
+                    </td>
+                    <td class="small text-right">
+                        [! book.price|number:2 !]
+                    </td>
+                    <td class="small text-right">
+                        [! book.print_length|number:0 !]
+                    </td>
+                    <td class="small text-right">
+                        [! book.total_number_of_reviews|number:0 !]
+                    </td>
+                    <td class="small text-right">
+                        [! book.review_average|number:2 !]
+                    </td>
+                    <td class="small text-right">
+                        <span ng-show="book.amazon_best_sellers_rank['Paid in Kindle Store']">
+                            [! book.amazon_best_sellers_rank['Paid in Kindle Store']|number:0 !]
+                        </span>
+                        <span ng-show="!book.amazon_best_sellers_rank['Paid in Kindle Store']">
+                            N/A
+                        </span>
+                    </td>
+                    <td
+                        class="small text-right"
+                        ng-show="category == 1"
                         >
-                        <button
-                            class="btn btn-default"
-                            ng-class="mode == 'table' && 'active' || ''"
-                            ng-click="mode = 'table'"
-                            type="button"
-                            >
-                            <i class="icon-table"></i>
-                            Table
-                        </button>
-                        <button
-                            class="btn btn-default"
-                            ng-class="mode == 'tiles' && 'active' || ''"
-                            ng-click="mode = 'tiles'"
-                            type="button"
-                            >
-                            <i class="icon-th-large"></i>
-                            Tiles
-                        </button>
-                    </div>
-                    <h2>Books ([! contents.books.length|number:0 !])</h2>
-                </div>
-                <table
-                    class="table table-hover table-striped"
-                    ng-show="mode == 'table'"
-                    >
-                    <thead>
-                        <th
-                            class="header narrow right [! order_by['books'][0] == 'rank' && get_order_by('books') || '' !]"
-                            ng-click="set_order_by('books', 'rank')"
-                            >Rank</th>
-                        <th
-                            class="header [! order_by['books'][0] == 'title' && get_order_by('books') || '' !]"
-                            ng-click="set_order_by('books', 'title')"
-                            >Title</th>
-                        <th
-                            class="header narrow [! order_by['books'][0] == 'author_name' && get_order_by('books') || '' !]"
-                            ng-click="set_order_by('books', 'author_name')"
-                            >Author</th>
-                        <th
-                            class="header narrow right [! order_by['books'][0] == 'price' && get_order_by('books') || '' !]"
-                            ng-click="set_order_by('books', 'price')"
-                            >Price ($)</th>
-                        <th
-                            class="header narrow right [! order_by['books'][0] == 'print_length' && get_order_by('books') || '' !]"
-                            ng-click="set_order_by('books', 'print_length')"
-                            >Print Length</th>
-                        <th
-                            class="header narrow right [! order_by['books'][0] == 'total_number_of_reviews' && get_order_by('books') || '' !]"
-                            ng-click="set_order_by('books', 'total_number_of_reviews')"
-                            >Reviews</th>
-                        <th
-                            class="header narrow right [! order_by['books'][0] == 'review_average' && get_order_by('books') || '' !]"
-                            ng-click="set_order_by('books', 'review_average')"
-                            >Review Average</th>
-                        <th
-                            class="header narrow right [! order_by['books'][0] == 'amazon_best_sellers_rank_' && get_order_by('books') || '' !]"
-                            ng-click="set_order_by('books', 'amazon_best_sellers_rank_')"
-                            >Amazon BSR</th>
-                        <th
-                            class="header narrow right [! order_by['books'][0] == 'days_in_the_top_100' && get_order_by('books') || '' !]"
-                            ng-click="set_order_by('books', 'days_in_the_top_100')"
-                            ng-show="category == 1"
-                            >Days in the Top 100</th>
-                    </thead>
-                    <tbody
-                        ng-controller="book"
-                        ng-repeat="book in contents.books|orderBy:order_by['books'][0]:order_by['books'][1]"
-                        >
-                        <tr>
-                            <td class="narrow right">
-                                [! book.rank|number:0 !]
-                            </td>
-                            <td>
-                                <a
-                                    class="pull-right"
-                                    ng-click="status = true"
-                                    ng-show="!status"
-                                    >Show More</a>
-                                <a
-                                    class="pull-right"
-                                    ng-click="status = false"
-                                    ng-show="status"
-                                    >Show Less</a>
-                                <a
-                                    href="{{ url('ba') }}?url=[! book.url|encodeUri !]"
-                                    target="_blank"
-                                    >[! book.title !]</a>
-                                <a
-                                    href="[! book.url !]"
-                                    rel="noreferrer"
-                                    target="_blank"
-                                    ><i class="icon-external-link"></i></a>
-                            </td>
-                            <td class="narrow">
-                                <a
-                                    class="pull-right"
-                                    href="[! book.author_url !]"
-                                    ng-show="book.author_url.length > 0"
-                                    rel="noreferrer"
-                                    target="_blank"
-                                    ><i class="icon-external-link"></i></a>
-                                <a
-                                    href="{{ url('aa') }}?url=[! book.author_url|encodeUri !]"
-                                    ng-show="book.author_url.length > 0"
-                                    target="_blank"
-                                    >[! book.author_name !]</a>
-                                <span ng-show="book.author_url.length == 0">
-                                    [! book.author_name !]
-                                </span>
-                            </td>
-                            <td class="narrow right">
-                                [! book.price|number:2 !]
-                            </td>
-                            <td class="narrow right">
-                                [! book.print_length|number:0 !]
-                            </td>
-                            <td class="narrow right">
-                                [! book.total_number_of_reviews|number:0 !]
-                            </td>
-                            <td class="narrow right">
-                                [! book.review_average|number:2 !]
-                            </td>
-                            <td class="narrow right">
-                                <span ng-show="book.amazon_best_sellers_rank['Paid in Kindle Store']">
-                                    [! book.amazon_best_sellers_rank['Paid in Kindle Store']|number:0 !]
-                                </span>
-                                <span ng-show="!book.amazon_best_sellers_rank['Paid in Kindle Store']">
-                                    N/A
-                                </span>
-                            </td>
-                            <td
-                                class="narrow right"
-                                ng-show="category == 1"
-                                >
-                                <span ng-show="book.days_in_the_top_100 > 0">
-                                    [! book.days_in_the_top_100|number:0 !]
-                                </span>
-                                <span ng-show="book.days_in_the_top_100 == 0">
-                                    N/A
-                                </span>
-                            </td>
-                        </tr>
-                        <tr ng-show="status">
-                            <td class="details" colspan="9">
-                                <div class="row-fluid">
-                                    <div class="span4">
-                                        <p ng-show="category == -1">
-                                            <strong>Category:</strong>
-                                            [! book.category !]
-                                        </p>
-                                        <p>
-                                            <strong>Publication Date:</strong>
-                                            [! book.publication_date !]
-                                        </p>
-                                        <p>
-                                            <strong>
-                                                Estimated Sales Per Day:
-                                            </strong>
-                                            [! book.estimated_sales_per_day|number:0 !]
-                                        </p>
-                                        <p>
-                                            <strong>Earnings Per Day:</strong>
-                                            $[! book.earnings_per_day|number:2 !]
-                                        </p>
-                                    </div>
-                                    <div class="span4">
-                                        <p>
-                                            <strong>
-                                                Categories & Ranks:
-                                            </strong>
-                                        </p>
-                                        <ul ng-controller="amazon_best_sellers_rank">
-                                            <li
-                                                ng-repeat="(key, value) in book.amazon_best_sellers_rank"
-                                                ng-show="(key == 'Paid in Kindle Store') || $parent.status"
-                                                >
-                                                <strong>
-                                                    #[! value|number:0 !]
-                                                </strong>
-                                                in
-                                                [! key !]
-                                                <span ng-show="key == 'Paid in Kindle Store'">
-                                                    <a
-                                                        ng-click="$parent.status = true"
-                                                        ng-show="!$parent.status"
-                                                        >Show More</a>
-                                                    <a
-                                                        ng-click="$parent.status = false"
-                                                        ng-show="$parent.status"
-                                                        >Show Less</a>
-                                                </span>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="span4">
-                                        <p><strong>Appearances:</strong></p>
-                                        <ul>
-                                            <li ng-repeat="(key, value) in book.appearances">
-                                                <strong>[! value|number:0 !]</strong>
-                                                in the
-                                                [! key !]
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div
-                    class="row-fluid"
-                    ng-repeat="chunk in contents.chunks"
-                    ng-show="mode == 'tiles'"
-                    >
-                    <div class="span4" ng-repeat="book in chunk">
-                        <div class="media well">
-                            <div class="media-body">
-                                <h4 class="media-heading">
-                                    [! book.rank !].
-                                    <a
-                                        href="{{ url('ba') }}?url=[! book.url|encodeUri !]"
-                                        target="_blank"
-                                        >[! book.title !]</a>
-                                    <a
-                                        href="[! book.url !]"
-                                        rel="noreferrer"
-                                        target="_blank"
-                                        ><i class="icon-external-link"></i></a>
-                                </h4>
-                                <p>
-                                    <strong>Author:</strong>
-                                    <a
-                                        href="{{ url('aa') }}?url=[! book.author_url|encodeUri !]"
-                                        ng-show="book.author_url.length > 0"
-                                        target="_blank"
-                                        >[! book.author_name !]</a>
-                                    <a
-                                        href="[! book.author_url !]"
-                                        ng-show="book.author_url.length > 0"
-                                        rel="noreferrer"
-                                        target="_blank"
-                                        ><i class="icon-external-link"></i></a>
-                                    <span ng-show="book.author_url.length == 0">
-                                        [! book.author_name !]
-                                    </span>
-                                </p>
-                                <p>
-                                    <strong>Price:</strong>
-                                    $[! book.price|number:2 !]
+                        <span ng-show="book.days_in_the_top_100 > 0">
+                            [! book.days_in_the_top_100|number:0 !]
+                        </span>
+                        <span ng-show="book.days_in_the_top_100 == 0">
+                            N/A
+                        </span>
+                    </td>
+                </tr>
+                <tr ng-show="status">
+                    <td class="details" colspan="9">
+                        <div class="row">
+                            <div class="col-xs-4">
+                                <p ng-show="category == -1">
+                                    <strong>Category:</strong>
+                                    [! book.category !]
                                 </p>
                                 <p>
                                     <strong>Publication Date:</strong>
                                     [! book.publication_date !]
                                 </p>
                                 <p>
-                                    <strong>Print Length:</strong>
-                                    [! book.print_length|number:0 !]
+                                    <strong>
+                                        Estimated Sales Per Day:
+                                    </strong>
+                                    [! book.estimated_sales_per_day|number:0 !]
                                 </p>
-                                <p ng-show="category == 1">
-                                    <strong>Days in the Top 100:</strong>
-                                    <span ng-show="book.days_in_the_top_100 > 0">
-                                        [! book.days_in_the_top_100|number:0 !]
-                                    </span>
-                                    <span ng-show="book.days_in_the_top_100 == 0">
-                                        N/A
-                                    </span>
+                                <p>
+                                    <strong>Earnings Per Day:</strong>
+                                    $[! book.earnings_per_day|number:2 !]
                                 </p>
-                                <p><strong>Categories & Ranks:</strong></p>
+                            </div>
+                            <div class="col-xs-4">
+                                <p>
+                                    <strong>
+                                        Categories & Ranks:
+                                    </strong>
+                                </p>
                                 <ul ng-controller="amazon_best_sellers_rank">
                                     <li
                                         ng-repeat="(key, value) in book.amazon_best_sellers_rank"
                                         ng-show="(key == 'Paid in Kindle Store') || $parent.status"
                                         >
-                                        <strong>#[! value|number:0 !]</strong>
+                                        <strong>
+                                            #[! value|number:0 !]
+                                        </strong>
                                         in
                                         [! key !]
                                         <span ng-show="key == 'Paid in Kindle Store'">
@@ -915,22 +820,8 @@
                                         </span>
                                     </li>
                                 </ul>
-                                <p>
-                                    <strong>Estimated Sales Per Day:</strong>
-                                    [! book.estimated_sales_per_day|number:0 !]
-                                </p>
-                                <p>
-                                    <strong>Earnings Per Day:</strong>
-                                    $[! book.earnings_per_day|number:2 !]
-                                </p>
-                                <p>
-                                    <strong>Reviews:</strong>
-                                    [! book.total_number_of_reviews|number:0 !]
-                                </p>
-                                <p>
-                                    <strong>Review Average:</strong>
-                                    [! book.review_average|number:2 !]
-                                </p>
+                            </div>
+                            <div class="col-xs-4">
                                 <p><strong>Appearances:</strong></p>
                                 <ul>
                                     <li ng-repeat="(key, value) in book.appearances">
@@ -941,6 +832,113 @@
                                 </ul>
                             </div>
                         </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div
+            class="row"
+            ng-repeat="chunk in contents.chunks"
+            ng-show="mode == 'tiles'"
+            >
+            <div class="span4" ng-repeat="book in chunk">
+                <div class="media well">
+                    <div class="media-body">
+                        <h4 class="media-heading">
+                            [! book.rank !].
+                            <a
+                                href="{{ url('ba') }}?url=[! book.url|encodeUri !]"
+                                target="_blank"
+                                >[! book.title !]</a>
+                            <a
+                                href="[! book.url !]"
+                                rel="noreferrer"
+                                target="_blank"
+                                ><i class="icon-external-link"></i></a>
+                        </h4>
+                        <p>
+                            <strong>Author:</strong>
+                            <a
+                                href="{{ url('aa') }}?url=[! book.author_url|encodeUri !]"
+                                ng-show="book.author_url.length > 0"
+                                target="_blank"
+                                >[! book.author_name !]</a>
+                            <a
+                                href="[! book.author_url !]"
+                                ng-show="book.author_url.length > 0"
+                                rel="noreferrer"
+                                target="_blank"
+                                ><i class="icon-external-link"></i></a>
+                            <span ng-show="book.author_url.length == 0">
+                                [! book.author_name !]
+                            </span>
+                        </p>
+                        <p>
+                            <strong>Price:</strong>
+                            $[! book.price|number:2 !]
+                        </p>
+                        <p>
+                            <strong>Publication Date:</strong>
+                            [! book.publication_date !]
+                        </p>
+                        <p>
+                            <strong>Print Length:</strong>
+                            [! book.print_length|number:0 !]
+                        </p>
+                        <p ng-show="category == 1">
+                            <strong>Days in the Top 100:</strong>
+                            <span ng-show="book.days_in_the_top_100 > 0">
+                                [! book.days_in_the_top_100|number:0 !]
+                            </span>
+                            <span ng-show="book.days_in_the_top_100 == 0">
+                                N/A
+                            </span>
+                        </p>
+                        <p><strong>Categories & Ranks:</strong></p>
+                        <ul ng-controller="amazon_best_sellers_rank">
+                            <li
+                                ng-repeat="(key, value) in book.amazon_best_sellers_rank"
+                                ng-show="(key == 'Paid in Kindle Store') || $parent.status"
+                                >
+                                <strong>#[! value|number:0 !]</strong>
+                                in
+                                [! key !]
+                                <span ng-show="key == 'Paid in Kindle Store'">
+                                    <a
+                                        ng-click="$parent.status = true"
+                                        ng-show="!$parent.status"
+                                        >Show More</a>
+                                    <a
+                                        ng-click="$parent.status = false"
+                                        ng-show="$parent.status"
+                                        >Show Less</a>
+                                </span>
+                            </li>
+                        </ul>
+                        <p>
+                            <strong>Estimated Sales Per Day:</strong>
+                            [! book.estimated_sales_per_day|number:0 !]
+                        </p>
+                        <p>
+                            <strong>Earnings Per Day:</strong>
+                            $[! book.earnings_per_day|number:2 !]
+                        </p>
+                        <p>
+                            <strong>Reviews:</strong>
+                            [! book.total_number_of_reviews|number:0 !]
+                        </p>
+                        <p>
+                            <strong>Review Average:</strong>
+                            [! book.review_average|number:2 !]
+                        </p>
+                        <p><strong>Appearances:</strong></p>
+                        <ul>
+                            <li ng-repeat="(key, value) in book.appearances">
+                                <strong>[! value|number:0 !]</strong>
+                                in the
+                                [! key !]
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>

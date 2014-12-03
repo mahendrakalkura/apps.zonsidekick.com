@@ -717,9 +717,9 @@ $application->before(function (Request $request) use ($application) {
     $is_paying_customer = is_paying_customer($application, $user);
     if ($is_paying_customer) {
         if ($request->get('_route') == '403') {
-            return $application->redirect(
-                $application['url_generator']->generate('dashboard')
-            );
+            # return $application->redirect(
+            #     $application['url_generator']->generate('dashboard')
+            # );
         }
     } else {
         if ($request->get('_route') != '403') {
@@ -1780,14 +1780,17 @@ $application->match(
 ->method('POST');
 
 $application->match(
-    '/ps',
+    '/popular_searches',
     function (Request $request) use ($application) {
-        return $application['twig']->render('views/ps.twig', array(
-            'popular_searches' => get_popular_searches($application),
-        ));
+        return $application['twig']->render(
+            'views/popular_searches.twig',
+            array(
+                'popular_searches' => get_popular_searches($application),
+            )
+        );
     }
 )
-->bind('ps')
+->bind('popular_searches')
 ->method('GET');
 
 $application->match('/logos/overview', function () use ($application) {

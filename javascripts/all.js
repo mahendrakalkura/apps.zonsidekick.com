@@ -1305,4 +1305,5 @@ jQuery(function () {
         jQuery('[data-target="#aks-qsg"]').click();
     }
     zclip();
+    window.PixelAdmin.start([]);
 });

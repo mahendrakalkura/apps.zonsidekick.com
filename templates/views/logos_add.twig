@@ -1,47 +1,52 @@
 {% extends 'layout.twig' %}
 
 {% set module = 'Logos - Add' %}
-{% set nav = 'others' %}
+{% set nav = 'others_logos' %}
 
 {% block content %}
-<div id="logos_add">
-    <div class="row-fluid">
-        <div class="span12">
-            <div class="page-header">
-                {% include 'slots/feedback.twig' %}
-                <h1>{{ module }}</h1>
-            </div>
-            <form
-                accept-charset="UTF-8"
-                action="{{ url('logos_add') }}"
-                class="form-horizontal"
-                enctype="multipart/form-data"
-                method="POST"
-                >
-                <div class="control-group {{ error is defined and error? 'error': '' }}">
-                    <label class="control-label" for="logo">Logo</label>
-                    <div class="controls">
-                        <input id="logo" name="logo" type="file">
-                        {% if error is defined and error %}
-                            <span class="help-inline">{{ error }}</span>
-                        {% endif %}
-                    </div>
-                </div>
-                <span class="help-inline">
-                    Note: Logos must be uploaded in .png format.
-                </span>
-                <div class="form-actions">
-                    <button class="btn btn-success" type="submit">
-                        <span class="icon-info-sign icon-large"></span>
-                        Submit
-                    </button>
-                    <button class="btn btn-danger" type="reset">
-                        <span class="icon-trash icon-large"></span>
-                        Reset
-                    </button>
-                </div>
-            </form>
-        </div>
+<ul class="breadcrumb breadcrumb-page">
+    <div class="breadcrumb-label text-light-gray">You are here:</div>
+    <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
+    <li class="active"><a href="{{ url('logos_overview') }}">{{ module }}</a></li>
+</ul>
+<div class="page-header">
+    <div class="row">
+        <h1 class="col-xs-12">
+            {% include 'slots/feedback.twig' %}
+            <i class="fa fa-fw fa-picture-o"></i> {{ module }}
+        </h1>
     </div>
 </div>
+{% include 'slots/alerts.twig' %}
+<form
+    accept-charset="UTF-8"
+    action="{{ url('logos_add') }}"
+    enctype="multipart/form-data"
+    method="POST"
+    >
+    <div class="panel">
+        <div class="panel-body">
+            <div class="form-group {{ error is defined and error? 'has-error': '' }}">
+                <label class="control-label" for="logo">Logo</label>
+                <input id="logo" name="logo" type="file">
+                {% if error is defined and error %}
+                    <div class="help-block">{{ error }}</div>
+                {% endif %}
+            </div>
+            <div class="help-block">
+                Note: Logos must be uploaded in .png format.
+            </div>
+        </div>
+        <div class="clearfix panel-footer text-right">
+            <button class="btn btn-success pull-right" type="submit">
+                <span class="fa fa-lg fa-fw fa-thumbs-up"></span>
+                Submit
+            </button>
+            <button class="btn btn-danger pull-right" type="reset">
+                <span class="fa fa-lg fa-fw fa-thumbs-down"></span>
+                Reset
+            </button>
+        </div>
+    </div>
+</form>
 {% endblock %}

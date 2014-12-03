@@ -52,7 +52,8 @@
                             data-target="#main-navbar-collapse"
                             data-toggle="collapse"
                             type="button"
-                            ><i class="navbar-icon fa fa-bars"></i></button>
+                            ><i class="navbar-icon fa fa-fw fa-bars"></i>
+                        </button>
                     </div>
                     <div
                         class="collapse navbar-collapse main-navbar-collapse"
@@ -61,19 +62,40 @@
                         <div>
                             <ul class="nav navbar-nav">
                                 <li>
-                                    <a href="{{ url('dashboard') }}">
-                                        Dashboard
-                                    </a>
-                                </li>
-                                <li class="dropdown">
                                     <a
-                                        class="dropdown-toggle"
-                                        data-toggle="dropdown"
-                                        href="{{ url('dashboard') }}"
-                                        >Projects</a>
-                                    <ul class="dropdown-menu">
-                                        <li><a href="{{ url('dashboard') }}">Add</a></li>
-                                    </ul>
+                                        href="http://zonsidekick.com/features/"
+                                        target="_blank"
+                                        >Features</a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="http://zonsidekick.com/pricing/"
+                                        target="_blank"
+                                        >Pricing</a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="http://zonsidekick.com/my-account/"
+                                        target="_blank"
+                                        >My Account</a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="https://perfectsidekick.zendesk.com/hc/en-us/categories/200005513-Zon-Sidekick"
+                                        target="_blank"
+                                        >Support</a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="http://zonsidekick.com/blog/"
+                                        target="_blank"
+                                        >Blog</a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="http://perfectsidekick.com/affiliates"
+                                        target="_blank"
+                                        >Affiliates</a>
                                 </li>
                             </ul>
                             <div class="right clearfix">
@@ -82,19 +104,22 @@
                                         <a
                                             class="dropdown-toggle user-menu"
                                             data-toggle="dropdown"
-                                            ><span>{{ user.name }}</span></a>
+                                            >
+                                            <i class="fa fa-fw fa-user"></i>
+                                            <span>{{ user.name }}</span>
+                                        </a>
                                         <ul class="dropdown-menu">
                                             <li>
-                                                <a href="{{ url('dashboard') }}">
-                                                    <i class="dropdown-icon fa fa-cog">
+                                                <a href="{{ url('profile') }}">
+                                                    <i class="dropdown-icon fa fa-fw fa-cog">
                                                     </i>
                                                     &nbsp;&nbsp;
-                                                    Settings
+                                                    Profile
                                                 </a>
                                             </li>
                                             <li>
                                                 <a href="{{ url('sign_out') }}">
-                                                    <i class="dropdown-icon fa fa-power-off">
+                                                    <i class="dropdown-icon fa fa-fw fa-power-off">
                                                     </i>
                                                     &nbsp;&nbsp;
                                                     Sign Out
@@ -111,19 +136,106 @@
             <div id="main-menu" role="navigation">
                 <div id="main-menu-inner">
                     <ul class="navigation">
-                        {% for project in [1, 2, 3] %}
-                            <li>
-                                <a href="{{ url('dashboard') }}">
-                                    <i class="menu-icon fa fa-tasks"></i>
-                                    <span class="mm-text">
-                                        {{ project }}
-                                    </span>
-                                    <span class="badge badge-success">
-                                        {{ project }}
-                                    </span>
-                                </a>
-                            </li>
-                        {% endfor %}
+                        <li class="{% if nav == 'dashboard' %}active{% endif %}">
+                            <a href="{{ url('dashboard') }}">
+                                <i class="menu-icon fa fa-fw fa-dashboard"></i>
+                                <span class="mm-text">Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="{% if nav == 'top_100_explorer' %}active{% endif %}">
+                            <a href="{{ url('ce_overview') }}">
+                                <i class="menu-icon fa fa-fw fa-key"></i>
+                                <span class="mm-text">Top 100 Explorer</span>
+                            </a>
+                        </li>
+                        <li class="{% if nav == 'keyword_suggester' %}active{% endif %}">
+                            <a href="{{ url('aks') }}">
+                                <span class="menu-icon fa fa-fw fa-list">
+                                </span>
+                                <span class="mm-text">Keywords Suggester</span>
+                            </a>
+                        </li>
+                        <li class="mm-dropdown">
+                            <a>
+                                <i class="menu-icon fa fa-fw fa-user-md"></i>
+                                <span class="mm-text">Keyword Analyzers</span>
+                            </a>
+                            <ul>
+                                <li class="{% if nav == 'keyword_analyzers_multiple' %}active{% endif %}">
+                                    <a href="{{ url('kns_overview') }}">
+                                        <i class="menu-icon fa fa-fw fa-tags">
+                                        </i>
+                                        <span class="mm-text">Multiple</span>
+                                    </a>
+                                </li>
+                                <li class="{% if nav == 'keyword_analyzers_single' %}active{% endif %}">
+                                    <a href="{{ url('kns_single') }}">
+                                        <i class="menu-icon fa fa-fw fa-tag">
+                                        </i>
+                                        <span class="mm-text">Single</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="mm-dropdown">
+                            <a>
+                                <i class="menu-icon fa fa-fw fa-crosshairs">
+                                </i>
+                                <span class="mm-text">Other Analyzers</span>
+                            </a>
+                            <ul>
+                                <li class="{% if nav == 'other_analyzers_author' %}active{% endif %}">
+                                    <a href="{{ url('aa') }}">
+                                        <i class="menu-icon fa fa-fw fa-user">
+                                        </i>
+                                        <span class="mm-text">
+                                            Author
+                                        </span>
+                                    </a>
+                                </li>
+                                <li class="{% if nav == 'other_analyzers_book' %}active{% endif %}">
+                                    <a href="{{ url('ba') }}">
+                                        <i class="menu-icon fa fa-fw fa-book">
+                                        </i>
+                                        <span class="mm-text">
+                                            Book
+                                        </span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="{% if nav == 'popular_searches' %}active{% endif %}">
+                            <a href="{{ url('popular_searches') }}">
+                                <i class="menu-icon fa fa-fw fa-search"></i>
+                                <span class="mm-text">Popular Searches</span>
+                            </a>
+                        </li>
+                        <li class="mm-dropdown">
+                            <a>
+                                <i class="menu-icon fa fa-fw fa-cogs"></i>
+                                <span class="mm-text">Others</span>
+                            </a>
+                            <ul>
+                                <li class="{% if nav == 'others_logos' %}active{% endif %}">
+                                    <a href="{{ url('logos_overview') }}">
+                                        <i class="menu-icon fa fa-fw fa-picture-o">
+                                        </i>
+                                        <span class="mm-text">Logos</span>
+                                    </a>
+                                </li>
+                                {% if has_statistics %}
+                                    <li class="{% if nav == 'others_statistics' %}active{% endif %}">
+                                        <a href="{{ url('statistics') }}">
+                                            <i class="menu-icon fa fa-fw fa-bar-chart-o">
+                                            </i>
+                                            <span class="mm-text">
+                                                Statistics
+                                            </span>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -146,124 +258,3 @@
         {% include 'slots/javascripts.twig' %}
     </body>
 </html>
-{#% if user.id and is_paying_customer %}
-    <div class="navbar">
-        <div class="navbar-inner">
-            <ul class="nav">
-                <li class="{% if nav == 'dashboard' %}active{% endif %}">
-                    <a href="{{ url('dashboard') }}">
-                        <i class="icon-home"></i>
-                        Dashboard
-                    </a>
-                </li>
-                <li class="{% if nav == 'ce' %}active{% endif %}">
-                    <a href="{{ url('ce_overview') }}">
-                        <i class="icon-key icon-large"></i>
-                        Top 100 Explorer
-                    </a>
-                </li>
-                <li class="{% if nav == 'aks' %}active{% endif %}">
-                    <a href="{{ url('aks') }}">
-                        <span class="icon-list icon-large"></span>
-                        Keywords Suggester
-                    </a>
-                </li>
-                <li class="{% if nav == 'kns' %}active{% endif %} dropdown">
-                    <a
-                        class="dropdown-toggle"
-                        data-toggle="dropdown"
-                        >
-                        <i class="icon-user-md icon-large"></i>
-                        Keyword Analyzers
-                        <i class="caret"></i>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a href="{{ url('kns_overview') }}">
-                                <i class="icon-tags icon-large">
-                                </i>
-                                Multiple Keywords Analyzer
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ url('kns_single') }}">
-                                <i class="icon-tag icon-large"></i>
-                                Single Keyword Analyzer
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="{% if nav == 'a' %}active{% endif %} dropdown">
-                    <a
-                        class="dropdown-toggle"
-                        data-toggle="dropdown"
-                        >
-                        <i class="icon-screenshot icon-large"></i>
-                        Other Analyzers
-                        <i class="caret"></i>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a href="{{ url('aa') }}">
-                                <i class="icon-user icon-large">
-                                </i>
-                                Author Analyzer
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ url('ba') }}">
-                                <i class="icon-book icon-large">
-                                </i>
-                                Book Analyzer
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="{% if nav == 'ps' %}active{% endif %}">
-                    <a href="{{ url('ps') }}">
-                        <i class="icon-search icon-large"></i>
-                        Popular Searches
-                    </a>
-                </li>
-                <li class="{% if nav == 'others' %}active{% endif %} dropdown">
-                    <a
-                        class="dropdown-toggle"
-                        data-toggle="dropdown"
-                        >
-                        <i class="icon-cogs"></i>
-                        Others
-                        <i class="caret"></i>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a href="{{ url('logos_overview') }}">
-                                <i class="icon-picture"></i>
-                                Logos
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ url('profile') }}">
-                                <i class="icon-user"></i>
-                                Profile
-                            </a>
-                        </li>
-                        {% if has_statistics %}
-                            <li>
-                                <a href="{{ url('statistics') }}">
-                                    <i class="icon-bar-chart"></i>
-                                    Statistics
-                                </a>
-                            </li>
-                        {% endif %}
-                        <li>
-                            <a href="{{ url('sign_out') }}">
-                                <i class="icon-user"></i>
-                                Sign Out
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </div>
-{% endif %#}

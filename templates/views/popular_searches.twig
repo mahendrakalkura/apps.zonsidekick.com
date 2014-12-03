@@ -1,0 +1,38 @@
+{% extends 'layout.twig' %}
+
+{% set module = 'Popular Searches' %}
+{% set nav = 'popular_searches' %}
+
+{% block content %}
+<ul class="breadcrumb breadcrumb-page">
+    <div class="breadcrumb-label text-light-gray">You are here:</div>
+    <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
+    <li class="active"><a href="{{ url('popular_searches') }}">Popular Searches</a></li>
+</ul>
+<div class="page-header">
+    <div class="row">
+        <h1 class="col-xs-12">
+            {% include 'slots/feedback.twig' %}
+            {% include 'slots/popular_searches_how_do_we_know_this.twig' %}
+            <div
+                class="btn pull-right"
+                data-target="#popular_searches"
+                data-toggle="modal"
+                >
+                <span class="fa fa-fw fa-info-circle"></span>
+                Information
+            </div>
+            <i class="fa fa-fw fa-search page-header-icon"></i> {{ module }}
+        </h1>
+    </div>
+</div>
+{% include 'slots/alerts.twig' %}
+<p>
+    Each hour, we scan Amazon for user searches similar to phrases such as
+    "books like..." and "books similar to..." to find out what people want to
+    read more of, right now. We then identify these products and show them to
+    you here so that you have an immediate understanding of what's currently in
+    demand.
+</p>
+{% include 'slots/popular_searches.twig' %}
+{% endblock %}

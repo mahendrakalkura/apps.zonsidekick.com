@@ -1,9 +1,30 @@
 {% extends 'layout.twig' %}
 
 {% set module = 'Author Analyzer' %}
-{% set nav = 'a' %}
+{% set nav = 'other_analyzers_author' %}
 
 {% block content %}
+<ul class="breadcrumb breadcrumb-page">
+    <div class="breadcrumb-label text-light-gray">You are here:</div>
+    <li><a href="{{ url('dashboard') }}">Dashboard</a></li>
+    <li class="active"><a href="{{ url('aa') }}">{{ module }}</a></li>
+</ul>
+<div class="page-header">
+    <div class="row">
+        <h1 class="col-xs-12">
+            {% include 'slots/feedback.twig' %}
+            <i class="fa fa-fw fa-user"></i> {{ module }}
+        </h1>
+    </div>
+</div>
+{% include 'slots/alerts.twig' %}
+<p>
+    The Author Analyzer allows you to quickly inspect other authors and their
+    books. This section is great for "reverse engineering" their publishing
+    techniques. You may also open authors directly in this tool by clicking on
+    their names in
+    other tools.
+</p>
 <div
     data-error-1-middle="<p>Please enter a valid keyword.</p>"
     data-error-1-top="Error #1"
@@ -15,189 +36,164 @@
     id="aa"
     ng-controller="aa"
     >
-    <div class="row-fluid">
-        <div class="span12">
-            <div class="page-header">
-                {% include 'slots/feedback.twig' %}
-                <h1>{{ module }}</h1>
-            </div>
-        </div>
-    </div>
-    <div class="row-fluid">
-        <div class="span12">
-            <form
-                class="form-horizontal"
-                name="form"
-                ng-submit="get_authors()"
-                >
-                <p>
-                    The Author Analyzer allows you to quickly inspect other
-                    authors and their books. This section is great for "reverse
-                    engineering" their publishing techniques. You may also open
-                    authors directly in this tool by clicking on their names in
-                    other tools.
-                </p>
-                <div class="control-group">
+    <form name="form" ng-submit="get_authors()">
+        <div class="panel">
+            <div class="panel-body">
+                <div class="form-group">
                     <label class="control-label" for="keyword">
                         Author's name
                     </label>
-                    <div class="controls">
-                        <input
-                            class="span12"
-                            id="keyword"
-                            placeholder="Enter a name"
-                            type="text"
-                            value=""
-                            ng-model="keyword"
-                            >
-                    </div>
+                    <input
+                        class="form-control"
+                        id="keyword"
+                        placeholder="Enter a name"
+                        type="text"
+                        value=""
+                        ng-model="keyword"
+                        >
                 </div>
-                <div class="form-actions">
-                    <button class="btn btn-success" type="submit">
-                        <span class="icon-info-sign icon-large"></span>
-                        Submit
-                    </button>
+                <div class="text-right">
                     <button class="btn btn-danger" type="reset">
                         <span class="icon-trash icon-large"></span>
                         Reset
                     </button>
+                    <button class="btn btn-success" type="submit">
+                        <span class="icon-info-sign icon-large"></span>
+                        Submit
+                    </button>
                 </div>
-            </form>
+            </div>
         </div>
+    </form>
+    <p class="text-center hide [! authors.spinner == true && 'show' || 'hide' !]">
+        <span class="fa fa-fw fa-spinner fa-spin fa-2x"></span>
+    </p>
+    <div class="hide [! authors.contents.length > 0 && 'show' || 'hide' !]">
+        <table class="table table-bordered table-hover table-striped">
+            <thead>
+                <th>Name</th>
+                <th class="small">URL</th>
+            </thead>
+            <tbody>
+                <tr ng-repeat="author in authors.contents">
+                    <td>
+                        <a ng-click="get_author(author.url)">
+                            [! author.name !]
+                        </a>
+                    </td>
+                    <td class="small">
+                        <a
+                            href="[! author.url !]"
+                            rel="noreferrer"
+                            target="_blank"
+                            >[! author.url !]</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
-    <div class="row-fluid">
-        <p class="text-center span12 hide [! authors.spinner == true && 'show' || 'hide' !]">
-            <span class="icon-spinner icon-spin icon-2x"></span>
+    <div id="scroll">
+        <p class="text-center hide [! author.spinner == true && 'show' || 'hide' !]">
+            <span class="fa fa-fw fa-spinner fa-spin fa-2x"></span>
         </p>
     </div>
-    <div class="row-fluid">
-        <div class="span12 hide [! authors.contents.length > 0 && 'show' || 'hide' !]">
-            <table class="table table-hover table-striped">
-                <thead>
-                    <th>Name</th>
-                    <th class="narrow">URL</th>
-                </thead>
-                <tbody>
-                    <tr ng-repeat="author in authors.contents">
-                        <td>
-                            <a ng-click="get_author(author.url)">
-                                [! author.name !]
-                            </a>
-                        </td>
-                        <td class="narrow">
-                            <a
-                                href="[! author.url !]"
-                                rel="noreferrer"
-                                target="_blank"
-                                >[! author.url !]</a>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+    <div class="hide [! author.contents != '' && 'show' || 'hide' !]">
+        <div class="page-header">
+            <div class="row">
+                <h1 class="col-xs-12">[! author.contents.name !]</h1>
+            </div>
         </div>
-    </div>
-    <div class="row-fluid" id="scroll">
-        <p class="text-center span12 hide [! author.spinner == true && 'show' || 'hide' !]">
-            <span class="icon-spinner icon-spin icon-2x"></span>
-        </p>
-    </div>
-    <div class="row-fluid">
-        <div class="span12 hide [! author.contents != '' && 'show' || 'hide' !]">
-            <div class="page-header">
-                <h1>[! author.contents.name !]</h1>
-            </div>
-            <div class="clearfix">
-                <img
-                    class="img-polaroid pull-left"
-                    ng-show="author.contents.photo.length > 0"
-                    src="[! author.contents.photo !]"
-                    >
-                <p ng-show="author.contents.description.length > 0">
-                    [! author.contents.description !]
-                </p>
-                <p>
-                    Estimated earnings per month:
-                    $[! author.contents.earnings_per_month|number:2 !]
-                </p>
-                <img
-                    class="img-polaroid pull-left"
-                    ng-show="author.contents.twitter.profile_image_url.length > 0"
-                    src="[! author.contents.twitter.profile_image_url !]"
-                    >
-                <p ng-show="author.contents.twitter.screen_name.length > 0">
-                    <a
-                        href="http://twitter.com/[! author.contents.twitter.screen_name !]"
-                        rel="noreferrer"
-                        target="_blank"
-                        >@[! author.contents.twitter.screen_name !]</a>
-                </p>
-                <p ng-show="author.contents.twitter.tweet.length > 0">
-                    [! author.contents.twitter.tweet !]
-                </p>
-            </div>
-            <ul
-                class="clearfix"
-                ng-show="author.contents.amazon_rank != {}"
+        <div class="clearfix">
+            <img
+                class="img-polaroid pull-left"
+                ng-show="author.contents.photo.length > 0"
+                src="[! author.contents.photo !]"
                 >
-                <li ng-repeat="(key, value) in author.contents.amazon_rank">
-                    <strong>#[! value|number:0 !]</strong> in [! key !]
-                </li>
-            </ul>
-            <table class="table table-hover table-striped">
-                <thead>
-                    <th>Title</th>
-                    <th class="narrow right">Publication Date</th>
-                    <th class="narrow right">Price (in $)</th>
-                    <th class="narrow right">Print Length</th>
-                    <th class="narrow right">Reviews</th>
-                    <th class="narrow right">Review Average</th>
-                    <th class="narrow right">Daily Revenue</th>
-                    <th class="narrow right">Amazon BSR</th>
-                </thead>
-                <tbody>
-                    <tr ng-repeat="book in author.contents.books|orderBy:'publication_date':true">
-                        <td>
-                            <a
-                                class="pull-right"
-                                href="[! book.url !]"
-                                rel="noreferrer"
-                                target="_blank"
-                                ><i class="icon-external-link"></i></a>
-                            <a
-                                href="{{ url('ba') }}?url=[! book.url|encodeUri !]"
-                                target="_blank"
-                                >[! book.title !]</a>
-                        </td>
-                        <td class="narrow right">
-                            [! book.publication_date !]
-                        </td>
-                        <td class="narrow right">
-                            [! book.price|number:2 !]
-                        </td>
-                        <td class="narrow right">
-                            [! book.print_length|number:0 !]
-                        </td>
-                        <td class="narrow right">
-                            [! book.total_number_of_reviews|number:0 !]
-                        </td>
-                        <td class="narrow right">
-                            [! book.review_average|number:2 !]
-                        </td>
-                        <td class="narrow right">
-                            [! book.earnings_per_day|number:2 !]
-                        </td>
-                        <td class="narrow right">
-                            <span ng-show="book.amazon_best_sellers_rank['Paid in Kindle Store']">
-                                [! book.amazon_best_sellers_rank['Paid in Kindle Store']|number:0 !]
-                            </span>
-                            <span ng-show="!book.amazon_best_sellers_rank['Paid in Kindle Store']">
-                                N/A
-                            </span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <p ng-show="author.contents.description.length > 0">
+                [! author.contents.description !]
+            </p>
+            <p>
+                Estimated earnings per month:
+                $[! author.contents.earnings_per_month|number:2 !]
+            </p>
+            <img
+                class="img-polaroid pull-left"
+                ng-show="author.contents.twitter.profile_image_url.length > 0"
+                src="[! author.contents.twitter.profile_image_url !]"
+                >
+            <p ng-show="author.contents.twitter.screen_name.length > 0">
+                <a
+                    href="http://twitter.com/[! author.contents.twitter.screen_name !]"
+                    rel="noreferrer"
+                    target="_blank"
+                    >@[! author.contents.twitter.screen_name !]</a>
+            </p>
+            <p ng-show="author.contents.twitter.tweet.length > 0">
+                [! author.contents.twitter.tweet !]
+            </p>
         </div>
+        <ul
+            class="clearfix"
+            ng-show="author.contents.amazon_rank != {}"
+            >
+            <li ng-repeat="(key, value) in author.contents.amazon_rank">
+                <strong>#[! value|number:0 !]</strong> in [! key !]
+            </li>
+        </ul>
+        <table class="table table-bordered table-hover table-striped">
+            <thead>
+                <th>Title</th>
+                <th class="small text-right">Publication Date</th>
+                <th class="small text-right">Price (in $)</th>
+                <th class="small text-right">Print Length</th>
+                <th class="small text-right">Reviews</th>
+                <th class="small text-right">Review Average</th>
+                <th class="small text-right">Daily Revenue</th>
+                <th class="small text-right">Amazon BSR</th>
+            </thead>
+            <tbody>
+                <tr ng-repeat="book in author.contents.books|orderBy:'publication_date':true">
+                    <td>
+                        <a
+                            class="pull-right"
+                            href="[! book.url !]"
+                            rel="noreferrer"
+                            target="_blank"
+                            ><i class="icon-external-link"></i></a>
+                        <a
+                            href="{{ url('ba') }}?url=[! book.url|encodeUri !]"
+                            target="_blank"
+                            >[! book.title !]</a>
+                    </td>
+                    <td class="small text-right">
+                        [! book.publication_date !]
+                    </td>
+                    <td class="small text-right">
+                        [! book.price|number:2 !]
+                    </td>
+                    <td class="small text-right">
+                        [! book.print_length|number:0 !]
+                    </td>
+                    <td class="small text-right">
+                        [! book.total_number_of_reviews|number:0 !]
+                    </td>
+                    <td class="small text-right">
+                        [! book.review_average|number:2 !]
+                    </td>
+                    <td class="small text-right">
+                        [! book.earnings_per_day|number:2 !]
+                    </td>
+                    <td class="small text-right">
+                        <span ng-show="book.amazon_best_sellers_rank['Paid in Kindle Store']">
+                            [! book.amazon_best_sellers_rank['Paid in Kindle Store']|number:0 !]
+                        </span>
+                        <span ng-show="!book.amazon_best_sellers_rank['Paid in Kindle Store']">
+                            N/A
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 {% endblock %}
