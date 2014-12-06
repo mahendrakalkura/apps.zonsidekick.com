@@ -7,6 +7,7 @@ tmp/*
 !tmp/.htaccess
 vendor/*
 !vendor/pixeladmin
+!vendor/class-phpass.php
 development.log
 error_log
 variables.json
