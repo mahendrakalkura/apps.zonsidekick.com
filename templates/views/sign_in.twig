@@ -37,7 +37,10 @@
             <div class="signin-container">
                 <div class="signin-info">
                     <a class="logo" href="{{ url('dashboard') }}">
-                        ZonSidekick
+                        <img
+                            src="{{ app.request.getSchemeAndHttpHost() }}{{ app.request.baseUrl }}/images/logo.png"
+                            width="200"
+                            >
                     </a>
                 </div>
                 <div class="signin-form">
