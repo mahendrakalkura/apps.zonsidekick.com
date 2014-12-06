@@ -1367,10 +1367,10 @@ jQuery(function () {
             }).get()
         )
     );
-    if (jQuery.cookie('keyword_analyzer_multiple') != 'Yes') {
+    if (jQuery.cookie('modal-keyword-analyzer-multiple') != 'Yes') {
         jQuery('[data-target="#modal-keyword-analyzer-multiple"]').click();
     }
-    if (jQuery.cookie('keyword_suggester') != 'Yes') {
+    if (jQuery.cookie('modal-keyword-suggester') != 'Yes') {
         jQuery('[data-target="#modal-keyword-suggester"]').click();
     }
     zclip();
