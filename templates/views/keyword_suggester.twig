@@ -54,6 +54,25 @@
         <div class="col-xs-6">
             <form accept-charset="UTF-8" ng-submit="submit()">
                 <div class="panel">
+                    <div class="bordered clearfix no-border-l no-border-r no-border-t panel-footer text-right">
+                        <button
+                            class="btn btn-success pull-right"
+                            ng-show="!spinner"
+                            type="submit"
+                            >
+                            <span class="fa fa-lg fa-fw fa-thumbs-up"></span>
+                            Submit
+                        </button>
+                        <button
+                            class="btn btn-danger pull-right"
+                            ng-click="reset()"
+                            ng-show="spinner"
+                            type="reset"
+                            >
+                            <span class="fa fa-lg fa-fw fa-thumbs-down"></span>
+                            Reset
+                        </button>
+                    </div>
                     <div class="panel-body">
                         <div ng-show="!spinner">
                             <div class="form-group">

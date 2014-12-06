@@ -112,6 +112,10 @@ ul {
     margin: 0;
 }
 
+.form-group {
+    margin-bottom: 18px;
+}
+
 .media img {
     height: 100px;
 }
@@ -139,7 +143,7 @@ ul {
 }
 
 .panel-body {
-    padding-bottom: 5px;
+    padding-bottom: 2px;
 }
 
 .panel-body .btn + .btn {
