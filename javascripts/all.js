@@ -1349,6 +1349,18 @@ var zclip = function () {
 };
 
 jQuery(function () {
+    jQuery(document).on(
+        'hidden.bs.modal',
+        '#modal-popular-searches, #modal-top-100-explorer',
+        function () {
+            var frames = document.getElementsByTagName('iframe');
+            for (var frame = 0; frame < frames.length; frame++) {
+                frames.item(frame).contentWindow.postMessage(
+                    '{"event": "command", "func": "pauseVideo"}', '*'
+                );
+            }
+        }
+    );
     jQuery('body').tooltip({
         container: jQuery('body'),
         selector: '[data-toggle="tooltip"]'
@@ -1358,12 +1370,6 @@ jQuery(function () {
     });
     jQuery('.got-it').click(function () {
         jQuery.cookie(jQuery(this).parents('.modal').attr('id'), 'Yes');
-        var frames = document.getElementsByTagName('iframe');
-        for (var frame = 0; frame < frames.length; frame++) {
-            frames.item(frame).contentWindow.postMessage(
-                '{"event": "command", "func": "pauseVideo"}', '*'
-            );
-        }
     });
     jQuery('.well').height(
         Math.max.apply(
