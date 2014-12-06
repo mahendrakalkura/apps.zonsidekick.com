@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <link
-            href="{{ app.request.getSchemeAndHttpHost() }}{{ app.request.baseUrl }}/vendor/normalize-css/normalize.css"
+            href="{{ app.request.getSchemeAndHttpHost() }}{{ app.request.baseUrl }}/vendor/normalize.css/normalize.css"
             rel="stylesheet"
         >
         <meta charset="utf-8">
@@ -67,10 +67,10 @@
             .break {
                 page-break-after: always;
             }
-            .center {
+            .text-center {
                 text-align: center;
             }
-            .right {
+            .text-right {
                 text-align: right;
             }
             #credits {
@@ -87,7 +87,7 @@
     <body>
         <h1>Keyword Analyzer - PDF Reports</h1>
         <h6>Page 1</h6>
-        <p class="center">
+        <p class="text-center">
             <img src="{{ logo? logo: app.request.getSchemeAndHttpHost() ~ app.request.baseUrl ~ '/images/logo.png' }}">
         </p>
         <p>
@@ -140,7 +140,7 @@
             any product title to open it in your web browser.
         </p>
         <div class="break"></div>
-        <p class="center">
+        <p class="text-center">
             <img src="{{ logo? logo: app.request.getSchemeAndHttpHost() ~ app.request.baseUrl ~ '/images/logo.png' }}">
         </p>
         <table>
