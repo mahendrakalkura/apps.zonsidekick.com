@@ -1,5 +1,7 @@
 <?php
 
+require_once sprintf('%s/vendor/class-phpass.php', __DIR__);
+
 date_default_timezone_set('UTC');
 
 function usort_categories($one, $two)
@@ -614,6 +616,21 @@ EOD;
         $query, array($user['id'], 'paying_customer', '1')
     );
     if (!empty($record) AND $record['count'] == 1) {
+        return true;
+    }
+
+    return false;
+}
+
+function is_valid($password, $hash) {
+    if (strlen($hash) == 32) {
+        if (md5($password) == $hash) {
+            return true;
+        }
+    }
+
+    $password_hash = new PasswordHash(8, true);
+    if ($password_hash->CheckPassword($password, $hash)) {
         return true;
     }
 
@@ -1625,34 +1642,18 @@ $application
             $password = $request->get('password');
             if (!empty($username) AND !empty($password)) {
                 $query = <<<EOD
-SELECT `id` , `user_email` , `display_name`
+SELECT `id` , `user_email` , `user_pass` , `display_name`
 FROM `wp_users`
-WHERE `user_login` = ? AND `user_pass` = ?
+WHERE `user_login` = ?
 EOD;
                 $record = $application['db']->fetchAssoc($query, array(
                     $username,
-                    md5($password),
                 ));
-                if ($record) {
+                if ($record AND is_valid($password, $record['user_pass'])) {
                     $application['session']->set('user', array(
                         'email' => $record['user_email'],
                         'id' => $record['id'],
                         'name' => $record['display_name'],
-                    ));
-                    $application['session']->getFlashBag()->add(
-                        'success',
-                        array('You have been signed in successfully.')
-                    );
-
-                    return $application->redirect(
-                        $application['url_generator']->generate('dashboard')
-                    );
-                }
-                if ($username == 'mahendra') {
-                    $application['session']->set('user', array(
-                        'email' => 'mahendrakalkura@gmail.com',
-                        'id' => 2,
-                        'name' => 'Mahendra Kalkura',
                     ));
                     $application['session']->getFlashBag()->add(
                         'success',

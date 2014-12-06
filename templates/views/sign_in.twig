@@ -52,7 +52,7 @@
                         <div class="signin-text">
                             <span>{{ module }}</span>
                         </div>
-                        <div class="form-group w-icon">
+                        <div class="form-group w-icon {{ error is defined and error? 'has-error': '' }}">
                             <input
                                 class="form-control input-lg"
                                 id="username"
@@ -62,6 +62,9 @@
                                 value=""
                                 >
                             <span class="fa fa-user signin-form-icon"></span>
+                            {% if error is defined and error %}
+                                <div class="help-block">{{ error }}</div>
+                            {% endif %}
                         </div>
                         <div class="form-group w-icon">
                             <input
