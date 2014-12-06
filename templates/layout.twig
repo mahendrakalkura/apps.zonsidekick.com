@@ -46,7 +46,12 @@
                         <a
                             class="navbar-brand"
                             href="{{ url('dashboard') }}"
-                            >ZonSidekick</a>
+                            >
+                            <img
+                                height="26"
+                                src="{{ app.request.getSchemeAndHttpHost() }}{{ app.request.baseUrl }}/images/logo.png"
+                                >
+                        </a>
                         <button
                             class="navbar-toggle collapsed"
                             data-target="#main-navbar-collapse"
