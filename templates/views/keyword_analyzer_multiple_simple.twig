@@ -124,14 +124,11 @@
             </a>
         </p>
         <p ng-show="spinner">
-            <span class="fa fa-2x fa-fw fa-spinner fa-spin">
-            </span>
+            <span class="fa fa-2x fa-fw fa-spinner fa-spin"></span>
         </p>
         <p ng-show="items.length > 0">
             <ul>
-                <li ng-repeat="item in items">
-                    [! item !]
-                </li>
+                <li ng-repeat="item in items">[! item !]</li>
             </ul>
         </p>
         <p ng-show="items.length > 0">
@@ -211,9 +208,9 @@
             </div>
         </div>
     </form>
-    <div class="row">
+    <div class="row" ng-show="is_finished()">
         <div class="col-xs-12 table-light">
-            <hr ng-show="is_finished()">
+            <hr>
             <p class="text-center">Mouse over headers for explanation</p>
             <table class="table table-bordered table-hover table-striped">
                 <thead>
@@ -669,7 +666,7 @@
             </table>
         </div>
     </div>
-    <p ng-show="!keywords.length">
+    <p class="text-center" ng-show="!keywords.length">
         <span class="fa fa-fw fa-spinner fa-spin fa-2x"></span>
     </p>
 </div>
