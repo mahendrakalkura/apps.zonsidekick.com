@@ -107,6 +107,10 @@ ul {
     padding-right: 10px;
 }
 
+.btn.clearfix.col-xs-12 {
+    margin-bottom: 18px !important;
+}
+
 .buttons {
     border-color: #ececec !important;
 }

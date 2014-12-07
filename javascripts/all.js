@@ -75,7 +75,7 @@ application.directive('popover', function () {
         link: function (scope, element, attrs) {
             jQuery(element).popover({
                 container: 'body',
-                content: jQuery(element).find('div').contents(),
+                content: jQuery(element).next().contents(),
                 html: true,
                 placement: 'bottom'
             });

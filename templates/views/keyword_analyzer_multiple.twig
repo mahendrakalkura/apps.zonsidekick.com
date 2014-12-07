@@ -47,90 +47,92 @@
     Additional (new) reports will be queued until your others have finished.
 </p>
 {% if requests %}
-    <table class="table table-bordered table-hover table-striped">
-        <thead>
-            <tr>
-                <th>Report #</th>
-                <th class="narrow text-right">Keywords</th>
-                <th class="narrow text-right">Expires In</th>
-                <th class="narrow text-right">Progress</th>
-                <th class="narrow text-center">Status</th>
-                <th class="narrow text-center">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for request in requests %}
+    <div class="table-light">
+        <table class="table table-bordered table-hover table-striped">
+            <thead>
                 <tr>
-                    <td>{{ request.id }}</td>
-                    <td class="narrow text-right">
-                        {{ request.preview }}
-                        ({{ request.keywords[1] }})
-                    </td>
-                    <td class="narrow text-right">
-                        {{ request.expires_in }}
-                    </td>
-                    <td class="narrow text-right">
-                        {{ request.progress|number_format(2, '.', ',') }}%
-                    </td>
-                    <td class="narrow text-center">
-                        {% if request.status == 'Completed' %}
-                            <span class="label label-info">
-                                {{ request.status }}
-                            </span>
-                        {% endif %}
-                        {% if request.status == 'Waiting' %}
-                            <span class="label label-warning">
-                                {{ request.status }}
-                            </span>
-                        {% endif %}
-                        {% if request.status == 'In Progress' %}
-                            <span class="label label-success">
-                                {{ request.status }}
-                            </span>
-                        {% endif %}
-                    </td>
-                    <td class="narrow text-center">
-                        <a
-                            class="fa fa-lg fa-fw fa-tasks"
-                            href="{{ url('keyword_analyzer_multiple_simple', {'id': request.id}) }}"
-                            title="View Simple Report"
-                            data-placement="left"
-                            data-toggle="tooltip"
-                            ></a>
-                        <a
-                            class="fa fa-lg fa-fw fa-bar-chart-o"
-                            href="{{ url('keyword_analyzer_multiple_detailed', {'id': request.id}) }}"
-                            target="_blank"
-                            title="View Detailed Report (For very large reports this page could take a little while to complete. Please be patient.)"
-                            data-placement="left"
-                            data-toggle="tooltip"
-                            ></a>
-                        <a
-                            class="fa fa-lg fa-fw fa-download"
-                            href="{{ url('keyword_analyzer_multiple_csv', {'id': request.id}) }}"
-                            title="Download CSV (Simple Report)"
-                            data-placement="left"
-                            data-toggle="tooltip"
-                            ></a>
-                        <a
-                            class="fa fa-lg fa-fw fa-download"
-                            href="{{ url('keyword_analyzer_multiple_pdf', {'id': request.id}) }}"
-                            title="Download PDF (Detailed Report)"
-                            data-placement="left"
-                            data-toggle="tooltip"
-                            ></a>
-                        <a
-                            class="fa fa-lg fa-fw fa-times-circle"
-                            href="{{ url('keyword_analyzer_multiple_delete', {'id': request.id}) }}"
-                            title="Delete"
-                            data-placement="left"
-                            data-toggle="tooltip"
-                            ></a>
-                    </td>
+                    <th>Report #</th>
+                    <th class="narrow text-right">Keywords</th>
+                    <th class="narrow text-right">Expires In</th>
+                    <th class="narrow text-right">Progress</th>
+                    <th class="narrow text-center">Status</th>
+                    <th class="narrow text-center">Actions</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for request in requests %}
+                    <tr>
+                        <td>{{ request.id }}</td>
+                        <td class="narrow text-right">
+                            {{ request.preview }}
+                            ({{ request.keywords[1] }})
+                        </td>
+                        <td class="narrow text-right">
+                            {{ request.expires_in }}
+                        </td>
+                        <td class="narrow text-right">
+                            {{ request.progress|number_format(2, '.', ',') }}%
+                        </td>
+                        <td class="narrow text-center">
+                            {% if request.status == 'Completed' %}
+                                <span class="label label-info">
+                                    {{ request.status }}
+                                </span>
+                            {% endif %}
+                            {% if request.status == 'Waiting' %}
+                                <span class="label label-warning">
+                                    {{ request.status }}
+                                </span>
+                            {% endif %}
+                            {% if request.status == 'In Progress' %}
+                                <span class="label label-success">
+                                    {{ request.status }}
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="narrow text-center">
+                            <a
+                                class="fa fa-lg fa-fw fa-tasks"
+                                href="{{ url('keyword_analyzer_multiple_simple', {'id': request.id}) }}"
+                                title="View Simple Report"
+                                data-placement="left"
+                                data-toggle="tooltip"
+                                ></a>
+                            <a
+                                class="fa fa-lg fa-fw fa-bar-chart-o"
+                                href="{{ url('keyword_analyzer_multiple_detailed', {'id': request.id}) }}"
+                                target="_blank"
+                                title="View Detailed Report (For very large reports this page could take a little while to complete. Please be patient.)"
+                                data-placement="left"
+                                data-toggle="tooltip"
+                                ></a>
+                            <a
+                                class="fa fa-lg fa-fw fa-download"
+                                href="{{ url('keyword_analyzer_multiple_csv', {'id': request.id}) }}"
+                                title="Download CSV (Simple Report)"
+                                data-placement="left"
+                                data-toggle="tooltip"
+                                ></a>
+                            <a
+                                class="fa fa-lg fa-fw fa-download"
+                                href="{{ url('keyword_analyzer_multiple_pdf', {'id': request.id}) }}"
+                                title="Download PDF (Detailed Report)"
+                                data-placement="left"
+                                data-toggle="tooltip"
+                                ></a>
+                            <a
+                                class="fa fa-lg fa-fw fa-times-circle"
+                                href="{{ url('keyword_analyzer_multiple_delete', {'id': request.id}) }}"
+                                title="Delete"
+                                data-placement="left"
+                                data-toggle="tooltip"
+                                ></a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% else %}
     <div class="alert alert-dark alert-danger">
         You have not added any requests yet.
