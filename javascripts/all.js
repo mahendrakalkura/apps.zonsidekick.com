@@ -709,6 +709,9 @@ application.controller('keyword_analyzer_multiple_simple', [
         };
 
         $scope.is_finished = function () {
+            if (!$scope.keywords.length) {
+                return false;
+            }
             var status = true;
             for (var index in $scope.keywords) {
                 if (index == 'get_chunks') {
