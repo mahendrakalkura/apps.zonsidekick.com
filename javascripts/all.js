@@ -490,7 +490,6 @@ application.controller('keyword_analyzer_multiple_add', [
         };
 
         $scope.get_class = function () {
-            console.log($scope.count);
             if ($scope.count < 1) {
                 return 'text-danger';
             }
@@ -1370,6 +1369,10 @@ jQuery(function () {
     });
     jQuery('.got-it').click(function () {
         jQuery.cookie(jQuery(this).parents('.modal').attr('id'), 'Yes');
+    });
+    jQuery('.switcher').switcher({
+        off_state_content: 'No',
+        on_state_content: 'Yes'
     });
     jQuery('.well').height(
         Math.max.apply(

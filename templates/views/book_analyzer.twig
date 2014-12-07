@@ -31,8 +31,8 @@
     page.
 </p>
 <div
-    data-error-1-middle="<p>Please enter a valid keyword.</p>"
-    data-error-1-top="Keyword Error"
+    data-error-1-middle="<p>Please enter a valid name.</p>"
+    data-error-1-top="Name Error"
     data-error-2-middle="<p>Network Error (replied not received for the most recent AJAX request).</p>"
     data-error-2-top="Network Error"
     data-url-book="{{ url('book_analyzer_book') }}"
@@ -73,7 +73,7 @@
     <p class="text-center hide [! books.spinner == true && 'show' || 'hide' !]">
         <span class="fa fa-2x fa-fw fa-spin fa-spinner"></span>
     </p>
-    <div class="hide [! books.contents.length > 0 && 'show' || 'hide' !]">
+    <div class="hide table-light [! books.contents.length > 0 && 'show' || 'hide' !]">
         <table class="table table-bordered table-hover table-striped">
             <thead>
                 <th class="book-cover-image">Image</th>
@@ -208,7 +208,7 @@
     <p class="text-center hide [! items.spinner == true && 'show' || 'hide' !]">
         <span class="fa fa-2x fa-fw fa-spin fa-spinner"></span>
     </p>
-    <div class="hide [! items.contents != '' && 'show' || 'hide' !]">
+    <div class="hide table-light [! items.contents != '' && 'show' || 'hide' !]">
         <table class="table table-bordered table-hover table-striped">
             <thead>
                 <tr>

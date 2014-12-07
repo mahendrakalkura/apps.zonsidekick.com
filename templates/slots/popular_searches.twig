@@ -1,80 +1,78 @@
-{% for batch in popular_searches|batch(3) %}
-    <div class="row">
-        {% for popular_search in batch %}
-            <div class="col-xs-4">
-                <div class="media well">
-                    <a
-                        class="pull-left"
-                        href="{{ popular_search.url }}"
-                        rel="noreferrer"
-                        target="_blank"
-                        ><img src="{{ popular_search.book_cover_image }}"></a>
-                    <div class="media-body">
-                        <h4 class="media-heading">
-                            <a
-                                href="{{ url('book_analyzer') }}?url={{ popular_search.url_ }}"
-                                target="_blank"
-                                >{{ popular_search.title }}</a>
-                            <a
-                                href="{{ popular_search.url }}"
-                                rel="noreferrer"
-                                target="_blank"
-                                ><i class="fa fa-fw fa-external-link"></i></a>
-                        </h4>
-                        <p><strong>Categories & Ranks:</strong></p>
-                        <ul ng-controller="amazon_best_sellers_rank">
-                            {% for key, value in popular_search.amazon_best_sellers_rank %}
-                                <li
-                                    {% if key == 'Paid in Kindle Store' %}
-                                    {% else %}
+<div class="row">
+    {% for popular_search in popular_searches %}
+        <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
+            <div class="media well">
+                <a
+                    class="pull-left"
+                    href="{{ popular_search.url }}"
+                    rel="noreferrer"
+                    target="_blank"
+                    ><img src="{{ popular_search.book_cover_image }}"></a>
+                <div class="media-body">
+                    <h4 class="media-heading">
+                        <a
+                            href="{{ url('book_analyzer') }}?url={{ popular_search.url_ }}"
+                            target="_blank"
+                            >{{ popular_search.title }}</a>
+                        <a
+                            href="{{ popular_search.url }}"
+                            rel="noreferrer"
+                            target="_blank"
+                            ><i class="fa fa-fw fa-external-link"></i></a>
+                    </h4>
+                    <p><strong>Categories & Ranks:</strong></p>
+                    <ul ng-controller="amazon_best_sellers_rank">
+                        {% for key, value in popular_search.amazon_best_sellers_rank %}
+                            <li
+                                {% if key == 'Paid in Kindle Store' %}
+                                {% else %}
+                                    ng-show="status"
+                                {% endif %}
+                                >
+                                <strong>
+                                    #{{ value|number_format(0, '.', ',') }}
+                                </strong>
+                                in
+                                {{ key }}
+                                {% if key == 'Paid in Kindle Store' %}
+                                    <a
+                                        ng-click="status = true"
+                                        ng-show="!status"
+                                        >Show More</a>
+                                    <a
+                                        ng-click="status = false"
                                         ng-show="status"
-                                    {% endif %}
-                                    >
-                                    <strong>
-                                        #{{ value|number_format(0, '.', ',') }}
-                                    </strong>
-                                    in
-                                    {{ key }}
-                                    {% if key == 'Paid in Kindle Store' %}
-                                        <a
-                                            ng-click="status = true"
-                                            ng-show="!status"
-                                            >Show More</a>
-                                        <a
-                                            ng-click="status = false"
-                                            ng-show="status"
-                                            >Show Less</a>
-                                    {% else %}
-                                    {% endif %}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                        <p><strong>Appearances:</strong></p>
+                                        >Show Less</a>
+                                {% else %}
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <p><strong>Appearances:</strong></p>
+                    <ul>
+                        {% for key, value in popular_search.appearances %}
+                            <li>
+                                <strong>
+                                {{ value|number_format(0, '.', ',') }}
+                                </strong>
+                                in the
+                                {{ key }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    {% if popular_search.keywords|length > 0 %}
+                        <p><strong>Keywords:</strong></p>
                         <ul>
-                            {% for key, value in popular_search.appearances %}
+                            {% for key, value in popular_search.keywords %}
                                 <li>
-                                    <strong>
-                                    {{ value|number_format(0, '.', ',') }}
-                                    </strong>
-                                    in the
                                     {{ key }}
+                                    ({{ value|number_format(2, '.', ',') }}%)
                                 </li>
                             {% endfor %}
                         </ul>
-                        {% if popular_search.keywords|length > 0 %}
-                            <p><strong>Keywords:</strong></p>
-                            <ul>
-                                {% for key, value in popular_search.keywords %}
-                                    <li>
-                                        {{ key }}
-                                        ({{ value|number_format(2, '.', ',') }}%)
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        {% endif %}
-                    </div>
+                    {% endif %}
                 </div>
             </div>
-        {% endfor %}
-    </div>
-{% endfor %}
+        </div>
+    {% endfor %}
+</div>

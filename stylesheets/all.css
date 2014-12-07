@@ -99,12 +99,16 @@ ul {
 
 .book {
     margin-bottom: 18px;
-    margin-right: 18px;
+    margin-left: 18px;
 }
 
 .breadcrumb-label {
     margin-top: 0;
     padding-right: 10px;
+}
+
+.buttons {
+    border-color: #ececec !important;
 }
 
 .details p,
@@ -165,6 +169,16 @@ ul {
 .select2 + .form-control,
 .select2 + .input-group {
     margin-top: 10px;
+}
+
+.switcher {
+    float: right;
+    vertical-align: middle;
+}
+
+.switcher + label {
+    margin-bottom: 0;
+    vertical-align: middle;
 }
 
 .table > tbody + tbody {

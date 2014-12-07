@@ -51,10 +51,10 @@
     ng-controller="keyword_suggester"
     >
     <div class="row">
-        <div class="col-xs-6">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-xs-6">
             <form accept-charset="UTF-8" ng-submit="submit()">
                 <div class="panel">
-                    <div class="bordered clearfix no-border-l no-border-r no-border-t panel-footer text-right">
+                    <div class="bordered buttons clearfix no-border-l no-border-r no-border-t panel-footer text-right">
                         <button
                             class="btn btn-success pull-right"
                             ng-show="!spinner"
@@ -64,7 +64,7 @@
                             Submit
                         </button>
                         <button
-                            class="btn btn-danger pull-right"
+                            class="btn btn-danger no-margin pull-right"
                             ng-click="reset()"
                             ng-show="spinner"
                             type="reset"
@@ -135,11 +135,13 @@
                                 </select>
                             </div>
                             <div class="form-group">
+                                <input
+                                    class="pull-right switcher"
+                                    type="checkbox"
+                                    ng-model="checkbox"
+                                    >
                                 <label class="control-label" class="checkbox">
-                                    <input
-                                        type="checkbox"
-                                        ng-model="checkbox"
-                                        > Automatically download on completion
+                                    Automatically download on completion
                                 </label>
                             </div>
                         </div>
@@ -184,7 +186,7 @@
                             Submit
                         </button>
                         <button
-                            class="btn btn-danger pull-right"
+                            class="btn btn-danger no-margin pull-right"
                             ng-click="reset()"
                             ng-show="spinner"
                             type="reset"
@@ -196,7 +198,7 @@
                 </div>
             </form>
         </div>
-        <div class="col-xs-6 hide [! suggestions.length && 'show' || 'hide' !]">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-xs-6 hide [! suggestions.length && 'show' || 'hide' !]">
             <form accept-charset="UTF-8">
                 <div class="panel">
                     <div class="panel-body">

@@ -1,7 +1,7 @@
 {% extends 'layout.twig' %}
 
 {% set module = 'Logos - Overview' %}
-{% set nav = 'others_logos' %}
+{% set nav = 'logos' %}
 
 {% block content %}
 <ul class="breadcrumb breadcrumb-page">
@@ -34,42 +34,43 @@
     reports.
 </p>
 {% if logos %}
-    <table class="table table-bordered table-hover table-striped">
-        <thead>
-            <tr>
-                <th>Logo</th>
-                <th class="narrow text-right">Dimensions</th>
-                <th class="narrow text-center">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for logo in logos %}
+    <div class="table-light">
+        <table class="table table-bordered table-hover table-striped">
+            <thead>
                 <tr>
-                    <td>
-                        <span class="pull-right">
-                            {{ logo.file_name }}
-                        </span>
-                        <img src="{{ url('logos_preview', {'file_name': logo.file_name}) }}">
-                    </td>
-                    <td class="narrow text-right">{{ logo.dimensions }}</td>
-                    <td class="narrow text-center">
-                        <a
-                            class="fa fa-lg fa-fw fa-download"
-                            href="{{ url('logos_download', {'file_name': logo.file_name}) }}"
-                            title="Download"
-                            data-toggle="tooltip"
-                            ></a>
-                        <a
-                            class="fa fa-lg fa-fw fa-times-circle"
-                            href="{{ url('logos_delete', {'file_name': logo.file_name}) }}"
-                            title="Delete"
-                            data-toggle="tooltip"
-                            ></a>
-                    </td>
+                    <th>Logo</th>
+                    <th class="narrow text-right">Dimensions</th>
+                    <th class="narrow text-center">Actions</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for logo in logos %}
+                    <tr>
+                        <td>
+                            <img src="{{ url('logos_preview', {'file_name': logo.file_name}) }}">
+                        </td>
+                        <td class="narrow text-right">
+                            {{ logo.dimensions }}
+                        </td>
+                        <td class="narrow text-center">
+                            <a
+                                class="fa fa-lg fa-fw fa-download"
+                                href="{{ url('logos_download', {'file_name': logo.file_name}) }}"
+                                title="Download"
+                                data-toggle="tooltip"
+                                ></a>
+                            <a
+                                class="fa fa-lg fa-fw fa-times-circle"
+                                href="{{ url('logos_delete', {'file_name': logo.file_name}) }}"
+                                title="Delete"
+                                data-toggle="tooltip"
+                                ></a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% else %}
     <div class="alert alert-dark alert-danger">
         You have not uploaded any logos yet.
