@@ -115,6 +115,42 @@ ul {
     border-color: #ececec !important;
 }
 
+.carousel-control,
+.carousel-control:hover {
+    color: #23272d;
+    background: none !important;
+    width: 1.28571em !important;
+}
+
+.carousel-control .fa {
+    display: inline-block;
+    left: 0;
+    position: absolute;
+    top: 50%;
+    z-index: 5;
+}
+
+.carousel-indicators {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.carousel-indicators li {
+    background-color: #fff;
+    border-color: #23272d;
+    color: #23272d;
+}
+
+.carousel-indicators li.active {
+    background-color: #23272d;
+    border-color: #23272d;
+    color: #23272d;
+}
+
+.carousel-inner {
+    padding-bottom: 60px;
+}
+
 .details p,
 .details ul {
     margin: 0;
