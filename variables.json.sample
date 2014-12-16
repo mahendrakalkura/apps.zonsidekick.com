@@ -16,5 +16,5 @@
         "port": "...",
         "username": "..."
     },
-    "virtualenv": "..." // Example: /home/{{ username }}/.virtualenvs/zonsidekick.com/bin
+    "virtualenv": "..." // Example: /home/{{ username }}/.virtualenvs/apps.zonsidekick.com/bin
 }
