@@ -33,7 +33,7 @@ CONCURRENT_ITEMS = 16
 CONCURRENT_REQUESTS_PER_DOMAIN = 16
 CONCURRENT_REQUESTS = 16
 DOWNLOADER_MIDDLEWARES = {
-    'ce.Middleware': 400,
+    'top_100_explorer.Middleware': 400,
     'scrapy.contrib.downloadermiddleware.retry.RetryMiddleware': 500,
     'scrapy.contrib.downloadermiddleware.redirect.RedirectMiddleware': 600,
     (
@@ -45,11 +45,11 @@ DOWNLOADER_MIDDLEWARES = {
 DOWNLOAD_TIMEOUT = 60
 HTTPCACHE_ENABLED = False
 ITEM_PIPELINES = {
-    'ce.Pipeline': 100,
+    'top_100_explorer.Pipeline': 100,
 }
 LOG_LEVEL = 'INFO'
 SPIDER_MODULES = [
-    'ce',
+    'top_100_explorer',
 ]
 USER_AGENT = BOT_NAME
 
