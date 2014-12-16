@@ -246,7 +246,7 @@ class Spider(CrawlSpider):
     allowed_domains = [
         'amazon.com',
     ]
-    name = 'ce'
+    name = 'top_100_explorer'
     rules = (
         Rule(
             SgmlLinkExtractor(
