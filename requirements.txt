@@ -9,6 +9,7 @@ cairocffi==0.5.4
 cffi==0.8.6
 characteristic==0.1.0
 cryptography==0.5.2
+cssmin==0.2.0
 cssselect==0.9.1
 furl==0.3.95
 gevent==1.0.1
@@ -25,10 +26,12 @@ pycparser==2.10
 python-dateutil==2.2
 queuelib==1.2.2
 requests==2.3.0
+rjsmin==1.0.10
 service-identity==1.0.0
 simplejson==3.6.0
 six==1.7.3
 tinycss==0.3
 w3lib==1.8.0
+webassets==0.10.1
 wsgiref==0.1.2
 zope.interface==4.1.1

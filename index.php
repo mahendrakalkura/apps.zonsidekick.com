@@ -698,7 +698,7 @@ $application->register(new TwigServiceProvider(), array(
 $application->register(new UrlGeneratorServiceProvider());
 
 $application['mailer'] = $application->share(function ($application) {
-    return new \Swift_Mailer($application['swiftmailer.transport']);
+    return new Swift_Mailer($application['swiftmailer.transport']);
 });
 
 if ($application['debug']) {
@@ -753,8 +753,10 @@ $application->before(function (Request $request) use ($application) {
         }
     }
     $application['session']->set('user', $user);
-    $application['twig']->addGlobal('has_statistics', has_statistics($user));
-    $application['twig']->addGlobal('is_paying_customer', $is_paying_customer);
+    $application['twig']
+        ->addGlobal('has_statistics', has_statistics($user));
+    $application['twig']
+        ->addGlobal('is_paying_customer', $is_paying_customer);
     $application['twig']->addGlobal('user', $user);
 });
 
