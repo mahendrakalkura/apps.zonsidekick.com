@@ -156,6 +156,11 @@ ul {
     margin: 0;
 }
 
+.forgot-password {
+    margin-left: 0;
+    margin-top: 11px;
+}
+
 .form-group {
     margin-bottom: 18px;
 }
@@ -200,6 +205,11 @@ ul {
 
 .popover-content input {
     vertical-align: top;
+}
+
+.remember-me {
+    margin-right: 10px;
+    margin-top: 3px;
 }
 
 .select2-search:after {

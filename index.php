@@ -547,6 +547,21 @@ function get_user($application) {
             'name' => 'Administrator',
         );
     }
+    $query = <<<EOD
+SELECT `id` , `user_email` , `user_pass` , `display_name`
+FROM `wp_users`
+WHERE `id` = ?
+EOD;
+    $record = $application['db']->fetchAssoc($query, array(
+        !empty($_COOKIE['id'])? $_COOKIE['id']: 0,
+    ));
+    if ($record) {
+        return array(
+            'email' => $record['user_email'],
+            'id' => $record['id'],
+            'name' => $record['display_name'],
+        );
+    }
     $user = $application['session']->get('user_');
     if ($user) {
         return $user;
@@ -1652,6 +1667,17 @@ EOD;
                     $username,
                 ));
                 if ($record AND is_valid($password, $record['user_pass'])) {
+                    if ($request->get('remember_me') == 'yes') {
+                        setcookie(
+                            'id',
+                            $record['id'],
+                            time() + (60 * 60 * 24 * 365),
+                            '/',
+                            'apps.zonsidekick.com',
+                            false,
+                            false
+                        );
+                    }
                     $application['session']->set('user', array(
                         'email' => $record['user_email'],
                         'id' => $record['id'],
@@ -1682,6 +1708,15 @@ $application
 ->match(
     '/sign-out',
     function () use ($application) {
+        setcookie(
+            'id',
+            0,
+            time() - (60 * 60 * 24 * 365),
+            '/',
+            'apps.zonsidekick.com',
+            false,
+            false
+        );
         $application['session']->set('user_', array(
             'email' => '',
             'id' => '',
