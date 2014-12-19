@@ -716,7 +716,7 @@ def get_contents(keyword, country):
         related_items = ''
         try:
             related_items = get_string(selector.xpath(
-                '//div[@id="purchaseSimsData"]/text()'
+                '//div[@id="purchaseData"]/text()'
             ).extract()[0]).split(',')
         except IndexError:
             pass
