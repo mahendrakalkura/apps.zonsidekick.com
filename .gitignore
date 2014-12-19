@@ -1,3 +1,5 @@
+assets/*.css
+assets/*.js
 composer.lock
 files/*
 !files/*.sql
