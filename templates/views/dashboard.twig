@@ -98,25 +98,21 @@
     {% include 'slots/popular_searches.twig' %}
 {% endif %}
 <hr>
-<p>Current Version: <strong>3.1</strong></p>
+<p>Current Version: <strong>4.0</strong></p>
 <ul>
     <li>
-        Keyword Analyzer:
-        <ul>
-            <li>Performance improvements</li>
-            {#<li>Support for multiple countries</li>#}
-            <li>
-                Results will now sort by highest score as default
-            </li>
-        </ul>
+        A brand new look! Version 4.0 features our new user interface. We're
+        always looking for ways to improve, if you have any feedback at all
+        please submit it via the "Feedback" button. We'd love to hear from you!
     </li>
     <li>
-        Keyword Suggester:
+        New tools! We've added the following tools to the Zon Sidekick suite:
         <ul>
-            <li>
-                Resolved an issue that prevented German queries
-                from working correctly
-            </li>
+            <li>Top 100 Explorer</li>
+            <li>Author Analyzer</li>
+            <li>Book Analyzer</li>
+            <li>Popular Searches</li>
+            <li>Single Keyword Analyzer</li>
         </ul>
     </li>
 </ul>
@@ -128,6 +124,28 @@
         <a ng-click="status = false">Hide Previous Versions</a>
     </p>
     <div ng-show="status">
+        <p>Version: <strong>3.1</strong></p>
+        <ul>
+            <li>
+                Keyword Analyzer:
+                <ul>
+                    <li>Performance improvements</li>
+                    {#<li>Support for multiple countries</li>#}
+                    <li>
+                        Results will now sort by highest score as default
+                    </li>
+                </ul>
+            </li>
+            <li>
+                Keyword Suggester:
+                <ul>
+                    <li>
+                        Resolved an issue that prevented German queries
+                        from working correctly
+                    </li>
+                </ul>
+            </li>
+        </ul>
         <p>Version: <strong>3.0</strong></p>
         <ul>
             <li>
