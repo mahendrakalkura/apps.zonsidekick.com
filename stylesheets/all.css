@@ -83,6 +83,15 @@ ul {
     padding-bottom: 1px;
 }
 
+#main-menu ul.navigation > .support {
+    background-color: #5ebd5e;
+}
+
+#main-menu ul.navigation > .support a .menu-icon,
+#main-menu ul.navigation > .support a .mm-text {
+    color: #ffffff;
+}
+
 .author {
     margin-bottom: 18px;
     margin-right: 18px;
