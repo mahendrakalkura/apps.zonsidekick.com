@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from email.mime.text import MIMEText
 from smtplib import SMTP
 
 from author_analyzer import get_author, get_authors
-from keyword_suggester import get_results
 from book_analyzer import get_books, get_items
+from flask.ext.mail import Message
 from keyword_analyzer import get_contents
+from keyword_suggester import get_results
 from suggested_keywords import get_suggested_keywords
 from utilities import get_book, get_response, variables
 
@@ -195,9 +195,12 @@ if __name__ == '__main__':
     resource.login(
         variables['smtp']['username'], variables['smtp']['password']
     )
-    message = MIMEText(body)
-    message['Subject'] = 'tests.py'
-    message['From'] = 'reports@perfectsidekick.com'
-    message['To'] = 'ncroan@gmail.com'
-    resource.sendmail(message['From'], message['To'], message.as_string())
+    message = Message(
+        'tests.py',
+        bcc=['mahendrakalkura@gmail.com'],
+        body=body,
+        recipients=['ncroan@gmail.com'],
+        sender=('Perfect Sidekick', 'support@perfectsidekick.com'),
+    )
+    resource.sendmail(message.sender, message.send_to, str(message))
     resource.quit()

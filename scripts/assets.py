@@ -4,7 +4,6 @@ from logging import DEBUG, getLogger, StreamHandler
 
 from webassets import Bundle, Environment
 from webassets.script import CommandLineEnvironment
-from webassets.script import CommandLineEnvironment
 
 from utilities import variables
 
