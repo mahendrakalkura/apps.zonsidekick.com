@@ -40,7 +40,7 @@ def get_suggested_keywords(original_keywords):
             if len([word for word in words if word in original_keywords]) >= 2:
                 if keyword not in suggested_keywords:
                     suggested_keywords.append(keyword)
-    return suggested_keywords
+    return sorted(suggested_keywords)
 
 if __name__ == '__main__':
     print dumps(get_suggested_keywords(argv[1].split(',')))
