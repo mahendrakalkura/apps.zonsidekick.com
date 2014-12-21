@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from smtplib import SMTP_SSL
+from smtplib import SMTP
 
 from flask.ext.mail import Message
 
@@ -192,7 +192,7 @@ if __name__ == '__main__':
             'status': 'Success' if suggested_keywords_py() else 'Failure'
         },
     ])
-    resource = SMTP_SSL(variables['smtp']['host'], variables['smtp']['port'])
+    resource = SMTP(variables['smtp']['host'], variables['smtp']['port'])
     resource.login(
         variables['smtp']['username'], variables['smtp']['password']
     )
