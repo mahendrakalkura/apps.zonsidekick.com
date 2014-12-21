@@ -584,7 +584,7 @@ function get_words_from_title($title) {
     if ($items) {
         foreach ($items as $item) {
             if (strlen($item) > 3) {
-                $words[] = $item;
+                $words[] = strtolower($item);
             }
         }
     }
