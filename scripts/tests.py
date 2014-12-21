@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from smtplib import SMTP
+from smtplib import SMTP_SSL
+
+from flask.ext.mail import Message
 
 from author_analyzer import get_author, get_authors
 from book_analyzer import get_books, get_items
-from flask.ext.mail import Message
 from keyword_analyzer import get_contents
 from keyword_suggester import get_results
 from suggested_keywords import get_suggested_keywords
@@ -191,7 +192,7 @@ if __name__ == '__main__':
             'status': 'Success' if suggested_keywords_py() else 'Failure'
         },
     ])
-    resource = SMTP(variables['smtp']['host'], variables['smtp']['port'])
+    resource = SMTP_SSL(variables['smtp']['host'], variables['smtp']['port'])
     resource.login(
         variables['smtp']['username'], variables['smtp']['password']
     )
