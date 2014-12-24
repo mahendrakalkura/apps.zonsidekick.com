@@ -58,6 +58,16 @@ $ grunt compile-less
 $ grunt compile-sass
 ```
 
+Step 6
+------
+
+```
+$ cd apps.zonsidekick.com
+$ workon apps.zonsidekick.com
+$ cd scripts
+$ python assets.py
+```
+
 How to run?
 ===========
 
