@@ -30,13 +30,13 @@ class book(base):
     __table_args__ = {
         'autoload': True,
     }
-    __tablename__ = 'tools_ps_books'
+    __tablename__ = 'apps_popular_searches_books'
 
     amazon_best_sellers_rank = Column(mutators_dict.as_mutable(json))
 
 
 class trend(base):
-    __tablename__ = 'tools_ps_trends'
+    __tablename__ = 'apps_popular_searches_trends'
     __table_args__ = {
         'autoload': True,
     }

@@ -28,10 +28,10 @@
     data-email-middle="<p>The email has been queued for delivery successfully.</p>"
     data-pdf-top="PDF"
     data-pdf-middle="<p>Your PDF report is being generated. This process could take up to 15 minutes depending on the size of your report. When ready, a download dialogue will appear.</p><p>NOTE: This report is limited to 100 pages. We'll display the top 100 keywords with 25 products in each keyword on your PDF. For the complete report please click &quot;View Detailed Report&quot;.</p>"
-    data-url-csv="{{ url('keyword_analyzer_multiple_csv', {'id': request.id}) }}"
-    data-url-email="{{ url('keyword_analyzer_multiple_email', {'id': request.id}) }}"
-    data-url-pdf="{{ url('keyword_analyzer_multiple_pdf', {'id': request.id}) }}"
-    data-url-xhr="{{ url('keyword_analyzer_multiple_xhr', {'id': request.id}) }}"
+    data-url-csv="{{ url('keyword_analyzer_multiple_csv', {'id': report.id}) }}"
+    data-url-email="{{ url('keyword_analyzer_multiple_email', {'id': report.id}) }}"
+    data-url-pdf="{{ url('keyword_analyzer_multiple_pdf', {'id': report.id}) }}"
+    data-url-xhr="{{ url('keyword_analyzer_multiple_xhr', {'id': report.id}) }}"
     ng-controller="keyword_analyzer_multiple_simple"
     >
     <div class="row" ng-show="is_finished()">
@@ -40,7 +40,7 @@
                 <a
                     class="btn btn-info col-xs-12"
                     data-toggle="tooltip"
-                    href="{{ url('keyword_analyzer_multiple_detailed', {'id': request.id}) }}"
+                    href="{{ url('keyword_analyzer_multiple_detailed', {'id': report.id}) }}"
                     target="_blank"
                     title="For very large reports this page could take a little while to complete. Please be patient."
                     >
@@ -53,7 +53,7 @@
             <p class="clearfix">
                 <a
                     class="btn btn-info col-xs-12"
-                    href="{{ url('keyword_analyzer_multiple_csv', {'id': request.id}) }}"
+                    href="{{ url('keyword_analyzer_multiple_csv', {'id': report.id}) }}"
                     title="Simple Report"
                     data-toggle="tooltip"
                     >
@@ -75,14 +75,14 @@
             <div class="hide">
                 <img
                     class="popover-pdf"
-                    data-url="{{ url('keyword_analyzer_multiple_pdf', {'id': request.id}) }}"
+                    data-url="{{ url('keyword_analyzer_multiple_pdf', {'id': report.id}) }}"
                     src="{{ app.request.getSchemeAndHttpHost() }}{{ app.request.baseUrl }}/images/logo.png"
                     width="100"
                     >
                 {% for logo in logos %}
                     <img
                         class="img-polaroid popover-pdf"
-                        data-url="{{ url('keyword_analyzer_multiple_pdf', {'id': request.id, 'logo': logo.file_name|e('url')}) }}"
+                        data-url="{{ url('keyword_analyzer_multiple_pdf', {'id': report.id, 'logo': logo.file_name|e('url')}) }}"
                         src="{{ url('logos_preview', {'file_name': logo.file_name}) }}"
                         width="100"
                         >
@@ -92,7 +92,7 @@
         <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
             <p
                 class="btn btn-info clearfix col-xs-12"
-                data-url="{{ url('keyword_analyzer_multiple_email', {'id': request.id}) }}"
+                data-url="{{ url('keyword_analyzer_multiple_email', {'id': report.id}) }}"
                 title="Simple Report + Detailed Report"
                 data-toggle="tooltip"
                 popover

@@ -58,7 +58,7 @@ class category(base):
     __table_args__ = {
         'autoload': True,
     }
-    __tablename__ = 'tools_ce_categories'
+    __tablename__ = 'apps_top_100_explorer_categories'
 
     id = Column(Integer(), primary_key=True)
 
@@ -75,20 +75,20 @@ class section(base):
     __table_args__ = {
         'autoload': True,
     }
-    __tablename__ = 'tools_ce_sections'
+    __tablename__ = 'apps_top_100_explorer_sections'
 
 
 class book(base):
     __table_args__ = {
         'autoload': True,
     }
-    __tablename__ = 'tools_ce_books'
+    __tablename__ = 'apps_top_100_explorer_books'
 
     amazon_best_sellers_rank = Column(mutators_dict.as_mutable(json))
 
 
 class trend(base):
-    __tablename__ = 'tools_ce_trends'
+    __tablename__ = 'apps_top_100_explorer_trends'
     __table_args__ = {
         'autoload': True,
     }

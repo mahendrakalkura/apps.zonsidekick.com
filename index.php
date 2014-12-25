@@ -76,7 +76,7 @@ function get_category($application, $category_id) {
     while (true) {
         $query = <<<EOD
 SELECT `category_id`, `title`
-FROM `tools_ce_categories`
+FROM `apps_top_100_explorer_categories`
 WHERE `id` = ?
 EOD;
         $record = $application['db']->fetchAssoc($query, array(
@@ -100,14 +100,14 @@ function get_categories($application, $category_id, $prefixes) {
     if ($category_id) {
         $query = <<<EOD
 SELECT *
-FROM `tools_ce_categories`
+FROM `apps_top_100_explorer_categories`
 WHERE `category_id` = ?
 ORDER BY `title` ASC
 EOD;
     } else {
         $query = <<<EOD
 SELECT *
-FROM `tools_ce_categories`
+FROM `apps_top_100_explorer_categories`
 WHERE `category_id` IS NULL
 ORDER BY `title` ASC
 EOD;
@@ -182,7 +182,7 @@ function get_contents($application, $user, $logo) {
 }
 
 function get_csv($application, $user, $id) {
-    list($request, $keywords) = get_request_and_keywords(
+    list($report, $keywords) = get_report_and_keywords(
         $application, $user, $id
     );
 
@@ -193,8 +193,8 @@ function get_csv($application, $user, $id) {
         'Competition',
         'Optimization',
         'Popularity',
-        sprintf('Spend (%s)', get_currency($request['country'])),
-        sprintf('Avg. Price (%s)', get_currency($request['country'])),
+        sprintf('Spend (%s)', get_currency($report['country'])),
+        sprintf('Avg. Price (%s)', get_currency($report['country'])),
         'Avg. Length',
         'Score',
     ));
@@ -277,7 +277,7 @@ function get_path($application, $user, $directory) {
 }
 
 function get_pdf($application, $user, $logo, $id, $variables) {
-    list($request, $keywords) = get_request_and_keywords(
+    list($report, $keywords) = get_report_and_keywords(
         $application, $user, $id
     );
     usort($keywords, 'usort_keywords_1');
@@ -300,7 +300,7 @@ function get_pdf($application, $user, $logo, $id, $variables) {
             $application['twig']->render(
                 'views/keyword_analyzer_multiple_detailed.twig',
                 array(
-                    'currency' => get_currency($request['country']),
+                    'currency' => get_currency($report['country']),
                     'is_pdf' => false,
                     'keywords' => $keywords,
                     'logo' => get_contents($application, $user, $logo),
@@ -321,14 +321,17 @@ function get_pdf($application, $user, $logo, $id, $variables) {
 function get_popular_searches($application) {
     $query = <<<EOD
 SELECT *
-FROM `tools_ps_books`
+FROM `apps_popular_searches_books`
 INNER JOIN
-    `tools_ps_trends` ON `tools_ps_books`.`id` = `tools_ps_trends`.`book_id`
-WHERE `tools_ps_trends`.`date_and_time` IN (
+    `apps_popular_searches_trends` ON
+    `apps_popular_searches_books`.`id`
+    =
+    `apps_popular_searches_trends`.`book_id`
+WHERE `apps_popular_searches_trends`.`date_and_time` IN (
     SELECT MAX(`date_and_time`)
-    FROM `tools_ps_trends`
+    FROM `apps_popular_searches_trends`
 )
-ORDER BY `tools_ps_books`.`title` ASC
+ORDER BY `apps_popular_searches_books`.`title` ASC
 EOD;
     $popular_searches = $application['db']->fetchAll($query);
     foreach ($popular_searches as $key => $value) {
@@ -344,7 +347,7 @@ EOD;
         arsort($popular_searches[$key]['keywords'], SORT_NUMERIC);
         $query = <<<EOD
 SELECT COUNT(DISTINCT DATE(`date_and_time`)) AS `count`
-FROM `tools_ps_trends`
+FROM `apps_popular_searches_trends`
 WHERE `book_id` = ? AND `date_and_time` >= NOW() - INTERVAL 7 DAY
 EOD;
         $record_1 = $application['db']->fetchAssoc($query, array(
@@ -352,7 +355,7 @@ EOD;
         ));
         $query = <<<EOD
 SELECT COUNT(DISTINCT DATE(`date_and_time`)) AS `count`
-FROM `tools_ps_trends`
+FROM `apps_popular_searches_trends`
 WHERE `book_id` = ? AND `date_and_time` >= NOW() - INTERVAL 30 DAY
 EOD;
         $record_2 = $application['db']->fetchAssoc($query, array(
@@ -372,66 +375,68 @@ EOD;
     return $popular_searches;
 }
 
-function get_requests($application, $user) {
+function get_reports($application, $user) {
     $query = <<<EOD
 SELECT *
-FROM `tools_kns_requests`
+FROM `apps_keyword_analyzer_reports`
 WHERE `user_id` = ?
 ORDER BY `timestamp` DESC
 EOD;
-    $requests = $application['db']->fetchAll($query, array($user['id']));
-    if ($requests) {
+    $reports = $application['db']->fetchAll($query, array($user['id']));
+    if ($reports) {
         $query_preview = <<<EOD
 SELECT `string`
-FROM `tools_kns_keywords`
-WHERE `request_id` = ?
+FROM `apps_keyword_analyzer_keywords`
+WHERE `report_id` = ?
 ORDER BY `id` ASC
 LIMIT 5
 OFFSET 0
 EOD;
         $query_keywords_1 = <<<EOD
 SELECT COUNT(`id`) AS `count`
-FROM `tools_kns_keywords`
-WHERE `request_id` = ?
+FROM `apps_keyword_analyzer_keywords`
+WHERE `report_id` = ?
 EOD;
         $query_keywords_2 = <<<EOD
-SELECT COUNT(`tools_kns_keywords`.`id`) AS `count`
-FROM `tools_kns_keywords`
-LEFT JOIN `tools_kns_requests` ON (
-    `tools_kns_requests`.`id` = `tools_kns_keywords`.`request_id`
+SELECT COUNT(`apps_keyword_analyzer_keywords`.`id`) AS `count`
+FROM `apps_keyword_analyzer_keywords`
+LEFT JOIN `apps_keyword_analyzer_reports` ON (
+    `apps_keyword_analyzer_reports`.`id`
+    =
+    `apps_keyword_analyzer_keywords`.`report_id`
 )
 WHERE (
-    `tools_kns_keywords`.`request_id` = ?
+    `apps_keyword_analyzer_keywords`.`report_id` = ?
     AND
-    `tools_kns_keywords`.`contents` IS NULL
+    `apps_keyword_analyzer_keywords`.`contents` IS NULL
     AND
-    `tools_kns_requests`.`timestamp` < (NOW() - INTERVAL 5 HOUR)
+    `apps_keyword_analyzer_reports`.`timestamp` < (NOW() - INTERVAL 5 HOUR)
 )
 EOD;
         $query_total = <<<EOD
 SELECT COUNT(`id`) AS `count`
-FROM `tools_kns_keywords`
-WHERE `request_id` = ?
+FROM `apps_keyword_analyzer_keywords`
+WHERE `report_id` = ?
 EOD;
         $query_completed = <<<EOD
 SELECT COUNT(`id`) AS `count`
-FROM `tools_kns_keywords`
-WHERE `request_id` = ? AND `contents` IS NOT NULL
+FROM `apps_keyword_analyzer_keywords`
+WHERE `report_id` = ? AND `contents` IS NOT NULL
 EOD;
-        foreach ($requests as $key => $value) {
-            $requests[$key]['preview'] = array();
+        foreach ($reports as $key => $value) {
+            $reports[$key]['preview'] = array();
             $records = $application['db']->fetchAll(
                 $query_preview, array($value['id'])
             );
             if ($records) {
                 foreach ($records as $record) {
-                    $requests[$key]['preview'][] = get_truncated_text(
+                    $reports[$key]['preview'][] = get_truncated_text(
                         $record['string'], 10
                     );
                 }
             }
-            $requests[$key]['preview'] = implode(
-                ', ', $requests[$key]['preview']
+            $reports[$key]['preview'] = implode(
+                ', ', $reports[$key]['preview']
             );
             $record_1 = $application['db']->fetchAssoc(
                 $query_keywords_1, array($value['id'])
@@ -439,60 +444,60 @@ EOD;
             $record_2 = $application['db']->fetchAssoc(
                 $query_keywords_2, array($value['id'])
             );
-            $requests[$key]['keywords'] = array(
+            $reports[$key]['keywords'] = array(
                 $record_1['count'],
                 number_format($record_1['count'], 0, '.', ','),
                 $record_2['count'],
                 number_format($record_2['count'], 0, '.', ','),
             );
             $old = new DateTime(date('Y-m-d H:i:s'));
-            $new = new DateTime($requests[$key]['timestamp']);
+            $new = new DateTime($reports[$key]['timestamp']);
             $new->add(new DateInterval('P30D'));
             $interval = $old->diff($new);
-            $requests[$key]['expires_in'] = $interval->format('%R%a days');
+            $reports[$key]['expires_in'] = $interval->format('%R%a days');
             $total = $application['db']->fetchAssoc(
                 $query_total, array($value['id'])
             );
             $completed = $application['db']->fetchAssoc(
                 $query_completed, array($value['id'])
             );
-            $requests[$key]['progress'] = (
+            $reports[$key]['progress'] = (
                 $completed['count'] / $total['count']
             ) * 100.00;
-            if ($requests[$key]['progress'] == 100.00) {
-                $requests[$key]['status'] = 'Completed';
+            if ($reports[$key]['progress'] == 100.00) {
+                $reports[$key]['status'] = 'Completed';
             }
-            if ($requests[$key]['progress'] == 0.00) {
-                $requests[$key]['status'] = 'Waiting';
+            if ($reports[$key]['progress'] == 0.00) {
+                $reports[$key]['status'] = 'Waiting';
             }
             if (
-                $requests[$key]['progress'] > 0.00
+                $reports[$key]['progress'] > 0.00
                 AND
-                $requests[$key]['progress'] < 100.00
+                $reports[$key]['progress'] < 100.00
             ) {
-                $requests[$key]['status'] = 'In Progress';
+                $reports[$key]['status'] = 'In Progress';
             }
         }
     }
 
-    return $requests;
+    return $reports;
 }
 
-function get_request_and_keywords($application, $user, $id) {
+function get_report_and_keywords($application, $user, $id) {
     $query = <<<EOD
 SELECT *
-FROM `tools_kns_requests`
+FROM `apps_keyword_analyzer_reports`
 WHERE `id` = ? AND `user_id` = ?
 EOD;
-    $request = $application['db']->fetchAssoc(
+    $report = $application['db']->fetchAssoc(
         $query, array($id, $user['id'])
     );
     $keywords = array();
-    if ($request) {
+    if ($report) {
         $query = <<<EOD
 SELECT *
-FROM `tools_kns_keywords`
-WHERE `request_id` = ?
+FROM `apps_keyword_analyzer_keywords`
+WHERE `report_id` = ?
 EOD;
         $keywords = $application['db']->fetchAll($query, array($id));
         if ($keywords) {
@@ -511,14 +516,14 @@ EOD;
         }
     }
 
-    return array($request, $keywords);
+    return array($report, $keywords);
 }
 
 function get_sections($application) {
     $sections = array();
     $query = <<<EOD
 SELECT *
-FROM `tools_ce_sections`
+FROM `apps_top_100_explorer_sections`
 ORDER BY `id` ASC
 EOD;
     $records = $application['db']->fetchAll($query);
@@ -742,25 +747,25 @@ if ($application['debug']) {
     });
 }
 
-$application->before(function (Request $request) use ($application) {
+$application->before(function (Request $report) use ($application) {
     $user = get_user($application);
     if (!$user['id']) {
-        if ($request->get('_route') != 'sign_in') {
+        if ($report->get('_route') != 'sign_in') {
             return $application->redirect(
                 $application['url_generator']->generate('sign_in')
             );
         }
     }
     $is_paying_customer = is_paying_customer($application, $user);
-    if ($request->get('_route') != 'sign_in') {
+    if ($report->get('_route') != 'sign_in') {
         if ($is_paying_customer) {
-            if ($request->get('_route') == '403') {
+            if ($report->get('_route') == '403') {
                 return $application->redirect(
                     $application['url_generator']->generate('dashboard')
                 );
             }
         } else {
-            if ($request->get('_route') != '403') {
+            if ($report->get('_route') != '403') {
                 return $application->redirect(
                     $application['url_generator']->generate('403')
                 );
@@ -807,11 +812,11 @@ $application
 $application
 ->match(
     '/author-analyzer',
-    function (Request $request) use ($application) {
+    function (Request $report) use ($application) {
         return $application['twig']->render(
             'views/author_analyzer.twig',
             array(
-                'url' => $request->get('url'),
+                'url' => $report->get('url'),
             )
         );
     }
@@ -822,7 +827,7 @@ $application
 $application
 ->match(
     '/author-analyzer/author',
-    function (Request $request) use ($application, $variables) {
+    function (Request $report) use ($application, $variables) {
         ignore_user_abort(true);
         set_time_limit(0);
         exec(sprintf(
@@ -830,7 +835,7 @@ $application
             '2>/dev/null',
             $variables['virtualenv'],
             __DIR__,
-            escapeshellarg($request->get('url'))
+            escapeshellarg($report->get('url'))
         ), $output, $return_var);
         return new Response(implode('', $output));
     }
@@ -841,7 +846,7 @@ $application
 $application
 ->match(
     '/author-analyzer/authors',
-    function (Request $request) use ($application, $variables) {
+    function (Request $report) use ($application, $variables) {
         ignore_user_abort(true);
         set_time_limit(0);
         exec(sprintf(
@@ -849,7 +854,7 @@ $application
             '2>/dev/null',
             $variables['virtualenv'],
             __DIR__,
-            escapeshellarg($request->get('keyword'))
+            escapeshellarg($report->get('keyword'))
         ), $output, $return_var);
         return new Response(implode('', $output));
     }
@@ -860,9 +865,9 @@ $application
 $application
 ->match(
     '/book-analyzer',
-    function (Request $request) use ($application) {
+    function (Request $report) use ($application) {
         return $application['twig']->render('views/book_analyzer.twig', array(
-            'url' => $request->get('url'),
+            'url' => $report->get('url'),
         ));
     }
 )
@@ -872,14 +877,14 @@ $application
 $application
 ->match(
     '/book-analyzer/book',
-    function (Request $request) use ($application, $variables) {
+    function (Request $report) use ($application, $variables) {
         ignore_user_abort(true);
         set_time_limit(0);
         exec(sprintf(
             '%s/python %s/scripts/book_analyzer.py get_book %s 2>/dev/null',
             $variables['virtualenv'],
             __DIR__,
-            escapeshellarg($request->get('url'))
+            escapeshellarg($report->get('url'))
         ), $output, $return_var);
         return new Response(implode('', $output));
     }
@@ -890,14 +895,14 @@ $application
 $application
 ->match(
     '/book-analyzer/books',
-    function (Request $request) use ($application, $variables) {
+    function (Request $report) use ($application, $variables) {
         ignore_user_abort(true);
         set_time_limit(0);
         exec(sprintf(
             '%s/python %s/scripts/book_analyzer.py get_books %s 2>/dev/null',
             $variables['virtualenv'],
             __DIR__,
-            escapeshellarg($request->get('keyword'))
+            escapeshellarg($report->get('keyword'))
         ), $output, $return_var);
         return new Response(implode('', $output));
     }
@@ -908,8 +913,8 @@ $application
 $application
 ->match(
     '/book-analyzer/items',
-    function (Request $request) use ($application, $variables) {
-        $keywords = $request->get('keywords');
+    function (Request $report) use ($application, $variables) {
+        $keywords = $report->get('keywords');
         $keywords = strtolower($keywords);
         $keywords = explode("\n", $keywords);
         if (!empty($keywords)) {
@@ -930,7 +935,7 @@ $application
             '2>/dev/null',
             $variables['virtualenv'],
             __DIR__,
-            escapeshellarg($request->get('url')),
+            escapeshellarg($report->get('url')),
             escapeshellarg(json_encode($keywords))
         ), $output, $return_var);
         return new Response(implode('', $output));
@@ -956,10 +961,10 @@ $application
 $application
 ->match(
     '/feedback',
-    function (Request $request) use ($application) {
+    function (Request $report) use ($application) {
         $error = '';
-        if ($request->isMethod('POST')) {
-            $body = $request->get('body');
+        if ($report->isMethod('POST')) {
+            $body = $report->get('body');
             if (!empty($body)) {
                 if (!is_development()) {
                     $user = $application['session']->get('user');
@@ -968,7 +973,7 @@ $application
                     );
                     try {
                         $message = \Swift_Message::newInstance()
-                            ->setBody(trim($request->get('body')))
+                            ->setBody(trim($report->get('body')))
                             ->setFrom(array(
                                 $user['email'],
                             ))
@@ -1005,12 +1010,12 @@ $application
     '/keyword-analyzer/multiple',
     function () use ($application) {
         $user = $application['session']->get('user');
-        $requests = get_requests($application, $user);
+        $reports = get_reports($application, $user);
 
         return $application['twig']->render(
             'views/keyword_analyzer_multiple.twig',
             array(
-                'requests' => $requests,
+                'reports' => $reports,
             )
         );
     }
@@ -1039,7 +1044,7 @@ $application
 $application
 ->match(
     '/keyword-analyzer/multiple/{id}/csv',
-    function (Request $request, $id) use ($application) {
+    function (Request $report, $id) use ($application) {
         $user = $application['session']->get('user');
         $csv = get_csv($application, $user, $id);
         $stream = function () use ($csv) {
@@ -1063,20 +1068,20 @@ $application
 $application
 ->match(
     '/keyword-analyzer/multiple/{id}/delete',
-    function (Request $request, $id) use ($application) {
+    function (Request $report, $id) use ($application) {
         $user = $application['session']->get('user');
-        list($request_, $keywords) = get_request_and_keywords(
+        list($report_, $keywords) = get_report_and_keywords(
             $application, $user, $id
         );
-        if (!$request_ OR !$keywords) {
+        if (!$report_ OR !$keywords) {
             return $application->redirect(
                 $application['url_generator']
                     ->generate('keyword_analyzer_multiple')
             );
         }
-        if ($request->isMethod('POST')) {
+        if ($report->isMethod('POST')) {
             $application['db']->executeUpdate(
-                'DELETE FROM `tools_kns_requests` WHERE `ID` = ?',
+                'DELETE FROM `apps_keyword_analyzer_reports` WHERE `ID` = ?',
                 array($id)
             );
             $application['session']->getFlashBag()->add(
@@ -1101,12 +1106,12 @@ $application
 $application
 ->match(
     '/keyword-analyzer/multiple/{id}/detailed',
-    function (Request $request, $id) use ($application) {
+    function (Request $report, $id) use ($application) {
         $user = $application['session']->get('user');
-        list($request, $keywords) = get_request_and_keywords(
+        list($report, $keywords) = get_report_and_keywords(
             $application, $user, $id
         );
-        if (!$request OR !$keywords) {
+        if (!$report OR !$keywords) {
             return $application->redirect(
                 $application['url_generator']
                     ->generate('keyword_analyzer_multiple')
@@ -1117,7 +1122,7 @@ $application
         return $application['twig']->render(
             'views/keyword_analyzer_multiple_detailed.twig',
             array(
-                'currency' => get_currency($request['country']),
+                'currency' => get_currency($report['country']),
                 'is_pdf' => true,
                 'keywords' => $keywords,
                 'logo' => '',
@@ -1131,7 +1136,7 @@ $application
 $application
 ->match(
     '/keyword-analyzer/multiple/{id}/email',
-    function (Request $request, $id) use ($application, $variables) {
+    function (Request $report, $id) use ($application, $variables) {
         $user = $application['session']->get('user');
         $subject = 'Your Keyword Analyzer report is ready!';
         $body = <<<EOD
@@ -1154,7 +1159,7 @@ EOD;
                     get_pdf(
                         $application,
                         $user,
-                        $request->get('logo'),
+                        $report->get('logo'),
                         $id,
                         $variables
                     ),
@@ -1166,7 +1171,7 @@ EOD;
                     'reports@perfectsidekick.com' => 'Zon Sidekick',
                 ))
                 ->setSubject($subject)
-                ->setTo(array($request->get('email')));
+                ->setTo(array($report->get('email')));
             $application['mailer']->send($message);
         } catch (Exception $exception ) {
         }
@@ -1180,10 +1185,10 @@ EOD;
 $application
 ->match(
     '/keyword-analyzer/multiple/{id}/pdf',
-    function (Request $request, $id) use ($application, $variables) {
+    function (Request $report, $id) use ($application, $variables) {
         $user = $application['session']->get('user');
         $pdf = get_pdf(
-            $application, $user, $request->get('logo'), $id, $variables
+            $application, $user, $report->get('logo'), $id, $variables
         );
         $stream = function () use ($pdf) {
             echo $pdf;
@@ -1206,10 +1211,10 @@ $application
 $application
 ->match(
     '/keyword-analyzer/multiple/process',
-    function (Request $request) use ($application) {
+    function (Request $report) use ($application) {
         $user = $application['session']->get('user');
         list($count, $keywords) = get_count_and_keywords(
-            $request->get('keywords')
+            $report->get('keywords')
         );
         if (!$count OR !$keywords) {
             return $application->redirect(
@@ -1217,18 +1222,21 @@ $application
                     ->generate('keyword_analyzer_multiple_add')
             );
         }
-        $application['db']->insert('tools_kns_requests', array(
-            'country' => $request->get('country'),
+        $application['db']->insert('apps_keyword_analyzer_reports', array(
+            'country' => $report->get('country'),
             'timestamp' => date('Y-m-d H:i:s'),
             'user_id' => $user['id'],
         ));
         $id = $application['db']->lastInsertId();
         if ($keywords) {
             foreach ($keywords as $keyword) {
-                $application['db']->insert('tools_kns_keywords', array(
-                    'request_id' => $id,
-                    'string' => $keyword,
-                ));
+                $application['db']->insert(
+                    'apps_keyword_analyzer_keywords',
+                    array(
+                        'report_id' => $id,
+                        'string' => $keyword,
+                    )
+                );
             }
         }
 
@@ -1248,12 +1256,12 @@ $application
 $application
 ->match(
     '/keyword-analyzer/multiple/{id}/simple',
-    function (Request $request, $id) use ($application) {
+    function (Request $report, $id) use ($application) {
         $user = $application['session']->get('user');
-        list($request, $keywords) = get_request_and_keywords(
+        list($report, $keywords) = get_report_and_keywords(
             $application, $user, $id
         );
-        if (!$request OR !$keywords) {
+        if (!$report OR !$keywords) {
             return $application->redirect(
                 $application['url_generator']
                     ->generate('keyword_analyzer_multiple')
@@ -1263,11 +1271,11 @@ $application
         return $application['twig']->render(
             'views/keyword_analyzer_multiple_simple.twig',
             array(
-                'currency' => get_currency($request['country']),
+                'currency' => get_currency($report['country']),
                 'email' => $user['email'],
                 'keywords' => $keywords,
                 'logos' => get_logos($application, $user),
-                'request' => $request,
+                'report' => $report,
             )
         );
     }
@@ -1278,9 +1286,9 @@ $application
 $application
 ->match(
     '/keyword-analyzer/multiple/{id}/xhr',
-    function (Request $request, $id) use ($application) {
+    function (Request $report, $id) use ($application) {
         $user = $application['session']->get('user');
-        list($request, $keywords) = get_request_and_keywords(
+        list($report, $keywords) = get_report_and_keywords(
             $application, $user, $id
         );
 
@@ -1331,15 +1339,15 @@ $application
 $application
 ->match(
     '/keyword-analyzer/single/xhr',
-    function (Request $request) use ($application, $variables) {
+    function (Request $report) use ($application, $variables) {
         ignore_user_abort(true);
         set_time_limit(0);
         exec(sprintf(
             '%s/python %s/scripts/keyword_analyzer.py %s %s 2>/dev/null',
             $variables['virtualenv'],
             __DIR__,
-            escapeshellarg($request->get('keyword')),
-            escapeshellarg($request->get('country'))
+            escapeshellarg($report->get('keyword')),
+            escapeshellarg($report->get('country'))
         ), $output, $return_var);
         return new Response(implode('', $output));
     }
@@ -1350,7 +1358,7 @@ $application
 $application
 ->match(
     '/keyword-suggester',
-    function (Request $request) use ($application) {
+    function (Request $report) use ($application) {
         return $application['twig']->render(
             'views/keyword_suggester.twig',
             array(
@@ -1365,8 +1373,8 @@ $application
                     'de' => 'Germany',
                     'co.jp' => 'Japan',
                 ),
-                'keywords' => $request->get('keywords', ''),
-                'mode' => $request->get('mode', 'Suggest'),
+                'keywords' => $report->get('keywords', ''),
+                'mode' => $report->get('mode', 'Suggest'),
                 'search_aliases' => array(
                     'aps' => 'All Departments',
                     'digital-text' => 'Kindle Store',
@@ -1416,8 +1424,8 @@ $application
 $application
 ->match(
     '/keyword-suggester/download',
-    function (Request $request) use ($application) {
-        $json = json_decode($request->get('json'), true);
+    function (Request $report) use ($application) {
+        $json = json_decode($report->get('json'), true);
         $json['suggestions'] = implode("\n", $json['suggestions']);
         $stream = function () use ($json) {
             echo $json['suggestions'];
@@ -1439,7 +1447,7 @@ $application
 $application
 ->match(
     '/keyword-suggester/xhr',
-    function (Request $request) use ($application, $variables) {
+    function (Request $report) use ($application, $variables) {
         if (is_development()) {
             $output = array('["1", "2", "3"]');
         } else {
@@ -1450,9 +1458,9 @@ $application
                 '2>/dev/null',
                 $variables['virtualenv'],
                 __DIR__,
-                escapeshellarg($request->get('keyword')),
-                escapeshellarg($request->get('country')),
-                escapeshellarg($request->get('search_alias'))
+                escapeshellarg($report->get('keyword')),
+                escapeshellarg($report->get('country')),
+                escapeshellarg($report->get('search_alias'))
             ), $output, $return_var);
         }
         return new Response(implode('', $output));
@@ -1478,12 +1486,12 @@ $application
 $application
 ->match(
     '/logos/add',
-    function (Request $request) use ($application) {
+    function (Request $report) use ($application) {
         $user = $application['session']->get('user');
 
         $error = null;
-        if ($request->isMethod('POST')) {
-            $logo = $request->files->get('logo');
+        if ($report->isMethod('POST')) {
+            $logo = $report->files->get('logo');
             if (
                 $logo
                 and
@@ -1524,13 +1532,13 @@ $application
 $application
 ->match(
     '/logos/delete',
-    function (Request $request) use ($application) {
+    function (Request $report) use ($application) {
         $user = $application['session']->get('user');
-        if ($request->isMethod('POST')) {
+        if ($report->isMethod('POST')) {
             unlink(sprintf(
                 '%s/%s',
                 get_path($application, $user, 'logos'),
-                $request->get('file_name')
+                $report->get('file_name')
             ));
             $application['session']->getFlashBag()->add(
                 'success', array('The logo was deleted successfully.')
@@ -1543,7 +1551,7 @@ $application
 
         return $application['twig']->render(
             'views/logos_delete.twig', array(
-                'file_name' => $request->get('file_name'),
+                'file_name' => $report->get('file_name'),
             )
         );
     }
@@ -1554,12 +1562,12 @@ $application
 $application
 ->match(
     '/logos/download',
-    function (Request $request) use ($application) {
+    function (Request $report) use ($application) {
         $user = $application['session']->get('user');
         $file_path = sprintf(
             '%s/%s',
             get_path($application, $user, 'logos'),
-            $request->get('file_name')
+            $report->get('file_name')
         );
         $stream = function () use ($file_path) {
             readfile($file_path);
@@ -1567,7 +1575,7 @@ $application
 
         return $application->stream($stream, 200, array(
             'Content-Disposition' => sprintf(
-                'attachment; filename="%s"', $request->get('file_name')
+                'attachment; filename="%s"', $report->get('file_name')
             ),
             'Content-length' => filesize($file_path),
             'Content-Type' => 'image/png',
@@ -1580,13 +1588,13 @@ $application
 $application
 ->match(
     '/logos/preview',
-    function (Request $request) use ($application) {
+    function (Request $report) use ($application) {
         $user = $application['session']->get('user');
-        $stream = function () use ($application, $request, $user) {
+        $stream = function () use ($application, $report, $user) {
             readfile(sprintf(
                 '%s/%s',
                 get_path($application, $user, 'logos'),
-                $request->get('file_name')
+                $report->get('file_name')
             ));
         };
 
@@ -1601,7 +1609,7 @@ $application
 $application
 ->match(
     '/popular-searches',
-    function (Request $request) use ($application) {
+    function (Request $report) use ($application) {
         return $application['twig']->render(
             'views/popular_searches.twig',
             array(
@@ -1616,14 +1624,14 @@ $application
 $application
 ->match(
     '/profile',
-    function (Request $request) use ($application) {
+    function (Request $report) use ($application) {
         $user = $application['session']->get('user');
 
         $error = null;
         $email = $user['email'];
 
-        if ($request->isMethod('POST')) {
-            $email = $request->get('email');
+        if ($report->isMethod('POST')) {
+            $email = $report->get('email');
             if (!empty($email)) {
                 $application['db']->executeUpdate(
                     'UPDATE `wp_users` SET `user_email` = ? WHERE `ID` = ?',
@@ -1652,11 +1660,11 @@ $application
 $application
 ->match(
     '/sign-in',
-    function (Request $request) use ($application) {
+    function (Request $report) use ($application) {
         $error = null;
-        if ($request->isMethod('POST')) {
-            $username = $request->get('username');
-            $password = $request->get('password');
+        if ($report->isMethod('POST')) {
+            $username = $report->get('username');
+            $password = $report->get('password');
             if (!empty($username) AND !empty($password)) {
                 $query = <<<EOD
 SELECT `id` , `user_email` , `user_pass` , `display_name`
@@ -1667,7 +1675,7 @@ EOD;
                     $username,
                 ));
                 if ($record AND is_valid($password, $record['user_pass'])) {
-                    if ($request->get('remember_me') == 'yes') {
+                    if ($report->get('remember_me') == 'yes') {
                         setcookie(
                             'id',
                             $record['id'],
@@ -1740,12 +1748,12 @@ $application
 $application
 ->match(
     '/statistics',
-    function (Request $request) use ($application) {
+    function (Request $report) use ($application) {
         $items = array();
         $total = array(
             'keywords_1' => 0,
             'keywords_2' => 0,
-            'requests' => 0,
+            'reports' => 0,
         );
         $query = <<<EOD
 SELECT `ID` AS `id`, `display_name`
@@ -1755,14 +1763,14 @@ EOD;
         $records = $application['db']->fetchAll($query);
         if (!empty($records)) {
             foreach ($records as $record) {
-                $requests = get_requests($application, $record);
-                $r = count($requests);
+                $reports = get_reports($application, $record);
+                $r = count($reports);
                 $k_1 = 0;
                 $k_2 = 0;
-                if ($requests) {
-                    foreach ($requests as $request) {
-                        $k_1 += $request['keywords'][0];
-                        $k_2 += $request['keywords'][2];
+                if ($reports) {
+                    foreach ($reports as $report) {
+                        $k_1 += $report['keywords'][0];
+                        $k_2 += $report['keywords'][2];
                     }
                 }
                 $items[] = array(
@@ -1770,11 +1778,11 @@ EOD;
                     'display_name' => $record['display_name'],
                     'keywords_1' => number_format($k_1, 0, '.', ','),
                     'keywords_2' => number_format($k_2, 0, '.', ','),
-                    'requests' => number_format($r, 0, '.', ','),
+                    'reports' => number_format($r, 0, '.', ','),
                 );
                 $total['keywords_1'] += $k_1;
                 $total['keywords_2'] += $k_2;
-                $total['requests'] += $r;
+                $total['reports'] += $r;
             }
         }
 
@@ -1782,7 +1790,7 @@ EOD;
             'items' => $items,
             'keywords_1' => number_format($total['keywords_1'], 0, '.', ','),
             'keywords_2' => number_format($total['keywords_2'], 0, '.', ','),
-            'requests' => number_format($total['requests'], 0, '.', ','),
+            'reports' => number_format($total['reports'], 0, '.', ','),
         ));
     }
 )
@@ -1793,14 +1801,14 @@ EOD;
 $application
 ->match(
     '/suggested_keywords',
-    function (Request $request) use ($application, $variables) {
+    function (Request $report) use ($application, $variables) {
         ignore_user_abort(true);
         set_time_limit(0);
         exec(sprintf(
             '%s/python %s/scripts/suggested_keywords.py %s 2>/dev/null',
             $variables['virtualenv'],
             __DIR__,
-            escapeshellarg($request->get('keywords'))
+            escapeshellarg($report->get('keywords'))
         ), $output, $return_var);
         return new Response(implode('', $output));
     }
@@ -1811,7 +1819,7 @@ $application
 $application
 ->match(
     '/top-100-explorer',
-    function (Request $request) use ($application) {
+    function (Request $report) use ($application) {
         return $application['twig']->render(
             'views/top_100_explorer.twig',
             array(
@@ -1821,44 +1829,44 @@ $application
                 ),
                 'filters' => array(
                     'amazon_best_sellers_rank_1'
-                        => $request->get('amazon_best_sellers_rank_1', ''),
+                        => $report->get('amazon_best_sellers_rank_1', ''),
                     'amazon_best_sellers_rank_2'
-                        => $request->get('amazon_best_sellers_rank_2', ''),
+                        => $report->get('amazon_best_sellers_rank_2', ''),
                     'amazon_best_sellers_rank_3'
-                        => $request->get('amazon_best_sellers_rank_3', ''),
+                        => $report->get('amazon_best_sellers_rank_3', ''),
                     'amazon_best_sellers_rank_4'
-                        => $request->get('amazon_best_sellers_rank_4', ''),
-                    'appearance_1' => $request->get('appearance_1', ''),
-                    'appearance_2' => $request->get('appearance_2', ''),
-                    'appearance_3' => $request->get('appearance_3', ''),
-                    'appearance_4' => $request->get('appearance_4', ''),
-                    'category_id' => $request->get('category_id', ''),
-                    'count' => $request->get('count', ''),
-                    'price_1' => $request->get('price_1', ''),
-                    'price_2' => $request->get('price_2', ''),
-                    'price_3' => $request->get('price_3', ''),
-                    'price_4' => $request->get('price_4', ''),
-                    'print_length_1' => $request->get('print_length_1', ''),
-                    'print_length_2' => $request->get('print_length_2', ''),
-                    'print_length_3' => $request->get('print_length_3', ''),
-                    'print_length_4' => $request->get('print_length_4', ''),
+                        => $report->get('amazon_best_sellers_rank_4', ''),
+                    'appearance_1' => $report->get('appearance_1', ''),
+                    'appearance_2' => $report->get('appearance_2', ''),
+                    'appearance_3' => $report->get('appearance_3', ''),
+                    'appearance_4' => $report->get('appearance_4', ''),
+                    'category_id' => $report->get('category_id', ''),
+                    'count' => $report->get('count', ''),
+                    'price_1' => $report->get('price_1', ''),
+                    'price_2' => $report->get('price_2', ''),
+                    'price_3' => $report->get('price_3', ''),
+                    'price_4' => $report->get('price_4', ''),
+                    'print_length_1' => $report->get('print_length_1', ''),
+                    'print_length_2' => $report->get('print_length_2', ''),
+                    'print_length_3' => $report->get('print_length_3', ''),
+                    'print_length_4' => $report->get('print_length_4', ''),
                     'publication_date_1'
-                        => $request->get('publication_date_1', ''),
+                        => $report->get('publication_date_1', ''),
                     'publication_date_2'
-                        => $request->get('publication_date_2', ''),
+                        => $report->get('publication_date_2', ''),
                     'publication_date_3'
-                        => $request->get('publication_date_3', ''),
+                        => $report->get('publication_date_3', ''),
                     'publication_date_4'
-                        => $request->get('publication_date_4', ''),
+                        => $report->get('publication_date_4', ''),
                     'review_average_1'
-                        => $request->get('review_average_1', ''),
+                        => $report->get('review_average_1', ''),
                     'review_average_2'
-                        => $request->get('review_average_2', ''),
+                        => $report->get('review_average_2', ''),
                     'review_average_3'
-                        => $request->get('review_average_3', ''),
+                        => $report->get('review_average_3', ''),
                     'review_average_4'
-                        => $request->get('review_average_4', ''),
-                    'section_id' => $request->get('section_id', ''),
+                        => $report->get('review_average_4', ''),
+                    'section_id' => $report->get('section_id', ''),
                 ),
                 'sections' => get_sections($application),
             )
@@ -1871,7 +1879,7 @@ $application
 $application
 ->match(
     '/top-100-explorer/xhr',
-    function (Request $request) use ($application) {
+    function (Request $report) use ($application) {
         $contents = array(
             'books' => array(),
             'categories' => array(),
@@ -1887,58 +1895,58 @@ $application
             'date' => 'N/A',
         );
 
-        $category_id = intval($request->get('category_id'));
-        $section_id = intval($request->get('section_id'));
-        $print_length_1 = $request->get('print_length_1');
-        $print_length_2 = intval($request->get('print_length_2'));
-        $print_length_3 = intval($request->get('print_length_3'));
-        $print_length_4 = intval($request->get('print_length_4'));
-        $price_1 = $request->get('price_1');
-        $price_2 = floatval($request->get('price_2'));
-        $price_3 = floatval($request->get('price_3'));
-        $price_4 = floatval($request->get('price_4'));
-        $publication_date_1 = $request->get('publication_date_1');
-        $publication_date_2 = $request->get('publication_date_2');
-        $publication_date_3 = $request->get('publication_date_3');
-        $publication_date_4 = $request->get('publication_date_4');
-        $amazon_best_sellers_rank_1 = $request
+        $category_id = intval($report->get('category_id'));
+        $section_id = intval($report->get('section_id'));
+        $print_length_1 = $report->get('print_length_1');
+        $print_length_2 = intval($report->get('print_length_2'));
+        $print_length_3 = intval($report->get('print_length_3'));
+        $print_length_4 = intval($report->get('print_length_4'));
+        $price_1 = $report->get('price_1');
+        $price_2 = floatval($report->get('price_2'));
+        $price_3 = floatval($report->get('price_3'));
+        $price_4 = floatval($report->get('price_4'));
+        $publication_date_1 = $report->get('publication_date_1');
+        $publication_date_2 = $report->get('publication_date_2');
+        $publication_date_3 = $report->get('publication_date_3');
+        $publication_date_4 = $report->get('publication_date_4');
+        $amazon_best_sellers_rank_1 = $report
             ->get('amazon_best_sellers_rank_1');
         $amazon_best_sellers_rank_2 = intval(
-            $request->get('amazon_best_sellers_rank_2')
+            $report->get('amazon_best_sellers_rank_2')
         );
         $amazon_best_sellers_rank_3 = intval(
-            $request->get('amazon_best_sellers_rank_3')
+            $report->get('amazon_best_sellers_rank_3')
         );
         $amazon_best_sellers_rank_4 = intval(
-            $request->get('amazon_best_sellers_rank_4')
+            $report->get('amazon_best_sellers_rank_4')
         );
-        $review_average_1 = $request->get('review_average_1');
-        $review_average_2 = floatval($request->get('review_average_2'));
-        $review_average_3 = floatval($request->get('review_average_3'));
-        $review_average_4 = floatval($request->get('review_average_4'));
-        $appearance_1 = $request->get('appearance_1');
-        $appearance_2 = floatval($request->get('appearance_2'));
-        $appearance_3 = floatval($request->get('appearance_3'));
-        $appearance_4 = floatval($request->get('appearance_4'));
-        $count = intval($request->get('count'));
+        $review_average_1 = $report->get('review_average_1');
+        $review_average_2 = floatval($report->get('review_average_2'));
+        $review_average_3 = floatval($report->get('review_average_3'));
+        $review_average_4 = floatval($report->get('review_average_4'));
+        $appearance_1 = $report->get('appearance_1');
+        $appearance_2 = floatval($report->get('appearance_2'));
+        $appearance_3 = floatval($report->get('appearance_3'));
+        $appearance_4 = floatval($report->get('appearance_4'));
+        $count = intval($report->get('count'));
 
         if ($category_id == -1) {
             $query = <<<EOD
 SELECT MAX(`date`) AS `date`
-FROM `tools_ce_trends`
+FROM `apps_top_100_explorer_trends`
 WHERE
-    `tools_ce_trends`.`category_id` > ?
+    `apps_top_100_explorer_trends`.`category_id` > ?
     AND
-    `tools_ce_trends`.`section_id` = ?
+    `apps_top_100_explorer_trends`.`section_id` = ?
 EOD;
         } else {
             $query = <<<EOD
 SELECT MAX(`date`) AS `date`
-FROM `tools_ce_trends`
+FROM `apps_top_100_explorer_trends`
 WHERE
-    `tools_ce_trends`.`category_id` = ?
+    `apps_top_100_explorer_trends`.`category_id` = ?
     AND
-    `tools_ce_trends`.`section_id` = ?
+    `apps_top_100_explorer_trends`.`section_id` = ?
 EOD;
         }
         $record = $application['db']->fetchAssoc($query, array(
@@ -1949,27 +1957,36 @@ EOD;
 
         $query = <<<EOD
 SELECT *
-FROM `tools_ce_books`
-INNER JOIN
-    `tools_ce_trends` ON `tools_ce_books`.`id` = `tools_ce_trends`.`book_id`
+FROM `apps_top_100_explorer_books`
+INNER JOIN `apps_top_100_explorer_trends`
+ON
+    `apps_top_100_explorer_books`.`id`
+    =
+    `apps_top_100_explorer_trends`.`book_id`
 WHERE %s
-ORDER BY `tools_ce_trends`.`rank` ASC, `tools_ce_trends`.`category_id` ASC
+ORDER BY
+    `apps_top_100_explorer_trends`.`rank` ASC,
+    `apps_top_100_explorer_trends`.`category_id` ASC
 LIMIT %d OFFSET 0
 EOD;
         $conditions = array();
         $parameters = array();
         switch ($print_length_1) {
             case 'More Than':
-                $conditions[] = '`tools_ce_books`.`print_length` > ?';
+                $conditions[] =
+                    '`apps_top_100_explorer_books`.`print_length` > ?';
                 $parameters[] = $print_length_2;
                 break;
             case 'Less Than':
-                $conditions[] = '`tools_ce_books`.`print_length` < ?';
+                $conditions[] =
+                    '`apps_top_100_explorer_books`.`print_length` < ?';
                 $parameters[] = $print_length_2;
                 break;
             case 'Between':
                 $conditions[] = <<<EOD
-`tools_ce_books`.`print_length` >= ? AND `tools_ce_books`.`print_length` <= ?
+`apps_top_100_explorer_books`.`print_length` >= ?
+AND
+`apps_top_100_explorer_books`.`print_length` <= ?
 EOD;
                 $parameters[] = $print_length_3;
                 $parameters[] = $print_length_4;
@@ -1977,16 +1994,18 @@ EOD;
         }
         switch ($price_1) {
             case 'More Than':
-                $conditions[] = '`tools_ce_books`.`price` > ?';
+                $conditions[] = '`apps_top_100_explorer_books`.`price` > ?';
                 $parameters[] = $price_2;
                 break;
             case 'Less Than':
-                $conditions[] = '`tools_ce_books`.`price` < ?';
+                $conditions[] = '`apps_top_100_explorer_books`.`price` < ?';
                 $parameters[] = $price_2;
                 break;
             case 'Between':
                 $conditions[] = <<<EOD
-`tools_ce_books`.`price` >= ? AND `tools_ce_books`.`price` <= ?
+`apps_top_100_explorer_books`.`price` >= ?
+AND
+`apps_top_100_explorer_books`.`price` <= ?
 EOD;
                 $parameters[] = $price_3;
                 $parameters[] = $price_4;
@@ -1994,18 +2013,20 @@ EOD;
         }
         switch ($publication_date_1) {
             case 'More Than':
-                $conditions[] = '`tools_ce_books`.`publication_date` > ?';
+                $conditions[] =
+                    '`apps_top_100_explorer_books`.`publication_date` > ?';
                 $parameters[] = $publication_date_2;
                 break;
             case 'Less Than':
-                $conditions[] = '`tools_ce_books`.`publication_date` < ?';
+                $conditions[] =
+                    '`apps_top_100_explorer_books`.`publication_date` < ?';
                 $parameters[] = $publication_date_2;
                 break;
             case 'Between':
                 $conditions[] = <<<EOD
-`tools_ce_books`.`publication_date` >= ?
+`apps_top_100_explorer_books`.`publication_date` >= ?
 AND
-`tools_ce_books`.`publication_date` <= ?
+`apps_top_100_explorer_books`.`publication_date` <= ?
 EOD;
                 $parameters[] = $publication_date_3;
                 $parameters[] = $publication_date_4;
@@ -2013,30 +2034,32 @@ EOD;
         }
         switch ($review_average_1) {
             case 'More Than':
-                $conditions[] = '`tools_ce_books`.`review_average` > ?';
+                $conditions[] =
+                    '`apps_top_100_explorer_books`.`review_average` > ?';
                 $parameters[] = $review_average_2;
                 break;
             case 'Less Than':
-                $conditions[] = '`tools_ce_books`.`review_average` < ?';
+                $conditions[] =
+                    '`apps_top_100_explorer_books`.`review_average` < ?';
                 $parameters[] = $review_average_2;
                 break;
             case 'Between':
                 $conditions[] = <<<EOD
-`tools_ce_books`.`review_average` >= ?
+`apps_top_100_explorer_books`.`review_average` >= ?
 AND
-`tools_ce_books`.`review_average` <= ?
+`apps_top_100_explorer_books`.`review_average` <= ?
 EOD;
                 $parameters[] = $review_average_3;
                 $parameters[] = $review_average_4;
                 break;
         }
         if ($category_id !== -1) {
-            $conditions[] = '`tools_ce_trends`.`category_id` = ?';
+            $conditions[] = '`apps_top_100_explorer_trends`.`category_id` = ?';
             $parameters[] = $category_id;
         }
-        $conditions[] = '`tools_ce_trends`.`section_id` = ?';
+        $conditions[] = '`apps_top_100_explorer_trends`.`section_id` = ?';
         $parameters[] = $section_id;
-        $conditions[] = '`tools_ce_trends`.`date` = ?';
+        $conditions[] = '`apps_top_100_explorer_trends`.`date` = ?';
         $parameters[] = $contents['date'];
         $conditions = implode(' AND ', $conditions);
         $query = sprintf($query, $conditions, $count);
@@ -2046,7 +2069,7 @@ EOD;
                 if ($category_id == -1) {
                     $query = <<<EOD
 SELECT COUNT(DISTINCT `date`) AS `count`
-FROM `tools_ce_trends`
+FROM `apps_top_100_explorer_trends`
 WHERE
     `category_id` > ?
     AND
@@ -2059,7 +2082,7 @@ EOD;
                 } else {
                     $query = <<<EOD
 SELECT COUNT(DISTINCT `date`) AS `count`
-FROM `tools_ce_trends`
+FROM `apps_top_100_explorer_trends`
 WHERE
     `category_id` = ?
     AND
@@ -2078,7 +2101,7 @@ EOD;
                 if ($category_id == -1) {
                     $query = <<<EOD
 SELECT COUNT(DISTINCT `date`) AS `count`
-FROM `tools_ce_trends`
+FROM `apps_top_100_explorer_trends`
 WHERE
     `category_id` > ?
     AND
@@ -2091,7 +2114,7 @@ EOD;
                 } else {
                     $query = <<<EOD
 SELECT COUNT(DISTINCT `date`) AS `count`
-FROM `tools_ce_trends`
+FROM `apps_top_100_explorer_trends`
 WHERE
     `category_id` = ?
     AND

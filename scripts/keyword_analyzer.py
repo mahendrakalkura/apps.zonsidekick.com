@@ -72,25 +72,25 @@ points = {
 }
 
 
-def get_keywords(requests):
+def get_keywords(reports):
     keywords = []
     mysql = get_mysql_connection()
-    for request in requests:
+    for report in reports:
         cursor = mysql.cursor()
         cursor.execute(
             '''
             SELECT `id`, `string`
-            FROM `tools_kns_keywords`
-            WHERE `request_id` = %(request_id)s AND `contents` IS NULL
+            FROM `apps_keyword_analyzer_keywords`
+            WHERE `report_id` = %(report_id)s AND `contents` IS NULL
             ORDER BY RAND()
             ''',
             {
-                'request_id': request['id'],
+                'report_id': report['id'],
             }
         )
         for row in cursor.fetchall():
             keywords.append({
-                'country': request['country'],
+                'country': report['country'],
                 'id': row['id'],
                 'string': row['string'],
             })
@@ -99,13 +99,13 @@ def get_keywords(requests):
     return keywords
 
 
-def get_requests(user):
+def get_reports(user):
     mysql = get_mysql_connection()
     cursor = mysql.cursor()
     cursor.execute(
         '''
         SELECT `id`, `country`
-        FROM `tools_kns_requests`
+        FROM `apps_keyword_analyzer_reports`
         WHERE `user_id` = %(user_id)s
         ORDER BY `id` ASC
         ''',
@@ -113,10 +113,10 @@ def get_requests(user):
             'user_id': user['ID'],
         }
     )
-    requests = cursor.fetchall()
+    reports = cursor.fetchall()
     cursor.close()
     mysql.close()
-    return requests
+    return reports
 
 
 def get_users():
@@ -134,7 +134,7 @@ def main():
     cursor = mysql.cursor()
     cursor.execute(
         '''
-        DELETE FROM `tools_kns_requests`
+        DELETE FROM `apps_keyword_analyzer_reports`
         WHERE `timestamp` < NOW() - INTERVAL 30 DAY
         '''
     )
@@ -144,7 +144,7 @@ def main():
 
     keywords = []
     for user in get_users():
-        for keyword in get_keywords(get_requests(user)):
+        for keyword in get_keywords(get_reports(user)):
             keywords.append({
                 'country': keyword['country'],
                 'id': keyword['id'],
@@ -162,7 +162,7 @@ def main():
             cursor = mysql.cursor()
             cursor.execute(
                 '''
-                UPDATE `tools_kns_keywords`
+                UPDATE `apps_keyword_analyzer_keywords`
                 SET `contents` = %(contents)s
                 WHERE `id` = %(id)s
                 ''',
