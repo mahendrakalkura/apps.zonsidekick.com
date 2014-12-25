@@ -192,6 +192,14 @@ ul {
     width: 1px;
 }
 
+.nav-tabs {
+    border-bottom-width: 1px;
+}
+
+.nav-tabs > li > a {
+    margin-bottom: 0;
+}
+
 .page-header .row h1 .btn + .btn {
     margin-right: 18px;
 }
@@ -238,6 +246,10 @@ ul {
 .switcher + label {
     margin-bottom: 0;
     vertical-align: middle;
+}
+
+.tab-pane .table {
+    margin-bottom: 0;
 }
 
 .table > tbody + tbody {

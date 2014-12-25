@@ -662,6 +662,46 @@ application.controller('keyword_analyzer_multiple_simple', [
             return keywords;
         };
 
+        $scope.get_keywords_na = function () {
+            if (!$scope.keywords.length) {
+                return 0;
+            }
+            var count = 0;
+            for (var index in $scope.keywords) {
+                if (index == 'get_chunks') {
+                    continue;
+                }
+                if (
+                    $scope.keywords[index].contents != null
+                    &&
+                    $scope.keywords[index].contents.score[0] == -1
+                ) {
+                    count += 1;
+                }
+            }
+            return count;
+        };
+
+        $scope.get_keywords_non_na = function () {
+            if (!$scope.keywords.length) {
+                return 0;
+            }
+            var count = 0;
+            for (var index in $scope.keywords) {
+                if (index == 'get_chunks') {
+                    continue;
+                }
+                if (
+                    $scope.keywords[index].contents == null
+                    ||
+                    $scope.keywords[index].contents.score[0] != -1
+                ) {
+                    count += 1;
+                }
+            }
+            return count;
+        };
+
         $scope.get_order_by = function () {
             return $scope.order_by[1]?
                 'fa-sort-amount-desc': 'fa-sort-amount-asc';
