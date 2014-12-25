@@ -1005,7 +1005,7 @@ def get_words(items):
     return Counter([
         word
         for item in items
-        for word in split(r'[^A-Za-z0-9]', item['title'][0])
+        for word in split(r'[^A-Za-z0-9]', item['title'][0].lower())
         if len(word) > 3
     ]).most_common(10)
 
