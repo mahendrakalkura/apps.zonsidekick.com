@@ -213,22 +213,19 @@
         <div class="col-xs-12 table-light">
             <ul class="nav nav-tabs" id="tabs">
                 <li class="active" ng-show="get_keywords_non_na()">
-                    <a data-toggle="tab" href="#tabs-filtered-kws">
-                        <span
-                            title="This tab contains the keywords in your report that did not contain sufficient data for analysis. These should generally be ignored."
-                            data-toggle="tooltip"
-                            >Filtered KWs</span>
+                    <a data-toggle="tab" href="#tabs-results">
+                        Results
                         <span class="badge badge-success">
                             [! get_keywords_non_na() !]
                         </span>
                     </a>
                 </li>
                 <li ng-show="get_keywords_na()">
-                    <a data-toggle="tab" href="#tabs-na-kws">
+                    <a data-toggle="tab" href="#tabs-filtered-kws">
                         <span
                             title="This tab contains keywords which returned a result of N/A. This typically means there wasn't enough data in the Kindle bookstore to properly analyze the keyword and you should disregard it."
                             data-toggle="tooltip"
-                            >N/A KWs</span>
+                            >Filtered KWs</span>
                         <span class="badge badge-danger">
                             [! get_keywords_na() !]
                         </span>
@@ -238,7 +235,7 @@
             <div class="tab-content tab-content-bordered">
                 <div
                     class="tab-pane fade active in"
-                    id="tabs-filtered-kws"
+                    id="tabs-results"
                     ng-show="get_keywords_non_na()"
                     >
                     <p class="text-center">
@@ -699,7 +696,7 @@
                 </div>
                 <div
                     class="tab-pane fade in"
-                    id="tabs-na-kws"
+                    id="tabs-filtered-kws"
                     ng-show="get_keywords_na()"
                     >
                     <p class="text-center">
