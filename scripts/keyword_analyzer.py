@@ -810,9 +810,6 @@ def get_contents(keyword, country):
     optimization = get_optimization(keyword, items) if price else (-1, 'N/A')
     spend = get_spend(items) if price else ((-1, 'N/A'), 'N/A')
     popularity = get_popularity(keyword) if price else (-1, 'N/A')
-    score = get_score(
-        buyer_behavior, competition, optimization, popularity, spend,
-    ) if price else (-1, 'N/A')
     return {
         'average_length': (
             average_length, get_float(average_length)
