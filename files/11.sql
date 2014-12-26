@@ -16,3 +16,16 @@ SET FOREIGN_KEY_CHECKS = 0;
 ALTER TABLE `apps_keyword_analyzer_keywords` ADD KEY `report_id` (`report_id`);
 ALTER TABLE `apps_keyword_analyzer_keywords` ADD CONSTRAINT `apps_keyword_analyzer_keywords_report_id` FOREIGN KEY (`report_id`) REFERENCES `apps_keyword_analyzer_reports` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 SET FOREIGN_KEY_CHECKS = 1;
+
+SET FOREIGN_KEY_CHECKS = 0;
+ALTER TABLE `apps_top_100_explorer_categories` DROP FOREIGN KEY `tools_ce_categories_category_id`;
+ALTER TABLE `apps_top_100_explorer_trends` DROP FOREIGN KEY `tools_ce_trends_book_id`;
+ALTER TABLE `apps_top_100_explorer_trends` DROP FOREIGN KEY `tools_ce_trends_category_id`;
+ALTER TABLE `apps_top_100_explorer_trends` DROP FOREIGN KEY `tools_ce_trends_section_id`;
+ALTER TABLE `apps_popular_searches_trends` DROP FOREIGN KEY `tools_ps_trends_book_id`;
+ALTER TABLE `apps_top_100_explorer_categories` ADD CONSTRAINT `apps_top_100_explorer_categories_category_id` FOREIGN KEY (`category_id`) REFERENCES `apps_top_100_explorer_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `apps_top_100_explorer_trends` ADD CONSTRAINT `apps_top_100_explorer_trends_book_id` FOREIGN KEY (`book_id`) REFERENCES `apps_top_100_explorer_books` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `apps_top_100_explorer_trends` ADD CONSTRAINT `apps_top_100_explorer_trends_category_id` FOREIGN KEY (`category_id`) REFERENCES `apps_top_100_explorer_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `apps_top_100_explorer_trends` ADD CONSTRAINT `apps_top_100_explorer_trends_section_id` FOREIGN KEY (`section_id`) REFERENCES `apps_top_100_explorer_sections` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `apps_popular_searches_trends` ADD CONSTRAINT `apps_popular_searches_trends_book_id` FOREIGN KEY (`book_id`) REFERENCES `apps_popular_searches_books` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+SET FOREIGN_KEY_CHECKS = 1;
