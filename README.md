@@ -91,6 +91,15 @@ supervisor
 ----------
 
 ```
+[program:book_tracker]
+autorestart=true
+autostart=true
+command={{ virtualenv }}/python book_tracker.py
+directory=cd {{ path }}/scripts
+startsecs=0
+```
+
+```
 [program:keyword_analyzer]
 autorestart=true
 autostart=true
