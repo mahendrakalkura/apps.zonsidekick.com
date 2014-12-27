@@ -18,15 +18,6 @@ Step 2
 $ cd apps.zonsidekick.com
 $ mysql -e 'CREATE DATABASE `apps.zonsidekick.com`'
 $ mysql apps.zonsidekick.com < files/1.sql
-$ mysql apps.zonsidekick.com < files/2.sql
-$ mysql apps.zonsidekick.com < files/3.sql
-$ mysql apps.zonsidekick.com < files/4.sql
-$ mysql apps.zonsidekick.com < files/5.sql
-$ mysql apps.zonsidekick.com < files/6.sql
-$ mysql apps.zonsidekick.com < files/7.sql
-$ mysql apps.zonsidekick.com < files/8.sql
-$ mysql apps.zonsidekick.com < files/9.sql
-$ mysql apps.zonsidekick.com < files/10.sql
 ```
 
 Step 3
