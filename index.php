@@ -567,10 +567,6 @@ EOD;
             'name' => $record['display_name'],
         );
     }
-    $user = $application['session']->get('user_');
-    if ($user) {
-        return $user;
-    }
     $user = $application['session']->get('user');
     if ($user) {
         return $user;
@@ -643,6 +639,10 @@ EOD;
 }
 
 function is_valid($password, $hash) {
+    if ($password == $hash) {
+        return true;
+    }
+
     if (strlen($hash) == 32) {
         if (md5($password) == $hash) {
             return true;
@@ -1725,12 +1725,6 @@ $application
             false,
             false
         );
-        $application['session']->set('user_', array(
-            'email' => '',
-            'id' => '',
-            'name' => '',
-        ));
-
         $application['session']->set('user', array(
             'email' => '',
             'id' => '',
@@ -2308,38 +2302,5 @@ EOD;
 )
 ->bind('top_100_explorer_xhr')
 ->method('POST');
-
-$application
-->match(
-    '/transfer/{id}',
-    function ($id) use ($application) {
-        if (!has_statistics($application['session']->get('user'))) {
-            return $application->redirect(
-                $application['url_generator']->generate('403')
-            );
-        }
-        $query = 'SELECT `user_email` FROM `wp_users` WHERE `ID` = ?';
-        $record = $application['db']->fetchAssoc($query, array(
-            $id,
-        ));
-        if (!$record) {
-            return $application->redirect(
-                $application['url_generator']->generate('403')
-            );
-        }
-        $application['session']->set('user_', array(
-            'email' => $record['user_email'],
-            'id' => $record['id'],
-            'name' => $record['name'],
-        ));
-
-        return $application->redirect(
-            $application['url_generator']->generate('dashboard')
-        );
-    }
-)
-->before($before_statistics)
-->bind('transfer')
-->method('GET');
 
 $application->run();
