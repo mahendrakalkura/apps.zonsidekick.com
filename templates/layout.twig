@@ -213,12 +213,14 @@
                                 </li>
                             </ul>
                         </li>
-                        <li class="{% if nav == 'book_tracker' %}active{% endif %}">
-                            <a href="{{ url('book_tracker') }}">
-                                <i class="menu-icon fa fa-fw fa-book"></i>
-                                <span class="mm-text">Book Tracker</span>
-                            </a>
-                        </li>
+                        {% if has_statistics %}
+                            <li class="{% if nav == 'book_tracker' %}active{% endif %}">
+                                <a href="{{ url('book_tracker') }}">
+                                    <i class="menu-icon fa fa-fw fa-book"></i>
+                                    <span class="mm-text">Book Tracker</span>
+                                </a>
+                            </li>
+                        {% endif %}
                         <li class="{% if nav == 'popular_searches' %}active{% endif %}">
                             <a href="{{ url('popular_searches') }}">
                                 <i class="menu-icon fa fa-fw fa-search"></i>
