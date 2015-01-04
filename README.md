@@ -56,7 +56,7 @@ Step 6
 $ cd apps.zonsidekick.com
 $ workon apps.zonsidekick.com
 $ cd scripts
-$ python assets.py
+$ python assets.py build
 ```
 
 How to run?

@@ -71,6 +71,43 @@ function usort_popular_searches($one, $two)
     return 0;
 }
 
+function get_book($application, $user, $id) {
+    $query = <<<EOD
+SELECT *
+FROM `apps_book_tracker_books`
+WHERE `id` = ? AND `user_id` = ?
+EOD;
+    $book = $application['db']->fetchAssoc($query, array($id, $user['id']));
+    if ($book) {
+        $book['keywords'] = get_keywords($application, $book['id']);
+    }
+
+    return $book;
+}
+
+function get_books($application, $user) {
+    $books = array();
+    $query = <<<EOD
+SELECT *
+FROM `apps_book_tracker_books`
+WHERE `user_id` = ?
+ORDER BY `id` ASC
+EOD;
+    $bs = $application['db']->fetchAll($query, array($user['id']));
+    if ($bs) {
+        foreach ($bs as $b) {
+            $books[] = array(
+                'id' => $b['id'],
+                'keywords' => get_keywords($application, $b['id']),
+                'title' => $b['title'],
+                'url' => $b['url'],
+            );
+        }
+    }
+
+    return $books;
+}
+
 function get_category($application, $category_id) {
     $categories = array();
     while (true) {
@@ -232,6 +269,24 @@ function get_currency($country) {
     }
 
     return '$';
+}
+
+function get_keywords($application, $book_id) {
+    $keywords = array();
+    $query = <<<EOD
+SELECT *
+FROM `apps_book_tracker_keywords`
+WHERE `book_id` = ?
+ORDER BY `id` ASC
+EOD;
+    $ks = $application['db']->fetchAll($query, array($book_id));
+    if ($ks) {
+        foreach ($ks as $k) {
+            $keywords[] = $k['string'];
+        }
+    }
+
+    return $keywords;
 }
 
 function get_logos($application, $user) {
@@ -606,6 +661,66 @@ function get_words_from_words($words_) {
     return $words;
 }
 
+function set_book($application, $user, $id, $array) {
+    if (!$id) {
+        $application['db']->insert('apps_book_tracker_books', array(
+            'title' => $array['title'],
+            'url' => $array['url'],
+            'user_id' => $user['id'],
+        ));
+        $id = $application['db']->lastInsertId();
+    } else {
+        $application['db']->update('apps_book_tracker_books', array(
+            'title' => $array['title'],
+            'url' => $array['url'],
+            'user_id' => $user['id'],
+        ), array(
+            'id' => $id,
+        ));
+    }
+    $array['keywords'] = explode("\n", $array['keywords']);
+    if (!empty($array['keywords'])) {
+        foreach ($array['keywords'] as $key => $value) {
+            $value = trim($value);
+            if (!empty($value)) {
+                $array['keywords'][$key] = $value;
+            } else {
+                unset($array['keywords'][$key]);
+            }
+        }
+    }
+    $array['keywords'] = array_unique($array['keywords']);
+    $query = <<<EOD
+DELETE
+FROM `apps_book_tracker_keywords`
+WHERE `book_id` = ? AND `string` NOT IN (?)
+EOD;
+    $application['db']->executeUpdate(
+        $query,
+        array($id, $array['keywords']),
+        array(\PDO::PARAM_INT, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
+    );
+    if ($array['keywords']) {
+        foreach ($array['keywords'] as $string) {
+            $query = <<<EOD
+SELECT COUNT(`id`) AS `count`
+FROM `apps_book_tracker_keywords`
+WHERE `book_id` = ? AND `string` = ?
+EOD;
+            $record = $application['db']->fetchAssoc($query, array(
+                $id, $string,
+            ));
+            if ($record['count'] >= 1) {
+                continue;
+            }
+            $application['db']->insert('apps_book_tracker_keywords', array(
+                'book_id' => $id,
+                'string' => $string,
+            ));
+        }
+    }
+}
+
 function has_statistics($user) {
     return in_array($user['id'], array(1, 2, 3));
 }
@@ -747,25 +862,25 @@ if ($application['debug']) {
     });
 }
 
-$application->before(function (Request $report) use ($application) {
+$application->before(function (Request $request) use ($application) {
     $user = get_user($application);
     if (!$user['id']) {
-        if ($report->get('_route') != 'sign_in') {
+        if ($request->get('_route') != 'sign_in') {
             return $application->redirect(
                 $application['url_generator']->generate('sign_in')
             );
         }
     }
     $is_paying_customer = is_paying_customer($application, $user);
-    if ($report->get('_route') != 'sign_in') {
+    if ($request->get('_route') != 'sign_in') {
         if ($is_paying_customer) {
-            if ($report->get('_route') == '403') {
+            if ($request->get('_route') == '403') {
                 return $application->redirect(
                     $application['url_generator']->generate('dashboard')
                 );
             }
         } else {
-            if ($report->get('_route') != '403') {
+            if ($request->get('_route') != '403') {
                 return $application->redirect(
                     $application['url_generator']->generate('403')
                 );
@@ -812,11 +927,11 @@ $application
 $application
 ->match(
     '/author-analyzer',
-    function (Request $report) use ($application) {
+    function (Request $request) use ($application) {
         return $application['twig']->render(
             'views/author_analyzer.twig',
             array(
-                'url' => $report->get('url'),
+                'url' => $request->get('url'),
             )
         );
     }
@@ -827,7 +942,7 @@ $application
 $application
 ->match(
     '/author-analyzer/author',
-    function (Request $report) use ($application, $variables) {
+    function (Request $request) use ($application, $variables) {
         ignore_user_abort(true);
         set_time_limit(0);
         exec(sprintf(
@@ -835,7 +950,7 @@ $application
             '2>/dev/null',
             $variables['virtualenv'],
             __DIR__,
-            escapeshellarg($report->get('url'))
+            escapeshellarg($request->get('url'))
         ), $output, $return_var);
         return new Response(implode('', $output));
     }
@@ -846,7 +961,7 @@ $application
 $application
 ->match(
     '/author-analyzer/authors',
-    function (Request $report) use ($application, $variables) {
+    function (Request $request) use ($application, $variables) {
         ignore_user_abort(true);
         set_time_limit(0);
         exec(sprintf(
@@ -854,7 +969,7 @@ $application
             '2>/dev/null',
             $variables['virtualenv'],
             __DIR__,
-            escapeshellarg($report->get('keyword'))
+            escapeshellarg($request->get('keyword'))
         ), $output, $return_var);
         return new Response(implode('', $output));
     }
@@ -865,9 +980,9 @@ $application
 $application
 ->match(
     '/book-analyzer',
-    function (Request $report) use ($application) {
+    function (Request $request) use ($application) {
         return $application['twig']->render('views/book_analyzer.twig', array(
-            'url' => $report->get('url'),
+            'url' => $request->get('url'),
         ));
     }
 )
@@ -877,14 +992,14 @@ $application
 $application
 ->match(
     '/book-analyzer/book',
-    function (Request $report) use ($application, $variables) {
+    function (Request $request) use ($application, $variables) {
         ignore_user_abort(true);
         set_time_limit(0);
         exec(sprintf(
             '%s/python %s/scripts/book_analyzer.py get_book %s 2>/dev/null',
             $variables['virtualenv'],
             __DIR__,
-            escapeshellarg($report->get('url'))
+            escapeshellarg($request->get('url'))
         ), $output, $return_var);
         return new Response(implode('', $output));
     }
@@ -895,14 +1010,14 @@ $application
 $application
 ->match(
     '/book-analyzer/books',
-    function (Request $report) use ($application, $variables) {
+    function (Request $request) use ($application, $variables) {
         ignore_user_abort(true);
         set_time_limit(0);
         exec(sprintf(
             '%s/python %s/scripts/book_analyzer.py get_books %s 2>/dev/null',
             $variables['virtualenv'],
             __DIR__,
-            escapeshellarg($report->get('keyword'))
+            escapeshellarg($request->get('keyword'))
         ), $output, $return_var);
         return new Response(implode('', $output));
     }
@@ -913,8 +1028,8 @@ $application
 $application
 ->match(
     '/book-analyzer/items',
-    function (Request $report) use ($application, $variables) {
-        $keywords = $report->get('keywords');
+    function (Request $request) use ($application, $variables) {
+        $keywords = $request->get('keywords');
         $keywords = strtolower($keywords);
         $keywords = explode("\n", $keywords);
         if (!empty($keywords)) {
@@ -935,7 +1050,7 @@ $application
             '2>/dev/null',
             $variables['virtualenv'],
             __DIR__,
-            escapeshellarg($report->get('url')),
+            escapeshellarg($request->get('url')),
             escapeshellarg(json_encode($keywords))
         ), $output, $return_var);
         return new Response(implode('', $output));
@@ -943,6 +1058,223 @@ $application
 )
 ->bind('book_analyzer_items')
 ->method('POST');
+
+$application
+->match(
+    '/book-tracker',
+    function (Request $request) use ($application) {
+        return $application['twig']->render(
+            'views/book_tracker.twig',
+            array(
+                'books' => get_books(
+                    $application, $application['session']->get('user')
+                ),
+            )
+        );
+    }
+)
+->bind('book_tracker')
+->method('GET');
+
+$application
+->match(
+    '/book-tracker/add',
+    function (Request $request) use ($application) {
+        $user = $application['session']->get('user');
+        $books = get_books($application, $user);
+        if (count($books) >= 3) {
+            $application['session']->getFlashBag()->add(
+                'success',
+                array(
+                    'You are only allowed to track at most 3 books at '.
+                    'any given time.'
+                )
+            );
+
+            return $application->redirect(
+                $application['url_generator']->generate('book_tracker')
+            );
+        }
+
+        if ($request->isMethod('POST')) {
+            set_book($application, $user, 0, array(
+                'keywords' => $request->get('keywords'),
+                'title' => $request->get('title'),
+                'url' => $request->get('url'),
+            ));
+            $application['session']->getFlashBag()->add(
+                'success', array('The book was added successfully.')
+            );
+
+            return $application->redirect(
+                $application['url_generator']->generate('book_tracker')
+            );
+        }
+
+        return $application['twig']->render('views/book_tracker_add.twig');
+    }
+)
+->bind('book_tracker_add')
+->method('GET|POST');
+
+$application
+->match(
+    '/book-tracker/{id}/view',
+    function (Request $request, $id) use ($application) {
+        $book = get_book(
+            $application, $application['session']->get('user'), $id
+        );
+        if (!$book) {
+            return $application->redirect(
+                $application['url_generator']->generate('book_tracker')
+            );
+        }
+
+        $dates = array();
+        for($index = 0; $index < 28; $index = $index + 1)  {
+            $dates[] = date('Y-m-d', strtotime(sprintf('-%d days', $index)));
+        }
+        $dates = array_reverse($dates);
+
+        $chart_1_categories = $dates;
+        $chart_1_series = array(
+            array(
+                'data' => array(),
+                'name'=> 'Amazon Best Seller Rank',
+            )
+        );
+        $chart_2_categories = $dates;
+        $chart_2_series = array();
+
+        foreach ($dates as $key => $value) {
+            $chart_1_series[0]['data'][$key] = 1000001;
+            $query = <<<EOD
+SELECT *
+FROM `apps_book_tracker_books_ranks`
+WHERE `book_id` = ? AND `date` = ?
+EOD;
+            $record = $application['db']->fetchAssoc(
+                $query, array($book['id'], $value)
+            );
+            if ($record AND $record['number'] < 1000001) {
+                $chart_1_series[0]['data'][$key] = intval($record['number']);
+            }
+        }
+        if ($book['keywords']) {
+            foreach ($book['keywords'] as $key => $value) {
+                $chart_2_series[$key] = array(
+                    'data' => array(),
+                    'name'=> 'Amazon Best Seller Rank',
+                );
+                foreach ($dates as $k => $v) {
+                    $chart_2_series[$key]['data'][$k] = 101;
+                    $query = <<<EOD
+SELECT *
+FROM `apps_book_tracker_keywords_ranks`
+WHERE `keyword_id` IN (
+    SELECT `id` FROM `apps_book_tracker_keywords` WHERE `string` = ?
+) AND `date` = ?
+EOD;
+                    $record = $application['db']->fetchAssoc(
+                        $query, array($value, $v)
+                    );
+                    if ($record) {
+                        $chart_2_series[$key]['data'][$k] = intval(
+                            $record['number']
+                        );
+                    }
+                }
+            }
+        }
+
+        return $application['twig']->render(
+            'views/book_tracker_view.twig',
+            array(
+                'book' => $book,
+                'chart_1_categories' => $chart_1_categories,
+                'chart_1_series' => $chart_1_series,
+                'chart_2_categories' => $chart_2_categories,
+                'chart_2_series' => $chart_2_series,
+            )
+        );
+    }
+)
+->bind('book_tracker_view')
+->method('GET');
+
+$application
+->match(
+    '/book-tracker/{id}/edit',
+    function (Request $request, $id) use ($application) {
+        $user = $application['session']->get('user');
+        $book = get_book($application, $user, $id);
+        if (!$book) {
+            return $application->redirect(
+                $application['url_generator']->generate('book_tracker')
+            );
+        }
+
+        if ($request->isMethod('POST')) {
+            set_book($application, $user, $id, array(
+                'keywords' => $request->get('keywords'),
+                'title' => $request->get('title'),
+                'url' => $request->get('url'),
+            ));
+            $application['session']->getFlashBag()->add(
+                'success', array('The book was edited successfully.')
+            );
+
+            return $application->redirect(
+                $application['url_generator']->generate('book_tracker')
+            );
+        }
+
+        return $application['twig']->render(
+            'views/book_tracker_edit.twig',
+            array(
+                'book' => $book,
+            )
+        );
+    }
+)
+->bind('book_tracker_edit')
+->method('GET|POST');
+
+$application
+->match(
+    '/book-tracker/{id}/delete',
+    function (Request $request, $id) use ($application) {
+        $user = $application['session']->get('user');
+        $book = get_book($application, $user, $id);
+        if (!$book) {
+            return $application->redirect(
+                $application['url_generator']->generate('book_tracker')
+            );
+        }
+        if ($request->isMethod('POST')) {
+            $query = <<<EOD
+DELETE FROM `apps_book_tracker_books` WHERE `id` = ? AND `user_id` = ?
+EOD;
+            $application['db']->executeUpdate($query, array($id, $user['id']));
+            $application['session']->getFlashBag()->add(
+                'success', array('The book was deleted successfully.')
+            );
+
+            return $application->redirect(
+                $application['url_generator']->generate('book_tracker')
+            );
+        }
+
+        return $application['twig']->render(
+            'views/book_tracker_delete.twig',
+            array(
+                'book' => $book,
+            )
+        );
+    }
+)
+->bind('book_tracker_delete')
+->method('GET|POST');
 
 $application
 ->match(
@@ -961,10 +1293,10 @@ $application
 $application
 ->match(
     '/feedback',
-    function (Request $report) use ($application) {
+    function (Request $request) use ($application) {
         $error = '';
-        if ($report->isMethod('POST')) {
-            $body = $report->get('body');
+        if ($request->isMethod('POST')) {
+            $body = $request->get('body');
             if (!empty($body)) {
                 if (!is_development()) {
                     $user = $application['session']->get('user');
@@ -973,7 +1305,7 @@ $application
                     );
                     try {
                         $message = \Swift_Message::newInstance()
-                            ->setBody(trim($report->get('body')))
+                            ->setBody(trim($request->get('body')))
                             ->setFrom(array(
                                 $user['email'],
                             ))
@@ -1044,7 +1376,7 @@ $application
 $application
 ->match(
     '/keyword-analyzer/multiple/{id}/csv',
-    function (Request $report, $id) use ($application) {
+    function (Request $request, $id) use ($application) {
         $user = $application['session']->get('user');
         $csv = get_csv($application, $user, $id);
         $stream = function () use ($csv) {
@@ -1068,7 +1400,7 @@ $application
 $application
 ->match(
     '/keyword-analyzer/multiple/{id}/delete',
-    function (Request $report, $id) use ($application) {
+    function (Request $request, $id) use ($application) {
         $user = $application['session']->get('user');
         list($report_, $keywords) = get_report_and_keywords(
             $application, $user, $id
@@ -1079,9 +1411,9 @@ $application
                     ->generate('keyword_analyzer_multiple')
             );
         }
-        if ($report->isMethod('POST')) {
+        if ($request->isMethod('POST')) {
             $application['db']->executeUpdate(
-                'DELETE FROM `apps_keyword_analyzer_reports` WHERE `ID` = ?',
+                'DELETE FROM `apps_keyword_analyzer_reports` WHERE `id` = ?',
                 array($id)
             );
             $application['session']->getFlashBag()->add(
@@ -1106,7 +1438,7 @@ $application
 $application
 ->match(
     '/keyword-analyzer/multiple/{id}/detailed',
-    function (Request $report, $id) use ($application) {
+    function (Request $request, $id) use ($application) {
         $user = $application['session']->get('user');
         list($report, $keywords) = get_report_and_keywords(
             $application, $user, $id
@@ -1136,7 +1468,7 @@ $application
 $application
 ->match(
     '/keyword-analyzer/multiple/{id}/email',
-    function (Request $report, $id) use ($application, $variables) {
+    function (Request $request, $id) use ($application, $variables) {
         $user = $application['session']->get('user');
         $subject = 'Your Keyword Analyzer report is ready!';
         $body = <<<EOD
@@ -1159,7 +1491,7 @@ EOD;
                     get_pdf(
                         $application,
                         $user,
-                        $report->get('logo'),
+                        $request->get('logo'),
                         $id,
                         $variables
                     ),
@@ -1171,7 +1503,7 @@ EOD;
                     'reports@perfectsidekick.com' => 'Zon Sidekick',
                 ))
                 ->setSubject($subject)
-                ->setTo(array($report->get('email')));
+                ->setTo(array($request->get('email')));
             $application['mailer']->send($message);
         } catch (Exception $exception ) {
         }
@@ -1185,10 +1517,10 @@ EOD;
 $application
 ->match(
     '/keyword-analyzer/multiple/{id}/pdf',
-    function (Request $report, $id) use ($application, $variables) {
+    function (Request $request, $id) use ($application, $variables) {
         $user = $application['session']->get('user');
         $pdf = get_pdf(
-            $application, $user, $report->get('logo'), $id, $variables
+            $application, $user, $request->get('logo'), $id, $variables
         );
         $stream = function () use ($pdf) {
             echo $pdf;
@@ -1211,10 +1543,10 @@ $application
 $application
 ->match(
     '/keyword-analyzer/multiple/process',
-    function (Request $report) use ($application) {
+    function (Request $request) use ($application) {
         $user = $application['session']->get('user');
         list($count, $keywords) = get_count_and_keywords(
-            $report->get('keywords')
+            $request->get('keywords')
         );
         if (!$count OR !$keywords) {
             return $application->redirect(
@@ -1223,7 +1555,7 @@ $application
             );
         }
         $application['db']->insert('apps_keyword_analyzer_reports', array(
-            'country' => $report->get('country'),
+            'country' => $request->get('country'),
             'timestamp' => date('Y-m-d H:i:s'),
             'user_id' => $user['id'],
         ));
@@ -1256,7 +1588,7 @@ $application
 $application
 ->match(
     '/keyword-analyzer/multiple/{id}/simple',
-    function (Request $report, $id) use ($application) {
+    function (Request $request, $id) use ($application) {
         $user = $application['session']->get('user');
         list($report, $keywords) = get_report_and_keywords(
             $application, $user, $id
@@ -1286,7 +1618,7 @@ $application
 $application
 ->match(
     '/keyword-analyzer/multiple/{id}/xhr',
-    function (Request $report, $id) use ($application) {
+    function (Request $request, $id) use ($application) {
         $user = $application['session']->get('user');
         list($report, $keywords) = get_report_and_keywords(
             $application, $user, $id
@@ -1339,15 +1671,15 @@ $application
 $application
 ->match(
     '/keyword-analyzer/single/xhr',
-    function (Request $report) use ($application, $variables) {
+    function (Request $request) use ($application, $variables) {
         ignore_user_abort(true);
         set_time_limit(0);
         exec(sprintf(
             '%s/python %s/scripts/keyword_analyzer.py %s %s 2>/dev/null',
             $variables['virtualenv'],
             __DIR__,
-            escapeshellarg($report->get('keyword')),
-            escapeshellarg($report->get('country'))
+            escapeshellarg($request->get('keyword')),
+            escapeshellarg($request->get('country'))
         ), $output, $return_var);
         return new Response(implode('', $output));
     }
@@ -1358,7 +1690,7 @@ $application
 $application
 ->match(
     '/keyword-suggester',
-    function (Request $report) use ($application) {
+    function (Request $request) use ($application) {
         return $application['twig']->render(
             'views/keyword_suggester.twig',
             array(
@@ -1373,8 +1705,8 @@ $application
                     'de' => 'Germany',
                     'co.jp' => 'Japan',
                 ),
-                'keywords' => $report->get('keywords', ''),
-                'mode' => $report->get('mode', 'Suggest'),
+                'keywords' => $request->get('keywords', ''),
+                'mode' => $request->get('mode', 'Suggest'),
                 'search_aliases' => array(
                     'aps' => 'All Departments',
                     'digital-text' => 'Kindle Store',
@@ -1424,8 +1756,8 @@ $application
 $application
 ->match(
     '/keyword-suggester/download',
-    function (Request $report) use ($application) {
-        $json = json_decode($report->get('json'), true);
+    function (Request $request) use ($application) {
+        $json = json_decode($request->get('json'), true);
         $json['suggestions'] = implode("\n", $json['suggestions']);
         $stream = function () use ($json) {
             echo $json['suggestions'];
@@ -1447,7 +1779,7 @@ $application
 $application
 ->match(
     '/keyword-suggester/xhr',
-    function (Request $report) use ($application, $variables) {
+    function (Request $request) use ($application, $variables) {
         if (is_development()) {
             $output = array('["1", "2", "3"]');
         } else {
@@ -1458,9 +1790,9 @@ $application
                 '2>/dev/null',
                 $variables['virtualenv'],
                 __DIR__,
-                escapeshellarg($report->get('keyword')),
-                escapeshellarg($report->get('country')),
-                escapeshellarg($report->get('search_alias'))
+                escapeshellarg($request->get('keyword')),
+                escapeshellarg($request->get('country')),
+                escapeshellarg($request->get('search_alias'))
             ), $output, $return_var);
         }
         return new Response(implode('', $output));
@@ -1486,12 +1818,12 @@ $application
 $application
 ->match(
     '/logos/add',
-    function (Request $report) use ($application) {
+    function (Request $request) use ($application) {
         $user = $application['session']->get('user');
 
         $error = null;
-        if ($report->isMethod('POST')) {
-            $logo = $report->files->get('logo');
+        if ($request->isMethod('POST')) {
+            $logo = $request->files->get('logo');
             if (
                 $logo
                 and
@@ -1532,13 +1864,13 @@ $application
 $application
 ->match(
     '/logos/delete',
-    function (Request $report) use ($application) {
+    function (Request $request) use ($application) {
         $user = $application['session']->get('user');
-        if ($report->isMethod('POST')) {
+        if ($request->isMethod('POST')) {
             unlink(sprintf(
                 '%s/%s',
                 get_path($application, $user, 'logos'),
-                $report->get('file_name')
+                $request->get('file_name')
             ));
             $application['session']->getFlashBag()->add(
                 'success', array('The logo was deleted successfully.')
@@ -1551,7 +1883,7 @@ $application
 
         return $application['twig']->render(
             'views/logos_delete.twig', array(
-                'file_name' => $report->get('file_name'),
+                'file_name' => $request->get('file_name'),
             )
         );
     }
@@ -1562,12 +1894,12 @@ $application
 $application
 ->match(
     '/logos/download',
-    function (Request $report) use ($application) {
+    function (Request $request) use ($application) {
         $user = $application['session']->get('user');
         $file_path = sprintf(
             '%s/%s',
             get_path($application, $user, 'logos'),
-            $report->get('file_name')
+            $request->get('file_name')
         );
         $stream = function () use ($file_path) {
             readfile($file_path);
@@ -1575,7 +1907,7 @@ $application
 
         return $application->stream($stream, 200, array(
             'Content-Disposition' => sprintf(
-                'attachment; filename="%s"', $report->get('file_name')
+                'attachment; filename="%s"', $request->get('file_name')
             ),
             'Content-length' => filesize($file_path),
             'Content-Type' => 'image/png',
@@ -1588,13 +1920,13 @@ $application
 $application
 ->match(
     '/logos/preview',
-    function (Request $report) use ($application) {
+    function (Request $request) use ($application) {
         $user = $application['session']->get('user');
         $stream = function () use ($application, $report, $user) {
             readfile(sprintf(
                 '%s/%s',
                 get_path($application, $user, 'logos'),
-                $report->get('file_name')
+                $request->get('file_name')
             ));
         };
 
@@ -1609,7 +1941,7 @@ $application
 $application
 ->match(
     '/popular-searches',
-    function (Request $report) use ($application) {
+    function (Request $request) use ($application) {
         return $application['twig']->render(
             'views/popular_searches.twig',
             array(
@@ -1624,14 +1956,14 @@ $application
 $application
 ->match(
     '/profile',
-    function (Request $report) use ($application) {
+    function (Request $request) use ($application) {
         $user = $application['session']->get('user');
 
         $error = null;
         $email = $user['email'];
 
-        if ($report->isMethod('POST')) {
-            $email = $report->get('email');
+        if ($request->isMethod('POST')) {
+            $email = $request->get('email');
             if (!empty($email)) {
                 $application['db']->executeUpdate(
                     'UPDATE `wp_users` SET `user_email` = ? WHERE `ID` = ?',
@@ -1660,11 +1992,11 @@ $application
 $application
 ->match(
     '/sign-in',
-    function (Request $report) use ($application) {
+    function (Request $request) use ($application) {
         $error = null;
-        if ($report->isMethod('POST')) {
-            $username = $report->get('username');
-            $password = $report->get('password');
+        if ($request->isMethod('POST')) {
+            $username = $request->get('username');
+            $password = $request->get('password');
             if (!empty($username) AND !empty($password)) {
                 $query = <<<EOD
 SELECT `id` , `user_email` , `user_pass` , `display_name`
@@ -1675,7 +2007,7 @@ EOD;
                     $username,
                 ));
                 if ($record AND is_valid($password, $record['user_pass'])) {
-                    if ($report->get('remember_me') == 'yes') {
+                    if ($request->get('remember_me') == 'yes') {
                         setcookie(
                             'id',
                             $record['id'],
@@ -1742,7 +2074,7 @@ $application
 $application
 ->match(
     '/statistics',
-    function (Request $report) use ($application) {
+    function (Request $request) use ($application) {
         $items = array();
         $total = array(
             'keywords_1' => 0,
@@ -1795,14 +2127,14 @@ EOD;
 $application
 ->match(
     '/suggested_keywords',
-    function (Request $report) use ($application, $variables) {
+    function (Request $request) use ($application, $variables) {
         ignore_user_abort(true);
         set_time_limit(0);
         exec(sprintf(
             '%s/python %s/scripts/suggested_keywords.py %s 2>/dev/null',
             $variables['virtualenv'],
             __DIR__,
-            escapeshellarg($report->get('keywords'))
+            escapeshellarg($request->get('keywords'))
         ), $output, $return_var);
         return new Response(implode('', $output));
     }
@@ -1813,7 +2145,7 @@ $application
 $application
 ->match(
     '/top-100-explorer',
-    function (Request $report) use ($application) {
+    function (Request $request) use ($application) {
         return $application['twig']->render(
             'views/top_100_explorer.twig',
             array(
@@ -1823,44 +2155,44 @@ $application
                 ),
                 'filters' => array(
                     'amazon_best_sellers_rank_1'
-                        => $report->get('amazon_best_sellers_rank_1', ''),
+                        => $request->get('amazon_best_sellers_rank_1', ''),
                     'amazon_best_sellers_rank_2'
-                        => $report->get('amazon_best_sellers_rank_2', ''),
+                        => $request->get('amazon_best_sellers_rank_2', ''),
                     'amazon_best_sellers_rank_3'
-                        => $report->get('amazon_best_sellers_rank_3', ''),
+                        => $request->get('amazon_best_sellers_rank_3', ''),
                     'amazon_best_sellers_rank_4'
-                        => $report->get('amazon_best_sellers_rank_4', ''),
-                    'appearance_1' => $report->get('appearance_1', ''),
-                    'appearance_2' => $report->get('appearance_2', ''),
-                    'appearance_3' => $report->get('appearance_3', ''),
-                    'appearance_4' => $report->get('appearance_4', ''),
-                    'category_id' => $report->get('category_id', ''),
-                    'count' => $report->get('count', ''),
-                    'price_1' => $report->get('price_1', ''),
-                    'price_2' => $report->get('price_2', ''),
-                    'price_3' => $report->get('price_3', ''),
-                    'price_4' => $report->get('price_4', ''),
-                    'print_length_1' => $report->get('print_length_1', ''),
-                    'print_length_2' => $report->get('print_length_2', ''),
-                    'print_length_3' => $report->get('print_length_3', ''),
-                    'print_length_4' => $report->get('print_length_4', ''),
+                        => $request->get('amazon_best_sellers_rank_4', ''),
+                    'appearance_1' => $request->get('appearance_1', ''),
+                    'appearance_2' => $request->get('appearance_2', ''),
+                    'appearance_3' => $request->get('appearance_3', ''),
+                    'appearance_4' => $request->get('appearance_4', ''),
+                    'category_id' => $request->get('category_id', ''),
+                    'count' => $request->get('count', ''),
+                    'price_1' => $request->get('price_1', ''),
+                    'price_2' => $request->get('price_2', ''),
+                    'price_3' => $request->get('price_3', ''),
+                    'price_4' => $request->get('price_4', ''),
+                    'print_length_1' => $request->get('print_length_1', ''),
+                    'print_length_2' => $request->get('print_length_2', ''),
+                    'print_length_3' => $request->get('print_length_3', ''),
+                    'print_length_4' => $request->get('print_length_4', ''),
                     'publication_date_1'
-                        => $report->get('publication_date_1', ''),
+                        => $request->get('publication_date_1', ''),
                     'publication_date_2'
-                        => $report->get('publication_date_2', ''),
+                        => $request->get('publication_date_2', ''),
                     'publication_date_3'
-                        => $report->get('publication_date_3', ''),
+                        => $request->get('publication_date_3', ''),
                     'publication_date_4'
-                        => $report->get('publication_date_4', ''),
+                        => $request->get('publication_date_4', ''),
                     'review_average_1'
-                        => $report->get('review_average_1', ''),
+                        => $request->get('review_average_1', ''),
                     'review_average_2'
-                        => $report->get('review_average_2', ''),
+                        => $request->get('review_average_2', ''),
                     'review_average_3'
-                        => $report->get('review_average_3', ''),
+                        => $request->get('review_average_3', ''),
                     'review_average_4'
-                        => $report->get('review_average_4', ''),
-                    'section_id' => $report->get('section_id', ''),
+                        => $request->get('review_average_4', ''),
+                    'section_id' => $request->get('section_id', ''),
                 ),
                 'sections' => get_sections($application),
             )
@@ -1873,7 +2205,7 @@ $application
 $application
 ->match(
     '/top-100-explorer/xhr',
-    function (Request $report) use ($application) {
+    function (Request $request) use ($application) {
         $contents = array(
             'books' => array(),
             'categories' => array(),
@@ -1889,40 +2221,40 @@ $application
             'date' => 'N/A',
         );
 
-        $category_id = intval($report->get('category_id'));
-        $section_id = intval($report->get('section_id'));
-        $print_length_1 = $report->get('print_length_1');
-        $print_length_2 = intval($report->get('print_length_2'));
-        $print_length_3 = intval($report->get('print_length_3'));
-        $print_length_4 = intval($report->get('print_length_4'));
-        $price_1 = $report->get('price_1');
-        $price_2 = floatval($report->get('price_2'));
-        $price_3 = floatval($report->get('price_3'));
-        $price_4 = floatval($report->get('price_4'));
-        $publication_date_1 = $report->get('publication_date_1');
-        $publication_date_2 = $report->get('publication_date_2');
-        $publication_date_3 = $report->get('publication_date_3');
-        $publication_date_4 = $report->get('publication_date_4');
+        $category_id = intval($request->get('category_id'));
+        $section_id = intval($request->get('section_id'));
+        $print_length_1 = $request->get('print_length_1');
+        $print_length_2 = intval($request->get('print_length_2'));
+        $print_length_3 = intval($request->get('print_length_3'));
+        $print_length_4 = intval($request->get('print_length_4'));
+        $price_1 = $request->get('price_1');
+        $price_2 = floatval($request->get('price_2'));
+        $price_3 = floatval($request->get('price_3'));
+        $price_4 = floatval($request->get('price_4'));
+        $publication_date_1 = $request->get('publication_date_1');
+        $publication_date_2 = $request->get('publication_date_2');
+        $publication_date_3 = $request->get('publication_date_3');
+        $publication_date_4 = $request->get('publication_date_4');
         $amazon_best_sellers_rank_1 = $report
             ->get('amazon_best_sellers_rank_1');
         $amazon_best_sellers_rank_2 = intval(
-            $report->get('amazon_best_sellers_rank_2')
+            $request->get('amazon_best_sellers_rank_2')
         );
         $amazon_best_sellers_rank_3 = intval(
-            $report->get('amazon_best_sellers_rank_3')
+            $request->get('amazon_best_sellers_rank_3')
         );
         $amazon_best_sellers_rank_4 = intval(
-            $report->get('amazon_best_sellers_rank_4')
+            $request->get('amazon_best_sellers_rank_4')
         );
-        $review_average_1 = $report->get('review_average_1');
-        $review_average_2 = floatval($report->get('review_average_2'));
-        $review_average_3 = floatval($report->get('review_average_3'));
-        $review_average_4 = floatval($report->get('review_average_4'));
-        $appearance_1 = $report->get('appearance_1');
-        $appearance_2 = floatval($report->get('appearance_2'));
-        $appearance_3 = floatval($report->get('appearance_3'));
-        $appearance_4 = floatval($report->get('appearance_4'));
-        $count = intval($report->get('count'));
+        $review_average_1 = $request->get('review_average_1');
+        $review_average_2 = floatval($request->get('review_average_2'));
+        $review_average_3 = floatval($request->get('review_average_3'));
+        $review_average_4 = floatval($request->get('review_average_4'));
+        $appearance_1 = $request->get('appearance_1');
+        $appearance_2 = floatval($request->get('appearance_2'));
+        $appearance_3 = floatval($request->get('appearance_3'));
+        $appearance_4 = floatval($request->get('appearance_4'));
+        $count = intval($request->get('count'));
 
         if ($category_id == -1) {
             $query = <<<EOD

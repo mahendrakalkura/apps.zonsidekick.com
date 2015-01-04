@@ -439,6 +439,211 @@ application.controller('book_analyzer', [
     }
 ]);
 
+application.controller('book_tracker', [
+    '$attrs',
+    '$scope',
+    function ($attrs, $scope) {
+        $scope.title = $attrs.title;
+        $scope.url = $attrs.url;
+        $scope.keywords = jQuery.parseJSON($attrs.keywords || '[]').join("\n");
+
+        $scope.count = 7;
+
+        $scope.errors = {
+            title: false,
+            url: false,
+        }
+
+        $scope.get_class = function () {
+            if ($scope.count < 0) {
+                return 'text-danger';
+            }
+            return 'text-info';
+        };
+
+        $scope.is_disabled = function () {
+            if ($scope.errors['title']) {
+                return true;
+            }
+            if ($scope.errors['url']) {
+                return true;
+            }
+            if ($scope.count < 0) {
+                return true;
+            }
+            return false;
+        };
+
+        $scope.$watch('keywords', function (new_value, old_value) {
+            if (typeof(new_value) == 'undefined') {
+                $scope.count = 7;
+                return;
+            }
+            new_value = $.trim(new_value);
+            if (new_value == '') {
+                $scope.count = 7;
+                return;
+            }
+            $scope.count = 7 - new_value.split(/\r|\n|\r\n/g).length;
+        }, true);
+
+        $scope.$watch('title', function (new_value, old_value) {
+            if (typeof(new_value) == 'undefined') {
+                $scope.errors['title'] = true;
+                return;
+            }
+            new_value = $.trim(new_value);
+            if (new_value == '') {
+                $scope.errors['title'] = true;
+                return;
+            }
+            $scope.errors['title'] = false;
+        });
+
+        $scope.$watch('url', function (new_value, old_value) {
+            if (typeof(new_value) == 'undefined') {
+                $scope.errors['url'] = true;
+                return;
+            }
+            new_value = $.trim(new_value);
+            if (new_value == '') {
+                $scope.errors['url'] = true;
+                return;
+            }
+            if (
+                /^http:\/\/www.amazon.com\/gp\/product\/([^\/]*)\/$/.test(
+                    new_value
+                )
+            ) {
+                $scope.errors['url'] = true;
+                return;
+            }
+            $scope.errors['url'] = false;
+        });
+    }
+]);
+
+application.controller('book_tracker_view', [
+    '$attrs',
+    '$scope',
+    function ($attrs, $scope) {
+        jQuery('#chart_1').highcharts({
+            chart: {
+                marginRight: 20,
+                marginTop: 30
+            },
+            credits: {
+                enabled: false
+            },
+            legend: {
+                enabled: false
+            },
+            plotOptions: {
+                line: {
+                    dataLabels: {
+                        enabled: true,
+                        formatter: function () {
+                            if (this.y < 1000001) {
+                                return this.y.toLocaleString();
+                            }
+                            return this.y.toLocaleString() + '+';
+                        }
+                    },
+                    enableMouseTracking: true
+                }
+            },
+            series: jQuery.parseJSON($attrs.chart1Series || '[]'),
+            title: {
+                text: null
+            },
+            tooltip: {
+                formatter: function () {
+                    value = this.y.toLocaleString();
+                    if (this.y >= 1000001) {
+                        value = this.y.toLocaleString() + '+';
+                    }
+                    return (
+                        'Amazon Best Seller Rank @ ' + this.key + ': ' + value
+                    );
+                }
+            },
+            xAxis: {
+                categories: jQuery.parseJSON($attrs.chart1Categories || '[]'),
+                labels: {
+                    rotation: -90
+                },
+                title: {
+                    text: null
+                }
+            },
+            yAxis: {
+                min: 1,
+                reversed: true,
+                title: {
+                    text: null
+                }
+            }
+        });
+        jQuery('#chart_2').highcharts({
+            chart: {
+                marginRight: 20,
+                marginTop: 30
+            },
+            credits: {
+                enabled: false
+            },
+            legend: {
+                enabled: false
+            },
+            plotOptions: {
+                line: {
+                    dataLabels: {
+                        enabled: true,
+                        formatter: function () {
+                            if (this.y < 101) {
+                                return this.y;
+                            }
+                            return this.y + '+';
+                        }
+                    },
+                    enableMouseTracking: true
+                }
+            },
+            series: jQuery.parseJSON($attrs.chart2Series || '[]'),
+            title: {
+                text: null
+            },
+            tooltip: {
+                formatter: function () {
+                    var value = this.y;
+                    if (this.y >= 101) {
+                        value = this.y + '+';
+                    }
+                    return 'Rank @ ' + this.key + ': ' + value;
+                }
+            },
+            xAxis: {
+                categories: jQuery.parseJSON($attrs.chart2Categories || '[]'),
+                labels: {
+                    rotation: -90
+                },
+                title: {
+                    text: null
+                }
+            },
+            yAxis: {
+                min: 1,
+                reversed: true,
+                startOnTick: false,
+                tickPositions: [1, 11, 21, 31, 41, 51, 61, 71, 81, 91, 101],
+                title: {
+                    text: null
+                }
+            }
+        });
+    }
+]);
+
 application.controller('category', [
     '$scope',
     function ($scope) {
@@ -490,7 +695,7 @@ application.controller('keyword_analyzer_multiple_add', [
         };
 
         $scope.get_class = function () {
-            if ($scope.count < 1) {
+            if ($scope.count < 0) {
                 return 'text-danger';
             }
             return 'text-info';

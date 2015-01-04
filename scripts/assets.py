@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from logging import DEBUG, getLogger, StreamHandler
+from sys import argv
 
 from webassets import Bundle, Environment
 from webassets.script import CommandLineEnvironment
@@ -28,6 +29,7 @@ environment.register('javascripts', Bundle(
     'vendor/angular-encode-uri/dist/angular-encode-uri.min.js',
     'vendor/angular-queue/angular-queue.js',
     'vendor/angular-scroll/angular-scroll.min.js',
+    'vendor/highcharts/highcharts.src.js',
     'vendor/lodash/dist/lodash.min.js',
     'vendor/moment/min/moment-with-locales.min.js',
     'vendor/pixeladmin/html/assets/javascripts/bootstrap.min.js',
@@ -50,4 +52,8 @@ environment.register('stylesheets', Bundle(
     output='assets/stylesheets.css',
 ))
 
-CommandLineEnvironment(environment, logger).build()
+if __name__ == '__main__':
+    if argv[1] == 'build':
+        CommandLineEnvironment(environment, logger).build()
+    if argv[1] == 'watch':
+        CommandLineEnvironment(environment, logger).watch()

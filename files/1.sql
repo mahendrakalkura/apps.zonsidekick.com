@@ -4,11 +4,12 @@ DROP TABLE IF EXISTS `apps_book_tracker_books`;
 CREATE TABLE IF NOT EXISTS `apps_book_tracker_books` (
     `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     `user_id` INT(11) NOT NULL,
+    `title` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
     `url` VARCHAR(255) NOT NULL,
     PRIMARY KEY (`id`),
     KEY `user_id` (`user_id`),
     KEY `url` (`url`),
-    UNIQUE KEY `user_id_url` (`user_id`, `url`)
+    KEY `title` (`title`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 DROP TABLE IF EXISTS `apps_book_tracker_books_ranks`;
@@ -31,8 +32,7 @@ CREATE TABLE IF NOT EXISTS `apps_book_tracker_keywords` (
     `string` VARCHAR(255) NOT NULL,
     PRIMARY KEY (`id`),
     CONSTRAINT `apps_book_tracker_keywords_book_id` FOREIGN KEY (`book_id`) REFERENCES `apps_book_tracker_books` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-    KEY `string` (`string`),
-    UNIQUE KEY `book_id_string` (`book_id`, `string`)
+    KEY `string` (`string`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 DROP TABLE IF EXISTS `apps_book_tracker_keywords_ranks`;
