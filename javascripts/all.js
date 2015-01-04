@@ -592,9 +592,6 @@ application.controller('book_tracker_view', [
             credits: {
                 enabled: false
             },
-            legend: {
-                enabled: false
-            },
             plotOptions: {
                 line: {
                     dataLabels: {
@@ -619,7 +616,17 @@ application.controller('book_tracker_view', [
                     if (this.y >= 101) {
                         value = this.y + '+';
                     }
-                    return 'Rank @ ' + this.key + ': ' + value;
+                    return (
+                        this.point.series.name
+                        +
+                        ' @ '
+                        +
+                        this.key
+                        +
+                        ': '
+                        +
+                        value
+                    );
                 }
             },
             xAxis: {

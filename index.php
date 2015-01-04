@@ -1164,7 +1164,7 @@ EOD;
             foreach ($book['keywords'] as $key => $value) {
                 $chart_2_series[$key] = array(
                     'data' => array(),
-                    'name'=> 'Amazon Best Seller Rank',
+                    'name'=> $value,
                 );
                 foreach ($dates as $k => $v) {
                     $chart_2_series[$key]['data'][$k] = 101;
