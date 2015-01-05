@@ -83,15 +83,6 @@ ul {
     padding-bottom: 1px;
 }
 
-#main-menu ul.navigation > .book_tracker {
-    background-color: #f39c12;
-}
-
-#main-menu ul.navigation > .book_tracker a .menu-icon,
-#main-menu ul.navigation > .book_tracker a .mm-text {
-    color: #ffffff;
-}
-
 #main-menu ul.navigation > .support {
     background-color: #5ebd5e;
 }
