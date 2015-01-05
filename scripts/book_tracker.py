@@ -128,7 +128,7 @@ def main():
 
 
 def get_asin(url):
-    match = compile('/(dp|gp)/(.*?)/').search(url)
+    match = compile('/(dp|gp)/([^/]*)/').search(url)
     if match:
         return match.group(2)
 
@@ -152,6 +152,7 @@ def get_book_rank(url):
 
 
 def get_keyword_rank(string, url):
+    asin = url.split('/')[-1]
     page = 0
     while True:
         page += 1
@@ -170,7 +171,6 @@ def get_keyword_rank(string, url):
         )
         if not response:
             return
-        asin = url.split('/')[-1]
         for rank, url in enumerate(
             Selector(
                 text=response.text,
