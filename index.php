@@ -2235,7 +2235,7 @@ $application
         $publication_date_2 = $request->get('publication_date_2');
         $publication_date_3 = $request->get('publication_date_3');
         $publication_date_4 = $request->get('publication_date_4');
-        $amazon_best_sellers_rank_1 = $report
+        $amazon_best_sellers_rank_1 = $request
             ->get('amazon_best_sellers_rank_1');
         $amazon_best_sellers_rank_2 = intval(
             $request->get('amazon_best_sellers_rank_2')
