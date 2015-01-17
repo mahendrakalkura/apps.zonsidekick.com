@@ -798,10 +798,10 @@ application.controller('keyword_analyzer_multiple_simple', [
                 if ($scope.keywords.one.length) {
                     $('#tabs li:eq(0) a').tab('show');
                 } else {
-                    if ($scope.keywords.one.length) {
+                    if ($scope.keywords.two.length) {
                         $('#tabs li:eq(1) a').tab('show');
                     } else {
-                        if ($scope.keywords.one.length) {
+                        if ($scope.keywords.three.length) {
                             $('#tabs li:eq(2) a').tab('show');
                         }
                     }
