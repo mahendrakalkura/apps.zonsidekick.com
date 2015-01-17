@@ -1629,30 +1629,154 @@ $application
 
 $application
 ->match(
-    '/keyword-analyzer/multiple/{id}/xhr',
-    function (Request $request, $id) use ($application) {
+    '/keyword-analyzer/multiple/{report_id}/simple/{keyword_id}',
+    function (Request $request, $report_id, $keyword_id) use ($application) {
         $user = $application['session']->get('user');
         list($report, $keywords) = get_report_and_keywords(
-            $application, $user, $id
+            $application, $user, $report_id
         );
-
+        $keyword = array();
         if ($keywords) {
             foreach ($keywords as $key => $value) {
-                if ($keywords[$key]['contents']) {
-                    if ($keywords[$key]['contents']['score'][1] !== 'N/A') {
-                        $keywords[$key]['position'] = 1;
-                    } else {
-                        $keywords[$key]['position'] = 2;
-                    }
-                } else {
-                    $keywords[$key]['position'] = 3;
+                if ($value['id'] == $keyword_id) {
+                    $keyword = $value;
+                    break;
                 }
             }
         }
+        if (!$report OR !$keywords) {
+            return $application->redirect(
+                $application['url_generator']
+                    ->generate('keyword_analyzer_multiple')
+            );
+        }
 
-        usort($keywords, 'usort_keywords_2');
+        return $application['twig']->render(
+            'views/keyword_analyzer_multiple_simple_keyword.twig',
+            array(
+                'currency' => get_currency($report['country']),
+                'keyword' => $keyword,
+                'report' => $report,
+            )
+        );
+    }
+)
+->bind('keyword_analyzer_multiple_simple_keyword')
+->method('GET');
 
-        return new Response(json_encode($keywords));
+$application
+->match(
+    '/keyword-analyzer/multiple/{id}/xhr',
+    function (Request $request, $id) use ($application) {
+        $user = $application['session']->get('user');
+        $amazon_best_sellers_rank_1 = $request
+            ->get('amazon_best_sellers_rank_1');
+        $amazon_best_sellers_rank_2 = $request
+            ->get('amazon_best_sellers_rank_2');
+        $books_1 = $request->get('books_1');
+        $books_2 = $request->get('books_2');
+        $count = $request->get('count');
+        list($report, $ks) = get_report_and_keywords(
+            $application, $user, $id
+        );
+        $keywords = array(
+            'one' => array(),
+            'three' => array(),
+            'two' => array(),
+        );
+        $words = array();
+        $is_finished = true;
+        if ($ks) {
+            foreach ($ks as $k) {
+                if ($k['contents']) {
+                    $k['contents']['items'] = array_slice(
+                        $k['contents']['items'], 0, $count
+                    );
+                    if ($k['contents']['items']) {
+                        foreach ($k['contents']['items'] as $k_ => $v_) {
+                            $status = false;
+                            switch ($amazon_best_sellers_rank_1) {
+                                case 'More Than':
+                                    if (
+                                        $v_['best_sellers_rank'][0]
+                                        >
+                                        $amazon_best_sellers_rank_2
+                                    ) {
+                                        $status = true;
+                                    }
+                                    break;
+                                case 'Less Than':
+                                    if (
+                                        $v_['best_sellers_rank'][0]
+                                        <
+                                        $amazon_best_sellers_rank_2
+                                    ) {
+                                        $status = true;
+                                    }
+                                    break;
+                                default:
+                                    $status = true;
+                                    break;
+                            }
+                            if (!$status) {
+                                unset($k['contents']['items'][$k_]);
+                            }
+                        }
+                    }
+                    $status = false;
+                    switch ($books_1) {
+                        case 'More Than':
+                            if (count($k['contents']['items']) > $books_2) {
+                                $status = true;
+                            }
+                            break;
+                        case 'Less Than':
+                            if (count($k['contents']['items']) < $books_2) {
+                                $status = true;
+                            }
+                            break;
+                        default:
+                            $status = true;
+                            break;
+                    }
+                    if (!$status) {
+                        continue;
+                    }
+                    unset ($k['contents']['items']);
+                    if ($k['contents']['words']) {
+                        foreach ($k['contents']['words'] as $word) {
+                            $words[] = $word[0];
+                        }
+                    }
+                    unset ($k['contents']['words']);
+                    if ($k['contents']['score'][1] !== 'N/A') {
+                        $k['position'] = 1;
+                    } else {
+                        $k['position'] = 2;
+                    }
+                    if ($k['contents']['score'][0] != -1) {
+                        $keywords['one'][] = $k;
+                    } else {
+                        $keywords['three'][] = $k;
+                    }
+                } else {
+                    $k['position'] = 3;
+                    $is_finished = false;
+                    $keywords['two'][] = $k;
+                }
+            }
+        } else {
+            $is_finished = false;
+        }
+        usort($keywords['one'], 'usort_keywords_2');
+        usort($keywords['two'], 'usort_keywords_2');
+        usort($keywords['three'], 'usort_keywords_2');
+
+        return new Response(json_encode(array(
+            'is_finished' => $is_finished,
+            'keywords' => $keywords,
+            'words' => get_words_from_words($words),
+        )));
     }
 )
 ->bind('keyword_analyzer_multiple_xhr')

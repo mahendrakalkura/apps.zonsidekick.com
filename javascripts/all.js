@@ -747,16 +747,6 @@ application.controller('keyword_analyzer_multiple_simple', [
         ];
         $scope.counts = _.range(48, 0, -12);
 
-        $scope.books_1 = $scope.books[0];
-        $scope.books_2 = 0;
-        $scope.amazon_best_sellers_rank_1
-            = $scope.amazon_best_sellers_ranks[0];
-        $scope.amazon_best_sellers_rank_2 = 0;
-        $scope.count = $scope.counts[0];
-
-        $scope.keywords = [];
-        $scope.order_by = [];
-        $scope.order_by_ = ['title[0]', 0];
         $scope.user_email = $attrs.userEmail;
 
         $scope.statuses = {};
@@ -786,6 +776,15 @@ application.controller('keyword_analyzer_multiple_simple', [
 
         $scope.process = function () {
             $http({
+                data: jQuery.param({
+                    amazon_best_sellers_rank_1:
+                        $scope.amazon_best_sellers_rank_1,
+                    amazon_best_sellers_rank_2:
+                        $scope.amazon_best_sellers_rank_2,
+                    books_1: $scope.books_1,
+                    books_2: $scope.books_2,
+                    count: $scope.count
+                }),
                 method: 'POST',
                 url: $attrs.urlXhr
             }).
@@ -793,15 +792,21 @@ application.controller('keyword_analyzer_multiple_simple', [
                 $timeout($scope.process, 15000);
             }).
             success(function (data, status, headers, config) {
-                $scope.keywords = data;
-                var status = (
-                    $scope.keywords.length
-                    &&
-                    _.filter($scope.keywords, function (model) {
-                        return model['others'] == null;
-                    }).length == 0
-                )? true: false;
-                if (!status) {
+                $scope.is_finished = data.is_finished;
+                $scope.keywords = data.keywords;
+                $scope.words = data.words;
+                if ($scope.keywords.one.length) {
+                    $('#tabs li:eq(0) a').tab('show');
+                } else {
+                    if ($scope.keywords.one.length) {
+                        $('#tabs li:eq(1) a').tab('show');
+                    } else {
+                        if ($scope.keywords.one.length) {
+                            $('#tabs li:eq(2) a').tab('show');
+                        }
+                    }
+                }
+                if (!$scope.is_finished) {
                     $timeout($scope.process, 15000);
                 }
             });
@@ -809,109 +814,27 @@ application.controller('keyword_analyzer_multiple_simple', [
             return;
         };
 
-        $scope.get_keywords = function () {
-            var keywords = $scope.keywords;
-            keywords = $filter('filter')(keywords, function (keyword) {
-                if (keyword.contents == null) {
-                    return true;
-                }
-                var count = 0;
-                var books = keyword.contents.items.slice(
-                    0, $scope.count
-                ).filter(
-                    function (book) {
-                        var status = false;
-                        switch ($scope.amazon_best_sellers_rank_1) {
-                            case 'More Than':
-                                if (
-                                    book.best_sellers_rank[0]
-                                    >
-                                    $scope.amazon_best_sellers_rank_2
-                                ) {
-                                    status = true;
-                                }
-                                break;
-                            case 'Less Than':
-                                if (
-                                    book.best_sellers_rank[0]
-                                    <
-                                    $scope.amazon_best_sellers_rank_2
-                                ) {
-                                    status = true;
-                                }
-                                break;
-                            default:
-                                status = true;
-                                break;
-                        }
-                        return status;
-                    }
-                );
-                var status = false;
-                switch ($scope.books_1) {
-                    case 'More Than':
-                        if (books.length > $scope.books_2) {
-                            status = true;
-                        }
-                        break;
-                    case 'Less Than':
-                        if (books.length < $scope.books_2) {
-                            status = true;
-                        }
-                        break;
-                    default:
-                        status = true;
-                        break;
-                }
+        $scope.reset = function () {
+            $scope.books_1 = $scope.books[0];
+            $scope.books_2 = 0;
+            $scope.amazon_best_sellers_rank_1
+                = $scope.amazon_best_sellers_ranks[0];
+            $scope.amazon_best_sellers_rank_2 = 0;
+            $scope.count = $scope.counts[0];
 
-                return status;
-            });
-            if ($scope.order_by.length) {
-                keywords = $filter('orderBy')(
-                    keywords, $scope.order_by[0], $scope.order_by[1]
-                );
-            }
-            return keywords;
+            $scope.submit();
         };
 
-        $scope.get_keywords_na = function () {
-            if (!$scope.keywords.length) {
-                return 0;
-            }
-            var count = 0;
-            for (var index in $scope.keywords) {
-                if (index == 'get_chunks') {
-                    continue;
-                }
-                if (
-                    $scope.keywords[index].contents != null
-                    &&
-                    $scope.keywords[index].contents.score[0] == -1
-                ) {
-                    count += 1;
-                }
-            }
-            return count;
-        };
+        $scope.submit = function () {
+            $scope.keywords = {
+                'one': [],
+                'two': [],
+                'three': [],
+            };
+            $scope.words = [];
+            $scope.order_by = [];
 
-        $scope.get_keywords_non_na = function () {
-            if (!$scope.keywords.length) {
-                return 0;
-            }
-            var count = 0;
-            for (var index in $scope.keywords) {
-                if (index == 'get_chunks') {
-                    continue;
-                }
-                if (
-                    $scope.keywords[index].contents == null
-                    ||
-                    $scope.keywords[index].contents.score[0] != -1
-                ) {
-                    count += 1;
-                }
-            }
-            return count;
+            $scope.process();
         };
 
         $scope.get_order_by = function () {
@@ -926,54 +849,15 @@ application.controller('keyword_analyzer_multiple_simple', [
                 $scope.order_by[0] = th;
                 $scope.order_by[1] = false;
             }
-            $scope.keywords = $filter('orderBy')(
-                $scope.keywords, $scope.order_by[0], $scope.order_by[1]
+            $scope.keywords.one = $filter('orderBy')(
+                $scope.keywords.one, $scope.order_by[0], $scope.order_by[1]
             );
-        };
-
-        $scope.get_order_by_ = function () {
-            return $scope.order_by_[1]?
-                'fa-sort-amount-desc': 'fa-sort-amount-asc';
-        };
-
-        $scope.set_order_by_ = function (th) {
-            if ($scope.order_by_[0] == th) {
-                $scope.order_by_[1] = !$scope.order_by_[1];
-            } else {
-                $scope.order_by_[0] = th;
-                $scope.order_by_[1] = false;
-            }
-        };
-
-        $scope.get_words = function () {
-            var words = [];
-            jQuery.each($scope.keywords, function (key, value) {
-                if (typeof(value.contents.words) !== 'undefined') {
-                    jQuery.each(value.contents.words, function (k, v) {
-                        words.push(v);
-                    });
-                }
-            });
-            words = _.sortBy(_.uniq(words), function (word) {
-                return word[1]
-            }).reverse().slice(0, 10);
-            return words;
-        };
-
-        $scope.is_finished = function () {
-            if (!$scope.keywords.length) {
-                return false;
-            }
-            var status = true;
-            for (var index in $scope.keywords) {
-                if (index == 'get_chunks') {
-                    continue;
-                }
-                if ($scope.keywords[index].contents == null) {
-                    status = false;
-                }
-            }
-            return status;
+            $scope.keywords.two = $filter('orderBy')(
+                $scope.keywords.two, $scope.order_by[0], $scope.order_by[1]
+            );
+            $scope.keywords.three = $filter('orderBy')(
+                $scope.keywords.three, $scope.order_by[0], $scope.order_by[1]
+            );
         };
 
         jQuery(document).on('click', '.popover-pdf', function () {
@@ -991,7 +875,31 @@ application.controller('keyword_analyzer_multiple_simple', [
             $scope.email(jQuery(this).prev().val());
         });
 
-        $scope.process();
+        $scope.reset();
+    }
+]);
+
+application.controller('keyword_analyzer_multiple_simple_keyword', [
+    '$attrs',
+    '$scope',
+    function ($attrs, $scope) {
+        $scope.keyword = jQuery.parseJSON($attrs.keyword);
+
+        $scope.order_by = [];
+
+        $scope.get_order_by = function () {
+            return $scope.order_by[1]?
+                'fa-sort-amount-desc': 'fa-sort-amount-asc';
+        };
+
+        $scope.set_order_by = function (th) {
+            if ($scope.order_by[0] == th) {
+                $scope.order_by[1] = !$scope.order_by[1];
+            } else {
+                $scope.order_by[0] = th;
+                $scope.order_by[1] = false;
+            }
+        };
     }
 ]);
 

@@ -23,7 +23,7 @@
 </div>
 {% include 'slots/alerts.twig' %}
 <div
-    data-countries="{{ countries|json_encode }}"
+    data-countries="{{ countries|json_encode() }}"
     data-error-1-middle="<p>Please enter a valid keyword.</p>"
     data-error-1-top="Keyword Error"
     data-error-2-middle="<p>Network Error (replied not received for the most recent AJAX request).</p>"

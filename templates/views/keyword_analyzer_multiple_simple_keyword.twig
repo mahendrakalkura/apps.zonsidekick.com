@@ -1,0 +1,349 @@
+{% extends 'layout.twig' %}
+
+{% set module = 'Keywords Analyzers - Multiple - Simple - ' ~ keyword.string %}
+{% set nav = 'keywords_analyzers_multiple' %}
+
+{% block content %}
+<ul class="breadcrumb breadcrumb-page">
+    <div class="breadcrumb-label text-light-gray">You are here:</div>
+    <li><a href="{{ url('dashboard') }}">Home</a></li>
+    <li><a href="{{ url('dashboard') }}">Keyword Analyzers</a></li>
+    <li><a href="{{ url('keyword_analyzer_multiple') }}">Multiple</a></li>
+    <li><a href="{{ url('keyword_analyzer_multiple_simple', {'id': report['id']}) }}">Simple</a></li>
+    <li class="active">
+        <a href="{{ url('keyword_analyzer_multiple_simple_keyword', {'report_id': report['id'], 'keyword_id': keyword['id']}) }}">
+            {{ keyword.string }}
+        </a>
+    </li>
+</ul>
+<div class="page-header">
+    <div class="row">
+        <h1 class="col-xs-12">
+            {% include 'slots/feedback.twig' %}
+            <i class="fa fa-fw fa-tag"></i>
+            {{ module }}
+        </h1>
+    </div>
+</div>
+{% include 'slots/alerts.twig' %}
+<div
+    ng-controller="keyword_analyzer_multiple_simple_keyword"
+    data-keyword="{{ keyword|json_encode() }}"
+    >
+    <table class="table table-bordered table-hover table-striped">
+        <tbody>
+            <tr>
+                <td>Buyer Behavior</td>
+                <td class="narrow text-right">
+                    <span ng-switch on="keyword.contents['buyer_behavior'][1]">
+                        <span
+                            class="text-error"
+                            ng-switch-when="N/A"
+                            >
+                            <strong>
+                                [! keyword.contents['buyer_behavior'][1] !]
+                            </strong>
+                        </span>
+                        <span ng-switch-default ng-bind-html="keyword.contents['buyer_behavior'][1]|label:keyword.contents['buyer_behavior'][1]:true|html"></span>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>Competition</td>
+                <td class="narrow text-right">
+                    <span ng-switch on="keyword.contents['competition'][1]">
+                        <span
+                            class="text-error"
+                            ng-switch-when="N/A"
+                            >
+                            <strong>
+                                [! keyword.contents['competition'][1] !]
+                            </strong>
+                        </span>
+                        <span ng-switch-default ng-bind-html="keyword.contents['competition'][1]|label:keyword.contents['competition'][1]:false|html"></span>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>Optimization</td>
+                <td class="narrow text-right">
+                    <span ng-switch on="keyword.contents['optimization'][1]">
+                        <span
+                            class="text-error"
+                            ng-switch-when="N/A"
+                            >
+                            <strong>
+                                [! keyword.contents['optimization'][1] !]
+                            </strong>
+                        </span>
+                        <span ng-switch-default ng-bind-html="keyword.contents['optimization'][1]|label:keyword.contents['optimization'][1]:false|html"></span>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>Popularity</td>
+                <td class="narrow text-right">
+                    <span ng-switch on="keyword.contents['popularity'][1]">
+                        <span
+                            class="text-error"
+                            ng-switch-when="N/A"
+                            >
+                            <strong>
+                                [! keyword.contents['popularity'][1] !]
+                            </strong>
+                        </span>
+                        <span ng-switch-default ng-bind-html="keyword.contents['popularity'][1]|label:keyword.contents['popularity'][1]:true|html"></span>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>Spend ($)</td>
+                <td class="narrow text-right">
+                    <span ng-switch on="keyword.contents['spend'][1]">
+                        <span
+                            class="text-error"
+                            ng-switch-when="N/A"
+                            >
+                            <strong>
+                                [! keyword.contents['spend'][1] !]
+                            </strong>
+                        </span>
+                        <span ng-switch-default ng-bind-html="keyword.contents['spend'][1]|label:keyword.contents['spend'][1]:true|html"></span>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>Avg. Price ($)</td>
+                <td class="narrow text-right">
+                    <span ng-switch on="keyword.contents['average_price'][1]">
+                        <span
+                            class="text-error"
+                            ng-switch-when="N/A"
+                            >
+                            <strong>
+                                [! keyword.contents['average_price'][1] !]
+                            </strong>
+                        </span>
+                        <span ng-switch-default>
+                            [! keyword.contents['average_price'][1] !]
+                        </span>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>Avg. Length</td>
+                <td class="narrow text-right">
+                    <span ng-switch on="keyword.contents['average_length'][1]">
+                        <span
+                            class="text-error"
+                            ng-switch-when="N/A"
+                            >
+                            <strong>
+                                [! keyword.contents['average_length'][1] !]
+                            </strong>
+                        </span>
+                        <span ng-switch-default>
+                            [! keyword.contents['average_length'][1] !]
+                        </span>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>Score</td>
+                <td class="narrow text-right">
+                    <span ng-switch on="keyword.contents['score'][1]">
+                        <span
+                            class="text-error"
+                            ng-switch-when="N/A"
+                            >
+                            <strong>
+                                [! keyword.contents['score'][1] !]
+                            </strong>
+                        </span>
+                        <span ng-switch-default>
+                            [! keyword.contents['score'][1] !]
+                        </span>
+                    </span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div ng-show="keyword.contents.words && keyword.contents.words.length > 0">
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
+                <p><strong>Top 10 words</strong></p>
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                        <ul>
+                            <li ng-repeat="word in keyword.contents.words|slice:0:5">
+                                [! word[0] !] ([! word[1] !])
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                        <ul>
+                            <li ng-repeat="word in keyword.contents.words|slice:5:10">
+                                [! words !]
+                                [! word[0] !] ([! word[1] !])
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div
+                class="col-xs-12 col-sm-12 col-md-4 col-lg-4"
+                data-urls-keyword-suggester="{{ url('keyword_suggester') }}"
+                data-urls-suggested-keywords="{{ url('suggested_keywords') }}"
+                ng-controller="suggested_keywords"
+                >
+                <p>
+                    <a ng-click="process(keyword.contents.words)">
+                        Click here to compile a list of suggested
+                        keywords
+                    </a>
+                </p>
+                <p ng-show="spinner">
+                    <span class="fa fa-fw fa-spinner fa-spin fa-2x">
+                    </span>
+                </p>
+                <p ng-show="items.length > 0">
+                    <ul>
+                        <li ng-repeat="item in items">
+                            [! item !]
+                        </li>
+                    </ul>
+                </p>
+                <p ng-show="items.length > 0">
+                    <a ng-click="get_more_suggestions(items, 'Combine')">
+                        Get more suggestions
+                    </a>
+                </p>
+                <p class="text-error" ng-show="error">
+                    Your query did not yield any results.
+                    Please try again after a while.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="table-light">
+        <table class="table table-bordered table-hover table-striped">
+            <thead>
+                <tr>
+                    <th
+                        class="header [! order_by[0] == 'title[0]' && get_order_by() || '' !]"
+                        ng-click="set_order_by('title[0]')"
+                        >
+                        <i class="fa fa-fw pull-right [! order_by[0] == 'title[0]' && get_order_by() || '' !]">
+                        </i>
+                        Title
+                        </th>
+                    <th
+                        class="narrow text-center header [! order_by[0] == 'title[1]' && get_order_by() || '' !]"
+                        ng-click="set_order_by('title[1]')"
+                        >
+                        <i class="fa fa-fw pull-right [! order_by[0] == 'title[1]' && get_order_by() || '' !]">
+                        </i>
+                        KW In Title
+                        </th>
+                    <th
+                        class="narrow header [! order_by[0] == 'author.name' && get_order_by() || '' !]"
+                        ng-click="set_order_by('author.name')"
+                        >
+                        <i class="fa fa-fw pull-right [! order_by[0] == 'author.name' && get_order_by() || '' !]">
+                        </i>
+                        Author
+                        </th>
+                    <th
+                        class="narrow text-right header [! order_by[0] == 'best_sellers_rank[0]' && get_order_by() || '' !]"
+                        ng-click="set_order_by('best_sellers_rank[0]')"
+                        >
+                        <i class="fa fa-fw pull-right [! order_by[0] == 'best_sellers_rank[0]' && get_order_by() || '' !]">
+                        </i>
+                        Best Seller Rank
+                        </th>
+                    <th
+                        class="narrow text-right header [! order_by[0] == 'price[0]' && get_order_by() || '' !]"
+                        ng-click="set_order_by('price[0]')"
+                        >
+                        <i class="fa fa-fw pull-right [! order_by[0] == 'price[0]' && get_order_by() || '' !]">
+                        </i>
+                        Price ($)
+                        </th>
+                    <th
+                        class="narrow text-right header [! order_by[0] == 'pages[0]' && get_order_by() || '' !]"
+                        ng-click="set_order_by('pages[0]')"
+                        >
+                        <i class="fa fa-fw pull-right [! order_by[0] == 'pages[0]' && get_order_by() || '' !]">
+                        </i>
+                        Print Length
+                        </th>
+                    <th
+                        class="narrow text-right header [! order_by[0] == 'publication_date' && get_order_by() || '' !]"
+                        ng-click="set_order_by('publication_date')"
+                        >
+                        <i class="fa fa-fw pull-right [! order_by[0] == 'publication_date' && get_order_by() || '' !]">
+                        </i>
+                        Date Published
+                        </th>
+                    <th
+                        class="narrow text-right header [! order_by[0] == 'stars[0]' && get_order_by() || '' !]"
+                        ng-click="set_order_by('stars[0]')"
+                        >
+                        <i class="fa fa-fw pull-right [! order_by[0] == 'stars[0]' && get_order_by() || '' !]">
+                        </i>
+                        Average Review
+                        </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="item in keyword.contents['items']|orderBy:order_by[0]:order_by[1]">
+                    <td>
+                        <a
+                            href="[! item.url !]"
+                            rel="noreferrer"
+                            target="_blank"
+                            >[! item.title[0] !]</a>
+                    </td>
+                    <td class="narrow text-center">
+                        [! item.title[1] !]
+                    </td>
+                    <td class="narrow">
+                        <span ng-hide="item.author == undefined">
+                            <a
+                                class="pull-right"
+                                href="[! item.author.url !]"
+                                ng-show="item.author.url.length > 0"
+                                rel="noreferrer"
+                                target="_blank"
+                                ><i class="fa fa-fw fa-external-link"></i></a>
+                            <a
+                                href="{{ url('author_analyzer') }}?url=[! item.author.url|encodeUri !]"
+                                ng-show="item.author.url.length > 0"
+                                target="_blank"
+                                >[! item.author.name !]</a>
+                            <span ng-show="item.author.url.length == 0">
+                                [! item.author.name !]
+                            </span>
+                        </span>
+                    </td>
+                    <td class="narrow text-right">
+                        [! item.best_sellers_rank[0]|number:0 !]
+                    </td>
+                    <td class="narrow text-right">
+                        [! item.price[0]|number:2 !]
+                    </td>
+                    <td class="narrow text-right">
+                        [! item.pages[0]|number:0 !]
+                    </td>
+                    <td class="narrow text-right">
+                        [! item.publication_date !]
+                    </td>
+                    <td class="narrow text-right">
+                        [! item.stars[0]|number:2 !]
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
