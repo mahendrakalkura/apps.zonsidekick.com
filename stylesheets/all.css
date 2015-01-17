@@ -270,6 +270,7 @@ ul {
 
 .table .header {
     cursor: pointer;
+    white-space: nowrap;
 }
 
 .table .table {
