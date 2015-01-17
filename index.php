@@ -1189,10 +1189,10 @@ EOD;
                             $record['number']
                         );
                     } else {
-                        if ($chart_2_series[0]['data'][$k-1]) {
-                            $chart_2_series[0]['data'][
+                        if ($chart_2_series[$key]['data'][$k-1]) {
+                            $chart_2_series[$key]['data'][
                                 $k
-                            ] = $chart_2_series[0]['data'][$k-1];
+                            ] = $chart_2_series[$key]['data'][$k-1];
                         }
                     }
                 }
