@@ -181,6 +181,5 @@ def get_keyword_rank(string, url):
             if get_asin(url) == asin:
                 return rank + 1
 
-
 if __name__ == '__main__':
     main()
