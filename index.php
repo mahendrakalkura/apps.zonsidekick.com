@@ -1158,6 +1158,12 @@ EOD;
             );
             if ($record AND $record['number'] < 1000001) {
                 $chart_1_series[0]['data'][$key] = intval($record['number']);
+            } else {
+                if ($chart_1_series[0]['data'][$key-1]) {
+                    $chart_1_series[0]['data'][
+                        $key
+                    ] = $chart_1_series[0]['data'][$key-1];
+                }
             }
         }
         if ($book['keywords']) {
@@ -1182,6 +1188,12 @@ EOD;
                         $chart_2_series[$key]['data'][$k] = intval(
                             $record['number']
                         );
+                    } else {
+                        if ($chart_2_series[0]['data'][$k-1]) {
+                            $chart_2_series[0]['data'][
+                                $k
+                            ] = $chart_2_series[0]['data'][$k-1];
+                        }
                     }
                 }
             }
