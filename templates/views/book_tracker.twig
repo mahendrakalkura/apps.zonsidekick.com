@@ -1,0 +1,87 @@
+{% extends 'layout.twig' %}
+
+{% set module = 'Book Tracker - Overview' %}
+{% set nav = 'book_tracker' %}
+
+{% block content %}
+<ul class="breadcrumb breadcrumb-page">
+    <div class="breadcrumb-label text-light-gray">You are here:</div>
+    <li><a href="{{ url('dashboard') }}">Home</a></li>
+    <li><a href="{{ url('book_tracker') }}">Book Tracker</a></li>
+    <li class="active"><a href="{{ url('book_tracker') }}">Overview</a></li>
+</ul>
+<div class="page-header">
+    <div class="row">
+        <h1 class="col-xs-12">
+            {% include 'slots/feedback.twig' %}
+            <a class="btn btn-success pull-right" href="{{ url('book_tracker_add') }}">
+                <span class="fa fa-lg fa-fw fa-plus-circle"></span>
+                Add
+            </a>
+            <i class="fa fa-fw fa-book"></i>
+            {{ module }}
+        </h1>
+    </div>
+</div>
+{% include 'slots/alerts.twig' %}
+{% include 'slots/book_tracker.twig' %}
+{% if books %}
+    <div class="table-light">
+        <table class="table table-bordered table-hover table-striped">
+            <thead>
+                <tr>
+                    <th class="narrow">Title</th>
+                    <th>URL</th>
+                    <th class="narrow text-right">Keywords</th>
+                    <th class="narrow text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in books %}
+                    <tr>
+                        <td class="narrow">{{ book.title }}</td>
+                        <td>
+                            {{ book.url }}
+                            <a
+                                href="{{ book.url }}"
+                                rel="noreferrer"
+                                target="_blank"
+                                ><i class="fa fa-fw fa-external-link"></i></a>
+                        </td>
+                        <td class="narrow text-right">
+                            {{ book.keywords|length }}
+                        </td>
+                        <td class="narrow text-center">
+                            <a
+                                class="fa fa-lg fa-fw fa-bar-chart-o"
+                                href="{{ url('book_tracker_view', {'id': book.id}) }}"
+                                title="View"
+                                data-placement="left"
+                                data-toggle="tooltip"
+                                ></a>
+                            <a
+                                class="fa fa-fw fa-pencil"
+                                href="{{ url('book_tracker_edit', {'id': book.id}) }}"
+                                title="Edit"
+                                data-placement="left"
+                                data-toggle="tooltip"
+                                ></a>
+                            <a
+                                class="fa fa-lg fa-fw fa-times-circle"
+                                href="{{ url('book_tracker_delete', {'id': book.id}) }}"
+                                title="Delete"
+                                data-placement="left"
+                                data-toggle="tooltip"
+                                ></a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="alert alert-dark alert-danger">
+        You have not added any books yet.
+    </div>
+{% endif %}
+{% endblock %}

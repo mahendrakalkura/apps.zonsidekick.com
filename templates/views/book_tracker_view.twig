@@ -1,0 +1,74 @@
+{% extends 'layout.twig' %}
+
+{% set module = 'Book Tracker - View' %}
+{% set nav = 'book_tracker' %}
+
+{% block content %}
+<ul class="breadcrumb breadcrumb-page">
+    <div class="breadcrumb-label text-light-gray">You are here:</div>
+    <li><a href="{{ url('dashboard') }}">Home</a></li>
+    <li><a href="{{ url('book_tracker') }}">Book Tracker</a></li>
+    <li class="active"><a href="{{ url('book_tracker') }}">View</a></li>
+</ul>
+<div class="page-header">
+    <div class="row">
+        <h1 class="col-xs-12">
+            {% include 'slots/feedback.twig' %}
+            <i class="fa fa-fw fa-book"></i>
+            {{ module }}
+        </h1>
+    </div>
+</div>
+{% include 'slots/alerts.twig' %}
+{% include 'slots/book_tracker.twig' %}
+<div class="table-light">
+    <table class="table table-bordered table-hover table-striped">
+        <tr>
+            <td class="narrow">Title</td>
+            <td>{{ book.title }}</td>
+        </tr>
+        <tr>
+            <td class="narrow">URL</td>
+            <td>
+                {{ book.url }}
+                <a
+                    href="{{ book.url }}"
+                    rel="noreferrer"
+                    target="_blank"
+                    ><i class="fa fa-fw fa-external-link"></i></a>
+            </td>
+        </tr>
+    </table>
+</div>
+<div
+    ng-controller="book_tracker_view"
+    data-chart_1_categories="{{ chart_1_categories|json_encode() }}"
+    data-chart_1_series="{{ chart_1_series|json_encode() }}"
+    data-chart_2_categories="{{ chart_2_categories|json_encode() }}"
+    data-chart_2_series="{{ chart_2_series|json_encode() }}"
+    >
+    <div class="page-header no-border-b no-margin-b">
+        <h1>Amazon Best Seller Ranks</h1>
+    </div>
+    {% if chart_1_categories and chart_1_series %}
+        <div id="chart_1"></div>
+    {% else %}
+        <div class="alert alert-dark alert-danger">
+            We do not have enough data to render this chart yet.
+        </div>
+    {% endif %}
+    <div class="page-header no-border-b no-margin-b">
+        <h1>Keyword Ranks</h1>
+    </div>
+    {% if chart_2_categories and chart_2_series %}
+        <div id="chart_2"></div>
+        <p class="text-center">
+            You may click on a legend item to hide/display it in the graph.
+        </p>
+    {% else %}
+        <div class="alert alert-dark alert-danger">
+            We do not have enough data to render this chart yet.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import date, timedelta
+from re import compile
 from sys import argv
 
 from furl import furl
@@ -70,10 +71,13 @@ def main():
     ).order_by(
         'apps_book_tracker_books_ranks.id ASC',
     ):
+        number = get_book_rank(b.url)
+        if not number:
+            continue
         session.add(book_rank(**{
             'book': b,
             'date': date_,
-            'number': get_book_rank(b.url),
+            'number': number,
         }))
         try:
             session.commit()
@@ -91,10 +95,13 @@ def main():
     ).order_by(
         'apps_book_tracker_keywords_ranks.id ASC',
     ):
+        number = get_keyword_rank(k.string, k.book.url)
+        if not number:
+            continue
         session.add(keyword_rank(**{
             'date': date_,
             'keyword': k,
-            'number': get_keyword_rank(k.string, k.book.url),
+            'number': number,
         }))
         try:
             session.commit()
@@ -120,10 +127,16 @@ def main():
     session.close()
 
 
+def get_asin(url):
+    match = compile('/(dp|gp)/([^/]*)/').search(url)
+    if match:
+        return match.group(2)
+
+
 def get_book_rank(url):
     response = get_response(get_url(url))
     if not response:
-        return 0
+        return
     try:
         return get_number(
             get_string(
@@ -136,34 +149,37 @@ def get_book_rank(url):
         )
     except IndexError:
         pass
-    return 0
 
 
 def get_keyword_rank(string, url):
-    response = get_response(
-        furl(
-            'http://www.amazon.com/s'
-        ).add({
-            'keywords': string,
-            'page': '1',
-            'rh': 'n:133140011,k:%(keyword)s' % {
-                'keyword': string,
-            },
-        }).url
-    )
-    if not response:
-        return 0
-    for rank, u in enumerate(
-        Selector(
-            text=response.text,
-        ).xpath(
-            '//div[@class="a-row a-spacing-small"]/a/@href',
-        ).extract()
-    ):
-        if get_url(u) == url:
-            return rank + 1
-    return 0
-
+    asin = url.split('/')[-1]
+    page = 0
+    while True:
+        page += 1
+        if page > 10:
+            return
+        response = get_response(
+            furl(
+                'http://www.amazon.com/s'
+            ).add({
+                'keywords': string,
+                'page': page,
+                'rh': 'n:133140011,k:%(keyword)s' % {
+                    'keyword': string,
+                },
+            }).url
+        )
+        if not response:
+            return
+        for rank, url in enumerate(
+            Selector(
+                text=response.text,
+            ).xpath(
+                '//div[@class="a-row a-spacing-small"]/a/@href',
+            ).extract()
+        ):
+            if get_asin(url) == asin:
+                return rank + 1
 
 if __name__ == '__main__':
     main()

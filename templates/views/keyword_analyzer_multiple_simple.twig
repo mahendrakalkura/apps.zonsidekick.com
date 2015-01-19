@@ -3,6 +3,311 @@
 {% set module = 'Keywords Analyzers - Multiple - Simple' %}
 {% set nav = 'keywords_analyzers_multiple' %}
 
+{% macro keywords(report, key, currency) %}
+<div
+    class="tab-pane fade in"
+    id="tabs-{{ key }}"
+    ng-show="keywords.{{ key }}.length"
+    >
+    <p class="text-center">
+        Mouse over headers for explanation
+    </p>
+    <table class="table table-bordered table-hover table-striped">
+        <thead>
+            <tr>
+                <th
+                    class="header [! order_by[0] == 'string' && get_order_by() || '' !]"
+                    ng-click="set_order_by('string')"
+                    >
+                    <i class="fa fa-fw pull-right [! order_by[0] == 'string' && get_order_by() || '' !]">
+                    </i>
+                    <span
+                        title="Keyword"
+                        data-toggle="tooltip"
+                        >Keyword</span>
+                </th>
+                <th
+                    class="text-center header [! order_by[0] == 'contents.buyer_behavior[0]' && get_order_by() || '' !]"
+                    ng-click="set_order_by('contents.buyer_behavior[0]')"
+                    >
+                    <i class="fa fa-fw pull-right [! order_by[0] == 'contents.buyer_behavior[0]' && get_order_by() || '' !]">
+                    </i>
+                    <span
+                        title="The likelyhood of customers purchasing multiple books within this keyword"
+                        data-toggle="tooltip"
+                        >Buyer Behavior</span>
+                </th>
+                <th
+                    class="text-center header [! order_by[0] == 'contents.competition[0]' && get_order_by() || '' !]"
+                    ng-click="set_order_by('contents.competition[0]')"
+                    >
+                    <i class="fa fa-fw pull-right [! order_by[0] == 'contents.competition[0]' && get_order_by() || '' !]">
+                    </i>
+                    <span
+                        title="Ranked by our advanced market analysis algorithm."
+                        data-toggle="tooltip"
+                        >Competition</span>
+                </th>
+                <th
+                    class="text-center header [! order_by[0] == 'contents.optimization[0]' && get_order_by() || '' !]"
+                    ng-click="set_order_by('contents.optimization[0]')"
+                    >
+                    <i class="fa fa-fw pull-right [! order_by[0] == 'contents.optimization[0]' && get_order_by() || '' !]">
+                    </i>
+                    <span
+                        title="Optimal keyword density and other factors on Titles and Descriptions (top competitors)."
+                        data-toggle="tooltip"
+                        >Optimization</span>
+                </th>
+                <th
+                    class="text-center header [! order_by[0] == 'contents.popularity[0]' && get_order_by() || '' !]"
+                    ng-click="set_order_by('contents.popularity[0]')"
+                    >
+                    <i class="fa fa-fw pull-right [! order_by[0] == 'contents.popularity[0]' && get_order_by() || '' !]">
+                    </i>
+                    <span
+                        title="Our Popularity algorithm carefully assesses keyword traffic in the Kindle bookstore. This is a very powerful indicator of a profitable keyword."
+                        data-toggle="tooltip"
+                        >Popularity</span>
+                </th>
+                <th
+                    class="text-right header [! order_by[0] == 'contents.spend[0][0]' && get_order_by() || '' !]"
+                    ng-click="set_order_by('contents.spend[0][0]')"
+                    >
+                    <i class="fa fa-fw pull-right [! order_by[0] == 'contents.spend[0][0]' && get_order_by() || '' !]">
+                    </i>
+                    <span
+                        title="The estimated amount of money spent on products in the top 48 most relevant listings (per day; paid books only)."
+                        data-toggle="tooltip"
+                        >Spend ({{ currency }})</span>
+                </th>
+                <th
+                    class="header text-right [! order_by[0] == 'contents.average_price[0]' && get_order_by() || '' !]"
+                    ng-click="set_order_by('contents.average_price[0]')"
+                    >
+                    <i class="fa fa-fw pull-right [! order_by[0] == 'contents.average_price[0]' && get_order_by() || '' !]">
+                    </i>
+                    <span
+                        title="The average price of products in the top 48 most relevant listings (paid books only)."
+                        data-toggle="tooltip"
+                        >Avg. Price ({{ currency }})</span>
+                </th>
+                <th
+                    class="header text-right [! order_by[0] == 'contents.average_length[0]' && get_order_by() || '' !]"
+                    ng-click="set_order_by('contents.average_length[0]')"
+                    >
+                    <i class="fa fa-fw pull-right [! order_by[0] == 'contents.average_length[0]' && get_order_by() || '' !]">
+                    </i>
+                    <span
+                        title="The average length of products in the top 48 most relevant listings (pages; paid books only)."
+                        data-toggle="tooltip"
+                        >Avg. Length</span>
+                </th>
+                <th
+                    class="header text-right [! order_by[0] == 'contents.score[0]' && get_order_by() || '' !]"
+                    ng-click="set_order_by('contents.score[0]')"
+                    >
+                    <i class="fa fa-fw pull-right [! order_by[0] == 'contents.score[0]' && get_order_by() || '' !]">
+                    </i>
+                    <span
+                        title="Ranked by our advanced market analysis algorithm."
+                        data-toggle="tooltip"
+                        >Score</span>
+                </th>
+            </tr>
+        </thead>
+        <tbody ng-repeat="keyword in keywords.{{ key }}">
+            <tr>
+                <td>
+                    <a
+                        class="pull-right"
+                        href="/keyword-analyzer/multiple/{{ report['id'] }}/simple/[! keyword.id !]"
+                        ng-show="keyword['contents']['score'][0] > 0"
+                        rel="noreferrer"
+                        target="_blank"
+                        ><i class="fa fa-fw fa-external-link"></i></a>
+                    [! keyword['string'] !]
+                </td>
+                <td class="text-center">
+                    <span ng-switch on="keyword['contents']">
+                        <span
+                            class="fa fa-fw fa-spinner fa-spin"
+                            ng-switch-when="null"
+                            ></span>
+                        <span ng-switch-default>
+                            <span ng-switch on="keyword['contents']['buyer_behavior'][1]">
+                                <span
+                                    class="text-error"
+                                    ng-switch-when="N/A"
+                                    >
+                                    <strong>
+                                        [! keyword['contents']['buyer_behavior'][1] !]
+                                    </strong>
+                                </span>
+                                <span ng-switch-default ng-bind-html="keyword['contents']['buyer_behavior'][1]|label:keyword['contents']['buyer_behavior'][1]:true|html"></span>
+                            </span>
+                        </span>
+                    </span>
+                </td>
+                <td class="text-center">
+                    <span ng-switch on="keyword['contents']">
+                        <span
+                            class="fa fa-fw fa-spinner fa-spin"
+                            ng-switch-when="null"
+                            ></span>
+                        <span ng-switch-default>
+                            <span ng-switch on="keyword['contents']['competition'][1]">
+                                <span
+                                    class="text-error"
+                                    ng-switch-when="N/A"
+                                    >
+                                    <strong>
+                                        [! keyword['contents']['competition'][1] !]
+                                    </strong>
+                                </span>
+                                <span ng-switch-default ng-bind-html="keyword['contents']['competition'][1]|label:keyword['contents']['competition'][1]:false|html"></span>
+                            </span>
+                        </span>
+                    </span>
+                </td>
+                <td class="text-center">
+                    <span ng-switch on="keyword['contents']">
+                        <span
+                            class="fa fa-fw fa-spinner fa-spin"
+                            ng-switch-when="null"
+                            ></span>
+                        <span ng-switch-default>
+                            <span ng-switch on="keyword['contents']['optimization'][1]">
+                                <span
+                                    class="text-error"
+                                    ng-switch-when="N/A"
+                                    >
+                                    <strong>
+                                        [! keyword['contents']['optimization'][1] !]
+                                    </strong>
+                                </span>
+                                <span ng-switch-default ng-bind-html="keyword['contents']['optimization'][1]|label:keyword['contents']['optimization'][1]:false|html"></span>
+                            </span>
+                        </span>
+                    </span>
+                </td>
+                <td class="text-center">
+                    <span ng-switch on="keyword['contents']">
+                        <span
+                            class="fa fa-fw fa-spinner fa-spin"
+                            ng-switch-when="null"
+                            ></span>
+                        <span ng-switch-default>
+                            <span ng-switch on="keyword['contents']['popularity'][1]">
+                                <span
+                                    class="text-error"
+                                    ng-switch-when="N/A"
+                                    >
+                                    <strong>
+                                        [! keyword['contents']['popularity'][1] !]
+                                    </strong>
+                                </span>
+                                <span ng-switch-default ng-bind-html="keyword['contents']['popularity'][1]|label:keyword['contents']['popularity'][1]:true|html"></span>
+                            </span>
+                        </span>
+                    </span>
+                </td>
+                <td class="text-right">
+                    <span ng-switch on="keyword['contents']">
+                        <span
+                            class="fa fa-fw fa-spinner fa-spin"
+                            ng-switch-when="null"
+                            ></span>
+                        <span ng-switch-default>
+                            <span ng-switch on="keyword['contents']['spend'][1]">
+                                <span
+                                    class="text-error"
+                                    ng-switch-when="N/A"
+                                    >
+                                    <strong>
+                                        [! keyword['contents']['spend'][1] !]
+                                    </strong>
+                                </span>
+                                <span ng-switch-default ng-bind-html="keyword['contents']['spend'][1]|label:keyword['contents']['spend'][0][1]:true|html"></span>
+                            </span>
+                        </span>
+                    </span>
+                </td>
+                <td class="text-right">
+                    <span ng-switch on="keyword['contents']">
+                        <span
+                            class="fa fa-fw fa-spinner fa-spin"
+                            ng-switch-when="null"
+                            ></span>
+                        <span ng-switch-default>
+                            <span ng-switch on="keyword['contents']['average_price'][1]">
+                                <span
+                                    class="text-error"
+                                    ng-switch-when="N/A"
+                                    >
+                                    <strong>
+                                        [! keyword['contents']['average_price'][1] !]
+                                    </strong>
+                                </span>
+                                <span ng-switch-default>
+                                    [! keyword['contents']['average_price'][1] !]
+                                </span>
+                            </span>
+                        </span>
+                    </span>
+                </td>
+                <td class="text-right">
+                    <span ng-switch on="keyword['contents']">
+                        <span
+                            class="fa fa-fw fa-spinner fa-spin"
+                            ng-switch-when="null"
+                            ></span>
+                        <span ng-switch-default>
+                            <span ng-switch on="keyword['contents']['average_length'][1]">
+                                <span
+                                    class="text-error"
+                                    ng-switch-when="N/A"
+                                    >
+                                    <strong>
+                                        [! keyword['contents']['average_length'][1] !]
+                                    </strong>
+                                </span>
+                                <span ng-switch-default>
+                                    [! keyword['contents']['average_length'][1] !]
+                                </span>
+                            </span>
+                        </span>
+                    </span>
+                </td>
+                <td class="text-right">
+                    <span ng-switch on="keyword['contents']">
+                        <span
+                            class="fa fa-fw fa-spinner fa-spin"
+                            ng-switch-when="null"
+                            ></span>
+                        <span ng-switch-default>
+                            <span ng-switch on="keyword['contents']['score'][1]">
+                                <span
+                                    class="text-error"
+                                    ng-switch-when="N/A"
+                                    >
+                                    <strong>
+                                        [! keyword['contents']['score'][1] !]
+                                    </strong>
+                                </span>
+                                <span ng-switch-default>
+                                    [! keyword['contents']['score'][1] !]
+                                </span>
+                            </span>
+                        </span>
+                    </span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endmacro %}
+
 {% block content %}
 <ul class="breadcrumb breadcrumb-page">
     <div class="breadcrumb-label text-light-gray">You are here:</div>
@@ -34,7 +339,98 @@
     data-url-xhr="{{ url('keyword_analyzer_multiple_xhr', {'id': report.id}) }}"
     ng-controller="keyword_analyzer_multiple_simple"
     >
-    <div class="row" ng-show="is_finished()">
+    <form>
+        <div class="panel">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+                        <div class="form-group kns">
+                            <label class="control-label" for="books">
+                                No. of Books
+                            </label>
+                            <div class="controls">
+                                <select
+                                    class="select2"
+                                    id="books"
+                                    ng-model="books_1"
+                                    ng-options="book as book for book in books"
+                                    ></select>
+                                <input
+                                    class="form-control"
+                                    max="999999999"
+                                    min="0"
+                                    ng-model="books_2"
+                                    ng-show="books_1 == 'Less Than' || books_1 == 'More Than'"
+                                    step="any"
+                                    type="number"
+                                    >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+                        <div class="form-group kns">
+                            <label class="control-label" for="books">
+                                Amazon BSR
+                            </label>
+                            <div class="controls">
+                                <select
+                                    class="select2"
+                                    id="amazon_best_sellers_ranks"
+                                    ng-model="amazon_best_sellers_rank_1"
+                                    ng-options="amazon_best_sellers_rank as amazon_best_sellers_rank for amazon_best_sellers_rank in amazon_best_sellers_ranks"
+                                    ></select>
+                                <input
+                                    class="form-control"
+                                    max="999999999"
+                                    min="0"
+                                    ng-model="amazon_best_sellers_rank_2"
+                                    ng-show="amazon_best_sellers_rank_1 == 'Less Than' || amazon_best_sellers_rank_1 == 'More Than'"
+                                    type="number"
+                                    >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+                        <div class="form-group kns">
+                            <label class="control-label" for="count">
+                                Top
+                            </label>
+                            <div class="controls">
+                                <select
+                                    class="select2"
+                                    id="count"
+                                    ng-model="count"
+                                    ng-options="count as count for count in counts"
+                                    ></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix panel-footer text-right">
+                <button
+                    class="btn btn-success pull-right"
+                    ng-click="submit()"
+                    type="submit"
+                    >
+                    <span class="fa fa-lg fa-fw fa-thumbs-up"></span>
+                    Submit
+                </button>
+                <button
+                    class="btn btn-danger pull-right"
+                    ng-click="reset()"
+                    type="reset"
+                    >
+                    <span class="fa fa-lg fa-fw fa-thumbs-down"></span>
+                    Reset
+                </button>
+            </div>
+        </div>
+    </form>
+    <div
+        class="row"
+        ng-show="keywords.one.length || keywords.two.length || keywords.three.length"
+        >
         <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
             <p class="clearfix">
                 <a
@@ -111,15 +507,15 @@
             </div>
         </div>
     </div>
-    <hr ng-show="is_finished()">
+    <hr ng-show="keywords.one.length || keywords.two.length || keywords.three.length">
     <div
         data-urls-keyword-suggester="{{ url('keyword_suggester') }}"
         data-urls-suggested-keywords="{{ url('suggested_keywords') }}"
         ng-controller="suggested_keywords"
-        ng-show="is_finished() && $parent.get_words().length > 0"
+        ng-show="$parent.words.length > 0"
         >
         <p>
-            <a ng-click="process($parent.get_words())">
+            <a ng-click="process($parent.words)">
                 Click here to compile a list of suggested keywords
             </a>
         </p>
@@ -140,1025 +536,53 @@
             Your query did not yield any results. Please try again
             after a while.
         </p>
-        <hr>
     </div>
-    <form ng-show="is_finished()">
-        <div class="row">
-            <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
-                <div class="form-group kns">
-                    <label class="control-label" for="books">
-                        No. of Books
-                    </label>
-                    <div class="controls">
-                        <select
-                            class="select2"
-                            id="books"
-                            ng-model="books_1"
-                            ng-options="book as book for book in books"
-                            ></select>
-                        <input
-                            class="form-control"
-                            max="999999999"
-                            min="0"
-                            ng-model="books_2"
-                            ng-show="books_1 == 'Less Than' || books_1 == 'More Than'"
-                            step="any"
-                            type="number"
-                            >
-                    </div>
-                </div>
-            </div>
-            <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
-                <div class="form-group kns">
-                    <label class="control-label" for="books">
-                        Amazon BSR
-                    </label>
-                    <div class="controls">
-                        <select
-                            class="select2"
-                            id="amazon_best_sellers_ranks"
-                            ng-model="amazon_best_sellers_rank_1"
-                            ng-options="amazon_best_sellers_rank as amazon_best_sellers_rank for amazon_best_sellers_rank in amazon_best_sellers_ranks"
-                            ></select>
-                        <input
-                            class="form-control"
-                            max="999999999"
-                            min="0"
-                            ng-model="amazon_best_sellers_rank_2"
-                            ng-show="amazon_best_sellers_rank_1 == 'Less Than' || amazon_best_sellers_rank_1 == 'More Than'"
-                            type="number"
-                            >
-                    </div>
-                </div>
-            </div>
-            <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
-                <div class="form-group kns">
-                    <label class="control-label" for="count">
-                        Top
-                    </label>
-                    <div class="controls">
-                        <select
-                            class="select2"
-                            id="count"
-                            ng-model="count"
-                            ng-options="count as count for count in counts"
-                            ></select>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <hr>
-    </form>
-    <div class="row" ng-show="keywords.length">
+    <hr ng-show="words.length > 0">
+    <div
+        class="row"
+        ng-show="keywords.one.length || keywords.two.length || keywords.three.length"
+        >
         <div class="col-xs-12 table-light">
             <ul class="nav nav-tabs" id="tabs">
-                <li class="active" ng-show="get_keywords_non_na()">
-                    <a data-toggle="tab" href="#tabs-results">
-                        Results
+                <li ng-show="keywords.one.length">
+                    <a data-toggle="tab" href="#tabs-one">
+                        Completed KWs
                         <span class="badge badge-success">
-                            [! get_keywords_non_na() !]
+                            [! keywords.one.length !]
                         </span>
                     </a>
                 </li>
-                <li ng-show="get_keywords_na()">
-                    <a data-toggle="tab" href="#tabs-filtered-kws">
+                <li ng-show="keywords.two.length">
+                    <a data-toggle="tab" href="#tabs-two">
+                        <span
+                            title="This tab contains keywords which are pending."
+                            data-toggle="tooltip"
+                            >Pending KWs</span>
+                        <span class="badge badge-warning">
+                            [! keywords.two.length !]
+                        </span>
+                    </a>
+                </li>
+                <li ng-show="keywords.three.length">
+                    <a data-toggle="tab" href="#tabs-three">
                         <span
                             title="This tab contains keywords which returned a result of N/A. This typically means there wasn't enough data in the Kindle bookstore to properly analyze the keyword and you should disregard it."
                             data-toggle="tooltip"
                             >Filtered KWs</span>
                         <span class="badge badge-danger">
-                            [! get_keywords_na() !]
+                            [! keywords.three.length !]
                         </span>
                     </a>
                 </li>
             </ul>
             <div class="tab-content tab-content-bordered">
-                <div
-                    class="tab-pane fade active in"
-                    id="tabs-results"
-                    ng-show="get_keywords_non_na()"
-                    >
-                    <p class="text-center">
-                        Mouse over headers for explanation
-                    </p>
-                    <table class="table table-bordered table-hover table-striped">
-                        <thead>
-                            <tr>
-                                <th
-                                    class="header [! order_by[0] == 'string' && get_order_by() || '' !]"
-                                    ng-click="set_order_by('string')"
-                                    >
-                                    <i class="fa fa-fw pull-right [! order_by[0] == 'string' && get_order_by() || '' !]">
-                                    </i>
-                                    <span
-                                        title="Keyword"
-                                        data-toggle="tooltip"
-                                        >Keyword</span>
-                                </th>
-                                <th
-                                    class="text-center header [! order_by[0] == 'contents.buyer_behavior[0]' && get_order_by() || '' !]"
-                                    ng-click="set_order_by('contents.buyer_behavior[0]')"
-                                    >
-                                    <i class="fa fa-fw pull-right [! order_by[0] == 'contents.buyer_behavior[0]' && get_order_by() || '' !]">
-                                    </i>
-                                    <span
-                                        title="The likelyhood of customers purchasing multiple books within this keyword"
-                                        data-toggle="tooltip"
-                                        >Buyer Behavior</span>
-                                </th>
-                                <th
-                                    class="text-center header [! order_by[0] == 'contents.competition[0]' && get_order_by() || '' !]"
-                                    ng-click="set_order_by('contents.competition[0]')"
-                                    >
-                                    <i class="fa fa-fw pull-right [! order_by[0] == 'contents.competition[0]' && get_order_by() || '' !]">
-                                    </i>
-                                    <span
-                                        title="Ranked by our advanced market analysis algorithm."
-                                        data-toggle="tooltip"
-                                        >Competition</span>
-                                </th>
-                                <th
-                                    class="text-center header [! order_by[0] == 'contents.optimization[0]' && get_order_by() || '' !]"
-                                    ng-click="set_order_by('contents.optimization[0]')"
-                                    >
-                                    <i class="fa fa-fw pull-right [! order_by[0] == 'contents.optimization[0]' && get_order_by() || '' !]">
-                                    </i>
-                                    <span
-                                        title="Optimal keyword density and other factors on Titles and Descriptions (top competitors)."
-                                        data-toggle="tooltip"
-                                        >Optimization</span>
-                                </th>
-                                <th
-                                    class="text-center header [! order_by[0] == 'contents.popularity[0]' && get_order_by() || '' !]"
-                                    ng-click="set_order_by('contents.popularity[0]')"
-                                    >
-                                    <i class="fa fa-fw pull-right [! order_by[0] == 'contents.popularity[0]' && get_order_by() || '' !]">
-                                    </i>
-                                    <span
-                                        title="Our Popularity algorithm carefully assesses keyword traffic in the Kindle bookstore. This is a very powerful indicator of a profitable keyword."
-                                        data-toggle="tooltip"
-                                        >Popularity</span>
-                                </th>
-                                <th
-                                    class="text-right header [! order_by[0] == 'contents.spend[0][0]' && get_order_by() || '' !]"
-                                    ng-click="set_order_by('contents.spend[0][0]')"
-                                    >
-                                    <i class="fa fa-fw pull-right [! order_by[0] == 'contents.spend[0][0]' && get_order_by() || '' !]">
-                                    </i>
-                                    <span
-                                        title="The estimated amount of money spent on products in the top 48 most relevant listings (per day; paid books only)."
-                                        data-toggle="tooltip"
-                                        >Spend ({{ currency }})</span>
-                                </th>
-                                <th
-                                    class="header text-right [! order_by[0] == 'contents.average_price[0]' && get_order_by() || '' !]"
-                                    ng-click="set_order_by('contents.average_price[0]')"
-                                    >
-                                    <i class="fa fa-fw pull-right [! order_by[0] == 'contents.average_price[0]' && get_order_by() || '' !]">
-                                    </i>
-                                    <span
-                                        title="The average price of products in the top 48 most relevant listings (paid books only)."
-                                        data-toggle="tooltip"
-                                        >Avg. Price ({{ currency }})</span>
-                                </th>
-                                <th
-                                    class="header text-right [! order_by[0] == 'contents.average_length[0]' && get_order_by() || '' !]"
-                                    ng-click="set_order_by('contents.average_length[0]')"
-                                    >
-                                    <i class="fa fa-fw pull-right [! order_by[0] == 'contents.average_length[0]' && get_order_by() || '' !]">
-                                    </i>
-                                    <span
-                                        title="The average length of products in the top 48 most relevant listings (pages; paid books only)."
-                                        data-toggle="tooltip"
-                                        >Avg. Length</span>
-                                </th>
-                                <th
-                                    class="header text-right [! order_by[0] == 'contents.score[0]' && get_order_by() || '' !]"
-                                    ng-click="set_order_by('contents.score[0]')"
-                                    >
-                                    <i class="fa fa-fw pull-right [! order_by[0] == 'contents.score[0]' && get_order_by() || '' !]">
-                                    </i>
-                                    <span
-                                        title="Ranked by our advanced market analysis algorithm."
-                                        data-toggle="tooltip"
-                                        >Score</span>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody ng-repeat="keyword in get_keywords()" ng-show="keyword.contents == null || keyword.contents.score[0] != -1">
-                            <tr>
-                                <td>
-                                    <a
-                                        class="pull-right"
-                                        ng-click="statuses[keyword['string']] = true"
-                                        ng-show="keyword['contents'] != null && !statuses[keyword['string']]"
-                                        >Show Details</a>
-                                    <a
-                                        class="pull-right"
-                                        ng-click="statuses[keyword['string']] = false"
-                                        ng-show="keyword['contents'] != null && statuses[keyword['string']]"
-                                        >Hide Details</a>
-                                    [! keyword['string'] !]
-                                </td>
-                                <td class="text-center">
-                                    <span ng-switch on="keyword['contents']">
-                                        <span
-                                            class="fa fa-fw fa-spinner fa-spin"
-                                            ng-switch-when="null"
-                                            ></span>
-                                        <span ng-switch-default>
-                                            <span ng-switch on="keyword['contents']['buyer_behavior'][1]">
-                                                <span
-                                                    class="text-error"
-                                                    ng-switch-when="N/A"
-                                                    >
-                                                    <strong>
-                                                        [! keyword['contents']['buyer_behavior'][1] !]
-                                                    </strong>
-                                                </span>
-                                                <span ng-switch-default ng-bind-html="keyword['contents']['buyer_behavior'][1]|label:keyword['contents']['buyer_behavior'][1]:true|html"></span>
-                                            </span>
-                                        </span>
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <span ng-switch on="keyword['contents']">
-                                        <span
-                                            class="fa fa-fw fa-spinner fa-spin"
-                                            ng-switch-when="null"
-                                            ></span>
-                                        <span ng-switch-default>
-                                            <span ng-switch on="keyword['contents']['competition'][1]">
-                                                <span
-                                                    class="text-error"
-                                                    ng-switch-when="N/A"
-                                                    >
-                                                    <strong>
-                                                        [! keyword['contents']['competition'][1] !]
-                                                    </strong>
-                                                </span>
-                                                <span ng-switch-default ng-bind-html="keyword['contents']['competition'][1]|label:keyword['contents']['competition'][1]:false|html"></span>
-                                            </span>
-                                        </span>
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <span ng-switch on="keyword['contents']">
-                                        <span
-                                            class="fa fa-fw fa-spinner fa-spin"
-                                            ng-switch-when="null"
-                                            ></span>
-                                        <span ng-switch-default>
-                                            <span ng-switch on="keyword['contents']['optimization'][1]">
-                                                <span
-                                                    class="text-error"
-                                                    ng-switch-when="N/A"
-                                                    >
-                                                    <strong>
-                                                        [! keyword['contents']['optimization'][1] !]
-                                                    </strong>
-                                                </span>
-                                                <span ng-switch-default ng-bind-html="keyword['contents']['optimization'][1]|label:keyword['contents']['optimization'][1]:false|html"></span>
-                                            </span>
-                                        </span>
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <span ng-switch on="keyword['contents']">
-                                        <span
-                                            class="fa fa-fw fa-spinner fa-spin"
-                                            ng-switch-when="null"
-                                            ></span>
-                                        <span ng-switch-default>
-                                            <span ng-switch on="keyword['contents']['popularity'][1]">
-                                                <span
-                                                    class="text-error"
-                                                    ng-switch-when="N/A"
-                                                    >
-                                                    <strong>
-                                                        [! keyword['contents']['popularity'][1] !]
-                                                    </strong>
-                                                </span>
-                                                <span ng-switch-default ng-bind-html="keyword['contents']['popularity'][1]|label:keyword['contents']['popularity'][1]:true|html"></span>
-                                            </span>
-                                        </span>
-                                    </span>
-                                </td>
-                                <td class="text-right">
-                                    <span ng-switch on="keyword['contents']">
-                                        <span
-                                            class="fa fa-fw fa-spinner fa-spin"
-                                            ng-switch-when="null"
-                                            ></span>
-                                        <span ng-switch-default>
-                                            <span ng-switch on="keyword['contents']['spend'][1]">
-                                                <span
-                                                    class="text-error"
-                                                    ng-switch-when="N/A"
-                                                    >
-                                                    <strong>
-                                                        [! keyword['contents']['spend'][1] !]
-                                                    </strong>
-                                                </span>
-                                                <span ng-switch-default ng-bind-html="keyword['contents']['spend'][1]|label:keyword['contents']['spend'][0][1]:true|html"></span>
-                                            </span>
-                                        </span>
-                                    </span>
-                                </td>
-                                <td class="text-right">
-                                    <span ng-switch on="keyword['contents']">
-                                        <span
-                                            class="fa fa-fw fa-spinner fa-spin"
-                                            ng-switch-when="null"
-                                            ></span>
-                                        <span ng-switch-default>
-                                            <span ng-switch on="keyword['contents']['average_price'][1]">
-                                                <span
-                                                    class="text-error"
-                                                    ng-switch-when="N/A"
-                                                    >
-                                                    <strong>
-                                                        [! keyword['contents']['average_price'][1] !]
-                                                    </strong>
-                                                </span>
-                                                <span ng-switch-default>
-                                                    [! keyword['contents']['average_price'][1] !]
-                                                </span>
-                                            </span>
-                                        </span>
-                                    </span>
-                                </td>
-                                <td class="text-right">
-                                    <span ng-switch on="keyword['contents']">
-                                        <span
-                                            class="fa fa-fw fa-spinner fa-spin"
-                                            ng-switch-when="null"
-                                            ></span>
-                                        <span ng-switch-default>
-                                            <span ng-switch on="keyword['contents']['average_length'][1]">
-                                                <span
-                                                    class="text-error"
-                                                    ng-switch-when="N/A"
-                                                    >
-                                                    <strong>
-                                                        [! keyword['contents']['average_length'][1] !]
-                                                    </strong>
-                                                </span>
-                                                <span ng-switch-default>
-                                                    [! keyword['contents']['average_length'][1] !]
-                                                </span>
-                                            </span>
-                                        </span>
-                                    </span>
-                                </td>
-                                <td class="text-right">
-                                    <span ng-switch on="keyword['contents']">
-                                        <span
-                                            class="fa fa-fw fa-spinner fa-spin"
-                                            ng-switch-when="null"
-                                            ></span>
-                                        <span ng-switch-default>
-                                            <span ng-switch on="keyword['contents']['score'][1]">
-                                                <span
-                                                    class="text-error"
-                                                    ng-switch-when="N/A"
-                                                    >
-                                                    <strong>
-                                                        [! keyword['contents']['score'][1] !]
-                                                    </strong>
-                                                </span>
-                                                <span ng-switch-default>
-                                                    [! keyword['contents']['score'][1] !]
-                                                </span>
-                                            </span>
-                                        </span>
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr ng-show="statuses[keyword['string']]">
-                                <td class="details table-light" colspan="9">
-                                    <p
-                                        ng-show="keyword.contents.words && keyword.contents.words.length > 0"
-                                        ><strong>Top 10 words</strong></p>
-                                    <div
-                                        class="row"
-                                        ng-show="keyword.contents.words && keyword.contents.words.length > 0"
-                                        >
-                                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-                                            <ul>
-                                                <li ng-repeat="word in keyword.contents.words|slice:0:5">
-                                                    [! word[0] !] ([! word[1] !])
-                                                </li>
-                                            </ul>
-                                        </div>
-                                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-                                            <ul>
-                                                <li ng-repeat="word in keyword.contents.words|slice:5:10">
-                                                    [! words !]
-                                                    [! word[0] !] ([! word[1] !])
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    <p
-                                        ng-show="keyword.contents.words && keyword.contents.words.length > 0"
-                                        data-urls-keyword-suggester="{{ url('keyword_suggester') }}"
-                                        ng-controller="suggested_keywords"
-                                        >
-                                        <a ng-click="get_more_suggestions(get_words(keyword.contents.words), 'Combine')">Get more suggestions</a>
-                                    </p>
-                                    <hr>
-                                    <table class="table table-bordered table-hover table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th
-                                                    class="header [! order_by_[0] == 'title[0]' && get_order_by_() || '' !]"
-                                                    ng-click="set_order_by_('title[0]')"
-                                                    >
-                                                    <i class="fa fa-fw pull-right [! order_by_[0] == 'title[0]' && get_order_by_() || '' !]">
-                                                    </i>
-                                                    Title
-                                                    </th>
-                                                <th
-                                                    class="narrow text-center header [! order_by_[0] == 'title[1]' && get_order_by_() || '' !]"
-                                                    ng-click="set_order_by_('title[1]')"
-                                                    >
-                                                    <i class="fa fa-fw pull-right [! order_by_[0] == 'title[1]' && get_order_by_() || '' !]">
-                                                    </i>
-                                                    KW In Title
-                                                    </th>
-                                                <th
-                                                    class="narrow header [! order_by_[0] == 'author.name' && get_order_by_() || '' !]"
-                                                    ng-click="set_order_by_('author.name')"
-                                                    >
-                                                    <i class="fa fa-fw pull-right [! order_by_[0] == 'author.name' && get_order_by_() || '' !]">
-                                                    </i>
-                                                    Author
-                                                    </th>
-                                                <th
-                                                    class="narrow text-right header [! order_by_[0] == 'best_sellers_rank[0]' && get_order_by_() || '' !]"
-                                                    ng-click="set_order_by_('best_sellers_rank[0]')"
-                                                    >
-                                                    <i class="fa fa-fw pull-right [! order_by_[0] == 'best_sellers_rank[0]' && get_order_by_() || '' !]">
-                                                    </i>
-                                                    Best Seller Rank
-                                                    </th>
-                                                <th
-                                                    class="narrow text-right header [! order_by_[0] == 'price[0]' && get_order_by_() || '' !]"
-                                                    ng-click="set_order_by_('price[0]')"
-                                                    >
-                                                    <i class="fa fa-fw pull-right [! order_by_[0] == 'price[0]' && get_order_by_() || '' !]">
-                                                    </i>
-                                                    Price ({{ currency }})
-                                                    </th>
-                                                <th
-                                                    class="narrow text-right header [! order_by_[0] == 'pages[0]' && get_order_by_() || '' !]"
-                                                    ng-click="set_order_by_('pages[0]')"
-                                                    >
-                                                    <i class="fa fa-fw pull-right [! order_by_[0] == 'pages[0]' && get_order_by_() || '' !]">
-                                                    </i>
-                                                    Print Length
-                                                    </th>
-                                                <th
-                                                    class="narrow text-right header [! order_by_[0] == 'publication_date' && get_order_by_() || '' !]"
-                                                    ng-click="set_order_by_('publication_date')"
-                                                    >
-                                                    <i class="fa fa-fw pull-right [! order_by_[0] == 'publication_date' && get_order_by_() || '' !]">
-                                                    </i>
-                                                    Date Published
-                                                    </th>
-                                                <th
-                                                    class="narrow text-right header [! order_by_[0] == 'stars[0]' && get_order_by_() || '' !]"
-                                                    ng-click="set_order_by_('stars[0]')"
-                                                    >
-                                                    <i class="fa fa-fw pull-right [! order_by_[0] == 'stars[0]' && get_order_by_() || '' !]">
-                                                    </i>
-                                                    Average Review
-                                                    </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr ng-repeat="item in keyword['contents']['items']|orderBy:order_by_[0]:order_by_[1]">
-                                                <td>
-                                                    <a
-                                                        href="[! item.url !]"
-                                                        rel="noreferrer"
-                                                        target="_blank"
-                                                        >[! item.title[0] !]</a>
-                                                </td>
-                                                <td class="narrow text-center">
-                                                    [! item.title[1] !]
-                                                </td>
-                                                <td class="narrow">
-                                                    <span ng-hide="item.author == undefined">
-                                                        <a
-                                                            class="pull-right"
-                                                            href="[! item.author.url !]"
-                                                            ng-show="item.author.url.length > 0"
-                                                            rel="noreferrer"
-                                                            target="_blank"
-                                                            >
-                                                            <i class="fa fa-fw fa-external-link">
-                                                            </i>
-                                                        </a>
-                                                        <a
-                                                            href="{{ url('author_analyzer') }}?url=[! item.author.url|encodeUri !]"
-                                                            ng-show="item.author.url.length > 0"
-                                                            target="_blank"
-                                                            >[! item.author.name !]</a>
-                                                        <span ng-show="item.author.url.length == 0">
-                                                            [! item.author.name !]
-                                                        </span>
-                                                    </span>
-                                                </td>
-                                                <td class="narrow text-right">
-                                                    [! item.best_sellers_rank[0]|number:0 !]
-                                                </td>
-                                                <td class="narrow text-right">
-                                                    [! item.price[0]|number:2 !]
-                                                </td>
-                                                <td class="narrow text-right">
-                                                    [! item.pages[0]|number:0 !]
-                                                </td>
-                                                <td class="narrow text-right">
-                                                    [! item.publication_date !]
-                                                </td>
-                                                <td class="narrow text-right">
-                                                    [! item.stars[0]|number:2 !]
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div
-                    class="tab-pane fade in"
-                    id="tabs-filtered-kws"
-                    ng-show="get_keywords_na()"
-                    >
-                    <p class="text-center">
-                        Mouse over headers for explanation
-                    </p>
-                    <table class="table table-bordered table-hover table-striped">
-                        <thead>
-                            <tr>
-                                <th
-                                    class="header [! order_by[0] == 'string' && get_order_by() || '' !]"
-                                    ng-click="set_order_by('string')"
-                                    >
-                                    <i class="fa fa-fw pull-right [! order_by[0] == 'string' && get_order_by() || '' !]">
-                                    </i>
-                                    <span
-                                        title="Keyword"
-                                        data-toggle="tooltip"
-                                        >Keyword</span>
-                                </th>
-                                <th
-                                    class="text-center header [! order_by[0] == 'contents.buyer_behavior[0]' && get_order_by() || '' !]"
-                                    ng-click="set_order_by('contents.buyer_behavior[0]')"
-                                    >
-                                    <i class="fa fa-fw pull-right [! order_by[0] == 'contents.buyer_behavior[0]' && get_order_by() || '' !]">
-                                    </i>
-                                    <span
-                                        title="The likelyhood of customers purchasing multiple books within this keyword"
-                                        data-toggle="tooltip"
-                                        >Buyer Behavior</span>
-                                </th>
-                                <th
-                                    class="text-center header [! order_by[0] == 'contents.competition[0]' && get_order_by() || '' !]"
-                                    ng-click="set_order_by('contents.competition[0]')"
-                                    >
-                                    <i class="fa fa-fw pull-right [! order_by[0] == 'contents.competition[0]' && get_order_by() || '' !]">
-                                    </i>
-                                    <span
-                                        title="Ranked by our advanced market analysis algorithm."
-                                        data-toggle="tooltip"
-                                        >Competition</span>
-                                </th>
-                                <th
-                                    class="text-center header [! order_by[0] == 'contents.optimization[0]' && get_order_by() || '' !]"
-                                    ng-click="set_order_by('contents.optimization[0]')"
-                                    >
-                                    <i class="fa fa-fw pull-right [! order_by[0] == 'contents.optimization[0]' && get_order_by() || '' !]">
-                                    </i>
-                                    <span
-                                        title="Optimal keyword density and other factors on Titles and Descriptions (top competitors)."
-                                        data-toggle="tooltip"
-                                        >Optimization</span>
-                                </th>
-                                <th
-                                    class="text-center header [! order_by[0] == 'contents.popularity[0]' && get_order_by() || '' !]"
-                                    ng-click="set_order_by('contents.popularity[0]')"
-                                    >
-                                    <i class="fa fa-fw pull-right [! order_by[0] == 'contents.popularity[0]' && get_order_by() || '' !]">
-                                    </i>
-                                    <span
-                                        title="Our Popularity algorithm carefully assesses keyword traffic in the Kindle bookstore. This is a very powerful indicator of a profitable keyword."
-                                        data-toggle="tooltip"
-                                        >Popularity</span>
-                                </th>
-                                <th
-                                    class="text-right header [! order_by[0] == 'contents.spend[0][0]' && get_order_by() || '' !]"
-                                    ng-click="set_order_by('contents.spend[0][0]')"
-                                    >
-                                    <i class="fa fa-fw pull-right [! order_by[0] == 'contents.spend[0][0]' && get_order_by() || '' !]">
-                                    </i>
-                                    <span
-                                        title="The estimated amount of money spent on products in the top 48 most relevant listings (per day; paid books only)."
-                                        data-toggle="tooltip"
-                                        >Spend ({{ currency }})</span>
-                                </th>
-                                <th
-                                    class="header text-right [! order_by[0] == 'contents.average_price[0]' && get_order_by() || '' !]"
-                                    ng-click="set_order_by('contents.average_price[0]')"
-                                    >
-                                    <i class="fa fa-fw pull-right [! order_by[0] == 'contents.average_price[0]' && get_order_by() || '' !]">
-                                    </i>
-                                    <span
-                                        title="The average price of products in the top 48 most relevant listings (paid books only)."
-                                        data-toggle="tooltip"
-                                        >Avg. Price ({{ currency }})</span>
-                                </th>
-                                <th
-                                    class="header text-right [! order_by[0] == 'contents.average_length[0]' && get_order_by() || '' !]"
-                                    ng-click="set_order_by('contents.average_length[0]')"
-                                    >
-                                    <i class="fa fa-fw pull-right [! order_by[0] == 'contents.average_length[0]' && get_order_by() || '' !]">
-                                    </i>
-                                    <span
-                                        title="The average length of products in the top 48 most relevant listings (pages; paid books only)."
-                                        data-toggle="tooltip"
-                                        >Avg. Length</span>
-                                </th>
-                                <th
-                                    class="header text-right [! order_by[0] == 'contents.score[0]' && get_order_by() || '' !]"
-                                    ng-click="set_order_by('contents.score[0]')"
-                                    >
-                                    <i class="fa fa-fw pull-right [! order_by[0] == 'contents.score[0]' && get_order_by() || '' !]">
-                                    </i>
-                                    <span
-                                        title="Ranked by our advanced market analysis algorithm."
-                                        data-toggle="tooltip"
-                                        >Score</span>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody ng-repeat="keyword in get_keywords()" ng-show="keyword.contents != null && keyword.contents.score[0] == -1">
-                            <tr>
-                                <td>
-                                    <a
-                                        class="pull-right"
-                                        ng-click="statuses[keyword['string']] = true"
-                                        ng-show="keyword['contents'] != null && !statuses[keyword['string']]"
-                                        >Show Details</a>
-                                    <a
-                                        class="pull-right"
-                                        ng-click="statuses[keyword['string']] = false"
-                                        ng-show="keyword['contents'] != null && statuses[keyword['string']]"
-                                        >Hide Details</a>
-                                    [! keyword['string'] !]
-                                </td>
-                                <td class="text-center">
-                                    <span ng-switch on="keyword['contents']">
-                                        <span
-                                            class="fa fa-fw fa-spinner fa-spin"
-                                            ng-switch-when="null"
-                                            ></span>
-                                        <span ng-switch-default>
-                                            <span ng-switch on="keyword['contents']['buyer_behavior'][1]">
-                                                <span
-                                                    class="text-error"
-                                                    ng-switch-when="N/A"
-                                                    >
-                                                    <strong>
-                                                        [! keyword['contents']['buyer_behavior'][1] !]
-                                                    </strong>
-                                                </span>
-                                                <span ng-switch-default ng-bind-html="keyword['contents']['buyer_behavior'][1]|label:keyword['contents']['buyer_behavior'][1]:true|html"></span>
-                                            </span>
-                                        </span>
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <span ng-switch on="keyword['contents']">
-                                        <span
-                                            class="fa fa-fw fa-spinner fa-spin"
-                                            ng-switch-when="null"
-                                            ></span>
-                                        <span ng-switch-default>
-                                            <span ng-switch on="keyword['contents']['competition'][1]">
-                                                <span
-                                                    class="text-error"
-                                                    ng-switch-when="N/A"
-                                                    >
-                                                    <strong>
-                                                        [! keyword['contents']['competition'][1] !]
-                                                    </strong>
-                                                </span>
-                                                <span ng-switch-default ng-bind-html="keyword['contents']['competition'][1]|label:keyword['contents']['competition'][1]:false|html"></span>
-                                            </span>
-                                        </span>
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <span ng-switch on="keyword['contents']">
-                                        <span
-                                            class="fa fa-fw fa-spinner fa-spin"
-                                            ng-switch-when="null"
-                                            ></span>
-                                        <span ng-switch-default>
-                                            <span ng-switch on="keyword['contents']['optimization'][1]">
-                                                <span
-                                                    class="text-error"
-                                                    ng-switch-when="N/A"
-                                                    >
-                                                    <strong>
-                                                        [! keyword['contents']['optimization'][1] !]
-                                                    </strong>
-                                                </span>
-                                                <span ng-switch-default ng-bind-html="keyword['contents']['optimization'][1]|label:keyword['contents']['optimization'][1]:false|html"></span>
-                                            </span>
-                                        </span>
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <span ng-switch on="keyword['contents']">
-                                        <span
-                                            class="fa fa-fw fa-spinner fa-spin"
-                                            ng-switch-when="null"
-                                            ></span>
-                                        <span ng-switch-default>
-                                            <span ng-switch on="keyword['contents']['popularity'][1]">
-                                                <span
-                                                    class="text-error"
-                                                    ng-switch-when="N/A"
-                                                    >
-                                                    <strong>
-                                                        [! keyword['contents']['popularity'][1] !]
-                                                    </strong>
-                                                </span>
-                                                <span ng-switch-default ng-bind-html="keyword['contents']['popularity'][1]|label:keyword['contents']['popularity'][1]:true|html"></span>
-                                            </span>
-                                        </span>
-                                    </span>
-                                </td>
-                                <td class="text-right">
-                                    <span ng-switch on="keyword['contents']">
-                                        <span
-                                            class="fa fa-fw fa-spinner fa-spin"
-                                            ng-switch-when="null"
-                                            ></span>
-                                        <span ng-switch-default>
-                                            <span ng-switch on="keyword['contents']['spend'][1]">
-                                                <span
-                                                    class="text-error"
-                                                    ng-switch-when="N/A"
-                                                    >
-                                                    <strong>
-                                                        [! keyword['contents']['spend'][1] !]
-                                                    </strong>
-                                                </span>
-                                                <span ng-switch-default ng-bind-html="keyword['contents']['spend'][1]|label:keyword['contents']['spend'][0][1]:true|html"></span>
-                                            </span>
-                                        </span>
-                                    </span>
-                                </td>
-                                <td class="text-right">
-                                    <span ng-switch on="keyword['contents']">
-                                        <span
-                                            class="fa fa-fw fa-spinner fa-spin"
-                                            ng-switch-when="null"
-                                            ></span>
-                                        <span ng-switch-default>
-                                            <span ng-switch on="keyword['contents']['average_price'][1]">
-                                                <span
-                                                    class="text-error"
-                                                    ng-switch-when="N/A"
-                                                    >
-                                                    <strong>
-                                                        [! keyword['contents']['average_price'][1] !]
-                                                    </strong>
-                                                </span>
-                                                <span ng-switch-default>
-                                                    [! keyword['contents']['average_price'][1] !]
-                                                </span>
-                                            </span>
-                                        </span>
-                                    </span>
-                                </td>
-                                <td class="text-right">
-                                    <span ng-switch on="keyword['contents']">
-                                        <span
-                                            class="fa fa-fw fa-spinner fa-spin"
-                                            ng-switch-when="null"
-                                            ></span>
-                                        <span ng-switch-default>
-                                            <span ng-switch on="keyword['contents']['average_length'][1]">
-                                                <span
-                                                    class="text-error"
-                                                    ng-switch-when="N/A"
-                                                    >
-                                                    <strong>
-                                                        [! keyword['contents']['average_length'][1] !]
-                                                    </strong>
-                                                </span>
-                                                <span ng-switch-default>
-                                                    [! keyword['contents']['average_length'][1] !]
-                                                </span>
-                                            </span>
-                                        </span>
-                                    </span>
-                                </td>
-                                <td class="text-right">
-                                    <span ng-switch on="keyword['contents']">
-                                        <span
-                                            class="fa fa-fw fa-spinner fa-spin"
-                                            ng-switch-when="null"
-                                            ></span>
-                                        <span ng-switch-default>
-                                            <span ng-switch on="keyword['contents']['score'][1]">
-                                                <span
-                                                    class="text-error"
-                                                    ng-switch-when="N/A"
-                                                    >
-                                                    <strong>
-                                                        [! keyword['contents']['score'][1] !]
-                                                    </strong>
-                                                </span>
-                                                <span ng-switch-default>
-                                                    [! keyword['contents']['score'][1] !]
-                                                </span>
-                                            </span>
-                                        </span>
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr ng-show="statuses[keyword['string']]">
-                                <td class="details table-light" colspan="9">
-                                    <p
-                                        ng-show="keyword.contents.words && keyword.contents.words.length > 0"
-                                        ><strong>Top 10 words</strong></p>
-                                    <div
-                                        class="row"
-                                        ng-show="keyword.contents.words && keyword.contents.words.length > 0"
-                                        >
-                                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-                                            <ul>
-                                                <li ng-repeat="word in keyword.contents.words|slice:0:5">
-                                                    [! word[0] !] ([! word[1] !])
-                                                </li>
-                                            </ul>
-                                        </div>
-                                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-                                            <ul>
-                                                <li ng-repeat="word in keyword.contents.words|slice:5:10">
-                                                    [! words !]
-                                                    [! word[0] !] ([! word[1] !])
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    <p
-                                        ng-show="keyword.contents.words && keyword.contents.words.length > 0"
-                                        data-urls-keyword-suggester="{{ url('keyword_suggester') }}"
-                                        ng-controller="suggested_keywords"
-                                        >
-                                        <a ng-click="get_more_suggestions(get_words(keyword.contents.words), 'Combine')">Get more suggestions</a>
-                                    </p>
-                                    <hr>
-                                    <table class="table table-bordered table-hover table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th
-                                                    class="header [! order_by_[0] == 'title[0]' && get_order_by_() || '' !]"
-                                                    ng-click="set_order_by_('title[0]')"
-                                                    >
-                                                    <i class="fa fa-fw pull-right [! order_by_[0] == 'title[0]' && get_order_by_() || '' !]">
-                                                    </i>
-                                                    Title
-                                                    </th>
-                                                <th
-                                                    class="narrow text-center header [! order_by_[0] == 'title[1]' && get_order_by_() || '' !]"
-                                                    ng-click="set_order_by_('title[1]')"
-                                                    >
-                                                    <i class="fa fa-fw pull-right [! order_by_[0] == 'title[1]' && get_order_by_() || '' !]">
-                                                    </i>
-                                                    KW In Title
-                                                    </th>
-                                                <th
-                                                    class="narrow header [! order_by_[0] == 'author.name' && get_order_by_() || '' !]"
-                                                    ng-click="set_order_by_('author.name')"
-                                                    >
-                                                    <i class="fa fa-fw pull-right [! order_by_[0] == 'author.name' && get_order_by_() || '' !]">
-                                                    </i>
-                                                    Author
-                                                    </th>
-                                                <th
-                                                    class="narrow text-right header [! order_by_[0] == 'best_sellers_rank[0]' && get_order_by_() || '' !]"
-                                                    ng-click="set_order_by_('best_sellers_rank[0]')"
-                                                    >
-                                                    <i class="fa fa-fw pull-right [! order_by_[0] == 'best_sellers_rank[0]' && get_order_by_() || '' !]">
-                                                    </i>
-                                                    Best Seller Rank
-                                                    </th>
-                                                <th
-                                                    class="narrow text-right header [! order_by_[0] == 'price[0]' && get_order_by_() || '' !]"
-                                                    ng-click="set_order_by_('price[0]')"
-                                                    >
-                                                    <i class="fa fa-fw pull-right [! order_by_[0] == 'price[0]' && get_order_by_() || '' !]">
-                                                    </i>
-                                                    Price ({{ currency }})
-                                                    </th>
-                                                <th
-                                                    class="narrow text-right header [! order_by_[0] == 'pages[0]' && get_order_by_() || '' !]"
-                                                    ng-click="set_order_by_('pages[0]')"
-                                                    >
-                                                    <i class="fa fa-fw pull-right [! order_by_[0] == 'pages[0]' && get_order_by_() || '' !]">
-                                                    </i>
-                                                    Print Length
-                                                    </th>
-                                                <th
-                                                    class="narrow text-right header [! order_by_[0] == 'publication_date' && get_order_by_() || '' !]"
-                                                    ng-click="set_order_by_('publication_date')"
-                                                    >
-                                                    <i class="fa fa-fw pull-right [! order_by_[0] == 'publication_date' && get_order_by_() || '' !]">
-                                                    </i>
-                                                    Date Published
-                                                    </th>
-                                                <th
-                                                    class="narrow text-right header [! order_by_[0] == 'stars[0]' && get_order_by_() || '' !]"
-                                                    ng-click="set_order_by_('stars[0]')"
-                                                    >
-                                                    <i class="fa fa-fw pull-right [! order_by_[0] == 'stars[0]' && get_order_by_() || '' !]">
-                                                    </i>
-                                                    Average Review
-                                                    </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr ng-repeat="item in keyword['contents']['items']|orderBy:order_by_[0]:order_by_[1]">
-                                                <td>
-                                                    <a
-                                                        href="[! item.url !]"
-                                                        rel="noreferrer"
-                                                        target="_blank"
-                                                        >[! item.title[0] !]</a>
-                                                </td>
-                                                <td class="narrow text-center">
-                                                    [! item.title[1] !]
-                                                </td>
-                                                <td class="narrow">
-                                                    <span ng-hide="item.author == undefined">
-                                                        <a
-                                                            class="pull-right"
-                                                            href="[! item.author.url !]"
-                                                            ng-show="item.author.url.length > 0"
-                                                            rel="noreferrer"
-                                                            target="_blank"
-                                                            >
-                                                            <i class="fa fa-fw fa-external-link">
-                                                            </i>
-                                                        </a>
-                                                        <a
-                                                            href="{{ url('author_analyzer') }}?url=[! item.author.url|encodeUri !]"
-                                                            ng-show="item.author.url.length > 0"
-                                                            target="_blank"
-                                                            >[! item.author.name !]</a>
-                                                        <span ng-show="item.author.url.length == 0">
-                                                            [! item.author.name !]
-                                                        </span>
-                                                    </span>
-                                                </td>
-                                                <td class="narrow text-right">
-                                                    [! item.best_sellers_rank[0]|number:0 !]
-                                                </td>
-                                                <td class="narrow text-right">
-                                                    [! item.price[0]|number:2 !]
-                                                </td>
-                                                <td class="narrow text-right">
-                                                    [! item.pages[0]|number:0 !]
-                                                </td>
-                                                <td class="narrow text-right">
-                                                    [! item.publication_date !]
-                                                </td>
-                                                <td class="narrow text-right">
-                                                    [! item.stars[0]|number:2 !]
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                {{ _self.keywords(report, 'one', currency) }}
+                {{ _self.keywords(report, 'two', currency) }}
+                {{ _self.keywords(report, 'three', currency) }}
             </div>
         </div>
     </div>
-    <p class="text-center" ng-show="!keywords.length">
+    <p class="text-center" ng-show="!keywords.one.length && !keywords.two.length && !keywords.three.length">
         <span class="fa fa-fw fa-spinner fa-spin fa-2x"></span>
     </p>
 </div>

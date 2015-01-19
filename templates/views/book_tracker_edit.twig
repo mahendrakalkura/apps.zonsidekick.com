@@ -1,0 +1,110 @@
+{% extends 'layout.twig' %}
+
+{% set module = 'Book Tracker - Edit' %}
+{% set nav = 'book_tracker' %}
+
+{% block content %}
+<ul class="breadcrumb breadcrumb-page">
+    <div class="breadcrumb-label text-light-gray">You are here:</div>
+    <li><a href="{{ url('dashboard') }}">Home</a></li>
+    <li><a href="{{ url('book_tracker') }}">Book Tracker</a></li>
+    <li class="active"><a href="{{ url('book_tracker') }}">Edit</a></li>
+</ul>
+<div class="page-header">
+    <div class="row">
+        <h1 class="col-xs-12">
+            {% include 'slots/feedback.twig' %}
+            <i class="fa fa-fw fa-book"></i>
+            {{ module }}
+        </h1>
+    </div>
+</div>
+{% include 'slots/alerts.twig' %}
+{% include 'slots/book_tracker.twig' %}
+<div
+    ng-controller="book_tracker"
+    data-keywords="{{ book.keywords|json_encode() }}"
+    data-title="{{ book.title }}"
+    data-url="{{ book.url }}"
+    >
+    <form
+        accept-charset="UTF-8"
+        action="{{ url('book_tracker_edit', {'id': book.id}) }}"
+        method="POST"
+        >
+        <div class="panel">
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="control-label" for="title">
+                        Title
+                    </label>
+                    <input
+                        class="form-control"
+                        id="title"
+                        name="title"
+                        ng-model="title"
+                        type="text"
+                        >
+                    <div
+                        class="help-block text-danger"
+                        ng-show="errors.title"
+                        >
+                        Invalid Title
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="url">
+                        URL
+                    </label>
+                    <input
+                        class="form-control"
+                        id="url"
+                        name="url"
+                        ng-model="url"
+                        type="text"
+                        >
+                    <div class="help-block" ng-class="text-info">
+                        <strong>Example:</strong>
+                        http://www.amazon.com/gp/product/XXXXXXXXXX
+                    </div>
+                    <div
+                        class="help-block text-danger"
+                        ng-show="errors.url"
+                        >
+                        Invalid URL
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="keywords">
+                        Keywords
+                    </label>
+                    <textarea
+                        class="form-control"
+                        id="keywords"
+                        name="keywords"
+                        ng-model="keywords"
+                        rows="10"
+                        ></textarea>
+                    <div class="help-block" ng-class="get_class()">
+                        [! count !] keywords remaining (one per line)
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix panel-footer text-right">
+                <button
+                    class="btn btn-success pull-right"
+                    ng-disabled="is_disabled()"
+                    type="submit"
+                    >
+                    <span class="fa fa-lg fa-fw fa-thumbs-up"></span>
+                    Submit
+                </button>
+                <button class="btn btn-danger pull-right" type="reset">
+                    <span class="fa fa-lg fa-fw fa-thumbs-down"></span>
+                    Reset
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
