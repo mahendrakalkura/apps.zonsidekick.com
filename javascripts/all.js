@@ -1525,6 +1525,7 @@ jQuery(function () {
     );
     jQuery('body').tooltip({
         container: jQuery('body'),
+        html: true,
         selector: '[data-toggle="tooltip"]'
     });
     jQuery('select.select2').select2({
