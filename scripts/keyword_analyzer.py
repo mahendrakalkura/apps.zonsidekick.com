@@ -945,15 +945,7 @@ def get_score(buyer_behavior, competition, optimization, popularity, spend):
 
 
 def get_url(country, keyword, page):
-    if (
-        country == 'co.uk'
-        or
-        country == 'es'
-        or
-        country == 'fr'
-        or
-        country == 'it'
-    ):
+    if country == 'co.uk' or country == 'es' or country == 'fr':
         return furl(
             'http://www.amazon.co.uk/s/'
         ).add({
@@ -986,6 +978,18 @@ def get_url(country, keyword, page):
             'keywords': keyword,
             'page': page,
             'rh': 'n:530484031,k:%(keyword)s' % {
+                'keyword': keyword,
+            },
+        }).url
+    if country == 'it':
+        return furl(
+            'http://www.amazon.it/s/'
+        ).add({
+            'fromApp': 'gp/search',
+            'fromPage': 'results',
+            'keywords': keyword,
+            'page': page,
+            'rh': 'n:818937031,k:%(keyword)s,' % {
                 'keyword': keyword,
             },
         }).url
