@@ -351,6 +351,8 @@ def get_contents(keyword, country):
                         ).extract()[0].strip().split(
                             ' '
                         )[0].replace(
+                            '.', ''
+                        ).replace(
                             ',', ''
                         ).replace(
                             u'件中', ''
@@ -370,6 +372,8 @@ def get_contents(keyword, country):
                         ).extract()[0].strip().split(
                             ' '
                         )[1].replace(
+                            '.', ''
+                        ).replace(
                             ',', ''
                         ).replace(
                             u'件中', ''
@@ -389,6 +393,8 @@ def get_contents(keyword, country):
                         ).extract()[0].strip().split(
                             ' '
                         )[2].replace(
+                            '.', ''
+                        ).replace(
                             ',', ''
                         ).replace(
                             u'件中', ''
@@ -429,7 +435,8 @@ def get_contents(keyword, country):
                 '@href'
             ).extract():
                 if not href.startswith('http'):
-                    href = 'http://www.amazon.com%(href)s' % {
+                    href = 'http://www.amazon.%(country)s%(href)s' % {
+                        'country': country,
                         'href': href,
                     }
                 urls.append(href)
@@ -491,7 +498,8 @@ def get_contents(keyword, country):
         except IndexError:
             try:
                 author['url'] = get_url_(get_string(
-                    'http://www.amazon.com/%(href)s' % {
+                    'http://www.amazon.%(country)s/%(href)s' % {
+                        'country': country,
                         'href': selector.xpath(
                             '//h1[@class="parseasinTitle "]/'
                             'following-sibling::span/a/@href'
@@ -551,7 +559,14 @@ def get_contents(keyword, country):
                     ).xpath('string()').extract()[1]
                 )
             except IndexError:
-                pass
+                try:
+                    description = get_string(
+                        selector.xpath(
+                            '//div[@class="productDescriptionWrapper"]'
+                        ).xpath('string()').extract()[0]
+                    )
+                except IndexError:
+                    pass
         pages = 0
         try:
             pages = int(get_string(

@@ -267,6 +267,9 @@ function get_currency($country) {
     if ($country == 'de') {
         return '€';
     }
+    if ($country == 'it') {
+        return '€';
+    }
 
     return '$';
 }
