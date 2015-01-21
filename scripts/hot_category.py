@@ -21,6 +21,7 @@ from top_100_explorer import book, category, trend
 from utilities import get_mysql_session
 
 from sys import modules
+
 if 'threading' in modules:
     del modules['threading']
 
@@ -55,8 +56,84 @@ if arguments.category == 'fiction':
 if arguments.category == 'nonfiction':
     category_id = 2191
 
+database = '%(category)s_%(page_length)s.db' % {
+    'category': category_id,
+    'page_length': arguments.page_length,
+}
+engine = create_engine(
+    'sqlite:///%(database)s' % {
+        'database': database,
+    },
+    convert_unicode=True,
+    echo=False
+)
+base = declarative_base(
+    bind=engine,
+    metadata=ThreadLocalMetaData()
+)
 
-def get_titles(category_id, print_length):
+
+class step_1(base):
+    __tablename__ = 'step_1'
+    id = Column(Integer, primary_key=True)
+    title = Column(String(255), index=True)
+
+
+class step_2(base):
+    __tablename__ = 'step_2'
+    id = Column(Integer, primary_key=True)
+    word = Column(String(255), index=True)
+
+
+class step_3(base):
+    __tablename__ = 'step_3'
+    id = Column(Integer, primary_key=True)
+    keyword = Column(String(255), index=True)
+
+
+class step_4(base):
+    __tablename__ = 'step_4'
+    id = Column(Integer, primary_key=True)
+    suggested_keyword = Column(String(255), index=True)
+
+
+class step_5(base):
+    __tablename__ = 'step_5'
+    id = Column(Integer, primary_key=True)
+    keyword = Column(String(255), index=True)
+    average_length = Column(Float)
+    average_price = Column(Float)
+    buyer_behavior = Column(Float)
+    competition = Column(Integer)
+    count = Column(Integer)
+    optimization = Column(Float)
+    popularity = Column(Float)
+    score = Column(Float)
+    spend = Column(Float)
+
+
+class step_6(base):
+    __tablename__ = 'step_6'
+    id = Column(Integer, primary_key=True)
+    words = Column(Text, index=True)
+
+
+class step_7(base):
+    __tablename__ = 'step_7'
+    id = Column(Integer, primary_key=True)
+    step_6_id = Column(Integer, ForeignKey('step_6.id'), nullable=False)
+    book_id = Column(Integer, nullable=False)
+
+
+if not isfile(database) and not arguments.reset:
+    base.metadata.create_all()
+
+
+def get_sqlite_session():
+    return sessionmaker(bind=engine)
+
+
+def get_step_1_titles(category_id, print_length):
     titles = []
     session = get_mysql_session()()
     query = session.query(book)
@@ -90,7 +167,7 @@ def get_titles(category_id, print_length):
             ).execution_options(
                 stream_results=True
             ):
-                for title in get_titles(c_.id, print_length):
+                for title in get_step_1_titles(c_.id, print_length):
                     titles.append(title.lower())
     else:
         c = session.query(category).get(category_id)
@@ -99,13 +176,13 @@ def get_titles(category_id, print_length):
         ).execution_options(
             stream_results=True
         ):
-            for title in get_titles(c_.id, print_length):
+            for title in get_step_1_titles(c_.id, print_length):
                 titles.append(title.lower())
     session.close()
     return titles
 
 
-def get_top_20_words(items):
+def get_step_2_words(items):
     return Counter([
         word
         for item in items
@@ -123,13 +200,6 @@ def get_step_3_words(titles):
     return step_3_words
 
 
-def get_intersection_length(titles, word):
-    common_words = set(titles).intersection(word.split(' '))
-    if len(common_words) >= 2:
-        return True
-    return False
-
-
 def get_step_4_words(step_3_words, titles):
     titles = ','.join(titles)
     titles = titles.lower()
@@ -137,7 +207,7 @@ def get_step_4_words(step_3_words, titles):
     step_4_words = []
     step_4_words_ = []
     for word in step_3_words:
-        if get_intersection_length(titles, word):
+        if is_similar(titles, word):
             step_4_words_.append(
                 get_suggested_keywords(word.split(' '))
             )
@@ -145,7 +215,6 @@ def get_step_4_words(step_3_words, titles):
         for word in list_of_words:
             if not word in step_4_words:
                 step_4_words.append(word)
-    print step_4_words
     return step_4_words
 
 
@@ -161,7 +230,8 @@ def get_step_5_words(step_4_words):
                 'competition': contents['competition'][0],
                 'count': contents['count'][0],
                 'optimization': contents['optimization'][0],
-                'popularity': contents['popularity'][0],
+                'popularity': contents['popularity'][0]
+                if 'popularity' in contents else 0.0,
                 'score': contents['score'][0],
                 'spend': contents['spend'][0][0],
                 'word': word,
@@ -173,179 +243,10 @@ def get_step_6_words(step_5_words):
     return sorted(step_5_words, key=itemgetter('score'))[:20]
 
 
-def is_similar(word_1, word_2):
-    intersection = set(word_1.split(' ')).intersection(word_2.split(' '))
-    if len(intersection) >= 2:
-        return True
-    return False
-
-
-def get_step_7_words(step_6_words):
-    step_7_words = []
-    step_6_words = [word['word'] for word in step_6_words]
-    for index, word in enumerate(step_6_words):
-        for index_, word_ in enumerate(step_6_words):
-            if index == index_:
-                continue
-            if is_similar(word, word_):
-                if not word_ in step_7_words:
-                    step_7_words.append(word_)
-    list_of_lists = []
-    for index, word in enumerate(step_7_words):
-        status = False
-        if not any(list_ for list_ in list_of_lists):
-            list_of_lists.append([word])
-            status = True
-        else:
-            for index_, words_ in enumerate(list_of_lists):
-                if is_similar(word, ' '.join(words_)):
-                    list_of_lists[index_].append(word)
-                    status = True
-                    break
-                else:
-                    next_elements = ' '.join(
-                        [word_ for word_ in step_7_words[(index + 1):]]
-                    )
-                    if (
-                        is_similar(word, next_elements)
-                        and
-                        is_similar(next_elements, ' '.join(words_))
-                    ):
-                        list_of_lists[index_].append(word)
-                        status = True
-        if not status:
-            list_of_lists.append([word])
-    return list_of_lists
-
-database = '%(category)s_%(page_length)s.db' % {
-    'category': category_id,
-    'page_length': arguments.page_length,
-}
-engine = create_engine(
-    'sqlite:///%(database)s' % {
-        'database': database,
-    },
-    convert_unicode=True,
-    echo=False
-)
-base = declarative_base(
-    bind=engine,
-    metadata=ThreadLocalMetaData()
-)
-
-
-class step_1(base):
-    __tablename__ = 'step_1'
-    id = Column(Integer, primary_key=True)
-    title = Column(String(255))
-
-
-class step_2(base):
-    __tablename__ = 'step_2'
-    id = Column(Integer, primary_key=True)
-    word = Column(String(255))
-
-
-class step_3(base):
-    __tablename__ = 'step_3'
-    id = Column(Integer, primary_key=True)
-    keyword = Column(String(255))
-
-
-class step_4(base):
-    __tablename__ = 'step_4'
-    id = Column(Integer, primary_key=True)
-    suggested_keyword = Column(String(255))
-
-
-class step_5(base):
-    __tablename__ = 'step_5'
-    id = Column(Integer, primary_key=True)
-    keyword = Column(String(255))
-    average_length = Column(Float)
-    average_price = Column(Float)
-    buyer_behavior = Column(Float)
-    competition = Column(Integer)
-    count = Column(Integer)
-    optimization = Column(Float)
-    popularity = Column(Float)
-    score = Column(Float)
-    spend = Column(Float)
-
-
-class step_6(base):
-    __tablename__ = 'step_6'
-    id = Column(Integer, primary_key=True)
-    words = Column(Text)
-
-
-class step_7(base):
-    __tablename__ = 'step_7'
-    id = Column(Integer, primary_key=True)
-    step_6_id = Column(Integer, ForeignKey('step_6.id'), nullable=False)
-    book_id = Column(Integer, nullable=False)
-
-if not isfile(database) and not arguments.reset:
-    base.metadata.create_all()
-
-
-def get_sqlite_session():
-    return sessionmaker(bind=engine)
-
-
-def has_step_1():
-    with closing(get_sqlite_session()()) as session:
-        if session.query(step_1).count():
-            return True
-    return False
-
-
-def has_step_2():
-    with closing(get_sqlite_session()()) as session:
-        if session.query(step_2).count():
-                return True
-    return False
-
-
-def has_step_3():
-    with closing(get_sqlite_session()()) as session:
-        if session.query(step_3).count():
-            return True
-    return False
-
-
-def has_step_4():
-    with closing(get_sqlite_session()()) as session:
-        if session.query(step_4).count():
-            return True
-    return False
-
-
-def has_step_5():
-    with closing(get_sqlite_session()()) as session:
-        if session.query(step_5).count():
-            return True
-    return False
-
-
-def has_step_6():
-    with closing(get_sqlite_session()()) as session:
-        if session.query(step_6).count():
-            return True
-    return False
-
-
-def has_step_7():
-    with closing(get_sqlite_session()()) as session:
-        if session.query(step_7).count():
-            return True
-    return False
-
-
-def get_step_1():
+def set_step_1():
     with closing(get_sqlite_session()()) as session:
         session.query(step_1).delete()
-        titles = get_titles(category_id, arguments.page_length)
+        titles = get_step_1_titles(category_id, arguments.page_length)
         if titles:
             if category_id > 0:
                 for title in titles:
@@ -361,13 +262,13 @@ def get_step_1():
             return True
 
 
-def get_step_2():
+def set_step_2():
     with closing(get_sqlite_session()()) as session:
         session.query(step_2).delete()
         titles = []
         for record in session.query(step_1):
             titles.append(record.title)
-        top_20_words = get_top_20_words(titles)
+        top_20_words = get_step_2_words(titles)
         top_20_words = [word for word, occurrence in top_20_words]
         for word in top_20_words:
             session.add(step_2(**{
@@ -377,7 +278,7 @@ def get_step_2():
         return True
 
 
-def get_step_3():
+def set_step_3():
     with closing(get_sqlite_session()()) as session:
         session.query(step_3).delete()
         words = []
@@ -391,7 +292,7 @@ def get_step_3():
         return True
 
 
-def get_step_4():
+def set_step_4():
     with closing(get_sqlite_session()()) as session:
         session.query(step_4).delete()
         titles = []
@@ -408,13 +309,13 @@ def get_step_4():
         return True
 
 
-def get_step_5():
+def set_step_5():
     with closing(get_sqlite_session()()) as session:
         session.query(step_5).delete()
         words = []
         for record in session.query(step_4):
             words.append(record.suggested_keyword)
-        for record in get_step_5_words(words):
+        for record in get_step_5_words(words[0:5]):
             session.add(step_5(**{
                 'average_length': record['average_length'],
                 'average_price': record['average_price'],
@@ -431,12 +332,12 @@ def get_step_5():
         return True
 
 
-def get_step_6():
+def set_step_6():
     with closing(get_sqlite_session()()) as session:
         session.query(step_6).delete()
         words = []
         for record in session.query(step_5):
-            if record.score >= 10:
+            if record.score >= 20.00:
                 words.append(record.keyword)
         list_of_lists = []
         for index, word in enumerate(words):
@@ -446,7 +347,7 @@ def get_step_6():
                 status = True
             else:
                 for index_, words_ in enumerate(list_of_lists):
-                    if is_similar(word, ' '.join(words_)):
+                    if is_similar(word.split(' '), ' '.join(words_)):
                         list_of_lists[index_].append(word)
                         status = True
                         break
@@ -455,9 +356,12 @@ def get_step_6():
                             [word_ for word_ in words[(index + 1):]]
                         )
                         if (
-                            is_similar(word, next_elements)
+                            is_similar(word.split(' '), next_elements)
                             and
-                            is_similar(next_elements, ' '.join(words_))
+                            is_similar(
+                                next_elements.split(' '),
+                                ' '.join(words_)
+                            )
                         ):
                             list_of_lists[index_].append(word)
                             status = True
@@ -471,7 +375,7 @@ def get_step_6():
         return True
 
 
-def get_step_7():
+def set_step_7():
     with closing(get_mysql_session()()) as mysql_session:
         with closing(get_sqlite_session()()) as session:
             session.query(step_7).delete()
@@ -501,20 +405,32 @@ def get_step_7():
             return True
 
 
+def has_step(number):
+    with closing(get_sqlite_session()()) as session:
+        if session.query(globals()['step_%(number)s' % {
+            'number': number,
+        }]).count():
+            return True
+    return False
+
+
+def is_similar(word_1, word_2):
+    intersection = set(word_1).intersection(word_2.split(' '))
+    if len(intersection) >= 2:
+        return True
+    return False
+
+
 if arguments.reset and arguments.reset == 1:
     base.metadata.drop_all()
     base.metadata.create_all()
     base.metadata.reflect(engine)
 elif arguments.step:
     for index in range(1, arguments.step):
-        if locals()[
-            'has_step_%(index)s' % {
-                'index': index,
-            }
-        ]():
+        if locals()['has_step'](index):
             continue
         if not locals()[
-            'get_step_%(index)s' % {
+            'set_step_%(index)s' % {
                 'index': index,
             }
         ]():
@@ -522,7 +438,7 @@ elif arguments.step:
                 'index': index,
             })
     if not locals()[
-        'get_step_%(step)s' % {
+        'set_step_%(step)s' % {
             'step': arguments.step,
         }
     ]():
