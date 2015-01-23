@@ -792,8 +792,10 @@ application.controller('keyword_analyzer_multiple_simple', [
                 $timeout($scope.process, 15000);
             }).
             success(function (data, status, headers, config) {
+                $scope.eta = data.eta;
                 $scope.is_finished = data.is_finished;
                 $scope.keywords = data.keywords;
+                $scope.progress = data.progress;
                 $scope.words = data.words;
                 if ($scope.keywords.one.length) {
                     $('#tabs li:eq(0) a').tab('show');

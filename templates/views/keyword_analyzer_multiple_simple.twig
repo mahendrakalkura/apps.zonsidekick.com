@@ -339,6 +339,11 @@
     data-url-xhr="{{ url('keyword_analyzer_multiple_xhr', {'id': report.id}) }}"
     ng-controller="keyword_analyzer_multiple_simple"
     >
+    <p ng-show="!is_finished">
+        <strong>Progress:</strong> [! progress !]
+        <br>
+        <strong>Approximate ETA:</strong> [! eta !]
+    </p>
     <form>
         <div class="panel">
             <div class="panel-body">
