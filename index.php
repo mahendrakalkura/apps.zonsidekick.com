@@ -1569,12 +1569,6 @@ $application
                     ->generate('keyword_analyzer_multiple_add')
             );
         }
-        /*print_r(array(
-            'country' => $request->get('country'),
-            'timestamp' => date('Y-m-d H:i:s'),
-            'user_id' => $user['id'],
-        ));
-        die();*/
         $application['db']->insert('apps_keyword_analyzer_reports', array(
             'country' => $request->get('country'),
             'timestamp' => date('Y-m-d H:i:s'),
