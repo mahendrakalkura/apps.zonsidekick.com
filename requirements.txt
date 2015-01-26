@@ -38,6 +38,7 @@ service-identity==1.0.0
 simplejson==3.6.0
 six==1.7.3
 tinycss==0.3
+ujson==1.33
 w3lib==1.8.0
 webassets==0.10.1
 wsgiref==0.1.2
