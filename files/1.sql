@@ -66,9 +66,11 @@ CREATE TABLE IF NOT EXISTS `apps_keyword_analyzer_keywords` (
     `report_id` INT(11) NOT NULL,
     `string` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
     `contents` LONGTEXT COLLATE utf8_unicode_ci,
+    `timestamp` DATETIME,
     PRIMARY KEY (`id`),
     CONSTRAINT `apps_keyword_analyzer_keywords_report_id` FOREIGN KEY (`report_id`) REFERENCES `apps_keyword_analyzer_reports` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-    KEY `string` (`string`)
+    KEY `string` (`string`),
+    KEY `timestamp` (`timestamp`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 DROP TABLE IF EXISTS `apps_popular_searches_books`;

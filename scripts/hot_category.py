@@ -33,20 +33,12 @@ parser.add_argument(
     dest='page_length',
     required=True,
 )
+parser.add_argument('--reset', action='store_true', dest='reset')
 parser.add_argument(
-    '--reset',
-    choices=(0, 1),
-    dest='reset',
-    required=False,
-    type=int
+    '--step', choices=range(1, 8), dest='step', required=False, type=int,
 )
-parser.add_argument(
-    '--step',
-    choices=range(1, 8),
-    dest='step',
-    required=False,
-    type=int
-)
+parser.set_defaults(reset=False)
+
 arguments = parser.parse_args()
 category_id = None
 if arguments.category == 'all':
@@ -65,12 +57,9 @@ engine = create_engine(
         'database': database,
     },
     convert_unicode=True,
-    echo=False
+    echo=False,
 )
-base = declarative_base(
-    bind=engine,
-    metadata=ThreadLocalMetaData()
-)
+base = declarative_base(bind=engine, metadata=ThreadLocalMetaData())
 
 
 class step_1(base):
@@ -123,7 +112,6 @@ class step_7(base):
     id = Column(Integer, primary_key=True)
     step_6_id = Column(Integer, ForeignKey('step_6.id'), nullable=False)
     book_id = Column(Integer, nullable=False)
-
 
 if not isfile(database) and not arguments.reset:
     base.metadata.create_all()
@@ -420,12 +408,13 @@ def is_similar(word_1, word_2):
         return True
     return False
 
-
-if arguments.reset and arguments.reset == 1:
+if arguments.reset:
     base.metadata.drop_all()
     base.metadata.create_all()
     base.metadata.reflect(engine)
-elif arguments.step:
+    exit()
+
+if arguments.step:
     for index in range(1, arguments.step):
         if locals()['has_step'](index):
             continue
@@ -434,7 +423,7 @@ elif arguments.step:
                 'index': index,
             }
         ]():
-            raise Exception('Error in step_%(index)s' % {
+            raise Exception('Error: `set_step_%(index)s`' % {
                 'index': index,
             })
     if not locals()[
@@ -442,6 +431,7 @@ elif arguments.step:
             'step': arguments.step,
         }
     ]():
-        raise Exception('Error in step_%(step)s' % {
+        raise Exception('Error: `set_step_%(step)s`' % {
             'step': arguments.step,
         })
+    exit()
