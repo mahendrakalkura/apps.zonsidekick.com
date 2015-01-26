@@ -1695,7 +1695,9 @@ $application
         $count = 0;
         if ($ks) {
             foreach ($ks as $k) {
-                $timestamps[] = $k['timestamp'];
+                if ($k['timestamp']) {
+                    $timestamps[] = $k['timestamp'];
+                }
                 if ($k['contents']) {
                     $k['contents']['items'] = array_slice(
                         $k['contents']['items'], 0, $count
