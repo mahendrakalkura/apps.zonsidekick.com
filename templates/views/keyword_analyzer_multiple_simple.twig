@@ -339,11 +339,6 @@
     data-url-xhr="{{ url('keyword_analyzer_multiple_xhr', {'id': report.id}) }}"
     ng-controller="keyword_analyzer_multiple_simple"
     >
-    <p ng-show="!is_finished">
-        <strong>Progress:</strong> [! progress !]
-        <br>
-        <strong>Approximate ETA:</strong> [! eta !]
-    </p>
     <form>
         <div class="panel">
             <div class="panel-body">
@@ -548,6 +543,11 @@
         ng-show="keywords.one.length || keywords.two.length || keywords.three.length"
         >
         <div class="col-xs-12 table-light">
+            <p class="pull-right" ng-show="!is_finished && progress && eta">
+                <strong>Progress:</strong> [! progress !]
+                &middot;
+                <strong>ETA:</strong> [! eta !]
+            </p>
             <ul class="nav nav-tabs" id="tabs">
                 <li ng-show="keywords.one.length">
                     <a data-toggle="tab" href="#tabs-one">

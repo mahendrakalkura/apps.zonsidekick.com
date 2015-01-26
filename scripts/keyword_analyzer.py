@@ -163,13 +163,13 @@ def main():
             cursor.execute(
                 '''
                 UPDATE `apps_keyword_analyzer_keywords`
-                SET `contents` = %(contents)s, `timestamp` = %(time)s
+                SET `contents` = %(contents)s, `timestamp` = %(timestamp)s
                 WHERE `id` = %(id)s
                 ''',
                 {
                     'contents': dumps(contents),
                     'id': keyword['id'],
-                    'time': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
+                    'timestamp': datetime.utcnow(),
                 }
             )
             cursor.close()

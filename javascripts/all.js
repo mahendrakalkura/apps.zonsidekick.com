@@ -824,6 +824,8 @@ application.controller('keyword_analyzer_multiple_simple', [
             $scope.amazon_best_sellers_rank_2 = 0;
             $scope.count = $scope.counts[0];
 
+            $scope.is_finished = false;
+
             $scope.submit();
         };
 
@@ -835,6 +837,10 @@ application.controller('keyword_analyzer_multiple_simple', [
             };
             $scope.words = [];
             $scope.order_by = [];
+
+            $scope.eta = '';
+            $scope.is_finished = false;
+            $scope.progress = '';
 
             $scope.process();
         };

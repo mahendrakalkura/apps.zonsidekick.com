@@ -1571,7 +1571,7 @@ $application
         }
         $application['db']->insert('apps_keyword_analyzer_reports', array(
             'country' => $request->get('country'),
-            'timestamp' => date('Y-m-d H:i:s'),
+            'timestamp' => gmdate('Y-m-d H:i:s'),
             'user_id' => $user['id'],
         ));
         $id = $application['db']->lastInsertId();
@@ -1682,15 +1682,20 @@ $application
         list($report, $ks) = get_report_and_keywords(
             $application, $user, $id
         );
+        $eta = 'Unknown';
         $keywords = array(
             'one' => array(),
             'three' => array(),
             'two' => array(),
         );
-        $words = array();
         $is_finished = true;
+        $progress = 0.00;
+        $words = array();
+        $timestamps = array();
+        $count = 0;
         if ($ks) {
             foreach ($ks as $k) {
+                $timestamps[] = $k['timestamp'];
                 if ($k['contents']) {
                     $k['contents']['items'] = array_slice(
                         $k['contents']['items'], 0, $count
@@ -1766,6 +1771,7 @@ $application
                     $k['position'] = 3;
                     $is_finished = false;
                     $keywords['two'][] = $k;
+                    $count += 1;
                 }
             }
         } else {
@@ -1774,35 +1780,19 @@ $application
         usort($keywords['one'], 'usort_keywords_2');
         usort($keywords['two'], 'usort_keywords_2');
         usort($keywords['three'], 'usort_keywords_2');
-        $eta = 'Unknown';
-        $progress = 0.0;
-        $timestamps = array();
-        $non_contents_count = 0;
-        foreach ($ks as $k) {
-            $timestamps[] = $k['timestamp'];
-            if (empty($k['contents'])) {
-                $non_contents_count += 1;
-            }
-        }
-        $timestamp = max($timestamps);
-        if (!empty($timestamp)) {
-            $difference = date_diff(
-                date_create($timestamp),
-                date_create($report['timestamp'])
-            );
-            $eta = $non_contents_count * ((intval(
-                $difference->format('%h')
-            ) * 60) + intval($difference->format('%i')));
-            $eta = $eta / (count($ks) - $non_contents_count);
-            $eta = sprintf('%s minutes', round($eta, 2));
-            $progress = ((count($ks) - $non_contents_count) * 100)/count($ks);
+        if ($timestamps) {
+            $timestamp = max($timestamps);
+            $eta = sprintf('~%d minutes', ($count * ((
+                strtotime($timestamp) - strtotime($report['timestamp'])
+            ) / (count($ks) - $count))) / 60.00);
+            $progress = ((count($ks) - $count) * 100.00) / count($ks);
         }
 
         return new Response(json_encode(array(
             'eta' => $eta,
             'is_finished' => $is_finished,
             'keywords' => $keywords,
-            'progress' => sprintf('%s %%', round($progress, 2)),
+            'progress' => sprintf('%.2f%%', $progress),
             'words' => get_words_from_words($words),
         )));
     }
