@@ -61,7 +61,7 @@ database = '%(category)s_%(page_length)s.db' % {
     'page_length': arguments.page_length,
 }
 engine = create_engine(
-    'sqlite:///%(database)s' % {
+    'sqlite:///../tmp/%(database)s' % {
         'database': database,
     },
     convert_unicode=True,
