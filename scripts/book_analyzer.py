@@ -38,7 +38,9 @@ def get_books(keyword):
                 title = get_string(anchor.xpath('.//@title').extract()[0])
             except IndexError:
                 try:
-                    title = get_string(anchor.xpath('.//h2/text()').extract()[0])
+                    title = get_string(
+                        anchor.xpath('.//h2/text()').extract()[0]
+                    )
                 except IndexError:
                     pass
             books.append({

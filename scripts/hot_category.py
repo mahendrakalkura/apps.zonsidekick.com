@@ -195,7 +195,7 @@ def get_step_3_words(titles):
     step_3_words = []
     for title in titles:
         for word in get_results(title, 'com', 'digital-text'):
-            if not word in step_3_words:
+            if word not in step_3_words:
                 step_3_words.append(word)
     return step_3_words
 
@@ -213,7 +213,7 @@ def get_step_4_words(step_3_words, titles):
             )
     for list_of_words in step_4_words_:
         for word in list_of_words:
-            if not word in step_4_words:
+            if word not in step_4_words:
                 step_4_words.append(word)
     return step_4_words
 

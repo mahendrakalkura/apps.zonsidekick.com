@@ -2,11 +2,9 @@
 
 from datetime import date, timedelta
 from re import compile
-from sys import argv
 
 from furl import furl
 from scrapy.selector import Selector
-from simplejson import loads
 from sqlalchemy import or_
 from sqlalchemy.exc import DBAPIError, SQLAlchemyError
 from sqlalchemy.orm import backref, relationship
