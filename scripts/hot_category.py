@@ -3,10 +3,11 @@
 from argparse import ArgumentParser
 from collections import Counter
 from contextlib import closing
-from operator import itemgetter
+from datetime import date, timedelta
 from os.path import isfile
-from re import split
 
+from nltk.tokenize import word_tokenize
+from progressbar import ProgressBar
 from sqlalchemy import Column, Integer, String, Text, Float
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -89,7 +90,7 @@ class step_4(base):
 class step_5(base):
     __tablename__ = 'step_5'
     id = Column(Integer, primary_key=True)
-    keyword = Column(String(255), index=True)
+    string = Column(String(255), index=True)
     average_length = Column(Float)
     average_price = Column(Float)
     buyer_behavior = Column(Float)
@@ -104,7 +105,7 @@ class step_5(base):
 class step_6(base):
     __tablename__ = 'step_6'
     id = Column(Integer, primary_key=True)
-    words = Column(Text, index=True)
+    keywords = Column(Text, index=True)
 
 
 class step_7(base):
@@ -122,275 +123,301 @@ def get_sqlite_session():
 
 
 def get_step_1_titles(category_id, print_length):
-    titles = []
-    session = get_mysql_session()()
-    query = session.query(book)
-    if print_length == 'short':
-        query = query.filter(book.print_length < 100)
-    if print_length == 'long':
-        query = query.filter(book.print_length >= 100)
-    if not category_id:
-        return query.order_by(
-            'id asc'
-        ).execution_options(
-            stream_results=True
-        )
-    query = query.join(trend)
-    if category_id:
-        query = query.filter(trend.category_id == category_id)
-    for b in query.order_by(
-        'apps_top_100_explorer_books.id asc'
-    ).execution_options(
-        stream_results=True
-    ):
-        titles.append(b.title)
-    if not category_id:
-        for c in session.query(
-            category
-        ).execution_options(
-            stream_results=True
-        ):
-            for c_ in c.categories.order_by(
-                'id asc'
-            ).execution_options(
-                stream_results=True
-            ):
-                for title in get_step_1_titles(c_.id, print_length):
-                    titles.append(title.lower())
-    else:
-        c = session.query(category).get(category_id)
-        for c_ in c.categories.order_by(
-            'id asc'
-        ).execution_options(
-            stream_results=True
-        ):
-            for title in get_step_1_titles(c_.id, print_length):
-                titles.append(title.lower())
-    session.close()
-    return titles
-
-
-def get_step_2_words(items):
-    return Counter([
-        word
-        for item in items
-        for word in split(r'[^A-Za-z0-9]', item)
-        if len(word) > 3
-    ]).most_common(20)
-
-
-def get_step_3_words(titles):
-    step_3_words = []
-    for title in titles:
-        for word in get_results(title, 'com', 'digital-text'):
-            if word not in step_3_words:
-                step_3_words.append(word)
-    return step_3_words
-
-
-def get_step_4_words(step_3_words, titles):
-    titles = ','.join(titles)
-    titles = titles.lower()
-    titles = titles.split(',')
-    step_4_words = []
-    step_4_words_ = []
-    for word in step_3_words:
-        if is_similar(titles, word):
-            step_4_words_.append(
-                get_suggested_keywords(word.split(' '))
+    titles = set()
+    with closing(get_mysql_session()()) as session:
+        query = session.query(book)
+        if print_length == 'short':
+            query = query.filter(book.print_length < 100)
+        if print_length == 'long':
+            query = query.filter(book.print_length >= 100)
+        if category_id:
+            query = query.join(
+                trend,
+            ).filter(
+                trend.category_id == category_id,
+                trend.date == date.today() - timedelta(days=1),
             )
-    for list_of_words in step_4_words_:
-        for word in list_of_words:
-            if word not in step_4_words:
-                step_4_words.append(word)
-    return step_4_words
+        for b in query.order_by(
+            'apps_top_100_explorer_books.id asc',
+        ).execution_options(
+            stream_results=True,
+        ):
+            titles.add(b.title.lower())
+        if category_id:
+            for c in session.query(
+                category,
+            ).filter(
+                category.category_id == category_id,
+            ).order_by(
+                'id asc',
+            ).execution_options(
+                stream_results=True,
+            ):
+                for title in get_step_1_titles(c.id, print_length):
+                    titles.add(title)
+    return sorted(titles)
 
 
-def get_step_5_words(step_4_words):
-    step_5_words = []
-    for word in step_4_words:
-        contents = get_contents(word, 'com')
-        if contents:
-            step_5_words.append({
-                'average_length': contents['average_length'][0],
-                'average_price': contents['average_price'][0],
-                'buyer_behavior': contents['buyer_behavior'][0],
-                'competition': contents['competition'][0],
-                'count': contents['count'][0],
-                'optimization': contents['optimization'][0],
-                'popularity': contents['popularity'][0]
-                if 'popularity' in contents else 0.0,
-                'score': contents['score'][0],
-                'spend': contents['spend'][0][0],
-                'word': word,
-            })
-    return step_5_words
+def get_step_2_words(titles):
+    return sorted(Counter([
+        word
+        for title in titles
+        for word in word_tokenize(title)
+        if len(word) > 3
+    ]).most_common(20))
 
 
-def get_step_6_words(step_5_words):
-    return sorted(step_5_words, key=itemgetter('score'))[:20]
+def get_step_3_keywords(words):
+    keywords = set()
+    with ProgressBar(maxval=len(words)) as progress:
+        for index, _ in enumerate(words):
+            for keyword in get_results(words[index], 'com', 'digital-text'):
+                if len(
+                    set(word_tokenize(keyword)).intersection(set(words))
+                ) >= 2:
+                    keywords.add(keyword)
+                progress.update(index)
+    return sorted(keywords)
+
+
+def get_step_4_suggested_keywords(keywords):
+    suggested_keywords = set()
+    with ProgressBar(maxval=len(keywords)) as progress:
+        for index, _ in enumerate(keywords):
+            for suggested_keyword in get_suggested_keywords(
+                word_tokenize(keywords[index])
+            ):
+                suggested_keywords.add(suggested_keyword)
+            progress.update(index)
+    return sorted(suggested_keywords)
+
+
+def get_step_5_keywords(suggested_keywords):
+    keywords = []
+    with ProgressBar(maxval=len(suggested_keywords)) as progress:
+        for index, _ in enumerate(suggested_keywords):
+            contents = get_contents(suggested_keywords[index], 'com')
+            if contents:
+                keywords.append({
+                    'average_length': contents['average_length'][0],
+                    'average_price': contents['average_price'][0],
+                    'buyer_behavior': contents['buyer_behavior'][0],
+                    'competition': contents['competition'][0],
+                    'count': contents['count'][0],
+                    'optimization': contents['optimization'][0],
+                    'popularity': contents['popularity'][0],
+                    'score': contents['score'][0],
+                    'spend': contents['spend'][0],
+                    'string': suggested_keywords[index],
+                })
+            progress.update(index)
+    return keywords
 
 
 def set_step_1():
+    print 'Step 1'
     with closing(get_sqlite_session()()) as session:
         session.query(step_1).delete()
-        titles = get_step_1_titles(category_id, arguments.page_length)
-        if titles:
-            if category_id > 0:
-                for title in titles:
-                    session.add(step_1(**{
-                        'title': title,
-                    }))
-            else:
-                for title in titles:
-                    session.add(step_1(**{
-                        'title': title.title,
-                    }))
-            session.commit()
-            return True
+        for title in get_step_1_titles(category_id, arguments.page_length):
+            session.add(step_1(**{
+                'title': title,
+            }))
+        session.commit()
+    print 'Done'
+    return True
 
 
 def set_step_2():
+    print 'Step 2'
     with closing(get_sqlite_session()()) as session:
         session.query(step_2).delete()
-        titles = []
-        for record in session.query(step_1):
-            titles.append(record.title)
-        top_20_words = get_step_2_words(titles)
-        top_20_words = [word for word, occurrence in top_20_words]
-        for word in top_20_words:
+        for word in [
+            word
+            for word, _ in get_step_2_words([
+                instance.title
+                for instance in session.query(
+                    step_1,
+                ).execution_options(
+                    stream_results=True,
+                )
+            ])
+        ]:
             session.add(step_2(**{
                 'word': word,
             }))
         session.commit()
-        return True
+    print 'Done'
+    return True
 
 
 def set_step_3():
+    print 'Step 3'
     with closing(get_sqlite_session()()) as session:
         session.query(step_3).delete()
-        words = []
-        for record in session.query(step_2):
-            words.append(record.word)
-        for word in get_step_3_words(words):
+        for keyword in get_step_3_keywords([
+            instance.word
+            for instance in session.query(
+                step_2,
+            ).execution_options(
+                stream_results=True,
+            )
+        ]):
             session.add(step_3(**{
-                'keyword': word,
+                'keyword': keyword,
             }))
         session.commit()
-        return True
+    print 'Done'
+    return True
 
 
 def set_step_4():
+    print 'Step 4'
     with closing(get_sqlite_session()()) as session:
         session.query(step_4).delete()
-        titles = []
-        for record in session.query(step_2):
-            titles.append(record.word)
-        words = []
-        for record in session.query(step_3):
-            words.append(record.keyword)
-        for word in get_step_4_words(words, titles):
+        for suggested_keyword in get_step_4_suggested_keywords([
+            instance.keyword
+            for instance in session.query(
+                step_3,
+            ).execution_options(
+                stream_results=True,
+            )
+        ]):
             session.add(step_4(**{
-                'suggested_keyword': word,
+                'suggested_keyword': suggested_keyword,
             }))
         session.commit()
-        return True
+    print 'Done'
+    return True
 
 
 def set_step_5():
+    print 'Step 5'
     with closing(get_sqlite_session()()) as session:
         session.query(step_5).delete()
-        words = []
-        for record in session.query(step_4):
-            words.append(record.suggested_keyword)
-        for record in get_step_5_words(words[0:5]):
+        for keyword in get_step_5_keywords([
+            instance.suggested_keyword
+            for instance in session.query(
+                step_4,
+            ).execution_options(
+                stream_results=True,
+            )
+        ]):
             session.add(step_5(**{
-                'average_length': record['average_length'],
-                'average_price': record['average_price'],
-                'buyer_behavior': record['buyer_behavior'],
-                'competition': record['competition'],
-                'count': record['count'],
-                'optimization': record['optimization'],
-                'popularity': record['popularity'],
-                'score': record['score'],
-                'spend': record['spend'],
-                'keyword': record['word'],
+                'average_length': keyword['average_length'],
+                'average_price': keyword['average_price'],
+                'buyer_behavior': keyword['buyer_behavior'],
+                'competition': keyword['competition'],
+                'count': keyword['count'],
+                'keyword': keyword['word'],
+                'optimization': keyword['optimization'],
+                'popularity': keyword['popularity'],
+                'score': keyword['score'],
+                'spend': keyword['spend'],
             }))
         session.commit()
-        return True
+    print 'Done'
+    return True
 
 
+# TODO
 def set_step_6():
+    print 'Step 6'
     with closing(get_sqlite_session()()) as session:
         session.query(step_6).delete()
-        words = []
-        for record in session.query(step_5):
-            if record.score >= 20.00:
-                words.append(record.keyword)
-        list_of_lists = []
-        for index, word in enumerate(words):
+        keywords = [
+            instance.string
+            for instance in session.query(
+                step_5,
+            ).filter(
+                step_5.score >= 70.00,
+            ).execution_options(
+                stream_results=True,
+            )[0:10]
+        ]
+        groups = []
+        for index, _ in enumerate(keywords):
             status = False
-            if not any(list_ for list_ in list_of_lists):
-                list_of_lists.append([word])
+            if not any(list_ for list_ in groups):
+                groups.append([keywords[index]])
                 status = True
             else:
-                for index_, words_ in enumerate(list_of_lists):
-                    if is_similar(word.split(' '), ' '.join(words_)):
-                        list_of_lists[index_].append(word)
+                for index_, words_ in enumerate(groups):
+                    if is_similar(
+                        keywords[index].split(' '), ' '.join(words_)
+                    ):
+                        groups[index_].append(keywords[index])
                         status = True
                         break
                     else:
                         next_elements = ' '.join(
-                            [word_ for word_ in words[(index + 1):]]
+                            [word_ for word_ in keywords[(index + 1):]]
                         )
                         if (
-                            is_similar(word.split(' '), next_elements)
+                            is_similar(
+                                keywords[index].split(' '), next_elements
+                            )
                             and
                             is_similar(
                                 next_elements.split(' '),
                                 ' '.join(words_)
                             )
                         ):
-                            list_of_lists[index_].append(word)
+                            groups[index_].append(keywords[index])
                             status = True
             if not status:
-                list_of_lists.append([word])
-        for group in list_of_lists:
+                groups.append([keywords[index]])
+        for group in groups:
             session.add(step_6(**{
-                'words': dumps(group),
+                'keywords': dumps(group),
             }))
         session.commit()
-        return True
+    print 'Done'
+    return True
 
 
 def set_step_7():
-    with closing(get_mysql_session()()) as mysql_session:
-        with closing(get_sqlite_session()()) as session:
-            session.query(step_7).delete()
-            for group in session.query(step_6):
-                books = []
-                words = loads(group.words)
-                for word in words:
-                    query = mysql_session.query(
-                        book
+    print 'Step 7'
+    with closing(get_sqlite_session()()) as session:
+        session.query(step_7).delete()
+    step_6_instances = []
+    with closing(get_sqlite_session()()) as session:
+        step_6_instances = [
+            {
+                'id': instance.id,
+                'keywords': loads(instance.keywords),
+            }
+            for instance in session.query(
+                step_6,
+            ).execution_options(
+                stream_results=True,
+            )
+        ]
+    step_7_instances = []
+    with closing(get_mysql_session()()) as session:
+        for instance in step_6_instances:
+            books = []
+            for keyword in instance['keywords']:
+                query = session.query(book)
+                for word in word_tokenize(keyword):
+                    query = query.filter(
+                        book.title.like('%%%(word)s%%' % {
+                            'word': word,
+                        })
                     )
-                    for word_ in word.split(' '):
-                        query = query.filter(
-                            book.title.like('%%%(title)s%%' % {
-                                'title': word_,
-                            })
-                        )
-                    for book_ in query.execution_options(stream_results=True):
-                        books.append(book_.id)
-                for book_id, frequency in Counter(books).most_common():
-                    if (frequency == len(words)):
-                        continue
-                    session.add(step_7(**{
-                        'step_6_id': group.id,
+                for b in query.execution_options(stream_results=True):
+                    books.append(b.id)
+            for book_id, frequency in Counter(books).most_common():
+                if frequency == len(instance['keywords']):
+                    step_7_instances.append({
                         'book_id': book_id,
-                    }))
-            session.commit()
-            return True
+                        'step_6_id': instance['id'],
+                    })
+    with closing(get_sqlite_session()()) as session:
+        for instance in step_7_instances:
+            session.add(step_7(**instance))
+        session.commit()
+    print 'Done'
+    return True
 
 
 def has_step(number):
@@ -403,8 +430,9 @@ def has_step(number):
 
 
 def is_similar(word_1, word_2):
-    intersection = set(word_1).intersection(word_2.split(' '))
-    if len(intersection) >= 2:
+    if len(
+        set(word_tokenize(word_1)).intersection(word_tokenize(word_2))
+    ) >= 2:
         return True
     return False
 
