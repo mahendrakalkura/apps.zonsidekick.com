@@ -24,8 +24,10 @@ grequests==0.2.0
 html5lib==0.999
 itsdangerous==0.24
 lxml==3.3.5
+nltk==3.0.1
 numpy==1.8.1
 orderedmultidict==0.7.3
+progressbar2==2.7.3
 pyOpenSSL==0.14
 pyasn1==0.1.7
 pyasn1-modules==0.0.5
