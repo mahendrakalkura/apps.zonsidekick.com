@@ -2,6 +2,7 @@
     "application": {
         "debug": ... // Choices: true OR false
     },
+    "broker": "amqp://guest@localhost//",
     "mysql": {
         "database": "...",
         "host": "...",
