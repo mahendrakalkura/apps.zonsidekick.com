@@ -471,7 +471,7 @@ def step_5_process(category_id, print_length, string, strings):
         session.commit()
 
 
-def step_6_4_reset(category_id, print_length):
+def step_6_1_reset(category_id, print_length):
     print 'Step 6.1 :: Reset'
     with closing(get_mysql_session()()) as session:
         session.query(
@@ -486,7 +486,7 @@ def step_6_4_reset(category_id, print_length):
     print 'Done'
 
 
-def step_6_4_queue(category_id, print_length):
+def step_6_1_queue(category_id, print_length):
     print 'Step 6.1 :: Queue'
     with closing(get_mysql_session()()) as session:
         for keyword in session.query(
@@ -499,12 +499,12 @@ def step_6_4_queue(category_id, print_length):
         ).execution_options(
             stream_results=True,
         ):
-            step_6_4_process.delay(category_id, print_length, keyword.string)
+            step_6_1_process.delay(category_id, print_length, keyword.string)
     print 'Done'
 
 
 @celery.task
-def step_6_4_process(category_id, print_length, string):
+def step_6_1_process(category_id, print_length, string):
     ss = get_suggested_keywords(word_tokenize(string))
     with closing(get_mysql_session()()) as session:
         for s in ss:
@@ -524,7 +524,7 @@ def step_6_4_process(category_id, print_length, string):
         session.commit()
 
 
-def step_6_5_reset(category_id, print_length):
+def step_6_2_reset(category_id, print_length):
     print 'Step 6.2 :: Reset'
     with closing(get_mysql_session()()) as session:
         session.query(
@@ -551,7 +551,7 @@ def step_6_5_reset(category_id, print_length):
     print 'Done'
 
 
-def step_6_5_queue(category_id, print_length):
+def step_6_2_queue(category_id, print_length):
     print 'Step 6.2 :: Queue'
     with closing(get_mysql_session()()) as session:
         for suggested_keyword in session.query(
@@ -565,7 +565,7 @@ def step_6_5_queue(category_id, print_length):
         ).execution_options(
             stream_results=True,
         ):
-            step_6_5_process.delay(
+            step_6_2_process.delay(
                 category_id,
                 print_length,
                 suggested_keyword.id,
@@ -575,7 +575,7 @@ def step_6_5_queue(category_id, print_length):
 
 
 @celery.task
-def step_6_5_process(category_id, print_length, id, string):
+def step_6_2_process(category_id, print_length, id, string):
     contents = get_contents(string, 'com')
     if not contents:
         return
