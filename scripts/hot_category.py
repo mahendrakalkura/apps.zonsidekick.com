@@ -390,7 +390,7 @@ def step_4(category_id, print_length):
         )
         session.commit()
         for string, _ in get_words([
-            word
+            word[0]
             for suggested_keyword in session.query(
                 step_3_suggested_keyword,
             ).filter(
