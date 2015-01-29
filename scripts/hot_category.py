@@ -1092,25 +1092,25 @@ def xlsx(category_id, print_length):
             }).style = td_center
             worksheet.cell('C%(row)s' % {
                 'row': row,
-            }).value = suggested_keyword.buyer_behavior)
+            }).value = suggested_keyword.buyer_behavior
             worksheet.cell('D%(row)s' % {
                 'row': row,
             }).style = td_center
             worksheet.cell('D%(row)s' % {
                 'row': row,
-            }).value = suggested_keyword.competition)
+            }).value = suggested_keyword.competition
             worksheet.cell('E%(row)s' % {
                 'row': row,
             }).style = td_center
             worksheet.cell('E%(row)s' % {
                 'row': row,
-            }).value = suggested_keyword.optimization)
+            }).value = suggested_keyword.optimization
             worksheet.cell('F%(row)s' % {
                 'row': row,
             }).style = td_center
             worksheet.cell('F%(row)s' % {
                 'row': row,
-            }).value = suggested_keyword.popularity)
+            }).value = suggested_keyword.popularity
             worksheet.cell('G%(row)s' % {
                 'row': row,
             }).style = td_right
