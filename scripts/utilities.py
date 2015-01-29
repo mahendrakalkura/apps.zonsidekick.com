@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from collections import OrderedDict
+from collections import Counter, OrderedDict
 from furl import furl
 from os.path import dirname, join
 from random import choice, randint
@@ -11,6 +11,8 @@ from urlparse import urlparse
 from grequests import get as get_, map as map_
 from MySQLdb import connect
 from MySQLdb.cursors import DictCursor
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
 from requests import get
 from requests.exceptions import RequestException
 from scrapy.selector import Selector
@@ -41,6 +43,8 @@ engine = create_engine(
     encoding='utf-8',
 )
 base = declarative_base(bind=engine, metadata=ThreadLocalMetaData())
+
+stopwords = stopwords.words('english')
 
 
 class json(TypeDecorator):
@@ -548,6 +552,18 @@ def get_user_agent():
         'Firefox/21.0',
         'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 7.1; Trident/5.0)',
     ])
+
+
+def get_words(titles, count):
+    return sorted(
+        Counter([
+            word
+            for title in titles
+            for word in word_tokenize(title.lower())
+            if len(word) > 3 and word not in stopwords
+        ]).most_common(count),
+        key=lambda word: (word[1], word[0], ),
+    )
 
 
 def is_development():
