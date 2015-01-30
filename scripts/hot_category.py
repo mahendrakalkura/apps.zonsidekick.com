@@ -98,13 +98,6 @@ class step_7_group(base):
         secondary='apps_hot_category_step_7_groups_suggested_keywords',
     )
 
-    books = relationship(
-        'book',
-        backref=backref('groups', lazy='dynamic'),
-        lazy='dynamic',
-        secondary='apps_hot_category_step_7_groups_books',
-    )
-
 
 class step_7_group_suggested_keyword(base):
     __tablename__ = 'apps_hot_category_step_7_groups_suggested_keywords'
@@ -114,16 +107,6 @@ class step_7_group_suggested_keyword(base):
 
     group = relationship('step_7_group')
     suggested_keyword = relationship('step_6_suggested_keyword')
-
-
-class step_7_group_book(base):
-    __tablename__ = 'apps_hot_category_step_7_groups_books'
-    __table_args__ = {
-        'autoload': True,
-    }
-
-    group = relationship('step_7_group')
-    book = relationship('book')
 
 
 def get_titles(category_id, print_length):
@@ -322,6 +305,7 @@ def step_3_2_reset(category_id, print_length):
                 'popularity': '',
                 'score': 0.00,
                 'spend': 0.00,
+                'items': '[]',
                 'words': '[]',
             },
             synchronize_session=False,
@@ -371,6 +355,7 @@ def step_3_2_process(category_id, print_length, id, string):
         suggested_keyword.average_price = contents['average_price'][0]
         suggested_keyword.average_print_length = contents['average_length'][0]
         suggested_keyword.score = contents['score'][0]
+        suggested_keyword.items = dumps(contents['items'])
         suggested_keyword.words = dumps(contents['words'])
         session.add(suggested_keyword)
         session.commit()
@@ -395,6 +380,7 @@ def step_4(category_id, print_length):
             ).filter(
                 step_3_suggested_keyword.category_id == category_id,
                 step_3_suggested_keyword.print_length == print_length,
+                step_3_suggested_keyword.score >= 50.00,
             ).order_by(
                 'id ASC',
             ).execution_options(
@@ -542,6 +528,7 @@ def step_6_2_reset(category_id, print_length):
                 'popularity': '',
                 'score': 0.00,
                 'spend': 0.00,
+                'items': '[]',
                 'words': '[]',
             },
             synchronize_session=False,
@@ -591,6 +578,7 @@ def step_6_2_process(category_id, print_length, id, string):
         suggested_keyword.average_price = contents['average_price'][0]
         suggested_keyword.average_print_length = contents['average_length'][0]
         suggested_keyword.score = contents['score'][0]
+        suggested_keyword.items = dumps(contents['items'])
         suggested_keyword.words = dumps(contents['words'])
         session.add(suggested_keyword)
         session.commit()
@@ -615,7 +603,7 @@ def step_7(category_id, print_length):
         ).filter(
             step_6_suggested_keyword.category_id == category_id,
             step_6_suggested_keyword.print_length == print_length,
-            step_6_suggested_keyword.score >= 60.00,
+            step_6_suggested_keyword.score >= 50.00,
         ).order_by(
             'score DESC',
         ).execution_options(
@@ -657,52 +645,6 @@ def step_7(category_id, print_length):
                 session.add(step_7_group_suggested_keyword(**{
                     'group': group,
                     'suggested_keyword': suggested_keyword,
-                }))
-        session.commit()
-    with closing(get_mysql_session()()) as session:
-        for group in session.query(
-            step_7_group,
-        ).filter(
-            step_7_group.category_id == category_id,
-            step_7_group.print_length == print_length,
-        ).order_by(
-            'id ASC',
-        ).execution_options(
-            stream_results=True,
-        ):
-            books = []
-            for suggested_keyword in group.suggested_keywords.order_by(
-                'apps_hot_category_step_7_groups_suggested_keywords.id ASC',
-            ).execution_options(
-                stream_results=True,
-            ):
-                query = session.query(book)
-                for word in word_tokenize(suggested_keyword.string):
-                    if word in stopwords:
-                        continue
-                    query = query.filter(book.title.like('%%%(word)s%%' % {
-                        'word': word,
-                    }))
-                for b in query.order_by(
-                    'id ASC',
-                ).execution_options(
-                    stream_results=True,
-                ):
-                    books.append(b)
-            if not books:
-                continue
-            count = max([
-                frequency
-                for b, frequency in Counter(books).most_common()
-            ])
-            if not count > 1:
-                continue
-            for b, frequency in Counter(books).most_common():
-                if not frequency == count:
-                    continue
-                session.add(step_7_group_book(**{
-                    'book': b,
-                    'group': group,
                 }))
         session.commit()
     print 'Done'
