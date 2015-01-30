@@ -9,7 +9,6 @@ from sys import modules
 from unicodedata import normalize
 
 from celery import Celery
-from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, Style
@@ -20,7 +19,7 @@ from keyword_analyzer import get_contents
 from keyword_suggester import get_results
 from suggested_keywords import get_suggested_keywords
 from top_100_explorer import book, category, trend
-from utilities import base, get_mysql_session, get_words, variables
+from utilities import base, get_mysql_session, get_words, stopwords, variables
 
 if 'threading' in modules:
     del modules['threading']
