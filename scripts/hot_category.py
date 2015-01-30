@@ -615,12 +615,12 @@ def step_7(category_id, print_length):
         ).filter(
             step_6_suggested_keyword.category_id == category_id,
             step_6_suggested_keyword.print_length == print_length,
-            step_6_suggested_keyword.score >= 70.00,
+            step_6_suggested_keyword.score >= 60.00,
         ).order_by(
             'score DESC',
         ).execution_options(
             stream_results=True,
-        )[0:10]
+        )[:]
         range_ = range(len(suggested_keywords))
         for outer in range_:
             items[outer].add(suggested_keywords[outer])
@@ -1164,6 +1164,8 @@ def xlsx(category_id, print_length):
         ).execution_options(
             stream_results=True,
         ):
+            if not group.suggested_keywords.count() > 1:
+                continue
             number += 1
             row += 1
             worksheet.cell('A%(row)s' % {
