@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from argparse import ArgumentParser
-from collections import Counter, defaultdict
+from collections import defaultdict
 from contextlib import closing
 from datetime import date, timedelta
+from itertools import izip_longest
 from locale import LC_ALL, format, setlocale
 from sys import modules
 from unicodedata import normalize
@@ -1118,16 +1119,103 @@ def xlsx(category_id, print_length):
             }).value = 'Group %(number)s' % {
                 'number': number,
             }
-            for suggested_keyword in group.suggested_keywords.order_by(
-                'apps_hot_category_step_7_groups_suggested_keywords.id ASC',
-            ).execution_options(
-                stream_results=True,
+            worksheet.merge_cells('A%(row)s:B%(row)s' % {
+                'row': row,
+            })
+            row += 1
+            worksheet.cell('A%(row)s' % {
+                'row': row,
+            }).style = Style(
+                alignment=Alignment(
+                    horizontal='left',
+                    indent=0,
+                    shrink_to_fit=False,
+                    text_rotation=0,
+                    vertical='center',
+                    wrap_text=False,
+                ),
+                font=Font(
+                    bold=True,
+                    italic=False,
+                    name='Calibri',
+                    size=10,
+                    strike=False,
+                    underline='none',
+                    vertAlign=None,
+                ),
+            )
+            worksheet.cell('A%(row)s' % {
+                'row': row,
+            }).value = 'Suggested Keywords'
+            worksheet.cell('B%(row)s' % {
+                'row': row,
+            }).style = Style(
+                alignment=Alignment(
+                    horizontal='left',
+                    indent=0,
+                    shrink_to_fit=False,
+                    text_rotation=0,
+                    vertical='center',
+                    wrap_text=False,
+                ),
+                font=Font(
+                    bold=True,
+                    italic=False,
+                    name='Calibri',
+                    size=10,
+                    strike=False,
+                    underline='none',
+                    vertAlign=None,
+                ),
+            )
+            worksheet.cell('B%(row)s' % {
+                'row': row,
+            }).value = 'Books'
+            suggested_keywords = [
+                (suggested_keyword.string, suggested_keyword.items, )
+                for suggested_keyword in group.suggested_keywords.order_by(
+                    'apps_hot_category_step_6_suggested_keywords.score DESC',
+                ).order_by(
+                    'apps_hot_category_step_6_suggested_keywords.score DESC',
+                ).execution_options(
+                    stream_results=True,
+                )
+            ]
+            titles = [
+                item['title'][0]
+                for suggested_keyword in suggested_keywords[1:]
+                for item in loads(suggested_keyword[1])
+            ]
+            for iterable in izip_longest(
+                [
+                    suggested_keyword[0]
+                    for suggested_keyword in suggested_keywords
+                ],
+                [
+                    (item['title'][0], item['url'], )
+                    for item in loads(suggested_keywords[0][1])
+                    if item['title'][0] in titles
+                ]
             ):
                 row += 1
-                worksheet.append([suggested_keyword.string])
-            row += 1
-            worksheet.append([''])
+                worksheet.cell('A%(row)s' % {
+                    'row': row,
+                }).style = td_left
+                worksheet.cell('A%(row)s' % {
+                    'row': row,
+                }).value = iterable[0]
+                if iterable[1]:
+                    worksheet.cell('B%(row)s' % {
+                        'row': row,
+                    }).style = td_left
+                    worksheet.cell('B%(row)s' % {
+                        'row': row,
+                    }).hyperlink = iterable[1][1]
+                    worksheet.cell('B%(row)s' % {
+                        'row': row,
+                    }).value = iterable[1][0]
     worksheet.column_dimensions['A'].width = 50
+    worksheet.column_dimensions['B'].width = 50
 
     workbook.save('../tmp/%(category_id)s-%(print_length)s-report.xlsx' % {
         'category_id': arguments.category_id,
