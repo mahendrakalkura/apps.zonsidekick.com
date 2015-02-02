@@ -16,5 +16,7 @@
         "port": "...",
         "username": "..."
     },
-    "virtualenv": "..." // Example: /home/{{ username }}/.virtualenvs/apps.zonsidekick.com/bin
+    "virtualenv": "..." // Example: /home/{{ username }}/.virtualenvs/apps.zonsidekick.com/bin,
+    "rollbar_access_token_client": "",
+    "rollbar_access_token_server": ""
 }

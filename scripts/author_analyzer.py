@@ -7,7 +7,13 @@ from scrapy.selector import Selector
 from simplejson import dumps
 
 from utilities import (
-    get_book, get_response, get_responses, get_number, get_string, get_url,
+    get_book,
+    get_response,
+    get_responses,
+    get_number,
+    get_string,
+    get_url,
+    set_rollbar_error
 )
 
 
@@ -114,9 +120,9 @@ def get_author(url):
     except IndexError:
         pass
     urls = []
-    url = ''
+    url_ = ''
     try:
-        url = selector.xpath(
+        url_ = selector.xpath(
             '//div[@class="wwRefinements"]/ul/li'
             '/a[contains(text(), "Kindle Edition")]/@href'
         ).extract()[0]
@@ -127,8 +133,8 @@ def get_author(url):
         index += 1
         if index >= 2:
             break
-        response = get_response('http://www.amazon.com%(url)s' % {
-            'url': url,
+        response = get_response('http://www.amazon.com%(url_)s' % {
+            'url_': url_,
         })
         if not response:
             break
@@ -137,17 +143,17 @@ def get_author(url):
             '//h3[@class="title"]/a[@class="title"]/@href'
         ).extract():
             urls.append(href)
-        url = ''
+        url_ = ''
         try:
-            url = get_url(get_string(selector.xpath(
+            url_ = get_url(get_string(selector.xpath(
                 '//a[@id="pagnNextLink"]/@href'
             ).extract()[0]))
         except IndexError:
             pass
-        if not url:
+        if not url_:
             break
-        url = furl(
-            url
+        url_ = furl(
+            url_
         ).remove(
             'page'
         ).add({
@@ -169,6 +175,13 @@ def get_author(url):
             'photo': photo,
             'twitter': twitter,
         }
+    else:
+        set_rollbar_error(
+            '`books` variable empty in get_author '
+            'function, url is %(url)s' % {
+                'url': url,
+            }
+        )
 
 if __name__ == '__main__':
     if argv[1] == 'get_authors':

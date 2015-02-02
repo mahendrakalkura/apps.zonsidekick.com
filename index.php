@@ -807,6 +807,21 @@ $application = new Application();
 
 $application['debug'] = $variables['application']['debug'];
 
+$application['Rollbar'] = array(
+    'access_token' => $variables['rollbar_access_token_server'],
+    'environment' => is_development() == true? 'development': 'production',
+    'person' => array(
+        'id' => '1',
+        'username'=> 'ZonSidekick',
+    ),
+    'root' => __DIR__,
+);
+Rollbar::init($application['Rollbar']);
+
+$application['rollbar_access_token_client'] = $variables[
+    'rollbar_access_token_client'
+];
+
 $application->register(new DoctrineServiceProvider(), array(
     'db.options' => array(
         'charset' => 'utf8',
@@ -1330,6 +1345,7 @@ $application
                             ));
                         $application['mailer']->send($message);
                     } catch (Exception $exception ) {
+                        Rollbar::report_exception($exception);
                     }
                 }
                 $application['session']->getFlashBag()->add(
@@ -1521,6 +1537,7 @@ EOD;
                 ->setTo(array($request->get('email')));
             $application['mailer']->send($message);
         } catch (Exception $exception ) {
+            Rollbar::report_exception($exception);
         }
 
         return new Response();

@@ -22,14 +22,21 @@ var is_development = function () {
 };
 
 var application = angular.module('application', [
-    'duScroll', 'ngQueue', 'rt.encodeuri',
+    'duScroll', 'ngQueue', 'rt.encodeuri', 'anotherpit/angular-rollbar',
 ]);
 
-application.config(function ($httpProvider, $interpolateProvider) {
+
+application.config(function ($httpProvider, $interpolateProvider, $rollbarProvider) {
     $httpProvider.defaults.headers.post[
         'Content-Type'
     ] = 'application/x-www-form-urlencoded';
     $interpolateProvider.startSymbol('[!').endSymbol('!]');
+    $rollbarProvider.config.accessToken = jQuery('body').attr(
+        'data-rollbar-access-token-client'
+    );
+    $rollbarProvider.config.payload = {
+        environment : is_development() ? 'development': 'production'
+    };
 });
 
 application.directive('datepicker', function () {
@@ -185,9 +192,10 @@ application.controller('author_analyzer', [
     '$attrs',
     '$document',
     '$http',
+    '$rollbar',
     '$rootScope',
     '$scope',
-    function ($attrs, $document, $http, $rootScope, $scope) {
+    function ($attrs, $document, $http, $rollbar, $rootScope, $scope) {
         $scope.keyword = '';
         $scope.authors = {
             'contents': [],
@@ -223,6 +231,10 @@ application.controller('author_analyzer', [
                 url: $attrs.urlAuthors
             }).
             error(function (data, status, headers, config) {
+                $rollbar.error(
+                    'Error occurred while calling get_authors, ' +
+                    'keyword is ' + $scope.keyword
+                );
                 $scope.authors.spinner = false;
                 $rootScope.$broadcast('open', {
                     top: $attrs.error2Top,
@@ -234,6 +246,10 @@ application.controller('author_analyzer', [
                 if (data.length > 0) {
                     $scope.authors.contents = data;
                 } else {
+                    $rollbar.error(
+                        'Error occurred while calling get_authors, ' +
+                        'length of data is 0, keyword is ' + $scope.keyword
+                    );
                     $rootScope.$broadcast('open', {
                         top: $attrs.error2Top,
                         middle: $attrs.error2Middle
@@ -260,6 +276,10 @@ application.controller('author_analyzer', [
                 url: $attrs.urlAuthor
             }).
             error(function (data, status, headers, config) {
+                $rollbar.error(
+                    'Error occurred while calling get_author, ' +
+                    'urlAuthor is ' + url
+                );
                 $scope.author.spinner = false;
                 $rootScope.$broadcast('open', {
                     top: $attrs.error2Top,
@@ -271,6 +291,10 @@ application.controller('author_analyzer', [
                 if (typeof(data) === 'object') {
                     $scope.author.contents = data;
                 } else {
+                    $rollbar.error(
+                        'Error occurred while calling get_author, ' +
+                        '$scope.data is not object, urlAuthor is ' + url
+                    );
                     $rootScope.$broadcast('open', {
                         top: $attrs.error2Top,
                         middle: $attrs.error2Middle
@@ -296,9 +320,10 @@ application.controller('book_analyzer', [
     '$attrs',
     '$document',
     '$http',
+    '$rollbar',
     '$rootScope',
     '$scope',
-    function ($attrs, $document, $http, $rootScope, $scope) {
+    function ($attrs, $document, $http, $rollbar, $rootScope, $scope) {
         $scope.keyword = '';
         $scope.books = {
             'contents': [],
@@ -341,6 +366,10 @@ application.controller('book_analyzer', [
                 url: $attrs.urlBooks
             }).
             error(function (data, status, headers, config) {
+                $rollbar.error(
+                    'Error occurred while calling get_books, ' +
+                    'keyword is ' + $scope.keyword
+                );
                 $scope.books.spinner = false;
                 $rootScope.$broadcast('open', {
                     top: $attrs.error2Top,
@@ -352,6 +381,10 @@ application.controller('book_analyzer', [
                 if (data.length > 0) {
                     $scope.books.contents = data;
                 } else {
+                    $rollbar.error(
+                        'Error occurred while calling get_books, ' +
+                        'length of data is 0, keyword is ' + $scope.keyword
+                    );
                     $rootScope.$broadcast('open', {
                         top: $attrs.error2Top,
                         middle: $attrs.error2Middle
@@ -380,6 +413,9 @@ application.controller('book_analyzer', [
                 url: $attrs.urlBook
             }).
             error(function (data, status, headers, config) {
+                $rollbar.error(
+                    'Error occurred while calling get_book, url is ' + url
+                );
                 $scope.book.spinner = false;
                 $rootScope.$broadcast('open', {
                     top: $attrs.error2Top,
@@ -391,6 +427,10 @@ application.controller('book_analyzer', [
                 if (typeof(data) === 'object') {
                     $scope.book.contents = data;
                 } else {
+                    $rollbar.error(
+                        'Error occurred while calling get_book, ' +
+                        '$scope.data is not object, url is ' + url
+                    );
                     $rootScope.$broadcast('open', {
                         top: $attrs.error2Top,
                         middle: $attrs.error2Middle
@@ -414,6 +454,11 @@ application.controller('book_analyzer', [
                 url: $attrs.urlItems
             }).
             error(function (data, status, headers, config) {
+                $rollbar.error(
+                    'Error occurred while calling get_items, ' +
+                    'keywords are ' + $scope.keywords +
+                    ' and url is ' + $scope.book.contents.url
+                );
                 $scope.items.spinner = false;
                 $rootScope.$broadcast('open', {
                     top: $attrs.error2Top,
@@ -425,6 +470,12 @@ application.controller('book_analyzer', [
                 if (typeof(data) === 'object') {
                     $scope.items.contents = data;
                 } else {
+                    $rollbar.error(
+                        'Error occurred while calling get_items, ' +
+                        '$scope.data is not object, ' +
+                        'keywords are ' + $scope.keywords +
+                        ' and url is ' + $scope.book.contents.url
+                    );
                     $rootScope.$broadcast('open', {
                         top: $attrs.error2Top,
                         middle: $attrs.error2Middle
@@ -914,9 +965,10 @@ application.controller('keyword_analyzer_multiple_simple_keyword', [
 application.controller('keyword_analyzer_single', [
     '$attrs',
     '$http',
+    '$rollbar',
     '$rootScope',
     '$scope',
-    function ($attrs, $http, $rootScope, $scope) {
+    function ($attrs, $http, $rollbar, $rootScope, $scope) {
         $scope.countries = jQuery.parseJSON($attrs.countries);
 
         $scope.keyword = '';
@@ -951,6 +1003,11 @@ application.controller('keyword_analyzer_single', [
                 url: $attrs.url
             }).
             error(function (data, status, headers, config) {
+                $rollbar.error(
+                    'Error occurred while calling keyword_analyzer ' +
+                    'for single keyword, keyword is ' + $scope.keyword +
+                    ' and country is ' + $scope.country
+                );
                 $scope.spinner = false;
                 $rootScope.$broadcast('open', {
                     top: $attrs.error2Top,
@@ -962,6 +1019,12 @@ application.controller('keyword_analyzer_single', [
                 if (typeof(data) == 'object') {
                     $scope.contents = data;
                 } else {
+                    $rollbar.error(
+                        'Error occurred while calling keyword_analyzer ' +
+                        'for single keyword, $scope.data is not object, ' +
+                        'keyword is ' + $scope.keyword +
+                        ' and country is ' + $scope.country
+                    );
                     $rootScope.$broadcast('open', {
                         top: $attrs.error2Top,
                         middle: $attrs.error2Middle
@@ -990,9 +1053,10 @@ application.controller('keyword_suggester', [
     '$attrs',
     '$http',
     '$queue',
+    '$rollbar',
     '$rootScope',
     '$scope',
-    function ($attrs, $http, $queue, $rootScope, $scope) {
+    function ($attrs, $http, $queue, $rollbar, $rootScope, $scope) {
         $scope.download = function () {
             $rootScope.$broadcast('download', {
                 action: $attrs.urlDownload,
@@ -1050,30 +1114,45 @@ application.controller('keyword_suggester', [
                     url: $attrs.urlXhr
                 }).
                 error(function (data, status, headers, config) {
+                    $rollbar.error(
+                        'Error occurred while calling keyword_suggester, ' +
+                        ' keyword is ' + keyword + ', country is ' +
+                        $scope.country + ' and search_alias is ' +
+                        $scope.search_alias
+                    );
                     $scope.statuses[keyword] = -1;
                 }).
                 success(function (data, status, headers, config) {
-                    jQuery.each(data, function (key, value) {
-                        if ($scope.mode == 'Suggest') {
-                            $scope.suggestions.push(value);
-                        }
-                        if ($scope.mode == 'Combine') {
-                            var count = 0;
-                            jQuery.each(value.split(' '), function (k, v) {
-                                jQuery.each(
-                                    $scope.keywords.toLowerCase().split('\n'),
-                                    function () {
-                                        if (this == v) {
-                                            count += 1;
-                                        }
-                                    }
-                                );
-                            });
-                            if (count >= 2) {
+                    if (data.length > 0) {
+                        jQuery.each(data, function (key, value) {
+                            if ($scope.mode == 'Suggest') {
                                 $scope.suggestions.push(value);
                             }
-                        }
-                    });
+                            if ($scope.mode == 'Combine') {
+                                var count = 0;
+                                jQuery.each(value.split(' '), function (k, v) {
+                                    jQuery.each(
+                                        $scope.keywords.toLowerCase().split('\n'),
+                                        function () {
+                                            if (this == v) {
+                                                count += 1;
+                                            }
+                                        }
+                                    );
+                                });
+                                if (count >= 2) {
+                                    $scope.suggestions.push(value);
+                                }
+                            }
+                        });
+                    } else {
+                        $rollbar.error(
+                            'Error occurred while calling keyword_suggester,' +
+                            ' keyword is ' + keyword + ', country is ' +
+                            $scope.country + ' and search_alias is '+
+                            $scope.search_alias
+                        );
+                    }
                     $scope.suggestions = _.uniq($scope.suggestions);
                     $scope.suggestions.sort();
                     $scope.statuses[keyword] = 1;
@@ -1166,8 +1245,9 @@ application.controller('previous_versions', [
 application.controller('suggested_keywords', [
     '$attrs',
     '$http',
+    '$rollbar',
     '$scope',
-    function ($attrs, $http, $scope) {
+    function ($attrs, $http, $rollbar, $scope) {
         $scope.items = [];
         $scope.spinner = false;
         $scope.error = false;
@@ -1186,6 +1266,9 @@ application.controller('suggested_keywords', [
                 url: $attrs.urlsSuggestedKeywords
             }).
             error(function (data, status, headers, config) {
+                $rollbar.error(
+                    'Error occurred while calling suggested_keywords.'
+                );
                 $scope.items = [];
                 $scope.spinner = false;
                 $scope.error = true;

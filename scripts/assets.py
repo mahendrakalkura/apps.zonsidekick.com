@@ -36,6 +36,7 @@ environment.register('javascripts', Bundle(
     'vendor/pixeladmin/html/assets/javascripts/ie.min.js',
     'vendor/pixeladmin/html/assets/javascripts/pixel-admin.min.js',
     'vendor/jquery-zclip/jquery.zclip.js',
+    'vendor/angular-rollbar/angular-rollbar.js',
     'javascripts/all.js',
     filters=None if environment.debug else 'rjsmin',
     output='assets/javascripts.js',

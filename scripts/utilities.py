@@ -8,6 +8,8 @@ from re import compile, sub
 from socket import timeout
 from urlparse import urlparse
 
+from rollbar import init, report_message
+
 from grequests import get as get_, map as map_
 from MySQLdb import connect
 from MySQLdb.cursors import DictCursor
@@ -412,6 +414,11 @@ def get_response(url):
     while True:
         index += 1
         if index >= 5:
+            set_rollbar_error(
+                'Maximum retries exceeded in get_response, url is %(url)s' % {
+                    'url': url,
+                }
+            )
             return ''
         try:
             response = get(
@@ -552,3 +559,13 @@ def get_user_agent():
 
 def is_development():
     return variables['application']['debug']
+
+
+init(
+    variables['rollbar_access_token_server'],
+    'development' if is_development() else 'production'
+)
+
+
+def set_rollbar_error(message):
+    report_message(message, 'error')
