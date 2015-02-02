@@ -807,20 +807,7 @@ $application = new Application();
 
 $application['debug'] = $variables['application']['debug'];
 
-$application['Rollbar'] = array(
-    'access_token' => $variables['rollbar_access_token_server'],
-    'environment' => is_development() == true? 'development': 'production',
-    'person' => array(
-        'id' => '1',
-        'username'=> 'ZonSidekick',
-    ),
-    'root' => __DIR__,
-);
-Rollbar::init($application['Rollbar']);
-
-$application['rollbar_access_token_client'] = $variables[
-    'rollbar_access_token_client'
-];
+$application['rollbar'] = $variables['rollbar'];
 
 $application->register(new DoctrineServiceProvider(), array(
     'db.options' => array(
@@ -1344,7 +1331,7 @@ $application
                                 'support@perfectsidekick.com',
                             ));
                         $application['mailer']->send($message);
-                    } catch (Exception $exception ) {
+                    } catch (Exception $exception) {
                         Rollbar::report_exception($exception);
                     }
                 }
@@ -1536,7 +1523,7 @@ EOD;
                 ->setSubject($subject)
                 ->setTo(array($request->get('email')));
             $application['mailer']->send($message);
-        } catch (Exception $exception ) {
+        } catch (Exception $exception) {
             Rollbar::report_exception($exception);
         }
 
@@ -2807,5 +2794,18 @@ EOD;
 )
 ->bind('top_100_explorer_xhr')
 ->method('POST');
+
+$user = get_user($application);
+
+Rollbar::init(array(
+    'access_token' => $variables['rollbar']['access_token']['server'],
+    'environment' => is_development() == true? 'development': 'production',
+    'person_fn' => array(
+        'email' => $user['email'],
+        'id' => $user['id'],
+        'name' => $user['name'],
+    ),
+    'root' => __DIR__,
+));
 
 $application->run();
