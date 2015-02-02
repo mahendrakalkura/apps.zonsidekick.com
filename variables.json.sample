@@ -9,6 +9,12 @@
         "password": "...",
         "user": "..."
     },
+    "rollbar": {
+        "access_token": {
+            "client": "...",
+            "server": "..."
+        }
+    },
     "smtp": {
         "auth_mode": ..., // Example: null
         "encryption": ..., // Example: null
@@ -18,6 +24,4 @@
         "username": "..."
     },
     "virtualenv": "..." // Example: /home/{{ username }}/.virtualenvs/apps.zonsidekick.com/bin,
-    "rollbar_access_token_client": "",
-    "rollbar_access_token_server": ""
 }
