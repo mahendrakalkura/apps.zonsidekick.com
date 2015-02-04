@@ -3,6 +3,7 @@
 from sys import argv
 
 from furl import furl
+from rollbar import report_message
 from simplejson import dumps, JSONDecodeError, loads
 
 from utilities import get_responses
@@ -76,4 +77,15 @@ def get_url(sub_domain):
     }
 
 if __name__ == '__main__':
-    print dumps(get_results(argv[1], argv[2], argv[3]))
+    results = get_results(argv[1], argv[2], argv[3])
+    if not results:
+        report_message(
+            'get_results()',
+            extra_data={
+                'country': argv[2],
+                'q': argv[1],
+                'search_alias': argv[3],
+            },
+            level='critical',
+        )
+    print dumps(results)

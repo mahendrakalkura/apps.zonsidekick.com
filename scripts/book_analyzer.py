@@ -4,6 +4,7 @@ from collections import OrderedDict
 from sys import argv
 
 from furl import furl
+from rollbar import report_message
 from scrapy.selector import Selector
 from simplejson import dumps, loads
 
@@ -83,8 +84,36 @@ def get_optimization(keyword, title):
 
 if __name__ == '__main__':
     if argv[1] == 'get_books':
-        print dumps(get_books(argv[2]))
+        books = get_books(argv[2])
+        if not books:
+            report_message(
+                'get_books()',
+                extra_data={
+                    'keyword': argv[2],
+                },
+                level='critical',
+            )
+        print dumps(books)
     if argv[1] == 'get_book':
-        print dumps(get_book(get_response(argv[2])))
+        book = get_book(get_response(argv[2]))
+        if not book:
+            report_message(
+                'get_book()',
+                extra_data={
+                    'url': argv[2],
+                },
+                level='critical',
+            )
+        print dumps(book)
     if argv[1] == 'get_items':
-        print dumps(get_items(argv[2], loads(argv[3])))
+        items = get_items(argv[2], loads(argv[3]))
+        if not items:
+            report_message(
+                'get_items()',
+                extra_data={
+                    'keywords': argv[3],
+                    'url': argv[2],
+                },
+                level='critical',
+            )
+        print dumps(items)

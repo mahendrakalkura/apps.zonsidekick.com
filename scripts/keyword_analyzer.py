@@ -19,6 +19,7 @@ from dateutil import relativedelta
 from dateutil.parser import parse
 from furl import furl
 from numpy import mean
+from rollbar import report_message
 from scrapy.selector import Selector
 from simplejson import dumps
 
@@ -1026,6 +1027,16 @@ def get_url(country, keyword, page):
 
 if __name__ == '__main__':
     if len(argv) == 3:
-        print dumps(get_contents(argv[1], argv[2]))
+        contents = get_contents(argv[1], argv[2])
+        if not contents:
+            report_message(
+                'get_contents()',
+                extra_data={
+                    'country': argv[2],
+                    'keyword': argv[1],
+                },
+                level='critical',
+            )
+        print dumps(contents)
     else:
         main()

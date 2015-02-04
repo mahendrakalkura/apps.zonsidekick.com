@@ -3,6 +3,7 @@
 from sys import argv
 
 from furl import furl
+from rollbar import report_message
 from scrapy.selector import Selector
 from simplejson import dumps
 
@@ -172,6 +173,24 @@ def get_author(url):
 
 if __name__ == '__main__':
     if argv[1] == 'get_authors':
-        print dumps(get_authors(argv[2]))
+        authors = get_authors(argv[2])
+        if not authors:
+            report_message(
+                'get_authors()',
+                extra_data={
+                    'keyword': argv[2],
+                },
+                level='critical',
+            )
+        print dumps(authors)
     if argv[1] == 'get_author':
-        print dumps(get_author(argv[2]))
+        author = get_author(argv[2])
+        if not author:
+            report_message(
+                'get_author()',
+                extra_data={
+                    'url': argv[2],
+                },
+                level='critical',
+            )
+        print dumps(author)

@@ -2,7 +2,7 @@
 
 from collections import Counter, OrderedDict
 from furl import furl
-from os.path import dirname, join
+from os.path import abspath, dirname, join
 from random import choice, randint
 from re import compile, sub
 from socket import timeout
@@ -15,6 +15,7 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from requests import get
 from requests.exceptions import RequestException
+from rollbar import init, report_message
 from scrapy.selector import Selector
 from simplejson import dumps, JSONDecodeError, loads
 from sqlalchemy import create_engine
@@ -416,6 +417,13 @@ def get_response(url):
     while True:
         index += 1
         if index >= 5:
+            report_message(
+                'get_response()',
+                extra_data={
+                    'url': url,
+                },
+                level='critical',
+            )
             return ''
         try:
             response = get(
@@ -568,3 +576,9 @@ def get_words(titles, count):
 
 def is_development():
     return variables['application']['debug']
+
+init(
+    variables['rollbar']['access_token']['server'],
+    environment='development' if is_development() else 'production',
+    root=abspath(join(dirname(__file__), '..')),
+)

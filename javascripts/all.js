@@ -22,15 +22,24 @@ var is_development = function () {
 };
 
 var application = angular.module('application', [
-    'duScroll', 'ngQueue', 'rt.encodeuri',
+    'anotherpit/angular-rollbar', 'duScroll', 'ngQueue', 'rt.encodeuri',
 ]);
 
-application.config(function ($httpProvider, $interpolateProvider) {
-    $httpProvider.defaults.headers.post[
-        'Content-Type'
-    ] = 'application/x-www-form-urlencoded';
-    $interpolateProvider.startSymbol('[!').endSymbol('!]');
-});
+
+application.config(
+    function ($httpProvider, $interpolateProvider, $rollbarProvider) {
+        $httpProvider.defaults.headers.post[
+            'Content-Type'
+        ] = 'application/x-www-form-urlencoded';
+        $interpolateProvider.startSymbol('[!').endSymbol('!]');
+        $rollbarProvider.config.accessToken = jQuery('body').attr(
+            'data-rollbar-access-token-client'
+        );
+        $rollbarProvider.config.payload.environment = (
+            is_development()? 'development': 'production'
+        );
+    }
+);
 
 application.directive('datepicker', function () {
     return {
@@ -1053,27 +1062,29 @@ application.controller('keyword_suggester', [
                     $scope.statuses[keyword] = -1;
                 }).
                 success(function (data, status, headers, config) {
-                    jQuery.each(data, function (key, value) {
-                        if ($scope.mode == 'Suggest') {
-                            $scope.suggestions.push(value);
-                        }
-                        if ($scope.mode == 'Combine') {
-                            var count = 0;
-                            jQuery.each(value.split(' '), function (k, v) {
-                                jQuery.each(
-                                    $scope.keywords.toLowerCase().split('\n'),
-                                    function () {
-                                        if (this == v) {
-                                            count += 1;
-                                        }
-                                    }
-                                );
-                            });
-                            if (count >= 2) {
+                    if (data.length > 0) {
+                        jQuery.each(data, function (key, value) {
+                            if ($scope.mode == 'Suggest') {
                                 $scope.suggestions.push(value);
                             }
-                        }
-                    });
+                            if ($scope.mode == 'Combine') {
+                                var count = 0;
+                                jQuery.each(value.split(' '), function (k, v) {
+                                    jQuery.each(
+                                        $scope.keywords.toLowerCase().split('\n'),
+                                        function () {
+                                            if (this == v) {
+                                                count += 1;
+                                            }
+                                        }
+                                    );
+                                });
+                                if (count >= 2) {
+                                    $scope.suggestions.push(value);
+                                }
+                            }
+                        });
+                    }
                     $scope.suggestions = _.uniq($scope.suggestions);
                     $scope.suggestions.sort();
                     $scope.statuses[keyword] = 1;

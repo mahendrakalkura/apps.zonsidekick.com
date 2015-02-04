@@ -33,6 +33,7 @@
     </head>
     <body
         class="theme-default main-menu-animated"
+        data-rollbar-access-token-client="{{ app.rollbar.access_token.client }}"
         data-url="{{ app.request.getSchemeAndHttpHost() }}{{ app.request.baseUrl }}"
         >
         <div id="main-wrapper">

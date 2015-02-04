@@ -3,6 +3,7 @@
 from sys import argv
 
 from furl import furl
+from rollbar import report_message
 from simplejson import dumps, JSONDecodeError, loads
 
 from utilities import get_responses
@@ -43,4 +44,13 @@ def get_suggested_keywords(original_keywords):
     return sorted(suggested_keywords)
 
 if __name__ == '__main__':
-    print dumps(get_suggested_keywords(argv[1].split(',')))
+    suggested_keywords = get_suggested_keywords(argv[1].split(','))
+    if not suggested_keywords:
+        report_message(
+            'get_suggested_keywords()',
+            extra_data={
+                'original_keywords': argv[1],
+            },
+            level='critical',
+        )
+    print dumps(suggested_keywords)

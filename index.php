@@ -807,6 +807,8 @@ $application = new Application();
 
 $application['debug'] = $variables['application']['debug'];
 
+$application['rollbar'] = $variables['rollbar'];
+
 $application->register(new DoctrineServiceProvider(), array(
     'db.options' => array(
         'charset' => 'utf8',
@@ -1329,7 +1331,8 @@ $application
                                 'support@perfectsidekick.com',
                             ));
                         $application['mailer']->send($message);
-                    } catch (Exception $exception ) {
+                    } catch (Exception $exception) {
+                        Rollbar::report_exception($exception);
                     }
                 }
                 $application['session']->getFlashBag()->add(
@@ -1520,7 +1523,8 @@ EOD;
                 ->setSubject($subject)
                 ->setTo(array($request->get('email')));
             $application['mailer']->send($message);
-        } catch (Exception $exception ) {
+        } catch (Exception $exception) {
+            Rollbar::report_exception($exception);
         }
 
         return new Response();
@@ -2790,5 +2794,18 @@ EOD;
 )
 ->bind('top_100_explorer_xhr')
 ->method('POST');
+
+$user = get_user($application);
+
+Rollbar::init(array(
+    'access_token' => $variables['rollbar']['access_token']['server'],
+    'environment' => is_development() == true? 'development': 'production',
+    'person_fn' => array(
+        'email' => $user['email'],
+        'id' => $user['id'],
+        'name' => $user['name'],
+    ),
+    'root' => __DIR__,
+));
 
 $application->run();

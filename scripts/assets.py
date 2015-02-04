@@ -28,6 +28,7 @@ environment.register('javascripts', Bundle(
     'vendor/angular/angular.min.js',
     'vendor/angular-encode-uri/dist/angular-encode-uri.min.js',
     'vendor/angular-queue/angular-queue.js',
+    'vendor/angular-rollbar/angular-rollbar.js',
     'vendor/angular-scroll/angular-scroll.min.js',
     'vendor/highcharts/highcharts.src.js',
     'vendor/lodash/dist/lodash.min.js',
