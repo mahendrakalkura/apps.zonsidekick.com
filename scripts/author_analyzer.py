@@ -193,4 +193,4 @@ if __name__ == '__main__':
                 },
                 level='critical',
             )
-        print dump(author)
+        print dumps(author)
