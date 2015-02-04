@@ -10,16 +10,13 @@ from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, Style
 from sqlalchemy import func
 from sqlalchemy.orm import backref, relationship
+from sqlalchemy.sql import null
 
 from keyword_analyzer import get_contents
 from suggested_keywords import get_suggested_keywords
 from top_100_explorer import book, category, trend
 from utilities import (
-    base,
-    get_mysql_session,
-    get_popularity,
-    get_words,
-    variables
+    base, get_mysql_session, get_popularity, get_words, variables
 )
 
 if 'threading' in modules:
@@ -44,32 +41,36 @@ celery.conf.update(
 )
 
 
-class suggested_keyword(base):
+class step_1_suggested_keyword(base):
     __table_args__ = {
         'autoload': True,
     }
-    __tablename__ = 'apps_hot_keywords_suggested_keywords'
+    __tablename__ = 'apps_hot_keywords_step_1_suggested_keywords'
 
     category = relationship(
         'category',
         backref=backref(
-            'apps_hot_keywords_suggested_keywords',
+            'suggested_keywords',
             cascade='all,delete-orphan',
             lazy='dynamic',
         ),
     )
 
 
-class keyword(base):
+class step_2_keyword(base):
     __table_args__ = {
         'autoload': True,
     }
-    __tablename__ = 'apps_hot_keywords_keywords'
+    __tablename__ = 'apps_hot_keywords_step_2_keywords'
 
 
 def step_1_1_reset():
     with closing(get_mysql_session()()) as session:
-        session.query(suggested_keyword).delete(synchronize_session=False)
+        session.query(
+            step_1_suggested_keyword,
+        ).delete(
+            synchronize_session=False,
+        )
         session.commit()
 
 
@@ -77,22 +78,30 @@ def step_1_1_queue():
     with closing(get_mysql_session()()) as session:
         date = session.query(func.max(trend.date)).first()[0]
         for category_ in session.query(
-            category
+            category,
         ).order_by(
-            'id asc'
+            'id ASC',
+        ).execution_options(
+            stream_results=True,
         ):
-            titles = []
-            for book_ in session.query(
-                book
-            ).join(
-                trend
-            ).filter(
-                trend.category_id == category_.id,
-                trend.date == date
-            ):
-                titles.append(book_.title)
             step_1_1_process.delay(
-                category_.id, [word for word, _ in get_words(titles, 10)]
+                category_.id,
+                [
+                    word
+                    for word, _ in get_words([
+                        b.title
+                        for b in session.query(
+                            book,
+                        ).join(
+                            trend,
+                        ).filter(
+                            trend.category_id == category_.id,
+                            trend.date == date,
+                        ).execution_options(
+                            stream_results=True,
+                        )
+                    ], 10)
+                ]
             )
 
 
@@ -100,7 +109,7 @@ def step_1_1_queue():
 def step_1_1_process(category_id, words):
     with closing(get_mysql_session()()) as session:
         for string in get_suggested_keywords(words):
-            session.add(suggested_keyword(**{
+            session.add(step_1_suggested_keyword(**{
                 'category_id': category_id,
                 'string': string,
             }))
@@ -110,24 +119,30 @@ def step_1_1_process(category_id, words):
 def step_1_2_reset():
     with closing(get_mysql_session()()) as session:
         session.query(
-            suggested_keyword
-        ).update({
-            'popularity': None,
-            }, synchronize_session=False
+            step_1_suggested_keyword,
+        ).update(
+            {
+                'popularity': None,
+            },
+            synchronize_session=False,
         )
         session.commit()
 
 
 def step_1_2_queue():
     with closing(get_mysql_session()()) as session:
-        for sk in session.query(
-            suggested_keyword
+        for suggested_keyword in session.query(
+            step_1_suggested_keyword,
         ).filter(
-            suggested_keyword.popularity == None
+            step_1_suggested_keyword.popularity == null(),
         ).order_by(
-            'id asc'
+            'id ASC',
+        ).execution_options(
+            stream_results=True,
         ):
-            step_1_2_process.delay(sk.id, sk.string)
+            step_1_2_process.delay(
+                suggested_keyword.id, suggested_keyword.string,
+            )
 
 
 @celery.task
@@ -136,46 +151,48 @@ def step_1_2_process(id, string):
         popularity = get_popularity(string)
         if not popularity:
             return
-        sk = session.query(suggested_keyword).get(id)
-        sk.popularity = popularity[0]
-        session.add(sk)
+        suggested_keyword = session.query(step_1_suggested_keyword).get(id)
+        suggested_keyword.popularity = popularity[0]
+        session.add(suggested_keyword)
         session.commit()
 
 
 def step_2_reset():
     with closing(get_mysql_session()()) as session:
-        session.query(keyword).delete(synchronize_session=False)
+        session.query(step_2_keyword).delete(synchronize_session=False)
         session.commit()
-        for category_ in session.query(category).order_by('id asc'):
-            sk = session.query(
-                suggested_keyword
+        for c in session.query(category).order_by('id asc'):
+            suggested_keyword = session.query(
+                step_1_suggested_keyword,
             ).filter(
-                suggested_keyword.category_id == category_.id
+                step_1_suggested_keyword.category_id == c.id,
             ).order_by(
-                'popularity desc'
+                'popularity DESC',
             ).first()
-            if sk:
+            if suggested_keyword:
                 if not session.query(
-                    keyword
+                    step_2_keyword
                 ).filter(
-                    keyword.string == sk.string
+                    step_2_keyword.string == suggested_keyword.string
                 ).first():
-                    session.add(keyword(**{
-                        'string': sk.string,
+                    session.add(step_2_keyword(**{
+                        'string': suggested_keyword.string,
                     }))
                     session.commit()
 
 
 def step_2_queue():
     with closing(get_mysql_session()()) as session:
-        for k in session.query(
-            keyword
+        for keyword in session.query(
+            step_2_keyword,
         ).filter(
-            keyword.score == None
+            step_2_keyword.score == null(),
         ).order_by(
-            'id asc'
+            'id ASC',
+        ).execution_options(
+            stream_results=True,
         ):
-            step_2_process.delay(k.id, k.string)
+            step_2_process.delay(keyword.id, keyword.string)
 
 
 @celery.task
@@ -184,17 +201,17 @@ def step_2_process(id, string):
         contents = get_contents(string, 'com')
         if not contents:
             return
-        kw = session.query(keyword).get(id)
-        kw.count = contents['count'][0]
-        kw.buyer_behavior = contents['buyer_behavior'][1]
-        kw.competition = contents['competition'][1]
-        kw.optimization = contents['optimization'][1]
-        kw.popularity = contents['popularity'][1]
-        kw.spend = contents['spend'][0][0]
-        kw.average_price = contents['average_price'][0]
-        kw.average_print_length = contents['average_length'][0]
-        kw.score = contents['score'][0]
-        session.add(kw)
+        keyword = session.query(step_2_keyword).get(id)
+        keyword.count = contents['count'][0]
+        keyword.buyer_behavior = contents['buyer_behavior'][1]
+        keyword.competition = contents['competition'][1]
+        keyword.optimization = contents['optimization'][1]
+        keyword.popularity = contents['popularity'][1]
+        keyword.spend = contents['spend'][0][0]
+        keyword.average_price = contents['average_price'][0]
+        keyword.average_print_length = contents['average_length'][0]
+        keyword.score = contents['score'][0]
+        session.add(keyword)
         session.commit()
 
 
@@ -333,15 +350,17 @@ def xlsx():
     worksheet.column_dimensions['J'].width = 15
     with closing(get_mysql_session()()) as session:
         row = 1
-        for kw in session.query(
-            keyword
+        for keyword in session.query(
+            step_2_keyword,
         ).order_by(
-            'score desc',
-        ).limit(10):
+            'score DESC',
+        ).execution_options(
+            stream_results=True,
+        )[0:10]:
             row += 1
             worksheet.cell('A%(row)s' % {
                 'row': row,
-            }).value = kw.string
+            }).value = keyword.string
             worksheet.cell('A%(row)s' % {
                 'row': row,
             }).style = Style(
@@ -365,44 +384,44 @@ def xlsx():
             )
             worksheet.cell('B%(row)s' % {
                 'row': row,
-            }).value = format('%d', kw.count, grouping=True)
+            }).value = format('%d', keyword.count, grouping=True)
             worksheet.cell('B%(row)s' % {
                 'row': row,
             }).style = td_right
             worksheet.cell('C%(row)s' % {
                 'row': row,
-            }).value = kw.buyer_behavior
+            }).value = keyword.buyer_behavior
             worksheet.cell('C%(row)s' % {
                 'row': row,
             }).style = td_center
             worksheet.cell('D%(row)s' % {
                 'row': row,
-            }).value = kw.competition
+            }).value = keyword.competition
             worksheet.cell('D%(row)s' % {
                 'row': row,
             }).style = td_center
             worksheet.cell('E%(row)s' % {
                 'row': row,
-            }).value = kw.optimization
+            }).value = keyword.optimization
             worksheet.cell('E%(row)s' % {
                 'row': row,
             }).style = td_center
             worksheet.cell('F%(row)s' % {
                 'row': row,
-            }).value = kw.popularity
+            }).value = keyword.popularity
             worksheet.cell('F%(row)s' % {
                 'row': row,
             }).style = td_center
             worksheet.cell('G%(row)s' % {
                 'row': row,
-            }).value = format('%.2f', kw.spend, grouping=True)
+            }).value = format('%.2f', keyword.spend, grouping=True)
             worksheet.cell('G%(row)s' % {
                 'row': row,
             }).style = td_right
             worksheet.cell('H%(row)s' % {
                 'row': row,
             }).value = format(
-                '%.2f', kw.average_price, grouping=True,
+                '%.2f', keyword.average_price, grouping=True,
             )
             worksheet.cell('H%(row)s' % {
                 'row': row,
@@ -410,19 +429,19 @@ def xlsx():
             worksheet.cell('I%(row)s' % {
                 'row': row,
             }).value = format(
-                '%.2f', kw.average_print_length, grouping=True,
+                '%.2f', keyword.average_print_length, grouping=True,
             )
             worksheet.cell('I%(row)s' % {
                 'row': row,
             }).style = td_right
             worksheet.cell('J%(row)s' % {
                 'row': row,
-            }).value = format('%.2f', kw.score, grouping=True)
+            }).value = format('%.2f', keyword.score, grouping=True)
             worksheet.cell('J%(row)s' % {
                 'row': row,
             }).style = td_right
 
-    workbook.save('../tmp/hot-keywords-report.xlsx')
+    workbook.save('../tmp/hot-keywords.xlsx')
 
 
 if __name__ == '__main__':

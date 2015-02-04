@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS `apps_hot_keywords_suggested_keywords`;
-CREATE TABLE IF NOT EXISTS `apps_hot_keywords_suggested_keywords` (
+DROP TABLE IF EXISTS `apps_hot_keywords_step_1_suggested_keywords`;
+CREATE TABLE IF NOT EXISTS `apps_hot_keywords_step_1_suggested_keywords` (
     `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     `category_id` INT(11) DEFAULT NULL,
     `string` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
@@ -16,8 +16,8 @@ CREATE TABLE IF NOT EXISTS `apps_hot_keywords_suggested_keywords` (
     KEY `popularity` (`popularity`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-DROP TABLE IF EXISTS `apps_hot_keywords_keywords`;
-CREATE TABLE IF NOT EXISTS `apps_hot_keywords_keywords` (
+DROP TABLE IF EXISTS `apps_hot_keywords_step_2_keywords`;
+CREATE TABLE IF NOT EXISTS `apps_hot_keywords_step_2_keywords` (
     `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     `string` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
     `count` BIGINT(20) UNSIGNED DEFAULT NULL,
