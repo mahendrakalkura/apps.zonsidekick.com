@@ -166,10 +166,15 @@ def step_2_reset():
         ).execution_options(
             stream_results=True,
         )[0:500]:
-            session.add(step_2_keyword(**{
-                'string': suggested_keyword.string,
-            }))
-            session.commit()
+            if not session.query(
+                step_2_keyword,
+            ).filter(
+                step_2_keyword.string == suggested_keyword.string,
+            ).count():
+                session.add(step_2_keyword(**{
+                    'string': suggested_keyword.string,
+                }))
+                session.commit()
 
 
 def step_2_queue():
