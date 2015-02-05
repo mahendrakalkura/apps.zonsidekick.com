@@ -50,9 +50,7 @@ class step_1_suggested_keyword(base):
     category = relationship(
         'category',
         backref=backref(
-            'suggested_keywords',
-            cascade='all,delete-orphan',
-            lazy='dynamic',
+            'suggested_keywords', cascade='all,delete-orphan', lazy='dynamic',
         ),
     )
 
@@ -161,24 +159,17 @@ def step_2_reset():
     with closing(get_mysql_session()()) as session:
         session.query(step_2_keyword).delete(synchronize_session=False)
         session.commit()
-        for c in session.query(category).order_by('id asc'):
-            suggested_keyword = session.query(
-                step_1_suggested_keyword,
-            ).filter(
-                step_1_suggested_keyword.category_id == c.id,
-            ).order_by(
-                'popularity DESC',
-            ).first()
-            if suggested_keyword:
-                if not session.query(
-                    step_2_keyword
-                ).filter(
-                    step_2_keyword.string == suggested_keyword.string
-                ).first():
-                    session.add(step_2_keyword(**{
-                        'string': suggested_keyword.string,
-                    }))
-                    session.commit()
+        for suggested_keyword in session.query(
+            step_1_suggested_keyword,
+        ).order_by(
+            'popularity DESC',
+        ).execution_options(
+            stream_results=True,
+        )[0:500]:
+            session.add(step_2_keyword(**{
+                'string': suggested_keyword.string,
+            }))
+            session.commit()
 
 
 def step_2_queue():
