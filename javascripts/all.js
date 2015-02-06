@@ -682,6 +682,42 @@ application.controller('download', [
     }
 ]);
 
+application.controller('free', [
+    '$attrs',
+    '$http',
+    '$scope',
+    '$timeout',
+    function ($attrs, $http, $scope, $timeout) {
+        $scope.spinner = true;
+        $scope.record = {};
+        $scope.queue = 0;
+
+        $scope.process = function () {
+            $scope.spinner = true;
+            $http({
+                method: 'GET',
+                url: $attrs.urlXhr
+            }).
+            error(function (data, status, headers, config) {
+                $scope.spinner = true;
+                $timeout($scope.process, 30000);
+            }).
+            success(function (data, status, headers, config) {
+                $scope.record = data.record;
+                $scope.queue = data.queue;
+                if ($scope.record.strings.length) {
+                    $scope.spinner = false;
+                } else {
+                    $scope.spinner = true;
+                    $timeout($scope.process, 30000);
+                }
+            });
+        };
+
+        $scope.process();
+    }
+]);
+
 application.controller('keyword_analyzer_multiple_add', [
     '$attrs',
     '$rootScope',

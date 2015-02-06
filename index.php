@@ -577,6 +577,48 @@ EOD;
     return array($report, $keywords);
 }
 
+function get_search_aliases() {
+    return array(
+        'aps' => 'All Departments',
+        'digital-text' => 'Kindle Store',
+        'instant-video' => 'Amazon Instant Video',
+        'appliances' => 'Appliances',
+        'mobile-apps' => 'Apps for Android',
+        'arts-crafts' => 'Arts, Crafts &amp; Sewing',
+        'automotive' => 'Automotive',
+        'baby-products' => 'Baby',
+        'beauty' => 'Beauty',
+        'stripbooks' => 'Books',
+        'mobile' => 'Cell Phones &amp; Accessories',
+        'apparel' => 'Clothing &amp; Accessories',
+        'collectibles' => 'Collectibles',
+        'computers' => 'Computers',
+        'financial' => 'Credit Cards',
+        'electronics' => 'Electronics',
+        'gift-cards' => 'Gift Cards Store',
+        'grocery' => 'Grocery &amp; Gourmet Food',
+        'hpc' => 'Health &amp; Personal Care',
+        'garden' => 'Home &amp; Kitchen',
+        'industrial' => 'Industrial &amp; Scientific',
+        'jewelry' => 'Jewelry',
+        'magazines' => 'Magazine Subscriptions',
+        'movies-tv' => 'Movies &amp; TV',
+        'digital-music' => 'MP3 Music',
+        'popular' => 'Music',
+        'mi' => 'Musical Instruments',
+        'office-products' => 'Office Products',
+        'lawngarden' => 'Patio, Lawn &amp; Garden',
+        'pets' => 'Pet Supplies',
+        'shoes' => 'Shoes',
+        'software' => 'Software',
+        'sporting' => 'Sports &amp; Outdoors',
+        'tools' => 'Tools &amp; Home Improvement',
+        'toys-and-games' => 'Toys &amp; Games',
+        'videogames' => 'Video Games',
+        'watches' => 'Watches',
+    );
+}
+
 function get_sections($application) {
     $sections = array();
     $query = <<<EOD
@@ -1357,6 +1399,84 @@ $application
 
 $application
 ->match(
+    '/free',
+    function (Request $request) use ($application) {
+        if ($request->isMethod('POST')) {
+            $application['db']->insert('apps_keyword_suggester', array(
+                'country' => $request->get('country'),
+                'mode' => 'Suggest',
+                'search_alias' => $request->get('search_alias'),
+                'string' => $request->get('string'),
+            ));
+            $id = $application['db']->lastInsertId();
+            return $application->redirect(
+                $application['url_generator']->generate(
+                    'free_id',
+                    array(
+                        'id' => $id,
+                    )
+                )
+            );
+        }
+        return $application['twig']->render(
+            'views/free.twig',
+            array(
+                'countries' => get_countries(),
+                'keywords' => $request->get('keywords', ''),
+                'mode' => $request->get('mode', 'Suggest'),
+                'search_aliases' => get_search_aliases(),
+            )
+        );
+    }
+)
+->bind('free')
+->method('GET|POST');
+
+$application
+->match(
+    '/free/{id}',
+    function (Request $request, $id) use ($application) {
+        return $application['twig']->render(
+            'views/free_id.twig', array(
+                'id' => $id,
+            )
+        );
+    }
+)
+->bind('free_id')
+->method('GET');
+
+$application
+->match(
+    '/free/{id}/xhr',
+    function (Request $request, $id) use ($application) {
+        $query = <<<EOD
+SELECT * FROM `apps_keyword_suggester` WHERE `id` = ?
+EOD;
+        $record = $application['db']->fetchAssoc($query, array($id));
+        if (!empty($record['strings'])) {
+            $record['strings'] = json_decode($record['strings']);
+        } else {
+            $record['strings'] = '';
+        }
+        $query = <<<EOD
+SELECT COUNT(`id`) AS count
+FROM `apps_keyword_suggester`
+WHERE `id` <= ? AND `strings` IS NULL
+EOD;
+        $queue = $application['db']->fetchAssoc($query, array($id));
+        return new Response(json_encode(array(
+            'record' => $record,
+            'queue' => $queue,
+        ), JSON_NUMERIC_CHECK));
+    }
+)
+->bind('free_id_xhr')
+->method('GET');
+
+
+$application
+->match(
     '/keyword-analyzer/multiple',
     function () use ($application) {
         $user = $application['session']->get('user');
@@ -1854,58 +1974,10 @@ $application
         return $application['twig']->render(
             'views/keyword_suggester.twig',
             array(
-                'countries' => array(
-                    'com' => 'US',
-                    'co.uk' => 'UK',
-                    'es' => 'Spain',
-                    'fr' => 'France',
-                    'it' => 'Italy',
-                    'com.br' => 'Brazil',
-                    'ca' => 'Canada',
-                    'de' => 'Germany',
-                    'co.jp' => 'Japan',
-                ),
+                'countries' => get_countries(),
                 'keywords' => $request->get('keywords', ''),
                 'mode' => $request->get('mode', 'Suggest'),
-                'search_aliases' => array(
-                    'aps' => 'All Departments',
-                    'digital-text' => 'Kindle Store',
-                    'instant-video' => 'Amazon Instant Video',
-                    'appliances' => 'Appliances',
-                    'mobile-apps' => 'Apps for Android',
-                    'arts-crafts' => 'Arts, Crafts &amp; Sewing',
-                    'automotive' => 'Automotive',
-                    'baby-products' => 'Baby',
-                    'beauty' => 'Beauty',
-                    'stripbooks' => 'Books',
-                    'mobile' => 'Cell Phones &amp; Accessories',
-                    'apparel' => 'Clothing &amp; Accessories',
-                    'collectibles' => 'Collectibles',
-                    'computers' => 'Computers',
-                    'financial' => 'Credit Cards',
-                    'electronics' => 'Electronics',
-                    'gift-cards' => 'Gift Cards Store',
-                    'grocery' => 'Grocery &amp; Gourmet Food',
-                    'hpc' => 'Health &amp; Personal Care',
-                    'garden' => 'Home &amp; Kitchen',
-                    'industrial' => 'Industrial &amp; Scientific',
-                    'jewelry' => 'Jewelry',
-                    'magazines' => 'Magazine Subscriptions',
-                    'movies-tv' => 'Movies &amp; TV',
-                    'digital-music' => 'MP3 Music',
-                    'popular' => 'Music',
-                    'mi' => 'Musical Instruments',
-                    'office-products' => 'Office Products',
-                    'lawngarden' => 'Patio, Lawn &amp; Garden',
-                    'pets' => 'Pet Supplies',
-                    'shoes' => 'Shoes',
-                    'software' => 'Software',
-                    'sporting' => 'Sports &amp; Outdoors',
-                    'tools' => 'Tools &amp; Home Improvement',
-                    'toys-and-games' => 'Toys &amp; Games',
-                    'videogames' => 'Video Games',
-                    'watches' => 'Watches',
-                ),
+                'search_aliases' => get_search_aliases(),
             )
         );
     }

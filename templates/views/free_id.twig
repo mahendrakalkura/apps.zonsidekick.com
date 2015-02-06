@@ -1,0 +1,97 @@
+{% extends 'layout.twig' %}
+
+{% set module = 'Free' %}
+{% set nav = 'keyword_suggester' %}
+
+{% block content %}
+<ul class="breadcrumb breadcrumb-page">
+    <div class="breadcrumb-label text-light-gray">You are here:</div>
+    <li><a href="{{ url('dashboard') }}">Home</a></li>
+    <li><a href="{{ url('free') }}">Free</a></li>
+    <li calss="active">
+        <a href="{{ url('free', {id: id}) }}">{{ id }}</a>
+    </li>
+</ul>
+
+<div class="page-header">
+    <div class="row">
+        <h1 class="col-xs-12">
+            {% include 'slots/feedback.twig' %}
+            <div
+                class="btn pull-right"
+                data-target="#modal-keyword-suggester"
+                data-toggle="modal"
+                >
+                <span class="fa fa-fw fa-thumbs-up"></span>
+                Information
+            </div>
+            <i class="fa fa-fw fa-list"></i>
+            {{ module }}
+        </h1>
+    </div>
+</div>
+{% include 'slots/alerts.twig' %}
+<div
+    data-url-xhr="{{ url('free_id_xhr', {id: id}) }}"
+    ng-controller="free"
+    >
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-xs-6">
+            <div class="panel">
+                <table
+                    class="table table-bordered table-hover table-striped"
+                    >
+                    <thead>
+                        <tr>
+                            <th>Keyword</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>[! record['string'] !]</td>
+                            <td class="narrow text-center">
+                                <span
+                                    class="class="fa fa-fw fa-spin fa-spinner"
+                                    ng-show="spinner"
+                                    >
+                                    Loading ... (Waiting List = [! queue['count'] !])
+                                    </span>
+                                <span
+                                    class="fa fa-fw fa-check-circle"
+                                    ng-show="!spinner"
+                                    ></span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div
+            class="col-xs-12 col-sm-12 col-md-6 col-xs-6"
+            ng-show="record.strings.length"
+            >
+            <div class="panel">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label
+                            class="control-label"
+                            class="pull-right"
+                            for="suggestions"
+                            >Suggestions</label>
+                        <textarea
+                            class="form-control"
+                            id="suggestions"
+                            rows="15"
+                            >[! record.strings.join('\n') !]</textarea>
+                        <div class="help-block text-right">
+                            Total Number of Suggestions:
+                            <span>[! record.strings.length !]</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

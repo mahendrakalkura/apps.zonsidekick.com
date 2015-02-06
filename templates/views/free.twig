@@ -1,0 +1,109 @@
+{% extends 'layout.twig' %}
+
+{% set module = 'Free' %}
+{% set nav = 'keyword_suggester' %}
+
+{% block content %}
+<ul class="breadcrumb breadcrumb-page">
+    <div class="breadcrumb-label text-light-gray">You are here:</div>
+    <li><a href="{{ url('free') }}">Free</a></li>
+</ul>
+<div class="page-header">
+    <div class="row">
+        <h1 class="col-xs-12">
+            {% include 'slots/feedback.twig' %}
+            <div
+                class="btn pull-right"
+                data-target="#modal-keyword-suggester"
+                data-toggle="modal"
+                >
+                <span class="fa fa-fw fa-thumbs-up"></span>
+                Information
+            </div>
+            <i class="fa fa-fw fa-list"></i>
+            {{ module }}
+        </h1>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-6 col-xs-6">
+        <form
+            accept-charset="UTF-8"
+            action="{{ url('free') }}"
+            method="POST"
+            >
+            <div class="panel">
+                <div class="panel-body">
+                    <div>
+                        <div class="form-group">
+                            <label class="control-label" for="keyword">
+                                Keyword
+                            </label>
+                            <input
+                                class="form-control input-lg"
+                                id="string"
+                                name="string"
+                                placeholder="Keyword"
+                                required
+                                type="text"
+                                value=""
+                                >
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" for="country">
+                                Country
+                            </label>
+                            <select
+                                class="form-control"
+                                id="country"
+                                name="country"
+                                >
+                                {% for key, value in countries %}
+                                    <option value="{{ key }}">
+                                        {{ value }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label
+                                class="control-label"
+                                for="search_alias"
+                                >
+                                Department
+                            </label>
+                            <select
+                                class="form-control"
+                                id="search_alias"
+                                name="search_alias"
+                                >
+                                {% for key, value in search_aliases %}
+                                    <option value="{{ key }}">
+                                        {{ value }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="clearfix panel-footer text-right">
+                    <button
+                        class="btn btn-success pull-right"
+                        type="submit"
+                        >
+                        <span class="fa fa-lg fa-fw fa-thumbs-up"></span>
+                        Submit
+                    </button>
+                    <button
+                        class="btn btn-danger no-margin pull-right"
+                        type="reset"
+                        >
+                        <span class="fa fa-lg fa-fw fa-thumbs-down"></span>
+                        Reset
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
