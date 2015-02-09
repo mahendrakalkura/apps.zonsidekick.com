@@ -143,6 +143,8 @@ def keyword_analyzer_py():
         'spend' in output
         and
         'words' in output
+        and
+        output['count'][0]
     ):
         return True
     return False
