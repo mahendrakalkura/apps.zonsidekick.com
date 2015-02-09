@@ -417,13 +417,6 @@ def get_response(url):
     while True:
         index += 1
         if index >= 5:
-            report_message(
-                'get_response()',
-                extra_data={
-                    'url': url,
-                },
-                level='critical',
-            )
             return ''
         try:
             response = get(
