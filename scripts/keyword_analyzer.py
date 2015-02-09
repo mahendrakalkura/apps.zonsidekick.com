@@ -434,7 +434,7 @@ def get_contents(keyword, country):
                 text=response.text
             ).xpath(
                 '//a'
-                '[@class="a-link-normal s-access-detail-page a-text-normal"]/'
+                '[@class="a-link-normal s-access-detail-page  a-text-normal"]/'
                 '@href'
             ).extract():
                 if not href.startswith('http'):
