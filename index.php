@@ -1404,7 +1404,6 @@ $application
         if ($request->isMethod('POST')) {
             $application['db']->insert('apps_keyword_suggester', array(
                 'country' => $request->get('country'),
-                'mode' => 'Suggest',
                 'search_alias' => $request->get('search_alias'),
                 'string' => $request->get('string'),
             ));
