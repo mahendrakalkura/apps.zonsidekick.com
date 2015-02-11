@@ -682,43 +682,6 @@ application.controller('download', [
     }
 ]);
 
-application.controller('free', [
-    '$attrs',
-    '$http',
-    '$scope',
-    '$timeout',
-    function ($attrs, $http, $scope, $timeout) {
-        $scope.spinner = true;
-        $scope.record = {};
-        $scope.queue = 0;
-
-        $scope.process = function () {
-            $scope.spinner = true;
-            $http({
-                method: 'GET',
-                url: $attrs.urlXhr
-            }).
-            error(function (data, status, headers, config) {
-                $scope.spinner = true;
-                $timeout($scope.process, 30000);
-            }).
-            success(function (data, status, headers, config) {
-                $scope.record = data.record;
-                $scope.queue = data.queue;
-                $scope.eta = data.eta;
-                if ($scope.record.strings.length) {
-                    $scope.spinner = false;
-                } else {
-                    $scope.spinner = true;
-                    $timeout($scope.process, 30000);
-                }
-            });
-        };
-
-        $scope.process();
-    }
-]);
-
 application.controller('keyword_analyzer_multiple_add', [
     '$attrs',
     '$rootScope',
@@ -835,7 +798,7 @@ application.controller('keyword_analyzer_multiple_simple', [
                 url: $attrs.urlXhr
             }).
             error(function (data, status, headers, config) {
-                $timeout($scope.process, 15000);
+                $timeout($scope.process, 60000);
             }).
             success(function (data, status, headers, config) {
                 $scope.eta = data.eta;
@@ -855,7 +818,7 @@ application.controller('keyword_analyzer_multiple_simple', [
                     }
                 }
                 if (!$scope.is_finished) {
-                    $timeout($scope.process, 15000);
+                    $timeout($scope.process, 60000);
                 }
             });
 
@@ -1173,6 +1136,44 @@ application.controller('keyword_suggester', [
         if ($attrs.mode.length) {
             $scope.mode = $attrs.mode;
         }
+    }
+]);
+
+application.controller('keyword_suggester_free', [
+    '$attrs',
+    '$http',
+    '$scope',
+    '$timeout',
+    function ($attrs, $http, $scope, $timeout) {
+        $scope.spinner = true;
+        $scope.record = {};
+        $scope.count = '';
+        $scope.eta = '';
+
+        $scope.process = function () {
+            $scope.spinner = true;
+            $http({
+                method: 'GET',
+                url: $attrs.urlXhr
+            }).
+            error(function (data, status, headers, config) {
+                $scope.spinner = true;
+                $timeout($scope.process, 60000);
+            }).
+            success(function (data, status, headers, config) {
+                $scope.record = data.record;
+                $scope.count = data.count;
+                $scope.eta = data.eta;
+                if ($scope.record.strings.length) {
+                    $scope.spinner = false;
+                } else {
+                    $scope.spinner = true;
+                    $timeout($scope.process, 60000);
+                }
+            });
+        };
+
+        $scope.process();
     }
 ]);
 

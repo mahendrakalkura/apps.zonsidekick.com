@@ -912,14 +912,30 @@ if ($application['debug']) {
 $application->before(function (Request $request) use ($application) {
     $user = get_user($application);
     if (!$user['id']) {
-        if ($request->get('_route') != 'sign_in') {
+        if (
+            $request->get('_route') != 'keyword_suggester_free'
+            &&
+            $request->get('_route') != 'keyword_suggester_free_id'
+            &&
+            $request->get('_route') != 'keyword_suggester_free_id_xhr'
+            &&
+            $request->get('_route') != 'sign_in'
+        ) {
             return $application->redirect(
                 $application['url_generator']->generate('sign_in')
             );
         }
     }
     $is_paying_customer = is_paying_customer($application, $user);
-    if ($request->get('_route') != 'sign_in') {
+    if (
+        $request->get('_route') != 'keyword_suggester_free'
+        &&
+        $request->get('_route') != 'keyword_suggester_free_id'
+        &&
+        $request->get('_route') != 'keyword_suggester_free_id_xhr'
+        &&
+        $request->get('_route') != 'sign_in'
+    ) {
         if ($is_paying_customer) {
             if ($request->get('_route') == '403') {
                 return $application->redirect(
@@ -1396,160 +1412,6 @@ $application
 )
 ->bind('feedback')
 ->method('GET|POST');
-
-$application
-->match(
-    '/free',
-    function (Request $request) use ($application, $variables) {
-        if ($request->isMethod('POST')) {
-            $application['db']->insert('apps_keyword_suggester', array(
-                'country' => $request->get('country'),
-                'email' => $request->get('email'),
-                'search_alias' => $request->get('search_alias'),
-                'string' => $request->get('string'),
-            ));
-            $id = $application['db']->lastInsertId();
-
-            $subject = 'Keyword Suggester - Queued';
-            $body = <<<EOD
-Your keyword has been queued into the Keyword Suggester.
-
-You can view the progress/status in the following URL:
-%s.
-
-This URL will be active for 7 days.
-EOD;
-            $body = sprintf(
-                $body,
-                $request->getUriForPath(
-                    $application['url_generator']->generate(
-                        'free_id',
-                        array(
-                            'id' => $id,
-                        )
-                    )
-                )
-            );
-            try {
-                $message = \Swift_Message::newInstance()
-                    ->addPart(get_part($subject, $body), 'text/html')
-                    ->setBody(trim($body))
-                    ->setFrom(array(
-                        'reports@perfectsidekick.com' => 'Zon Sidekick',
-                    ))
-                    ->setSubject($subject)
-                    ->setTo(array($request->get('email')));
-                $application['mailer']->send($message);
-            } catch (Exception $exception) {
-                Rollbar::report_exception($exception);
-            }
-            $aweber = new AWeberAPI(
-                $variables['aweber']['consumerKey'],
-                $variables['aweber']['consumerSecret']
-            );
-            try {
-                $account = $aweber->getAccount(
-                    $variables['aweber']['accessKey'],
-                    $variables['aweber']['accessSecret']
-                );
-                $list = $account->loadFromUrl(sprintf(
-                    '/accounts/%s/lists/%s',
-                    $variables['aweber']['account_id'],
-                    $variables['aweber']['list_id']
-                ));
-                $new_subscriber = $list->subscribers->create(array(
-                    'email' => $request->get('email'),
-                    'ip_address' => $_SERVER['REMOTE_ADDR'],
-                    'name' => $request->get('email'),
-                    'custom_fields' => array(
-                        'string' => $request->get('string'),
-                    ),
-                ));
-            } catch(AWeberAPIException $exception) {
-                Rollbar::report_exception($exception);
-            }
-            return $application->redirect(
-                $application['url_generator']->generate(
-                    'free_id',
-                    array(
-                        'id' => $id,
-                    )
-                )
-            );
-        }
-        return $application['twig']->render(
-            'views/free.twig',
-            array(
-                'countries' => get_countries(),
-                'keywords' => $request->get('keywords', ''),
-                'mode' => $request->get('mode', 'Suggest'),
-                'search_aliases' => get_search_aliases(),
-            )
-        );
-    }
-)
-->bind('free')
-->method('GET|POST');
-
-$application
-->match(
-    '/free/{id}',
-    function (Request $request, $id) use ($application) {
-        return $application['twig']->render(
-            'views/free_id.twig', array(
-                'id' => $id,
-            )
-        );
-    }
-)
-->bind('free_id')
-->method('GET');
-
-$application
-->match(
-    '/free/{id}/xhr',
-    function (Request $request, $id) use ($application) {
-        $query = <<<EOD
-SELECT * FROM `apps_keyword_suggester` WHERE `id` = ?
-EOD;
-        $record = $application['db']->fetchAssoc($query, array($id));
-        if (!empty($record['strings'])) {
-            $record['strings'] = json_decode($record['strings']);
-        } else {
-            $record['strings'] = '';
-        }
-        $eta = 'Unknown';
-        $query = <<<EOD
-SELECT COUNT(`id`) AS count
-FROM `apps_keyword_suggester`
-WHERE `id` <= ? AND `strings` IS NULL
-EOD;
-        $queue = $application['db']->fetchAssoc($query, array($id));
-        $query = <<<EOD
-SELECT `timestamp` FROM `apps_keyword_suggester` WHERE `strings` IS NOT NULL
-ORDER BY `timestamp` DESC LIMIT 2 OFFSET 0
-EOD;
-        $timestamps = $application['db']->fetchAll($query);
-        if (!empty($timestamps)) {
-            $eta = intval($queue['count']) * ((
-                strtotime($timestamps[0]['timestamp']) - strtotime($timestamps[1]['timestamp'])
-            ));
-            if (($eta != 'Unknown') && ($eta >= 60)) {
-                $eta = sprintf('~%d minutes, %d seconds', $eta/60, $eta%60);
-            } elseif (($eta != 'Unknown') && ($eta < 60)) {
-                $eta = sprintf('~%d seconds', $eta);
-            }
-        }
-        return new Response(json_encode(array(
-            'eta' => $eta,
-            'record' => $record,
-            'queue' => $queue,
-        ), JSON_NUMERIC_CHECK));
-    }
-)
-->bind('free_id_xhr')
-->method('GET');
-
 
 $application
 ->match(
@@ -2108,6 +1970,167 @@ $application
 )
 ->bind('keyword_suggester_xhr')
 ->method('POST');
+
+$application
+->match(
+    '/keyword-suggester/free',
+    function (Request $request) use ($application, $variables) {
+        if ($request->isMethod('POST')) {
+            $application['db']->insert('apps_keyword_suggester', array(
+                'country' => $request->get('country'),
+                'email' => $request->get('email'),
+                'search_alias' => $request->get('search_alias'),
+                'string' => $request->get('string'),
+            ));
+            $id = $application['db']->lastInsertId();
+            $subject = 'Keyword Suggester - Free';
+            $body = <<<EOD
+Hi,
+
+Your request has been successfully queued. You can view the progress in the
+following URL: %s
+
+Note: This URL will be active for 7 days.
+
+If you have any questions at all please don't hesitate to contact
+support@perfectsidekick.com
+EOD;
+            $body = sprintf(
+                $body,
+                $request->getUriForPath(
+                    $application['url_generator']->generate(
+                        'keyword_suggester_free_id',
+                        array(
+                            'id' => $id,
+                        )
+                    )
+                )
+            );
+            try {
+                $message = \Swift_Message::newInstance()
+                    ->addPart(get_part($subject, $body), 'text/html')
+                    ->setBody(trim($body))
+                    ->setFrom(array(
+                        'reports@perfectsidekick.com' => 'Zon Sidekick',
+                    ))
+                    ->setSubject($subject)
+                    ->setTo(array($request->get('email')));
+                $application['mailer']->send($message);
+            } catch (Exception $exception) {
+                Rollbar::report_exception($exception);
+            }
+            $aweber = new AWeberAPI(
+                $variables['aweber']['consumer_key'],
+                $variables['aweber']['consumer_secret']
+            );
+            try {
+                $account = $aweber->getAccount(
+                    $variables['aweber']['access_key'],
+                    $variables['aweber']['access_secret']
+                );
+                $list = $account->loadFromUrl(sprintf(
+                    '/accounts/%s/lists/%s',
+                    $variables['aweber']['account_id'],
+                    $variables['aweber']['list_id']
+                ));
+                $new_subscriber = $list->subscribers->create(array(
+                    'custom_fields' => array(
+                        'string' => $request->get('string'),
+                    ),
+                    'email' => $request->get('email'),
+                    'ip_address' => $_SERVER['REMOTE_ADDR'],
+                ));
+            } catch(AWeberAPIException $exception) {
+                Rollbar::report_exception($exception);
+            }
+            return $application->redirect(
+                $application['url_generator']->generate(
+                    'keyword_suggester_free_id',
+                    array(
+                        'id' => $id,
+                    )
+                )
+            );
+        }
+        return $application['twig']->render(
+            'views/keyword_suggester_free.twig',
+            array(
+                'countries' => get_countries(),
+                'keywords' => $request->get('keywords', ''),
+                'mode' => $request->get('mode', 'Suggest'),
+                'search_aliases' => get_search_aliases(),
+            )
+        );
+    }
+)
+->bind('keyword_suggester_free')
+->method('GET|POST');
+
+$application
+->match(
+    '/keyword-suggester/free/{id}',
+    function (Request $request, $id) use ($application) {
+        return $application['twig']->render(
+            'views/keyword_suggester_free_id.twig',
+            array(
+                'id' => $id,
+            )
+        );
+    }
+)
+->bind('keyword_suggester_free_id')
+->method('GET');
+
+$application
+->match(
+    '/keyword-suggester/free/{id}/xhr',
+    function (Request $request, $id) use ($application) {
+        $query = <<<EOD
+SELECT * FROM `apps_keyword_suggester` WHERE `id` = ?
+EOD;
+        $record = $application['db']->fetchAssoc($query, array($id));
+        if (!empty($record['strings'])) {
+            $record['strings'] = json_decode($record['strings']);
+        } else {
+            $record['strings'] = '';
+        }
+        $eta = '~1 minute(s)';
+        $query = <<<EOD
+SELECT COUNT(`id`) AS count
+FROM `apps_keyword_suggester`
+WHERE `id` < ? AND `strings` IS NULL
+EOD;
+        $count = $application['db']->fetchColumn($query, array($id), 0);
+        if ($count) {
+            $eta = sprintf('~%d minute(s)', $count + 1);
+        }
+        $query = <<<EOD
+SELECT `timestamp`
+FROM `apps_keyword_suggester`
+WHERE `strings` IS NOT NULL
+ORDER BY `timestamp` DESC
+LIMIT 2 OFFSET 0
+EOD;
+        $timestamps = $application['db']->fetchAll($query);
+        if (count($timestamps) == 2) {
+            $seconds = $count * ((
+                strtotime($timestamps[0]['timestamp'])
+                -
+                strtotime($timestamps[1]['timestamp'])
+            ));
+            if ($seconds > 0) {
+                $eta = sprintf('~%d minute(s)', $seconds / 60);
+            }
+        }
+        return new Response(json_encode(array(
+            'count' => $count + 1,
+            'eta' => $eta,
+            'record' => $record,
+        ), JSON_NUMERIC_CHECK));
+    }
+)
+->bind('keyword_suggester_free_id_xhr')
+->method('GET');
 
 $application
 ->match(
