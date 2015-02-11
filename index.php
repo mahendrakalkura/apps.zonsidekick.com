@@ -915,6 +915,10 @@ $application->before(function (Request $request) use ($application) {
         if (
             $request->get('_route') != 'keyword_suggester_free'
             &&
+            $request->get('_route') != 'keyword_suggester_free_id'
+            &&
+            $request->get('_route') != 'keyword_suggester_free_id_xhr'
+            &&
             $request->get('_route') != 'sign_in'
         ) {
             return $application->redirect(
