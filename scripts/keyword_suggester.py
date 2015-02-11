@@ -6,7 +6,58 @@ from furl import furl
 from rollbar import report_message
 from simplejson import dumps, JSONDecodeError, loads
 
-from utilities import get_responses
+from utilities import get_mysql_connection, get_responses
+
+
+def main():
+    mysql = get_mysql_connection()
+
+    cursor = mysql.cursor()
+    cursor.execute(
+        'SELECT * FROM `apps_keyword_suggester` WHERE `strings` IS NULL'
+    )
+    rows = cursor.fetchall()
+    cursor.close()
+    for row in rows:
+        results = get_results(
+            row['string'], row['country'], row['search_alias'],
+        )
+        if not results:
+            report_message(
+                'main()',
+                extra_data={
+                    'country': row['country'],
+                    'search_alias': row['search_alias'],
+                    'string': row['string'],
+                },
+                level='critical',
+            )
+            continue
+        cursor = mysql.cursor()
+        cursor.execute(
+            '''
+            UPDATE `apps_keyword_suggester`
+            SET `strings` = %(results)s , `timestamp` = NOW()
+            WHERE `id` = %(id)s
+            ''',
+            {
+                'id': row['id'],
+                'results': dumps(results),
+            }
+        )
+        cursor.close()
+        mysql.commit()
+
+    cursor = mysql.cursor()
+    cursor.execute(
+        '''
+        DELETE FROM apps_keyword_suggester
+        WHERE `timestamp` < DATE_SUB(NOW(), INTERVAL 7 DAY)
+        '''
+    )
+    cursor.close()
+
+    mysql.commit()
 
 
 def get_mkt_and_url(country):
@@ -77,15 +128,18 @@ def get_url(sub_domain):
     }
 
 if __name__ == '__main__':
-    results = get_results(argv[1], argv[2], argv[3])
-    if not results:
-        report_message(
-            'get_results()',
-            extra_data={
-                'country': argv[2],
-                'q': argv[1],
-                'search_alias': argv[3],
-            },
-            level='critical',
-        )
-    print dumps(results)
+    if len(argv) == 1:
+        main()
+    if len(argv) == 4:
+        results = get_results(argv[1], argv[2], argv[3])
+        if not results:
+            report_message(
+                'get_results()',
+                extra_data={
+                    'country': argv[2],
+                    'q': argv[1],
+                    'search_alias': argv[3],
+                },
+                level='critical',
+            )
+        print dumps(results)

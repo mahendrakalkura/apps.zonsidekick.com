@@ -3,11 +3,11 @@
         "debug": ... // Choices: true OR false
     },
     "aweber": {
-        "accessKey": "",
-        "accessSecret": "",
+        "access_key": "",
+        "access_secret": "",
         "account_id": "",
-        "consumerKey": "",
-        "consumerSecret": "",
+        "consumer_key": "",
+        "consumer_secret": "",
         "list_id": ""
     },
     "broker": "amqp://guest@localhost//",

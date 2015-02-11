@@ -15,7 +15,7 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from requests import get
 from requests.exceptions import RequestException
-from rollbar import init, report_message
+from rollbar import init
 from scrapy.selector import Selector
 from simplejson import dumps, JSONDecodeError, loads
 from sqlalchemy import create_engine

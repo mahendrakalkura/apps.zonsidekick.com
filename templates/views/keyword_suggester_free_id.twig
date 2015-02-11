@@ -1,0 +1,101 @@
+{% extends 'layout.twig' %}
+
+{% set module = 'Keyword Suggester - Free' %}
+{% set nav = 'keyword_suggester_free' %}
+
+{% block content %}
+<ul class="breadcrumb breadcrumb-page">
+    <div class="breadcrumb-label text-light-gray">You are here:</div>
+    <li><a href="{{ url('dashboard') }}">Home</a></li>
+    <li>
+        <a href="{{ url('keyword_suggester_free') }}">Keyword Suggester</a>
+    </li>
+    <li class="active">
+        <a href="{{ url('keyword_suggester_free_id', {'id': id}) }}">Free</a>
+    </li>
+</ul>
+
+<div class="page-header">
+    <div class="row">
+        <h1 class="col-xs-12">
+            {% include 'slots/feedback.twig' %}
+            <i class="fa fa-fw fa-list"></i>
+            {{ module }}
+        </h1>
+    </div>
+</div>
+{% include 'slots/alerts.twig' %}
+<div
+    data-url-xhr="{{ url('keyword_suggester_free_id_xhr', {id: id}) }}"
+    ng-controller="keyword_suggester_free"
+    >
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-xs-12">
+            <p class="text-center" ng-show="spinner">
+                <span class="fa fa-2x fa-fw fa-spin fa-spinner"></span>
+            </p>
+            <table
+                class="table table-bordered table-hover table-striped"
+                ng-show="spinner"
+                >
+                <tr>
+                    <td>ETA</td>
+                    <td class="narrow text-right">[! eta !]</td>
+                </tr>
+                <tr>
+                    <td>Wait List Number</td>
+                    <td class="narrow text-right">[! count !]</td>
+                </tr>
+            </table>
+        </div>
+        <div
+            class="col-xs-12 col-sm-12 col-md-12 col-xs-12"
+            ng-show="record.strings.length"
+            >
+            <div class="panel">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label class="control-label" for="keyword">
+                            Keyword
+                        </label>
+                        <input
+                            class="form-control"
+                            disabled
+                            id="string"
+                            name="string"
+                            type="text"
+                            value="[! record.string !]"
+                            >
+                    </div>
+                    <div class="form-group">
+                        <label
+                            class="control-label"
+                            class="pull-right"
+                            for="suggestions"
+                            >Suggestions</label>
+                        <textarea
+                            class="form-control"
+                            id="suggestions"
+                            rows="15"
+                            >[! record.strings.join('\n') !]</textarea>
+                        <div class="help-block text-right">
+                            Total Number of Suggestions:
+                            <span>[! record.strings.length !]</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="clearfix panel-footer text-right">
+                    <button
+                        class="btn btn-info copy-all no-margin pull-right"
+                        data-value="[! record.strings.join('\n') !]"
+                        type="button"
+                        >
+                        <span class="fa fa-lg fa-fw fa-copy"></span>
+                        Copy All
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
