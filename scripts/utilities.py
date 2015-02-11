@@ -46,6 +46,10 @@ engine = create_engine(
 base = declarative_base(bind=engine, metadata=ThreadLocalMetaData())
 
 stopwords = stopwords.words('english')
+stopwords.append('book')
+stopwords.append('books')
+stopwords.append('free')
+stopwords.append('kindle')
 
 
 class json(TypeDecorator):
