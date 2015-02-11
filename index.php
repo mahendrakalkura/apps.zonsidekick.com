@@ -927,7 +927,15 @@ $application->before(function (Request $request) use ($application) {
         }
     }
     $is_paying_customer = is_paying_customer($application, $user);
-    if ($request->get('_route') != 'sign_in') {
+    if (
+        $request->get('_route') != 'keyword_suggester_free'
+        &&
+        $request->get('_route') != 'keyword_suggester_free_id'
+        &&
+        $request->get('_route') != 'keyword_suggester_free_id_xhr'
+        &&
+        $request->get('_route') != 'sign_in'
+    ) {
         if ($is_paying_customer) {
             if ($request->get('_route') == '403') {
                 return $application->redirect(
