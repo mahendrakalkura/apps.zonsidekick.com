@@ -912,7 +912,11 @@ if ($application['debug']) {
 $application->before(function (Request $request) use ($application) {
     $user = get_user($application);
     if (!$user['id']) {
-        if ($request->get('_route') != 'sign_in') {
+        if (
+            $request->get('_route') != 'keyword_suggester_free'
+            &&
+            $request->get('_route') != 'sign_in'
+        ) {
             return $application->redirect(
                 $application['url_generator']->generate('sign_in')
             );
