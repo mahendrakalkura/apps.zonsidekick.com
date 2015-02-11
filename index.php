@@ -1400,14 +1400,74 @@ $application
 $application
 ->match(
     '/free',
-    function (Request $request) use ($application) {
+    function (Request $request) use ($application, $variables) {
         if ($request->isMethod('POST')) {
             $application['db']->insert('apps_keyword_suggester', array(
                 'country' => $request->get('country'),
+                'email' => $request->get('email'),
                 'search_alias' => $request->get('search_alias'),
                 'string' => $request->get('string'),
             ));
             $id = $application['db']->lastInsertId();
+
+            $subject = 'Keyword Suggester - Queued';
+            $body = <<<EOD
+Your keyword has been queued into the Keyword Suggester.
+
+You can view the progress/status in the following URL:
+%s.
+
+This URL will be active for 7 days.
+EOD;
+            $body = sprintf(
+                $body,
+                $request->getUriForPath(
+                    $application['url_generator']->generate(
+                        'free_id',
+                        array(
+                            'id' => $id,
+                        )
+                    )
+                )
+            );
+            try {
+                $message = \Swift_Message::newInstance()
+                    ->addPart(get_part($subject, $body), 'text/html')
+                    ->setBody(trim($body))
+                    ->setFrom(array(
+                        'reports@perfectsidekick.com' => 'Zon Sidekick',
+                    ))
+                    ->setSubject($subject)
+                    ->setTo(array($request->get('email')));
+                $application['mailer']->send($message);
+            } catch (Exception $exception) {
+                Rollbar::report_exception($exception);
+            }
+            $aweber = new AWeberAPI(
+                $variables['aweber']['consumerKey'],
+                $variables['aweber']['consumerSecret']
+            );
+            try {
+                $account = $aweber->getAccount(
+                    $variables['aweber']['accessKey'],
+                    $variables['aweber']['accessSecret']
+                );
+                $list = $account->loadFromUrl(sprintf(
+                    '/accounts/%s/lists/%s',
+                    $variables['aweber']['account_id'],
+                    $variables['aweber']['list_id']
+                ));
+                $new_subscriber = $list->subscribers->create(array(
+                    'email' => $request->get('email'),
+                    'ip_address' => $_SERVER['REMOTE_ADDR'],
+                    'name' => $request->get('email'),
+                    'custom_fields' => array(
+                        'string' => $request->get('string'),
+                    ),
+                ));
+            } catch(AWeberAPIException $exception) {
+                Rollbar::report_exception($exception);
+            }
             return $application->redirect(
                 $application['url_generator']->generate(
                     'free_id',
@@ -1458,13 +1518,30 @@ EOD;
         } else {
             $record['strings'] = '';
         }
+        $eta = 'Unknown';
         $query = <<<EOD
 SELECT COUNT(`id`) AS count
 FROM `apps_keyword_suggester`
 WHERE `id` <= ? AND `strings` IS NULL
 EOD;
         $queue = $application['db']->fetchAssoc($query, array($id));
+        $query = <<<EOD
+SELECT `timestamp` FROM `apps_keyword_suggester` WHERE `strings` IS NOT NULL
+ORDER BY `timestamp` DESC LIMIT 2 OFFSET 0
+EOD;
+        $timestamps = $application['db']->fetchAll($query);
+        if (!empty($timestamps)) {
+            $eta = intval($queue['count']) * ((
+                strtotime($timestamps[0]['timestamp']) - strtotime($timestamps[1]['timestamp'])
+            ));
+            if (($eta != 'Unknown') && ($eta >= 60)) {
+                $eta = sprintf('~%d minutes, %d seconds', $eta/60, $eta%60);
+            } elseif (($eta != 'Unknown') && ($eta < 60)) {
+                $eta = sprintf('~%d seconds', $eta);
+            }
+        }
         return new Response(json_encode(array(
+            'eta' => $eta,
             'record' => $record,
             'queue' => $queue,
         ), JSON_NUMERIC_CHECK));

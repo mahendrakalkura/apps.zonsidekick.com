@@ -10,3 +10,7 @@ CREATE TABLE IF NOT EXISTS `apps_keyword_suggester` (
     KEY `country` (`country`),
     KEY `search_alias` (`search_alias`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+ALTER TABLE `apps_keyword_suggester` ADD `email` VARCHAR(100) NOT NULL;
+
+ALTER TABLE `apps_keyword_suggester` ADD `timestamp` DATETIME NULL;

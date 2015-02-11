@@ -15,7 +15,9 @@ def main():
         SELECT * FROM `apps_keyword_suggester` WHERE `strings` IS NULL
         '''
     )
-    for row in cursor:
+    rows = cursor.fetchall()
+    cursor.close()
+    for row in rows:
         results = get_results(
             row['string'], row['country'], row['search_alias']
         )
@@ -29,9 +31,11 @@ def main():
                 }
             )
             continue
+        cursor = mysql.cursor()
         cursor.execute(
             '''
-            UPDATE `apps_keyword_suggester` SET `strings` = %(results)s
+            UPDATE `apps_keyword_suggester`
+            SET `strings` = %(results)s, `timestamp` = NOW()
             WHERE `id` = %(id)s
             ''',
             {
@@ -39,6 +43,16 @@ def main():
                 'results': dumps(results),
             }
         )
+        cursor.close()
+        mysql.commit()
+
+    cursor = mysql.cursor()
+    cursor.execute(
+        '''
+        DELETE FROM apps_keyword_suggester
+        WHERE `timestamp` < DATE_SUB(NOW(), INTERVAL 7 DAY)
+        '''
+    )
     cursor.close()
     mysql.commit()
 

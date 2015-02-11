@@ -705,6 +705,7 @@ application.controller('free', [
             success(function (data, status, headers, config) {
                 $scope.record = data.record;
                 $scope.queue = data.queue;
+                $scope.eta = data.eta;
                 if ($scope.record.strings.length) {
                     $scope.spinner = false;
                 } else {

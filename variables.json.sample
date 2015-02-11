@@ -2,6 +2,14 @@
     "application": {
         "debug": ... // Choices: true OR false
     },
+    "aweber": {
+        "accessKey": "",
+        "accessSecret": "",
+        "account_id": "",
+        "consumerKey": "",
+        "consumerSecret": "",
+        "list_id": ""
+    },
     "broker": "amqp://guest@localhost//",
     "mysql": {
         "database": "...",
