@@ -2043,6 +2043,15 @@ EOD;
             } catch(AWeberAPIException $exception) {
                 Rollbar::report_exception($exception);
             }
+            setcookie(
+                'email',
+                $request->get('email'),
+                time() + (60 * 60 * 24 * 365),
+                '/',
+                'apps.zonsidekick.com',
+                false,
+                false
+            );
             return $application->redirect(
                 $application['url_generator']->generate(
                     'keyword_suggester_free_id',
@@ -2056,6 +2065,7 @@ EOD;
             'views/keyword_suggester_free.twig',
             array(
                 'countries' => get_countries(),
+                'email' => $_COOKIE['email']? $_COOKIE['email']: '',
                 'keywords' => $request->get('keywords', ''),
                 'mode' => $request->get('mode', 'Suggest'),
                 'search_aliases' => get_search_aliases(),
