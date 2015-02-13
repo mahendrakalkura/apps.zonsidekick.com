@@ -20,7 +20,14 @@ from keyword_analyzer import get_contents
 from keyword_suggester import get_results
 from suggested_keywords import get_suggested_keywords
 from top_100_explorer import book, category, trend
-from utilities import base, get_mysql_session, get_words, stopwords, variables
+from utilities import (
+    base,
+    get_date,
+    get_mysql_session,
+    get_words,
+    stopwords,
+    variables
+)
 
 if 'threading' in modules:
     del modules['threading']
@@ -152,11 +159,13 @@ def get_titles(category_id, print_length):
 
 def step_1(category_id, print_length):
     print 'Step 1'
+    date = get_date()
     with closing(get_mysql_session()()) as session:
         session.query(
             step_1_word,
         ).filter(
             step_1_word.category_id == category_id,
+            step_1_word.date == date,
             step_1_word.print_length == print_length,
         ).delete(
             synchronize_session=False,
@@ -168,6 +177,7 @@ def step_1(category_id, print_length):
         ], 20):
             session.add(step_1_word(**{
                 'category_id': category_id,
+                'date': date,
                 'print_length': print_length,
                 'string': string,
             }))
@@ -177,11 +187,13 @@ def step_1(category_id, print_length):
 
 def step_2_reset(category_id, print_length):
     print 'Step 2 :: Reset'
+    date = get_date()
     with closing(get_mysql_session()()) as session:
         session.query(
             step_2_keyword,
         ).filter(
             step_2_keyword.category_id == category_id,
+            step_2_keyword.date == date,
             step_2_keyword.print_length == print_length,
         ).delete(
             synchronize_session=False,
@@ -192,6 +204,7 @@ def step_2_reset(category_id, print_length):
 
 def step_2_queue(category_id, print_length):
     print 'Step 2 :: Queue'
+    date = get_date()
     with closing(get_mysql_session()()) as session:
         strings = [
             word.string
@@ -199,6 +212,7 @@ def step_2_queue(category_id, print_length):
                 step_1_word,
             ).filter(
                 step_1_word.category_id == category_id,
+                step_1_word.date == date,
                 step_1_word.print_length == print_length,
             ).order_by(
                 'id ASC',
@@ -213,6 +227,7 @@ def step_2_queue(category_id, print_length):
 
 @celery.task
 def step_2_process(category_id, print_length, string, strings):
+    date = get_date()
     ss = get_results(string, 'com', 'digital-text')
     with closing(get_mysql_session()()) as session:
         for s in ss:
@@ -220,6 +235,7 @@ def step_2_process(category_id, print_length, string, strings):
                 step_2_keyword,
             ).filter(
                 step_2_keyword.category_id == category_id,
+                step_2_keyword.date == date,
                 step_2_keyword.print_length == print_length,
                 step_2_keyword.string == s,
             ).count():
@@ -228,6 +244,7 @@ def step_2_process(category_id, print_length, string, strings):
                 continue
             session.add(step_2_keyword(**{
                 'category_id': category_id,
+                'date': date,
                 'print_length': print_length,
                 'string': s,
             }))
@@ -236,11 +253,13 @@ def step_2_process(category_id, print_length, string, strings):
 
 def step_3_1_reset(category_id, print_length):
     print 'Step 3.1 :: Reset'
+    date = get_date()
     with closing(get_mysql_session()()) as session:
         session.query(
             step_3_suggested_keyword,
         ).filter(
             step_3_suggested_keyword.category_id == category_id,
+            step_3_suggested_keyword.date == date,
             step_3_suggested_keyword.print_length == print_length,
         ).delete(
             synchronize_session=False,
@@ -251,11 +270,13 @@ def step_3_1_reset(category_id, print_length):
 
 def step_3_1_queue(category_id, print_length):
     print 'Step 3.1 :: Queue'
+    date = get_date()
     with closing(get_mysql_session()()) as session:
         for keyword in session.query(
             step_2_keyword,
         ).filter(
             step_2_keyword.category_id == category_id,
+            step_2_keyword.date == date,
             step_2_keyword.print_length == print_length,
         ).order_by(
             'id ASC',
@@ -268,6 +289,7 @@ def step_3_1_queue(category_id, print_length):
 
 @celery.task
 def step_3_1_process(category_id, print_length, string):
+    date = get_date()
     ss = get_suggested_keywords(word_tokenize(string))
     with closing(get_mysql_session()()) as session:
         for s in ss:
@@ -275,12 +297,14 @@ def step_3_1_process(category_id, print_length, string):
                 step_3_suggested_keyword,
             ).filter(
                 step_3_suggested_keyword.category_id == category_id,
+                step_3_suggested_keyword.date == date,
                 step_3_suggested_keyword.print_length == print_length,
                 step_3_suggested_keyword.string == s,
             ).count():
                 continue
             session.add(step_3_suggested_keyword(**{
                 'category_id': category_id,
+                'date': date,
                 'print_length': print_length,
                 'string': s,
             }))
@@ -289,11 +313,13 @@ def step_3_1_process(category_id, print_length, string):
 
 def step_3_2_reset(category_id, print_length):
     print 'Step 3.2 :: Reset'
+    date = get_date()
     with closing(get_mysql_session()()) as session:
         session.query(
             step_3_suggested_keyword,
         ).filter(
             step_3_suggested_keyword.category_id == category_id,
+            step_3_suggested_keyword.date == date,
             step_3_suggested_keyword.print_length == print_length,
         ).update(
             {
@@ -317,11 +343,13 @@ def step_3_2_reset(category_id, print_length):
 
 def step_3_2_queue(category_id, print_length):
     print 'Step 3.2 :: Queue'
+    date = get_date()
     with closing(get_mysql_session()()) as session:
         for suggested_keyword in session.query(
             step_3_suggested_keyword,
         ).filter(
             step_3_suggested_keyword.category_id == category_id,
+            step_3_suggested_keyword.date == date,
             step_3_suggested_keyword.print_length == print_length,
             step_3_suggested_keyword.score == 0.00,
         ).order_by(
@@ -364,11 +392,13 @@ def step_3_2_process(category_id, print_length, id, string):
 
 def step_4(category_id, print_length):
     print 'Step 4'
+    date = get_date()
     with closing(get_mysql_session()()) as session:
         session.query(
             step_4_word,
         ).filter(
             step_4_word.category_id == category_id,
+            step_4_word.date == date,
             step_4_word.print_length == print_length,
         ).delete(
             synchronize_session=False,
@@ -380,6 +410,7 @@ def step_4(category_id, print_length):
                 step_3_suggested_keyword,
             ).filter(
                 step_3_suggested_keyword.category_id == category_id,
+                step_3_suggested_keyword.date == date,
                 step_3_suggested_keyword.print_length == print_length,
                 step_3_suggested_keyword.score >= 50.00,
             ).order_by(
@@ -391,6 +422,7 @@ def step_4(category_id, print_length):
         ], 20):
             session.add(step_4_word(**{
                 'category_id': category_id,
+                'date': date,
                 'print_length': print_length,
                 'string': string,
             }))
@@ -400,11 +432,13 @@ def step_4(category_id, print_length):
 
 def step_5_reset(category_id, print_length):
     print 'Step 5 :: Reset'
+    date = get_date()
     with closing(get_mysql_session()()) as session:
         session.query(
             step_5_keyword,
         ).filter(
             step_5_keyword.category_id == category_id,
+            step_5_keyword.date == date,
             step_5_keyword.print_length == print_length,
         ).delete(
             synchronize_session=False,
@@ -415,6 +449,7 @@ def step_5_reset(category_id, print_length):
 
 def step_5_queue(category_id, print_length):
     print 'Step 5 :: Queue'
+    date = get_date()
     with closing(get_mysql_session()()) as session:
         strings = [
             word.string
@@ -422,6 +457,7 @@ def step_5_queue(category_id, print_length):
                 step_4_word,
             ).filter(
                 step_4_word.category_id == category_id,
+                step_4_word.date == date,
                 step_4_word.print_length == print_length,
             ).order_by(
                 'id ASC',
@@ -436,6 +472,7 @@ def step_5_queue(category_id, print_length):
 
 @celery.task
 def step_5_process(category_id, print_length, string, strings):
+    date = get_date()
     ss = get_results(string, 'com', 'digital-text')
     with closing(get_mysql_session()()) as session:
         for s in ss:
@@ -443,6 +480,7 @@ def step_5_process(category_id, print_length, string, strings):
                 step_5_keyword,
             ).filter(
                 step_5_keyword.category_id == category_id,
+                step_5_keyword.date == date,
                 step_5_keyword.print_length == print_length,
                 step_5_keyword.string == s,
             ).count():
@@ -451,6 +489,7 @@ def step_5_process(category_id, print_length, string, strings):
                 continue
             session.add(step_5_keyword(**{
                 'category_id': category_id,
+                'date': date,
                 'print_length': print_length,
                 'string': s,
             }))
@@ -459,11 +498,13 @@ def step_5_process(category_id, print_length, string, strings):
 
 def step_6_1_reset(category_id, print_length):
     print 'Step 6.1 :: Reset'
+    date = get_date()
     with closing(get_mysql_session()()) as session:
         session.query(
             step_6_suggested_keyword,
         ).filter(
             step_6_suggested_keyword.category_id == category_id,
+            step_6_suggested_keyword.date == date,
             step_6_suggested_keyword.print_length == print_length,
         ).delete(
             synchronize_session=False,
@@ -474,11 +515,13 @@ def step_6_1_reset(category_id, print_length):
 
 def step_6_1_queue(category_id, print_length):
     print 'Step 6.1 :: Queue'
+    date = get_date()
     with closing(get_mysql_session()()) as session:
         for keyword in session.query(
             step_5_keyword,
         ).filter(
             step_5_keyword.category_id == category_id,
+            step_5_keyword.date == date,
             step_5_keyword.print_length == print_length,
         ).order_by(
             'id ASC',
@@ -491,6 +534,7 @@ def step_6_1_queue(category_id, print_length):
 
 @celery.task
 def step_6_1_process(category_id, print_length, string):
+    date = get_date()
     ss = get_suggested_keywords(word_tokenize(string))
     with closing(get_mysql_session()()) as session:
         for s in ss:
@@ -498,12 +542,14 @@ def step_6_1_process(category_id, print_length, string):
                 step_6_suggested_keyword,
             ).filter(
                 step_6_suggested_keyword.category_id == category_id,
+                step_6_suggested_keyword.date == date,
                 step_6_suggested_keyword.print_length == print_length,
                 step_6_suggested_keyword.string == s,
             ).count():
                 continue
             session.add(step_6_suggested_keyword(**{
                 'category_id': category_id,
+                'date': date,
                 'print_length': print_length,
                 'string': s,
             }))
@@ -512,11 +558,13 @@ def step_6_1_process(category_id, print_length, string):
 
 def step_6_2_reset(category_id, print_length):
     print 'Step 6.2 :: Reset'
+    date = get_date()
     with closing(get_mysql_session()()) as session:
         session.query(
             step_6_suggested_keyword,
         ).filter(
             step_6_suggested_keyword.category_id == category_id,
+            step_6_suggested_keyword.date == date,
             step_6_suggested_keyword.print_length == print_length,
         ).update(
             {
@@ -540,11 +588,13 @@ def step_6_2_reset(category_id, print_length):
 
 def step_6_2_queue(category_id, print_length):
     print 'Step 6.2 :: Queue'
+    date = get_date()
     with closing(get_mysql_session()()) as session:
         for suggested_keyword in session.query(
             step_6_suggested_keyword,
         ).filter(
             step_6_suggested_keyword.category_id == category_id,
+            step_6_suggested_keyword.date == date,
             step_6_suggested_keyword.print_length == print_length,
             step_6_suggested_keyword.score == 0.00,
         ).order_by(
@@ -587,11 +637,13 @@ def step_6_2_process(category_id, print_length, id, string):
 
 def step_7(category_id, print_length):
     print 'Step 7'
+    date = get_date()
     with closing(get_mysql_session()()) as session:
         session.query(
             step_7_group,
         ).filter(
             step_7_group.category_id == category_id,
+            step_7_group.date == date,
             step_7_group.print_length == print_length,
         ).delete(
             synchronize_session=False,
@@ -603,6 +655,7 @@ def step_7(category_id, print_length):
             step_6_suggested_keyword,
         ).filter(
             step_6_suggested_keyword.category_id == category_id,
+            step_6_suggested_keyword.date == date,
             step_6_suggested_keyword.print_length == print_length,
             step_6_suggested_keyword.score >= 50.00,
         ).order_by(
@@ -640,10 +693,12 @@ def step_7(category_id, print_length):
         for value in items.values():
             group = step_7_group(**{
                 'category_id': category_id,
+                'date': date,
                 'print_length': print_length,
             })
             for suggested_keyword in value:
                 session.add(step_7_group_suggested_keyword(**{
+                    'date': date,
                     'group': group,
                     'suggested_keyword': suggested_keyword,
                 }))
@@ -652,6 +707,7 @@ def step_7(category_id, print_length):
 
 
 def xlsx(category_id, print_length):
+    date = get_date()
     th_center = Style(
         alignment=Alignment(
             horizontal='center',
@@ -782,6 +838,7 @@ def xlsx(category_id, print_length):
             step_1_word,
         ).filter(
             step_1_word.category_id == category_id,
+            step_1_word.date == date,
             step_1_word.print_length == print_length,
         ).order_by(
             'string ASC',
@@ -807,6 +864,7 @@ def xlsx(category_id, print_length):
             step_2_keyword,
         ).filter(
             step_2_keyword.category_id == category_id,
+            step_2_keyword.date == date,
             step_2_keyword.print_length == print_length,
         ).order_by(
             'string ASC',
@@ -850,6 +908,7 @@ def xlsx(category_id, print_length):
             step_3_suggested_keyword,
         ).filter(
             step_3_suggested_keyword.category_id == category_id,
+            step_3_suggested_keyword.date == date,
             step_3_suggested_keyword.print_length == print_length,
         ).order_by(
             'score DESC',
@@ -942,6 +1001,7 @@ def xlsx(category_id, print_length):
             step_4_word,
         ).filter(
             step_4_word.category_id == category_id,
+            step_4_word.date == date,
             step_4_word.print_length == print_length,
         ).order_by(
             'string ASC',
@@ -967,6 +1027,7 @@ def xlsx(category_id, print_length):
             step_5_keyword,
         ).filter(
             step_5_keyword.category_id == category_id,
+            step_5_keyword.date == date,
             step_5_keyword.print_length == print_length,
         ).order_by(
             'string ASC',
@@ -1010,6 +1071,7 @@ def xlsx(category_id, print_length):
             step_6_suggested_keyword,
         ).filter(
             step_6_suggested_keyword.category_id == category_id,
+            step_6_suggested_keyword.date == date,
             step_6_suggested_keyword.print_length == print_length,
         ).order_by(
             'score DESC',
@@ -1101,6 +1163,7 @@ def xlsx(category_id, print_length):
             step_7_group,
         ).filter(
             step_7_group.category_id == category_id,
+            step_7_group.date == date,
             step_7_group.print_length == print_length,
         ).order_by(
             'id ASC',
@@ -1221,6 +1284,74 @@ def xlsx(category_id, print_length):
         'category_id': arguments.category_id,
         'print_length': arguments.print_length,
     })
+
+
+def reset(category_id, print_length):
+    date = get_date() - timedelta(weeks=3)
+    with closing(get_mysql_session()()) as session:
+        session.query(
+            step_1_word
+        ).filter(
+            step_1_word.category_id == category_id,
+            step_1_word.date < date,
+            step_1_word.print_length == print_length,
+        ).delete(synchronize_session=False)
+
+        session.query(
+            step_2_keyword
+        ).filter(
+            step_2_keyword.category_id == category_id,
+            step_2_keyword.date < date,
+            step_2_keyword.print_length == print_length,
+        ).delete(synchronize_session=False)
+
+        session.query(
+            step_3_suggested_keyword
+        ).filter(
+            step_3_suggested_keyword.category_id == category_id,
+            step_3_suggested_keyword.date < date,
+            step_3_suggested_keyword.print_length == print_length,
+        ).delete(synchronize_session=False)
+
+        session.query(
+            step_4_word
+        ).filter(
+            step_4_word.category_id == category_id,
+            step_4_word.date < date,
+            step_4_word.print_length == print_length,
+        ).delete(synchronize_session=False)
+
+        session.query(
+            step_5_keyword
+        ).filter(
+            step_5_keyword.category_id == category_id,
+            step_5_keyword.date < date,
+            step_5_keyword.print_length == print_length,
+        ).delete(synchronize_session=False)
+
+        session.query(
+            step_6_suggested_keyword
+        ).filter(
+            step_6_suggested_keyword.category_id == category_id,
+            step_6_suggested_keyword.date < date,
+            step_6_suggested_keyword.print_length == print_length,
+        ).delete(synchronize_session=False)
+
+        session.query(
+            step_7_group
+        ).filter(
+            step_7_group.category_id == category_id,
+            step_7_group.date < date,
+            step_7_group.print_length == print_length,
+        ).delete(synchronize_session=False)
+
+        session.query(
+            step_7_group_suggested_keyword
+        ).filter(
+            step_7_group_suggested_keyword.date < date
+        ).delete(synchronize_session=False)
+        session.commit()
+
 
 if __name__ == '__main__':
     parser = ArgumentParser()

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from collections import Counter, OrderedDict
+from datetime import date, datetime, timedelta
 from furl import furl
 from os.path import abspath, dirname, join
 from random import choice, randint
@@ -294,6 +295,11 @@ def get_book(response):
         'total_number_of_reviews': total_number_of_reviews,
         'url': response.url,
     }
+
+
+def get_date():
+    today = date.today()
+    return today - timedelta(days=today.weekday())
 
 
 def get_headers(url):
