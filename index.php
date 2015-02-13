@@ -1983,8 +1983,9 @@ $application
                 'string' => $request->get('string'),
             ));
             $id = $application['db']->lastInsertId();
-            $subject = 'Keyword Suggester - Free';
-            $body = <<<EOD
+            if ($request->get('email')) {
+                $subject = 'Keyword Suggester - Free';
+                $body = <<<EOD
 Hi,
 
 Your request has been successfully queued. You can view the progress in the
@@ -1995,53 +1996,54 @@ Note: This URL will be active for 7 days.
 If you have any questions at all please don't hesitate to contact
 support@perfectsidekick.com
 EOD;
-            $body = sprintf(
-                $body,
-                $request->getUriForPath(
-                    $application['url_generator']->generate(
-                        'keyword_suggester_free_id',
-                        array(
-                            'id' => $id,
+                $body = sprintf(
+                    $body,
+                    $request->getUriForPath(
+                        $application['url_generator']->generate(
+                            'keyword_suggester_free_id',
+                            array(
+                                'id' => $id,
+                            )
                         )
                     )
-                )
-            );
-            try {
-                $message = \Swift_Message::newInstance()
-                    ->addPart(get_part($subject, $body), 'text/html')
-                    ->setBody(trim($body))
-                    ->setFrom(array(
-                        'reports@perfectsidekick.com' => 'Zon Sidekick',
-                    ))
-                    ->setSubject($subject)
-                    ->setTo(array($request->get('email')));
-                $application['mailer']->send($message);
-            } catch (Exception $exception) {
-                Rollbar::report_exception($exception);
-            }
-            $aweber = new AWeberAPI(
-                $variables['aweber']['consumer_key'],
-                $variables['aweber']['consumer_secret']
-            );
-            try {
-                $account = $aweber->getAccount(
-                    $variables['aweber']['access_key'],
-                    $variables['aweber']['access_secret']
                 );
-                $list = $account->loadFromUrl(sprintf(
-                    '/accounts/%s/lists/%s',
-                    $variables['aweber']['account_id'],
-                    $variables['aweber']['list_id']
-                ));
-                $new_subscriber = $list->subscribers->create(array(
-                    'custom_fields' => array(
-                        'string' => $request->get('string'),
-                    ),
-                    'email' => $request->get('email'),
-                    'ip_address' => $_SERVER['REMOTE_ADDR'],
-                ));
-            } catch(AWeberAPIException $exception) {
-                Rollbar::report_exception($exception);
+                try {
+                    $message = \Swift_Message::newInstance()
+                        ->addPart(get_part($subject, $body), 'text/html')
+                        ->setBody(trim($body))
+                        ->setFrom(array(
+                            'reports@perfectsidekick.com' => 'Zon Sidekick',
+                        ))
+                        ->setSubject($subject)
+                        ->setTo(array($request->get('email')));
+                    $application['mailer']->send($message);
+                } catch (Exception $exception) {
+                    Rollbar::report_exception($exception);
+                }
+                $aweber = new AWeberAPI(
+                    $variables['aweber']['consumer_key'],
+                    $variables['aweber']['consumer_secret']
+                );
+                try {
+                    $account = $aweber->getAccount(
+                        $variables['aweber']['access_key'],
+                        $variables['aweber']['access_secret']
+                    );
+                    $list = $account->loadFromUrl(sprintf(
+                        '/accounts/%s/lists/%s',
+                        $variables['aweber']['account_id'],
+                        $variables['aweber']['list_id']
+                    ));
+                    $new_subscriber = $list->subscribers->create(array(
+                        'custom_fields' => array(
+                            'string' => $request->get('string'),
+                        ),
+                        'email' => $request->get('email'),
+                        'ip_address' => $_SERVER['REMOTE_ADDR'],
+                    ));
+                } catch(AWeberAPIException $exception) {
+                    Rollbar::report_exception($exception);
+                }
             }
             setcookie(
                 'email',
@@ -2065,7 +2067,8 @@ EOD;
             'views/keyword_suggester_free.twig',
             array(
                 'countries' => get_countries(),
-                'email' => $_COOKIE['email']? $_COOKIE['email']: '',
+                'email' =>
+                $_COOKIE['email']? $_COOKIE['email']: $request->get('email'),
                 'keywords' => $request->get('keywords', ''),
                 'mode' => $request->get('mode', 'Suggest'),
                 'search_aliases' => get_search_aliases(),
