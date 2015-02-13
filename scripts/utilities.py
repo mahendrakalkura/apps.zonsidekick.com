@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from collections import Counter, OrderedDict
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from furl import furl
 from os.path import abspath, dirname, join
 from random import choice, randint
