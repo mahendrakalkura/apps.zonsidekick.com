@@ -219,7 +219,7 @@ def step_2_queue(date, category_id, print_length):
         ]
         for string in strings:
             step_2_process.delay(
-                date.isoformat(), category_id, print_length, string, strings
+                date.isoformat(), category_id, print_length, string, strings,
             )
     print 'Done'
 
@@ -280,7 +280,7 @@ def step_3_1_queue(date, category_id, print_length):
             stream_results=True,
         ):
             step_3_1_process.delay(
-                date.isoformat(), category_id, print_length, keyword.string
+                date.isoformat(), category_id, print_length, keyword.string,
             )
     print 'Done'
 
@@ -459,7 +459,7 @@ def step_5_queue(date, category_id, print_length):
         ]
         for string in strings:
             step_5_process.delay(
-                date.isoformat(), category_id, print_length, string, strings
+                date.isoformat(), category_id, print_length, string, strings,
             )
     print 'Done'
 
@@ -520,7 +520,7 @@ def step_6_1_queue(date, category_id, print_length):
             stream_results=True,
         ):
             step_6_1_process.delay(
-                date.isoformat(), category_id, print_length, keyword.string
+                date.isoformat(), category_id, print_length, keyword.string,
             )
     print 'Done'
 
@@ -1281,66 +1281,75 @@ def reset(date, category_id, print_length):
     date = date - timedelta(weeks=3)
     with closing(get_mysql_session()()) as session:
         session.query(
-            step_1_word
+            step_1_word,
         ).filter(
             step_1_word.category_id == category_id,
             step_1_word.date < date,
             step_1_word.print_length == print_length,
-        ).delete(synchronize_session=False)
-
+        ).delete(
+            synchronize_session=False,
+        )
         session.query(
-            step_2_keyword
+            step_2_keyword,
         ).filter(
             step_2_keyword.category_id == category_id,
             step_2_keyword.date < date,
             step_2_keyword.print_length == print_length,
-        ).delete(synchronize_session=False)
-
+        ).delete(
+            synchronize_session=False,
+        )
         session.query(
-            step_3_suggested_keyword
+            step_3_suggested_keyword,
         ).filter(
             step_3_suggested_keyword.category_id == category_id,
             step_3_suggested_keyword.date < date,
             step_3_suggested_keyword.print_length == print_length,
-        ).delete(synchronize_session=False)
-
+        ).delete(
+            synchronize_session=False,
+        )
         session.query(
-            step_4_word
+            step_4_word,
         ).filter(
             step_4_word.category_id == category_id,
             step_4_word.date < date,
             step_4_word.print_length == print_length,
-        ).delete(synchronize_session=False)
-
+        ).delete(
+            synchronize_session=False,
+        )
         session.query(
-            step_5_keyword
+            step_5_keyword,
         ).filter(
             step_5_keyword.category_id == category_id,
             step_5_keyword.date < date,
             step_5_keyword.print_length == print_length,
-        ).delete(synchronize_session=False)
-
+        ).delete(
+            synchronize_session=False,
+        )
         session.query(
-            step_6_suggested_keyword
+            step_6_suggested_keyword,
         ).filter(
             step_6_suggested_keyword.category_id == category_id,
             step_6_suggested_keyword.date < date,
             step_6_suggested_keyword.print_length == print_length,
-        ).delete(synchronize_session=False)
-
+        ).delete(
+            synchronize_session=False,
+        )
         session.query(
-            step_7_group
+            step_7_group,
         ).filter(
             step_7_group.category_id == category_id,
             step_7_group.date < date,
             step_7_group.print_length == print_length,
-        ).delete(synchronize_session=False)
-
+        ).delete(
+            synchronize_session=False,
+        )
         session.query(
-            step_7_group_suggested_keyword
+            step_7_group_suggested_keyword,
         ).filter(
             step_7_group_suggested_keyword.date < date
-        ).delete(synchronize_session=False)
+        ).delete(
+            synchronize_session=False,
+        )
         session.commit()
 
 
