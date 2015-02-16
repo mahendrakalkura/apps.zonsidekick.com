@@ -1352,7 +1352,6 @@ def reset(date, category_id, print_length):
         )
         session.commit()
 
-
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument(

@@ -3,14 +3,14 @@ SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `apps_hot_category_step_1_words`;
 CREATE TABLE IF NOT EXISTS `apps_hot_category_step_1_words` (
     `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `date` DATE NOT NULL,
     `category_id` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+    `date` DATE NOT NULL,
     `print_length` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
     `string` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `category_id_print_length_string` (`category_id`, `print_length`, `string`),
-    KEY `date` (`date`),
+    UNIQUE KEY `category_id_date_print_length_string` (`category_id`, `date`, `print_length`, `string`),
     KEY `category_id` (`category_id`),
+    KEY `date` (`date`),
     KEY `print_length` (`print_length`),
     KEY `string` (`string`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -18,14 +18,14 @@ CREATE TABLE IF NOT EXISTS `apps_hot_category_step_1_words` (
 DROP TABLE IF EXISTS `apps_hot_category_step_2_keywords`;
 CREATE TABLE IF NOT EXISTS `apps_hot_category_step_2_keywords` (
     `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `date` DATE NOT NULL,
     `category_id` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+    `date` DATE NOT NULL,
     `print_length` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
     `string` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `category_id_print_length_string` (`category_id`, `print_length`, `string`),
-    KEY `date` (`date`),
+    UNIQUE KEY `category_id_date_print_length_string` (`category_id`, `date`, `print_length`, `string`),
     KEY `category_id` (`category_id`),
+    KEY `date` (`date`),
     KEY `print_length` (`print_length`),
     KEY `string` (`string`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -33,8 +33,8 @@ CREATE TABLE IF NOT EXISTS `apps_hot_category_step_2_keywords` (
 DROP TABLE IF EXISTS `apps_hot_category_step_3_suggested_keywords`;
 CREATE TABLE IF NOT EXISTS `apps_hot_category_step_3_suggested_keywords` (
     `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `date` DATE NOT NULL,
     `category_id` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+    `date` DATE NOT NULL,
     `print_length` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
     `string` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
     `count` BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
@@ -49,9 +49,9 @@ CREATE TABLE IF NOT EXISTS `apps_hot_category_step_3_suggested_keywords` (
     `items` LONGTEXT COLLATE utf8_unicode_ci,
     `words` LONGTEXT COLLATE utf8_unicode_ci,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `category_id_print_length_string` (`category_id`, `print_length`, `string`),
-    KEY `date` (`date`),
+    UNIQUE KEY `category_id_date_print_length_string` (`category_id`, `date`, `print_length`, `string`),
     KEY `category_id` (`category_id`),
+    KEY `date` (`date`),
     KEY `print_length` (`print_length`),
     KEY `string` (`string`),
     KEY `score` (`score`)
@@ -60,14 +60,14 @@ CREATE TABLE IF NOT EXISTS `apps_hot_category_step_3_suggested_keywords` (
 DROP TABLE IF EXISTS `apps_hot_category_step_4_words`;
 CREATE TABLE IF NOT EXISTS `apps_hot_category_step_4_words` (
     `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `date` DATE NOT NULL,
     `category_id` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+    `date` DATE NOT NULL,
     `print_length` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
     `string` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `category_id_print_length_string` (`category_id`, `print_length`, `string`),
-    KEY `date` (`date`),
+    UNIQUE KEY `category_id_date_print_length_string` (`category_id`, `date`, `print_length`, `string`),
     KEY `category_id` (`category_id`),
+    KEY `date` (`date`),
     KEY `print_length` (`print_length`),
     KEY `string` (`string`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -75,14 +75,14 @@ CREATE TABLE IF NOT EXISTS `apps_hot_category_step_4_words` (
 DROP TABLE IF EXISTS `apps_hot_category_step_5_keywords`;
 CREATE TABLE IF NOT EXISTS `apps_hot_category_step_5_keywords` (
     `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `date` DATE NOT NULL,
     `category_id` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+    `date` DATE NOT NULL,
     `print_length` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
     `string` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `category_id_print_length_string` (`category_id`, `print_length`, `string`),
-    KEY `date` (`date`),
+    UNIQUE KEY `category_id_date_print_length_string` (`category_id`, `date`, `print_length`, `string`),
     KEY `category_id` (`category_id`),
+    KEY `date` (`date`),
     KEY `print_length` (`print_length`),
     KEY `string` (`string`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -90,8 +90,8 @@ CREATE TABLE IF NOT EXISTS `apps_hot_category_step_5_keywords` (
 DROP TABLE IF EXISTS `apps_hot_category_step_6_suggested_keywords`;
 CREATE TABLE IF NOT EXISTS `apps_hot_category_step_6_suggested_keywords` (
     `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `date` DATE NOT NULL,
     `category_id` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+    `date` DATE NOT NULL,
     `print_length` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
     `string` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
     `count` BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
@@ -106,9 +106,9 @@ CREATE TABLE IF NOT EXISTS `apps_hot_category_step_6_suggested_keywords` (
     `items` LONGTEXT COLLATE utf8_unicode_ci,
     `words` LONGTEXT COLLATE utf8_unicode_ci,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `category_id_print_length_string` (`category_id`, `print_length`, `string`),
-    KEY `date` (`date`),
+    UNIQUE KEY `category_id_date_print_length_string` (`category_id`, `date`, `print_length`, `string`),
     KEY `category_id` (`category_id`),
+    KEY `date` (`date`),
     KEY `print_length` (`print_length`),
     KEY `string` (`string`),
     KEY `score` (`score`)
@@ -117,19 +117,18 @@ CREATE TABLE IF NOT EXISTS `apps_hot_category_step_6_suggested_keywords` (
 DROP TABLE IF EXISTS `apps_hot_category_step_7_groups`;
 CREATE TABLE IF NOT EXISTS `apps_hot_category_step_7_groups` (
     `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `date` DATE NOT NULL,
     `category_id` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+    `date` DATE NOT NULL,
     `print_length` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
     PRIMARY KEY (`id`),
-    KEY `date` (`date`),
     KEY `category_id` (`category_id`),
+    KEY `date` (`date`),
     KEY `print_length` (`print_length`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 DROP TABLE IF EXISTS `apps_hot_category_step_7_groups_suggested_keywords`;
 CREATE TABLE IF NOT EXISTS `apps_hot_category_step_7_groups_suggested_keywords` (
     `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `date` DATE NOT NULL,
     `group_id` BIGINT(20) UNSIGNED NOT NULL,
     `suggested_keyword_id` BIGINT(20) UNSIGNED NOT NULL,
     PRIMARY KEY (`id`),
