@@ -26,7 +26,7 @@ from utilities import (
     get_mysql_session,
     get_words,
     stopwords,
-    variables
+    variables,
 )
 
 if 'threading' in modules:
@@ -157,9 +157,8 @@ def get_titles(category_id, print_length):
     return titles
 
 
-def step_1(category_id, print_length):
+def step_1(date, category_id, print_length):
     print 'Step 1'
-    date = get_date()
     with closing(get_mysql_session()()) as session:
         session.query(
             step_1_word,
@@ -185,9 +184,8 @@ def step_1(category_id, print_length):
     print 'Done'
 
 
-def step_2_reset(category_id, print_length):
+def step_2_reset(date, category_id, print_length):
     print 'Step 2 :: Reset'
-    date = get_date()
     with closing(get_mysql_session()()) as session:
         session.query(
             step_2_keyword,
@@ -202,9 +200,8 @@ def step_2_reset(category_id, print_length):
     print 'Done'
 
 
-def step_2_queue(category_id, print_length):
+def step_2_queue(date, category_id, print_length):
     print 'Step 2 :: Queue'
-    date = get_date()
     with closing(get_mysql_session()()) as session:
         strings = [
             word.string
@@ -221,13 +218,14 @@ def step_2_queue(category_id, print_length):
             )
         ]
         for string in strings:
-            step_2_process.delay(category_id, print_length, string, strings)
+            step_2_process.delay(
+                date.isoformat(), category_id, print_length, string, strings
+            )
     print 'Done'
 
 
 @celery.task
-def step_2_process(category_id, print_length, string, strings):
-    date = get_date()
+def step_2_process(date, category_id, print_length, string, strings):
     ss = get_results(string, 'com', 'digital-text')
     with closing(get_mysql_session()()) as session:
         for s in ss:
@@ -251,9 +249,8 @@ def step_2_process(category_id, print_length, string, strings):
         session.commit()
 
 
-def step_3_1_reset(category_id, print_length):
+def step_3_1_reset(date, category_id, print_length):
     print 'Step 3.1 :: Reset'
-    date = get_date()
     with closing(get_mysql_session()()) as session:
         session.query(
             step_3_suggested_keyword,
@@ -268,9 +265,8 @@ def step_3_1_reset(category_id, print_length):
     print 'Done'
 
 
-def step_3_1_queue(category_id, print_length):
+def step_3_1_queue(date, category_id, print_length):
     print 'Step 3.1 :: Queue'
-    date = get_date()
     with closing(get_mysql_session()()) as session:
         for keyword in session.query(
             step_2_keyword,
@@ -283,13 +279,14 @@ def step_3_1_queue(category_id, print_length):
         ).execution_options(
             stream_results=True,
         ):
-            step_3_1_process.delay(category_id, print_length, keyword.string)
+            step_3_1_process.delay(
+                date.isoformat(), category_id, print_length, keyword.string
+            )
     print 'Done'
 
 
 @celery.task
-def step_3_1_process(category_id, print_length, string):
-    date = get_date()
+def step_3_1_process(date, category_id, print_length, string):
     ss = get_suggested_keywords(word_tokenize(string))
     with closing(get_mysql_session()()) as session:
         for s in ss:
@@ -311,9 +308,8 @@ def step_3_1_process(category_id, print_length, string):
         session.commit()
 
 
-def step_3_2_reset(category_id, print_length):
+def step_3_2_reset(date, category_id, print_length):
     print 'Step 3.2 :: Reset'
-    date = get_date()
     with closing(get_mysql_session()()) as session:
         session.query(
             step_3_suggested_keyword,
@@ -341,9 +337,8 @@ def step_3_2_reset(category_id, print_length):
     print 'Done'
 
 
-def step_3_2_queue(category_id, print_length):
+def step_3_2_queue(date, category_id, print_length):
     print 'Step 3.2 :: Queue'
-    date = get_date()
     with closing(get_mysql_session()()) as session:
         for suggested_keyword in session.query(
             step_3_suggested_keyword,
@@ -390,9 +385,8 @@ def step_3_2_process(category_id, print_length, id, string):
         session.commit()
 
 
-def step_4(category_id, print_length):
+def step_4(date, category_id, print_length):
     print 'Step 4'
-    date = get_date()
     with closing(get_mysql_session()()) as session:
         session.query(
             step_4_word,
@@ -430,9 +424,8 @@ def step_4(category_id, print_length):
     print 'Done'
 
 
-def step_5_reset(category_id, print_length):
+def step_5_reset(date, category_id, print_length):
     print 'Step 5 :: Reset'
-    date = get_date()
     with closing(get_mysql_session()()) as session:
         session.query(
             step_5_keyword,
@@ -447,9 +440,8 @@ def step_5_reset(category_id, print_length):
     print 'Done'
 
 
-def step_5_queue(category_id, print_length):
+def step_5_queue(date, category_id, print_length):
     print 'Step 5 :: Queue'
-    date = get_date()
     with closing(get_mysql_session()()) as session:
         strings = [
             word.string
@@ -466,13 +458,14 @@ def step_5_queue(category_id, print_length):
             )
         ]
         for string in strings:
-            step_5_process.delay(category_id, print_length, string, strings)
+            step_5_process.delay(
+                date.isoformat(), category_id, print_length, string, strings
+            )
     print 'Done'
 
 
 @celery.task
-def step_5_process(category_id, print_length, string, strings):
-    date = get_date()
+def step_5_process(date, category_id, print_length, string, strings):
     ss = get_results(string, 'com', 'digital-text')
     with closing(get_mysql_session()()) as session:
         for s in ss:
@@ -496,9 +489,8 @@ def step_5_process(category_id, print_length, string, strings):
         session.commit()
 
 
-def step_6_1_reset(category_id, print_length):
+def step_6_1_reset(date, category_id, print_length):
     print 'Step 6.1 :: Reset'
-    date = get_date()
     with closing(get_mysql_session()()) as session:
         session.query(
             step_6_suggested_keyword,
@@ -513,9 +505,8 @@ def step_6_1_reset(category_id, print_length):
     print 'Done'
 
 
-def step_6_1_queue(category_id, print_length):
+def step_6_1_queue(date, category_id, print_length):
     print 'Step 6.1 :: Queue'
-    date = get_date()
     with closing(get_mysql_session()()) as session:
         for keyword in session.query(
             step_5_keyword,
@@ -528,13 +519,14 @@ def step_6_1_queue(category_id, print_length):
         ).execution_options(
             stream_results=True,
         ):
-            step_6_1_process.delay(category_id, print_length, keyword.string)
+            step_6_1_process.delay(
+                date.isoformat(), category_id, print_length, keyword.string
+            )
     print 'Done'
 
 
 @celery.task
-def step_6_1_process(category_id, print_length, string):
-    date = get_date()
+def step_6_1_process(date, category_id, print_length, string):
     ss = get_suggested_keywords(word_tokenize(string))
     with closing(get_mysql_session()()) as session:
         for s in ss:
@@ -556,9 +548,8 @@ def step_6_1_process(category_id, print_length, string):
         session.commit()
 
 
-def step_6_2_reset(category_id, print_length):
+def step_6_2_reset(date, category_id, print_length):
     print 'Step 6.2 :: Reset'
-    date = get_date()
     with closing(get_mysql_session()()) as session:
         session.query(
             step_6_suggested_keyword,
@@ -586,9 +577,8 @@ def step_6_2_reset(category_id, print_length):
     print 'Done'
 
 
-def step_6_2_queue(category_id, print_length):
+def step_6_2_queue(date, category_id, print_length):
     print 'Step 6.2 :: Queue'
-    date = get_date()
     with closing(get_mysql_session()()) as session:
         for suggested_keyword in session.query(
             step_6_suggested_keyword,
@@ -635,9 +625,8 @@ def step_6_2_process(category_id, print_length, id, string):
         session.commit()
 
 
-def step_7(category_id, print_length):
+def step_7(date, category_id, print_length):
     print 'Step 7'
-    date = get_date()
     with closing(get_mysql_session()()) as session:
         session.query(
             step_7_group,
@@ -706,8 +695,7 @@ def step_7(category_id, print_length):
     print 'Done'
 
 
-def xlsx(category_id, print_length):
-    date = get_date()
+def xlsx(date, category_id, print_length):
     th_center = Style(
         alignment=Alignment(
             horizontal='center',
@@ -1280,14 +1268,17 @@ def xlsx(category_id, print_length):
     worksheet.column_dimensions['A'].width = 50
     worksheet.column_dimensions['B'].width = 50
 
-    workbook.save('../tmp/%(category_id)s-%(print_length)s-report.xlsx' % {
-        'category_id': arguments.category_id,
-        'print_length': arguments.print_length,
-    })
+    workbook.save(
+        '../tmp/%(date)s-%(category_id)s-%(print_length)s-report.xlsx' % {
+            'category_id': arguments.category_id,
+            'date': date.isoformat(),
+            'print_length': arguments.print_length,
+        }
+    )
 
 
-def reset(category_id, print_length):
-    date = get_date() - timedelta(weeks=3)
+def reset(date, category_id, print_length):
+    date = date - timedelta(weeks=3)
     with closing(get_mysql_session()()) as session:
         session.query(
             step_1_word
@@ -1364,4 +1355,6 @@ if __name__ == '__main__':
 
     arguments = parser.parse_args()
 
-    locals()[arguments.def_](arguments.category_id, arguments.print_length)
+    locals()[arguments.def_](
+        get_date(), arguments.category_id, arguments.print_length
+    )
