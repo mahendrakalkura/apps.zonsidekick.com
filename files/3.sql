@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS `apps_hot_keywords_step_1_suggested_keywords`;
 CREATE TABLE IF NOT EXISTS `apps_hot_keywords_step_1_suggested_keywords` (
     `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     `category_id` INT(11) DEFAULT NULL,
+    `date` DATE NOT NULL,
     `string` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
     `popularity` DECIMAL(9,2) DEFAULT NULL,
     PRIMARY KEY (`id`),
@@ -10,8 +11,9 @@ CREATE TABLE IF NOT EXISTS `apps_hot_keywords_step_1_suggested_keywords` (
         REFERENCES `apps_top_100_explorer_categories` (`id`)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    UNIQUE KEY `category_id_string` (`category_id`, `string`),
+    UNIQUE KEY `category_id_date_string` (`category_id`, `date`, `string`),
     KEY `category_id` (`category_id`),
+    KEY `date` (`date`),
     KEY `string` (`string`),
     KEY `popularity` (`popularity`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -19,6 +21,7 @@ CREATE TABLE IF NOT EXISTS `apps_hot_keywords_step_1_suggested_keywords` (
 DROP TABLE IF EXISTS `apps_hot_keywords_step_2_keywords`;
 CREATE TABLE IF NOT EXISTS `apps_hot_keywords_step_2_keywords` (
     `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `date` DATE NOT NULL,
     `string` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
     `count` BIGINT(20) UNSIGNED DEFAULT NULL,
     `buyer_behavior` VARCHAR(255) DEFAULT NULL,
@@ -30,6 +33,7 @@ CREATE TABLE IF NOT EXISTS `apps_hot_keywords_step_2_keywords` (
     `average_print_length` DECIMAL(9,2) DEFAULT NULL,
     `score` DECIMAL(9,2) DEFAULT NULL,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `string` (`string`),
+    UNIQUE KEY `date_string` (`date`, `string`),
+    KEY `date` (`date`),
     KEY `score` (`score`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
