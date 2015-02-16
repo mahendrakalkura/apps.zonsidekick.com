@@ -696,6 +696,7 @@ def step_7(date, category_id, print_length):
 
 
 def xlsx(date, category_id, print_length):
+    print 'XLSX'
     th_center = Style(
         alignment=Alignment(
             horizontal='center',
@@ -1275,9 +1276,11 @@ def xlsx(date, category_id, print_length):
             'print_length': arguments.print_length,
         }
     )
+    print 'Done'
 
 
 def reset(date, category_id, print_length):
+    print 'Reset'
     date = date - timedelta(weeks=3)
     with closing(get_mysql_session()()) as session:
         session.query(
@@ -1351,6 +1354,7 @@ def reset(date, category_id, print_length):
             synchronize_session=False,
         )
         session.commit()
+    print 'Done'
 
 if __name__ == '__main__':
     parser = ArgumentParser()
