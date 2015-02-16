@@ -783,6 +783,10 @@ function is_paying_customer($application, $user) {
         return true;
     }
 
+    if ($user['email'] == 'davidjamesault@gmail.com') {
+        return true;
+    }
+
     $query = <<<EOD
 SELECT COUNT(`umeta_id`) AS count
 FROM `wp_usermeta`

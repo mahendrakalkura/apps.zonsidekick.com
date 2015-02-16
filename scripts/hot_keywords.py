@@ -2,6 +2,7 @@
 
 from argparse import ArgumentParser
 from contextlib import closing
+from datetime import timedelta
 from locale import LC_ALL, format, setlocale
 from sys import modules
 
@@ -16,7 +17,7 @@ from keyword_analyzer import get_contents
 from suggested_keywords import get_suggested_keywords
 from top_100_explorer import book, category, trend
 from utilities import (
-    base, get_mysql_session, get_popularity, get_words, variables
+    base, get_date, get_mysql_session, get_popularity, get_words, variables,
 )
 
 if 'threading' in modules:
@@ -62,19 +63,21 @@ class step_2_keyword(base):
     __tablename__ = 'apps_hot_keywords_step_2_keywords'
 
 
-def step_1_1_reset():
+def step_1_1_reset(date):
     with closing(get_mysql_session()()) as session:
         session.query(
             step_1_suggested_keyword,
+        ).filter(
+            step_1_suggested_keyword.date == date,
         ).delete(
             synchronize_session=False,
         )
         session.commit()
 
 
-def step_1_1_queue():
+def step_1_1_queue(date):
     with closing(get_mysql_session()()) as session:
-        date = session.query(func.max(trend.date)).first()[0]
+        date_ = session.query(func.max(trend.date)).first()[0]
         for category_ in session.query(
             category,
         ).order_by(
@@ -84,6 +87,7 @@ def step_1_1_queue():
         ):
             step_1_1_process.delay(
                 category_.id,
+                date.isoformat(),
                 [
                     word
                     for word, _ in get_words([
@@ -94,7 +98,7 @@ def step_1_1_queue():
                             trend,
                         ).filter(
                             trend.category_id == category_.id,
-                            trend.date == date,
+                            trend.date == date_,
                         ).execution_options(
                             stream_results=True,
                         )
@@ -104,20 +108,23 @@ def step_1_1_queue():
 
 
 @celery.task
-def step_1_1_process(category_id, words):
+def step_1_1_process(category_id, date, words):
     with closing(get_mysql_session()()) as session:
         for string in get_suggested_keywords(words):
             session.add(step_1_suggested_keyword(**{
                 'category_id': category_id,
+                'date': date,
                 'string': string,
             }))
             session.commit()
 
 
-def step_1_2_reset():
+def step_1_2_reset(date):
     with closing(get_mysql_session()()) as session:
         session.query(
             step_1_suggested_keyword,
+        ).filter(
+            step_1_suggested_keyword.date == date,
         ).update(
             {
                 'popularity': None,
@@ -127,11 +134,12 @@ def step_1_2_reset():
         session.commit()
 
 
-def step_1_2_queue():
+def step_1_2_queue(date):
     with closing(get_mysql_session()()) as session:
         for suggested_keyword in session.query(
             step_1_suggested_keyword,
         ).filter(
+            step_1_suggested_keyword.date == date,
             step_1_suggested_keyword.popularity == null(),
         ).order_by(
             'id ASC',
@@ -155,12 +163,20 @@ def step_1_2_process(id, string):
         session.commit()
 
 
-def step_2_reset():
+def step_2_reset(date):
     with closing(get_mysql_session()()) as session:
-        session.query(step_2_keyword).delete(synchronize_session=False)
+        session.query(
+            step_2_keyword,
+        ).filter(
+            step_2_keyword.date == date,
+        ).delete(
+            synchronize_session=False,
+        )
         session.commit()
         for suggested_keyword in session.query(
             step_1_suggested_keyword,
+        ).filter(
+            step_1_suggested_keyword.date == date,
         ).order_by(
             'popularity DESC',
         ).execution_options(
@@ -170,18 +186,21 @@ def step_2_reset():
                 step_2_keyword,
             ).filter(
                 step_2_keyword.string == suggested_keyword.string,
+                step_2_keyword.date == date,
             ).count():
                 session.add(step_2_keyword(**{
+                    'date': date,
                     'string': suggested_keyword.string,
                 }))
                 session.commit()
 
 
-def step_2_queue():
+def step_2_queue(date):
     with closing(get_mysql_session()()) as session:
         for keyword in session.query(
             step_2_keyword,
         ).filter(
+            step_2_keyword.date == date,
             step_2_keyword.score == null(),
         ).order_by(
             'id ASC',
@@ -211,7 +230,7 @@ def step_2_process(id, string):
         session.commit()
 
 
-def xlsx():
+def xlsx(date):
     th_center = Style(
         alignment=Alignment(
             horizontal='center',
@@ -348,6 +367,8 @@ def xlsx():
         row = 1
         for keyword in session.query(
             step_2_keyword,
+        ).filter(
+            step_2_keyword.date == date,
         ).order_by(
             'score DESC',
         ).execution_options(
@@ -437,8 +458,29 @@ def xlsx():
                 'row': row,
             }).style = td_right
 
-    workbook.save('../tmp/hot-keywords.xlsx')
+    workbook.save('../tmp/%(date)s-hot-keywords.xlsx' % {
+        'date': date.isoformat(),
+    })
 
+
+def reset(date):
+    date = date - timedelta(weeks=3)
+    with closing(get_mysql_session()()) as session:
+        session.query(
+            step_1_suggested_keyword,
+        ).filter(
+            step_1_suggested_keyword.date < date,
+        ).delete(
+            synchronize_session=False,
+        )
+        session.query(
+            step_2_keyword,
+        ).filter(
+            step_2_keyword.date < date,
+        ).delete(
+            synchronize_session=False,
+        )
+        session.commit()
 
 if __name__ == '__main__':
     parser = ArgumentParser()
@@ -446,4 +488,4 @@ if __name__ == '__main__':
 
     arguments = parser.parse_args()
 
-    locals()[arguments.def_]()
+    locals()[arguments.def_](get_date())
