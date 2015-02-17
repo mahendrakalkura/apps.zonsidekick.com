@@ -434,7 +434,9 @@ def get_contents(keyword, country):
                 text=response.text
             ).xpath(
                 '//a'
-                '[@class="a-link-normal s-access-detail-page  a-text-normal"]/'
+                '[normalize-space(@class)'
+                '='
+                '"a-link-normal s-access-detail-page a-text-normal"]/'
                 '@href'
             ).extract():
                 if not href.startswith('http'):
@@ -489,7 +491,8 @@ def get_contents(keyword, country):
         except IndexError:
             try:
                 author['name'] = get_string(selector.xpath(
-                    '//h1[@class="parseasinTitle "]/following-sibling::span/a/'
+                    '//h1[normalize-space(@class)="parseasinTitle"]/'
+                    'following-sibling::span/a/'
                     'text()'
                 ).extract()[0])
             except IndexError:
@@ -504,7 +507,7 @@ def get_contents(keyword, country):
                     'http://www.amazon.%(country)s/%(href)s' % {
                         'country': country,
                         'href': selector.xpath(
-                            '//h1[@class="parseasinTitle "]/'
+                            '//h1[normalize-space(@class)="parseasinTitle"]/'
                             'following-sibling::span/a/@href'
                         ).extract()[0]
                     }

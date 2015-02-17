@@ -214,7 +214,8 @@ def get_book(response):
     except IndexError:
         try:
             author['name'] = get_string(selector.xpath(
-                '//h1[@class="parseasinTitle "]/following-sibling::span/a/'
+                '//h1[normalize-space(@class)="parseasinTitle"]/'
+                'following-sibling::span/a/'
                 'text()'
             ).extract()[0])
         except IndexError:
@@ -226,7 +227,8 @@ def get_book(response):
     except IndexError:
         try:
             author['url'] = get_url(selector.xpath(
-                '//h1[@class="parseasinTitle "]/following-sibling::span/a/'
+                '//h1[normalize-space(@class)="parseasinTitle"]/'
+                'following-sibling::span/a/'
                 '@href'
             ).extract()[0])
         except IndexError:

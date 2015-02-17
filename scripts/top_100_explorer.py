@@ -369,7 +369,8 @@ class Spider(CrawlSpider):
         except IndexError:
             try:
                 author_name = get_string(selector.xpath(
-                    '//h1[@class="parseasinTitle "]/following-sibling::span/a/'
+                    '//h1[normalize-space(@class)="parseasinTitle"]/'
+                    'following-sibling::span/a/'
                     'text()'
                 ).extract()[0])
             except IndexError:
@@ -381,7 +382,8 @@ class Spider(CrawlSpider):
         except IndexError:
             try:
                 author_url = get_string(selector.xpath(
-                    '//h1[@class="parseasinTitle "]/following-sibling::span/a/'
+                    '//h1[normalize-space(@class)="parseasinTitle"]/'
+                    'following-sibling::span/a/'
                     '@href'
                 ).extract()[0])
             except IndexError:

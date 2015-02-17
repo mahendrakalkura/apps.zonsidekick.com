@@ -32,7 +32,9 @@ def get_books(keyword):
         for anchor in Selector(
             text=response.text
         ).xpath(
-            '//a[@class="a-link-normal s-access-detail-page  a-text-normal"]'
+            '//a[normalize-space(@class)'
+            '='
+            '"a-link-normal s-access-detail-page a-text-normal"]'
         ):
             title = ''
             try:
