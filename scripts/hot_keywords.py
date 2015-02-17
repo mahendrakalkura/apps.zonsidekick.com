@@ -64,6 +64,7 @@ class step_2_keyword(base):
 
 
 def step_1_1_reset(date):
+    print 'Step 1.1 :: Reset'
     with closing(get_mysql_session()()) as session:
         session.query(
             step_1_suggested_keyword,
@@ -73,11 +74,13 @@ def step_1_1_reset(date):
             synchronize_session=False,
         )
         session.commit()
+    print 'Done'
 
 
-def step_1_1_queue(date_):
+def step_1_1_queue(date):
+    print 'Step 1.1 :: Queue'
     with closing(get_mysql_session()()) as session:
-        date = session.query(func.max(trend.date)).first()[0]
+        date_ = session.query(func.max(trend.date)).first()[0]
         for category_ in session.query(
             category,
         ).order_by(
@@ -86,8 +89,8 @@ def step_1_1_queue(date_):
             stream_results=True,
         ):
             step_1_1_process.delay(
-                date_.isoformat(),
                 category_.id,
+                date.isoformat(),
                 [
                     word
                     for word, _ in get_words([
@@ -98,17 +101,18 @@ def step_1_1_queue(date_):
                             trend,
                         ).filter(
                             trend.category_id == category_.id,
-                            trend.date == date,
+                            trend.date == date_,
                         ).execution_options(
                             stream_results=True,
                         )
                     ], 10)
                 ]
             )
+    print 'Done'
 
 
 @celery.task
-def step_1_1_process(date, category_id, words):
+def step_1_1_process(category_id, date, words):
     with closing(get_mysql_session()()) as session:
         for string in get_suggested_keywords(words):
             session.add(step_1_suggested_keyword(**{
@@ -120,6 +124,7 @@ def step_1_1_process(date, category_id, words):
 
 
 def step_1_2_reset(date):
+    print 'Step 1.2 :: Reset'
     with closing(get_mysql_session()()) as session:
         session.query(
             step_1_suggested_keyword,
@@ -132,9 +137,11 @@ def step_1_2_reset(date):
             synchronize_session=False,
         )
         session.commit()
+    print 'Done'
 
 
 def step_1_2_queue(date):
+    print 'Step 1.2 :: Queue'
     with closing(get_mysql_session()()) as session:
         for suggested_keyword in session.query(
             step_1_suggested_keyword,
@@ -149,6 +156,7 @@ def step_1_2_queue(date):
             step_1_2_process.delay(
                 suggested_keyword.id, suggested_keyword.string,
             )
+    print 'Done'
 
 
 @celery.task
@@ -164,12 +172,15 @@ def step_1_2_process(id, string):
 
 
 def step_2_reset(date):
+    print 'Step 2 :: Reset'
     with closing(get_mysql_session()()) as session:
         session.query(
-            step_2_keyword
+            step_2_keyword,
         ).filter(
             step_2_keyword.date == date,
-        ).delete(synchronize_session=False)
+        ).delete(
+            synchronize_session=False,
+        )
         session.commit()
         for suggested_keyword in session.query(
             step_1_suggested_keyword,
@@ -191,9 +202,11 @@ def step_2_reset(date):
                     'string': suggested_keyword.string,
                 }))
                 session.commit()
+    print 'Done'
 
 
 def step_2_queue(date):
+    print 'Step 2 :: Queue'
     with closing(get_mysql_session()()) as session:
         for keyword in session.query(
             step_2_keyword,
@@ -206,6 +219,7 @@ def step_2_queue(date):
             stream_results=True,
         ):
             step_2_process.delay(keyword.id, keyword.string)
+    print 'Done'
 
 
 @celery.task
@@ -229,6 +243,7 @@ def step_2_process(id, string):
 
 
 def xlsx(date):
+    print 'XLSX'
     th_center = Style(
         alignment=Alignment(
             horizontal='center',
@@ -456,28 +471,32 @@ def xlsx(date):
                 'row': row,
             }).style = td_right
 
-    workbook.save(
-        '../tmp/%(date)s-hot-keywords.xlsx' % {
-            'date': date.isoformat(),
-        }
-    )
+    workbook.save('../tmp/%(date)s-hot-keywords.xlsx' % {
+        'date': date.isoformat(),
+    })
+    print 'Done'
 
 
 def reset(date):
+    print 'Reset'
     date = date - timedelta(weeks=3)
     with closing(get_mysql_session()()) as session:
         session.query(
-            step_1_suggested_keyword
+            step_1_suggested_keyword,
         ).filter(
             step_1_suggested_keyword.date < date,
-        ).delete(synchronize_session=False)
+        ).delete(
+            synchronize_session=False,
+        )
         session.query(
-            step_2_keyword
+            step_2_keyword,
         ).filter(
             step_2_keyword.date < date,
-        ).delete(synchronize_session=False)
+        ).delete(
+            synchronize_session=False,
+        )
         session.commit()
-
+    print 'Done'
 
 if __name__ == '__main__':
     parser = ArgumentParser()
