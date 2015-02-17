@@ -2046,10 +2046,11 @@ EOD;
                         'ip_address' => $_SERVER['REMOTE_ADDR'],
                     ));
                 } catch(AWeberAPIException $exception) {
-                    if (strpos(
-                        $exception->message,
-                        'Email address blocked'
-                    ) === false) {
+                    if (
+                        strpos($exception->message, 'Email address blocked')
+                        ===
+                        false
+                    ) {
                         Rollbar::report_exception($exception);
                     }
                 }
