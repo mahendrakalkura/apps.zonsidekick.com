@@ -336,8 +336,7 @@ class Spider(CrawlSpider):
                 url=get_string(div.xpath(
                     './/div[@class="zg_itemWrapper"]/'
                     'div[@class="zg_image"]/'
-                    'div[@class="zg_itemImageImmersion"]/a/'
-                    '@href'
+                    'div[@class="zg_itemImageImmersion"]/a/@href'
                 ).extract()[0]),
             )
 
@@ -370,8 +369,7 @@ class Spider(CrawlSpider):
             try:
                 author_name = get_string(selector.xpath(
                     '//h1[normalize-space(@class)="parseasinTitle"]/'
-                    'following-sibling::span/a/'
-                    'text()'
+                    'following-sibling::span/a/text()'
                 ).extract()[0])
             except IndexError:
                 pass
@@ -383,8 +381,7 @@ class Spider(CrawlSpider):
             try:
                 author_url = get_string(selector.xpath(
                     '//h1[normalize-space(@class)="parseasinTitle"]/'
-                    'following-sibling::span/a/'
-                    '@href'
+                    'following-sibling::span/a/@href'
                 ).extract()[0])
             except IndexError:
                 pass
