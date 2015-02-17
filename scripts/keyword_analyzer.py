@@ -433,11 +433,9 @@ def get_contents(keyword, country):
             for href in Selector(
                 text=response.text
             ).xpath(
-                '//a'
-                '[normalize-space(@class)'
-                '='
-                '"a-link-normal s-access-detail-page a-text-normal"]/'
-                '@href'
+                '//a[normalize-space(@class)="'
+                'a-link-normal s-access-detail-page a-text-normal'
+                '"]/@href'
             ).extract():
                 if not href.startswith('http'):
                     href = 'http://www.amazon.%(country)s%(href)s' % {
@@ -492,8 +490,7 @@ def get_contents(keyword, country):
             try:
                 author['name'] = get_string(selector.xpath(
                     '//h1[normalize-space(@class)="parseasinTitle"]/'
-                    'following-sibling::span/a/'
-                    'text()'
+                    'following-sibling::span/a/text()'
                 ).extract()[0])
             except IndexError:
                 pass

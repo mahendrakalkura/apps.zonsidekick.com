@@ -195,15 +195,13 @@ def get_book(response):
     except AttributeError:
         try:
             book_cover_image = get_string(selector.xpath(
-                '//img[@id="imgBlkFront" or '
-                '@id="main-image"]/@rel'
+                '//img[@id="imgBlkFront" or @id="main-image"]/@rel'
             ).extract()[0])
         except IndexError:
             pass
     try:
         title = get_string(selector.xpath(
-            '//span[@id="btAsinTitle" or '
-            '@id="productTitle"]/text()'
+            '//span[@id="btAsinTitle" or @id="productTitle"]/text()'
         ).extract()[0])
     except IndexError:
         pass
@@ -215,8 +213,7 @@ def get_book(response):
         try:
             author['name'] = get_string(selector.xpath(
                 '//h1[normalize-space(@class)="parseasinTitle"]/'
-                'following-sibling::span/a/'
-                'text()'
+                'following-sibling::span/a/text()'
             ).extract()[0])
         except IndexError:
             pass
@@ -228,8 +225,7 @@ def get_book(response):
         try:
             author['url'] = get_url(selector.xpath(
                 '//h1[normalize-space(@class)="parseasinTitle"]/'
-                'following-sibling::span/a/'
-                '@href'
+                'following-sibling::span/a/@href'
             ).extract()[0])
         except IndexError:
             pass
