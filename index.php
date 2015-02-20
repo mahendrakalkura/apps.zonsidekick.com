@@ -2091,9 +2091,15 @@ EOD;
                     ));
                 } catch(AWeberAPIException $exception) {
                     if (
-                        strpos($exception->message, 'Email address blocked')
-                        ===
-                        false
+                        strpos(
+                            $exception->message,
+                            'Email address blocked'
+                        ) === false
+                        AND
+                        strpos(
+                            $exception->message,
+                            'Subscriber already subscribed'
+                        ) === false
                     ) {
                         Rollbar::report_exception($exception);
                     }
