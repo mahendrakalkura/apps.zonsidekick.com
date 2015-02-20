@@ -1,25 +1,26 @@
 {% extends 'layout.twig' %}
 
-{% set module = 'Keyword Suggester - Free - Email' %}
+{% set module = 'Keyword Suggester - Free - Email - ' ~ email %}
 {% set nav = 'keyword_suggester_free' %}
 
 {% block content %}
-
 <ul class="breadcrumb breadcrumb-page">
     <div class="breadcrumb-label text-light-gray">You are here:</div>
     <li><a href="{{ url('dashboard') }}">Home</a></li>
     <li>
         <a href="{{ url('keyword_suggester_free') }}">Keyword Suggester</a>
     </li>
+    <li>
+        <a href="{{ url('keyword_suggester_free_email', {'email': email|urlencode_dot}) }}">
+            Free
+        </a>
+    </li>
     <li class="active">
-        <a
-            href="{{ url('keyword_suggester_free_email', {'email': records[0].email|urlencode_dot}) }}"
-            >
-            {{ records[0].email }}
-            </a>
+        <a href="{{ url('keyword_suggester_free_email', {'email': email|urlencode_dot}) }}">
+            {{ email }}
+        </a>
     </li>
 </ul>
-
 <div class="page-header">
     <div class="row">
         <h1 class="col-xs-12">
@@ -30,62 +31,37 @@
     </div>
 </div>
 {% include 'slots/alerts.twig' %}
-<div
-    class="tab-pane fade in"
-    >
-    <p class="text-center">
-        To view the details of each keyword  please click on the <i class="fa fa-fw fa-external-link"></i> beside that keyword below.
-    </p>
-</div>
-<div>
-    <div class="row">
-        <div
-            class="col-xs-12 col-sm-12 col-md-12 col-xs-12"
-            >
-            <div class="panel">
-                <div class="panel-body">
-                    {% for record in records %}
-                        {% if record.strings|length %}
-                            {% set record_strings = record.strings|join("\n") %}
-                        {% else %}
-                        {% endif %}
-                        <div class="form-group">
-                            <a
-                            class="pull-right form-control"
-                            href="{{ url('keyword_suggester_free_id', {'id': record.id}) }}"
-                            target="_blank"
-                            >
-                            {{ record.string }}
-                            <i class="fa fa-fw fa-external-link"></i>
-                            </a>
-                        </div>
-                        {% if record.strings|length == 0 %}
-                            <p class="text-center hide show">
-                                <span class="fa fa-2x fa-fw fa-spin fa-spinner"></span>
-                            </p>
-                        {% else %}
-                            <div class="form-group">
-                                <label
-                                    class="control-label"
-                                    class="pull-right"
-                                    for="suggestions"
-                                    >Suggestions</label>
-                                <textarea
-                                    class="form-control"
-                                    id="suggestions"
-                                    rows="15"
-                                    >{{ record_strings }}</textarea>
-                                <div class="help-block text-right">
-                                    Total Number of Suggestions:
-                                    <span>{{ record.strings|length }}</span>
-                                </div>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
+{% if records|length %}
+    {% for record in records %}
+        <p>
+            <a href="{{ url('keyword_suggester_free_id', {'id': record.id}) }}">
+                {{ record.string }}
+            </a>
+        </p>
+        {% if record.strings %}
+            <div class="form-group">
+                <textarea
+                    class="form-control"
+                    rows="15"
+                    >{{ record.strings|join("\n") }}</textarea>
+                <div class="help-block text-right">
+                    Total Number of Suggestions:
+                    <span>{{ record.strings|length }}</span>
                 </div>
             </div>
-        </div>
+        {% else %}
+            <p class="text-center hide show">
+                <span class="fa fa-2x fa-fw fa-spin fa-spinner"></span>
+            </p>
+        {% endif %}
+        {% if not loop.last %}
+            <hr>
+        {% endif %}
+    {% endfor %}
+{% else %}
+    <div class="alert alert-dark alert-danger">
+        You have not added any requests yet.
     </div>
-</div>
+{% endif %}
 {% include 'slots/keyword_suggester.twig' %}
 {% endblock %}

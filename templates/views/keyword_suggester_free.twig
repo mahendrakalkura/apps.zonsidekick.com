@@ -23,118 +23,115 @@
         </h1>
     </div>
 </div>
-
-<div class="row">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-xs-12">
-        <form
-            accept-charset="UTF-8"
-            action="{{ url('keyword_suggester_free') }}"
-            method="POST"
-            >
-            <div class="panel">
-                <div class="panel-body">
-                    <div class="form-group">
-                        <label class="control-label" for="keyword">
-                            Keyword
+<form
+    accept-charset="UTF-8"
+    action="{{ url('keyword_suggester_free') }}"
+    method="POST"
+    >
+    <div class="panel">
+        <div class="panel-body">
+            <div class="form-group">
+                <label class="control-label" for="keyword">
+                    Keyword
+                </label>
+                <input
+                    class="form-control"
+                    id="string"
+                    name="string"
+                    placeholder="Keyword"
+                    required
+                    type="text"
+                    value=""
+                    >
+            </div>
+            <div class="form-group">
+                <label class="control-label" for="country">
+                    Country
+                </label>
+                <select
+                    class="form-control"
+                    id="country"
+                    name="country"
+                    >
+                    {% for key, value in countries %}
+                        <option value="{{ key }}">
+                            {{ value }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="control-label" for="search_alias">
+                    Department
+                </label>
+                <select
+                    class="form-control"
+                    id="search_alias"
+                    name="search_alias"
+                    >
+                    {% for key, value in search_aliases %}
+                        <option value="{{ key }}">
+                            {{ value }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% if email %}
+                <div ng-controller="keyword_suggester_free_email">
+                    <p ng-show="!status">
+                        We will send you (<strong>{{ email }}</strong>)
+                        a personalized link to this request. You may view your
+                        personalized history page
+                        <a
+                            href="{{ url('keyword_suggester_free_email', {'email': email|urlencode_dot}) }}"
+                            >here</a>.
+                        Would you like to send this to another email address?
+                        Click <a ng-click="status = true">here</a> to change
+                        it. Note: You will receive a new personalized history
+                        page once you change your email address.
+                    <p>
+                    <div class="form-group" ng-show="status">
+                        <label class="control-label" for="email">
+                            Email
                         </label>
                         <input
                             class="form-control"
-                            id="string"
-                            name="string"
-                            placeholder="Keyword"
-                            required
+                            id="email"
+                            name="email"
+                            placeholder="Email"
                             type="text"
-                            value=""
-                            >
+                            value="{{ email }}"
+                            ng-show="status"
+                        >
                     </div>
-                    <div class="form-group">
-                        <label class="control-label" for="country">
-                            Country
-                        </label>
-                        <select
-                            class="form-control"
-                            id="country"
-                            name="country"
-                            >
-                            {% for key, value in countries %}
-                                <option value="{{ key }}">
-                                    {{ value }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label" for="search_alias">
-                            Department
-                        </label>
-                        <select
-                            class="form-control"
-                            id="search_alias"
-                            name="search_alias"
-                            >
-                            {% for key, value in search_aliases %}
-                                <option value="{{ key }}">
-                                    {{ value }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    {% if email|length %}
-                        <div ng-controller="keyword_suggester_free_email">
-                            <p ng-show="!status">
-                                We will send you (<strong>{{ email }}</strong>) a personalized link to this request.
-                                You may view your personalized history page <a href="{{ url('keyword_suggester_free_email', {'email': email|urlencode_dot}) }}" target="_blank">here</a>.
-                            </p>
-                            <p ng-show="!status">
-                                Would you like to send this to another email address?
-                                Click <a ng-click="status = true">here</a> to change it.
-                                 Note: You will receive a new personalized history page once you change
-                                your email address.
-                            <p>
-                            <div class="form-group" ng-show="status">
-                                <label class="control-label" for="email">
-                                    Email
-                                </label>
-                                <input
-                                    class="form-control"
-                                    id="email"
-                                    name="email"
-                                    placeholder="Email"
-                                    type="text"
-                                    value="{{ email }}"
-                                    ng-show="status"
-                                >
-                            </div>
-                        </div>
-                    {% else %}
-                        <div class="form-group">
-                            <label class="control-label" for="email">
-                                Email
-                            </label>
-                            <input
-                                class="form-control"
-                                id="email"
-                                name="email"
-                                placeholder="Email"
-                                type="email"
-                                value="{{ email }}"
-                                >
-                        </div>
-                    {% endif %}
                 </div>
-                <div class="clearfix panel-footer text-right">
-                    <button class="btn btn-success pull-right" type="submit">
-                        <span class="fa fa-lg fa-fw fa-thumbs-up"></span>
-                        Submit
-                    </button>
-                    <button class="btn btn-danger pull-right" type="reset">
-                        <span class="fa fa-lg fa-fw fa-thumbs-down"></span>
-                        Reset
-                    </button>
+            {% else %}
+                <div class="form-group">
+                    <label class="control-label" for="email">
+                        Email
+                    </label>
+                    <input
+                        class="form-control"
+                        id="email"
+                        name="email"
+                        placeholder="Email"
+                        type="email"
+                        value="{{ email }}"
+                        >
                 </div>
-            </div>
-        </form>
+            {% endif %}
+        </div>
+        <div class="clearfix panel-footer text-right">
+            <button class="btn btn-success pull-right" type="submit">
+                <span class="fa fa-lg fa-fw fa-thumbs-up"></span>
+                Submit
+            </button>
+            <button class="btn btn-danger pull-right" type="reset">
+                <span class="fa fa-lg fa-fw fa-thumbs-down"></span>
+                Reset
+            </button>
+        </div>
     </div>
-</div>
+</form>
 {% include 'slots/keyword_suggester.twig' %}
 {% endblock %}

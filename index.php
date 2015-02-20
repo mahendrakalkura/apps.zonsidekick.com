@@ -4,6 +4,14 @@ require_once sprintf('%s/vendor/class-phpass.php', __DIR__);
 
 date_default_timezone_set('UTC');
 
+function urldecode_dot ($string) {
+    $string = str_replace('%2E', '.', $string);
+    $string = str_replace('%2D', '-', $string);
+    $string = urldecode($string);
+
+    return $string;
+}
+
 function urlencode_dot ($string) {
     $string = urlencode($string);
     $string = str_replace('.', '%2E', $string);
@@ -959,6 +967,9 @@ $application->before(function (Request $request) use ($application) {
         }
     }
     $application['session']->set('user', $user);
+    $application['twig']->addFilter(
+        new Twig_SimpleFilter('urldecode_dot', 'urldecode_dot')
+    );
     $application['twig']->addFilter(
         new Twig_SimpleFilter('urlencode_dot', 'urlencode_dot')
     );
@@ -2112,8 +2123,10 @@ EOD;
             'views/keyword_suggester_free.twig',
             array(
                 'countries' => get_countries(),
-                'email' =>
-                $_COOKIE['email']? $_COOKIE['email']: $request->get('email'),
+                'email' => (
+                    !empty($_COOKIE['email'])?
+                        $_COOKIE['email']: $request->get('email')
+                ),
                 'keywords' => $request->get('keywords', ''),
                 'mode' => $request->get('mode', 'Suggest'),
                 'search_aliases' => get_search_aliases(),
@@ -2128,16 +2141,13 @@ $application
 ->match(
     '/keyword-suggester/free/{id}',
     function (Request $request, $id) use ($application) {
-        $record = $application['db']->fetchAssoc(
-            'SELECT `email` FROM `apps_keyword_suggester` WHERE `id` = ?',
-            array($id)
-        );
-
         return $application['twig']->render(
             'views/keyword_suggester_free_id.twig',
             array(
-                'email' => $record['email'],
-                'id' => $id,
+                'record' => $application['db']->fetchAssoc(
+                    'SELECT * FROM `apps_keyword_suggester` WHERE `id` = ?',
+                    array($id)
+                ),
             )
         );
     }
@@ -2150,11 +2160,12 @@ $application
 ->match(
     '/keyword-suggester/free/{email}',
     function (Request $request, $email) use ($application) {
+        $email = urldecode_dot($email);
         $records = $application['db']->fetchAll(
             'SELECT * FROM `apps_keyword_suggester` WHERE `email` = ?',
             array(urldecode($email))
         );
-        foreach ($records as $index => $record) {
+        foreach ($records as $key => $value) {
             if (!empty($records[$key]['strings'])) {
                 $records[$key]['strings'] = json_decode(
                     $records[$key]['strings']
@@ -2167,12 +2178,13 @@ $application
         return $application['twig']->render(
             'views/keyword_suggester_free_email.twig',
             array(
+                'email' => $email,
                 'records' => $records,
             )
         );
     }
 )
-->assert('email', '.*%40.*.*')
+->assert('email', '.*%40.*')
 ->bind('keyword_suggester_free_email')
 ->method('GET');
 
