@@ -4,8 +4,15 @@ require_once sprintf('%s/vendor/class-phpass.php', __DIR__);
 
 date_default_timezone_set('UTC');
 
-function usort_categories($one, $two)
-{
+function urlencode_dot ($string) {
+    $string = urlencode($string);
+    $string = str_replace('.', '%2E', $string);
+    $string = str_replace('-', '%2D', $string);
+
+    return $string;
+}
+
+function usort_categories($one, $two) {
     $one_frequency = intval($one['frequency']);
     $two_frequency = intval($two['frequency']);
     if ($one_frequency != $two_frequency) {
@@ -21,8 +28,7 @@ function usort_categories($one, $two)
     return 0;
 }
 
-function usort_keywords_1($one, $two)
-{
+function usort_keywords_1($one, $two) {
     $one = floatval($one['contents']['score'][0]);
     $two = floatval($two['contents']['score'][0]);
     if ($one == $two) {
@@ -32,8 +38,7 @@ function usort_keywords_1($one, $two)
     return ($one > $two) ? -1 : 1;
 }
 
-function usort_keywords_2($one, $two)
-{
+function usort_keywords_2($one, $two) {
     $one_position = intval($one['position']);
     $two_position = intval($two['position']);
     if ($one_position != $two_position) {
@@ -49,8 +54,7 @@ function usort_keywords_2($one, $two)
     return 0;
 }
 
-function usort_logos($one, $two)
-{
+function usort_logos($one, $two) {
     $one = strtolower($one['file_name']);
     $two = strtolower($two['file_name']);
     if ($one == $two) {
@@ -60,8 +64,7 @@ function usort_logos($one, $two)
     return ($one < $two) ? -1 : 1;
 }
 
-function usort_popular_searches($one, $two)
-{
+function usort_popular_searches($one, $two) {
     $one = array_sum(array_values($one['keywords']));
     $two = array_sum(array_values($two['keywords']));
     if ($one != $two) {
@@ -703,6 +706,7 @@ function get_words_from_words($words_) {
             $words[] = array($key, $value);
         }
     }
+
     return $words;
 }
 
@@ -819,14 +823,6 @@ function is_valid($password, $hash) {
     }
 
     return false;
-}
-
-function urlencode_dot ($email) {
-    $email = urlencode($email);
-    $email = str_replace('.', '%2E', $email);
-    $email = str_replace('-', '%2D', $email);
-
-    return $email;
 }
 
 if (php_sapi_name() === 'cli-server') {
@@ -963,14 +959,14 @@ $application->before(function (Request $request) use ($application) {
         }
     }
     $application['session']->set('user', $user);
+    $application['twig']->addFilter(
+        new Twig_SimpleFilter('urlencode_dot', 'urlencode_dot')
+    );
     $application['twig']
         ->addGlobal('has_statistics', has_statistics($user));
     $application['twig']
         ->addGlobal('is_paying_customer', $is_paying_customer);
     $application['twig']->addGlobal('user', $user);
-    $application['twig']->addFilter(
-        new Twig_SimpleFilter('urlencode_dot', 'urlencode_dot')
-    );
 });
 
 $before_statistics = function () use ($application) {
@@ -1030,6 +1026,7 @@ $application
             __DIR__,
             escapeshellarg($request->get('url'))
         ), $output, $return_var);
+
         return new Response(implode('', $output));
     }
 )
@@ -1049,6 +1046,7 @@ $application
             __DIR__,
             escapeshellarg($request->get('keyword'))
         ), $output, $return_var);
+
         return new Response(implode('', $output));
     }
 )
@@ -1079,6 +1077,7 @@ $application
             __DIR__,
             escapeshellarg($request->get('url'))
         ), $output, $return_var);
+
         return new Response(implode('', $output));
     }
 )
@@ -1097,6 +1096,7 @@ $application
             __DIR__,
             escapeshellarg($request->get('keyword'))
         ), $output, $return_var);
+
         return new Response(implode('', $output));
     }
 )
@@ -1131,6 +1131,7 @@ $application
             escapeshellarg($request->get('url')),
             escapeshellarg(json_encode($keywords))
         ), $output, $return_var);
+
         return new Response(implode('', $output));
     }
 )
@@ -1412,6 +1413,7 @@ $application
                     'success',
                     array('Your feedback has been sent successfully.')
                 );
+
                 return $application->redirect(
                     $application['url_generator']->generate('feedback')
                 );
@@ -1510,11 +1512,13 @@ $application
             $application['session']->getFlashBag()->add(
                 'success', array('The report was deleted successfully.')
             );
+
             return $application->redirect(
                 $application['url_generator']
                     ->generate('keyword_analyzer_multiple')
             );
         }
+
         return $application['twig']->render(
             'views/keyword_analyzer_multiple_delete.twig',
             array(
@@ -1890,6 +1894,7 @@ $application
                 $countries[] = array($key, $value);
             }
         }
+
         return $application['twig']->render(
             'views/keyword_analyzer_single.twig',
             array(
@@ -1914,6 +1919,7 @@ $application
             escapeshellarg($request->get('keyword')),
             escapeshellarg($request->get('country'))
         ), $output, $return_var);
+
         return new Response(implode('', $output));
     }
 )
@@ -1947,6 +1953,7 @@ $application
         $stream = function () use ($json) {
             echo $json['suggestions'];
         };
+
         return $application->stream($stream, 200, array(
             'Content-Disposition' => sprintf(
                 'attachment; filename="keyword_suggester.csv"'
@@ -1980,6 +1987,7 @@ $application
                 escapeshellarg($request->get('search_alias'))
             ), $output, $return_var);
         }
+
         return new Response(implode('', $output));
     }
 )
@@ -2006,10 +2014,11 @@ Hi,
 Your request has been successfully queued. You can view the progress in the
 following URL: %s
 
-You can view your personalized history page in the
-following URL: %s
-
 Note: This URL will be active for 7 days.
+
+You can view your personalized history page in the following URL: %s
+
+Note: This URL will list your active requests (7 days).
 
 If you have any questions at all please don't hesitate to contact
 support@perfectsidekick.com
@@ -2088,6 +2097,7 @@ EOD;
                 false,
                 false
             );
+
             return $application->redirect(
                 $application['url_generator']->generate(
                     'keyword_suggester_free_id',
@@ -2097,6 +2107,7 @@ EOD;
                 )
             );
         }
+
         return $application['twig']->render(
             'views/keyword_suggester_free.twig',
             array(
@@ -2117,10 +2128,11 @@ $application
 ->match(
     '/keyword-suggester/free/{id}',
     function (Request $request, $id) use ($application) {
-        $query = <<<EOD
-SELECT `email` FROM `apps_keyword_suggester` WHERE `id` = ?
-EOD;
-        $record = $application['db']->fetchAssoc($query, array($id));
+        $record = $application['db']->fetchAssoc(
+            'SELECT `email` FROM `apps_keyword_suggester` WHERE `id` = ?',
+            array($id)
+        );
+
         return $application['twig']->render(
             'views/keyword_suggester_free_id.twig',
             array(
@@ -2138,17 +2150,20 @@ $application
 ->match(
     '/keyword-suggester/free/{email}',
     function (Request $request, $email) use ($application) {
-        $query = <<<EOD
-SELECT * FROM `apps_keyword_suggester` WHERE `email` = ?
-EOD;
         $records = $application['db']->fetchAll(
-            $query, array(urldecode($email))
+            'SELECT * FROM `apps_keyword_suggester` WHERE `email` = ?',
+            array(urldecode($email))
         );
         foreach ($records as $index => $record) {
-            $records[$index]['strings'] = (
-                $records[$index]['strings'] == null
-            )? '': json_decode($records[$index]['strings']);
+            if (!empty($records[$key]['strings'])) {
+                $records[$key]['strings'] = json_decode(
+                    $records[$key]['strings']
+                );
+            } else {
+                $records[$key]['strings'] = '';
+            }
         }
+
         return $application['twig']->render(
             'views/keyword_suggester_free_email.twig',
             array(
@@ -2202,6 +2217,7 @@ EOD;
                 $eta = sprintf('~%d minute(s)', $seconds / 60);
             }
         }
+
         return new Response(json_encode(array(
             'count' => $count + 1,
             'eta' => $eta,
@@ -2383,6 +2399,7 @@ $application
                 $application['session']->getFlashBag()->add(
                     'success', array('Your profile was updated successfully.')
                 );
+
                 return $application->redirect(
                     $application['url_generator']->generate('profile')
                 );
@@ -2547,6 +2564,7 @@ $application
             __DIR__,
             escapeshellarg($request->get('keywords'))
         ), $output, $return_var);
+
         return new Response(implode('', $output));
     }
 )
