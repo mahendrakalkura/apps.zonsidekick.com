@@ -1224,7 +1224,11 @@ def xlsx(date, category_id, print_length):
                 'row': row,
             }).value = 'Books'
             suggested_keywords = [
-                (suggested_keyword.string, suggested_keyword.items, )
+                (
+                    suggested_keyword.string,
+                    suggested_keyword.score,
+                    suggested_keyword.items,
+                )
                 for suggested_keyword in group.suggested_keywords.order_by(
                     'apps_hot_category_step_6_suggested_keywords.score DESC',
                 ).order_by(
@@ -1236,16 +1240,16 @@ def xlsx(date, category_id, print_length):
             titles = [
                 item['title'][0]
                 for suggested_keyword in suggested_keywords[1:]
-                for item in loads(suggested_keyword[1])
+                for item in loads(suggested_keyword[2])
             ]
             for iterable in izip_longest(
                 [
-                    suggested_keyword[0]
+                    (suggested_keyword[0], suggested_keyword[1], )
                     for suggested_keyword in suggested_keywords
                 ],
                 [
                     (item['title'][0], item['url'], )
-                    for item in loads(suggested_keywords[0][1])
+                    for item in loads(suggested_keywords[0][2])
                     if item['title'][0] in titles
                 ]
             ):
@@ -1255,7 +1259,10 @@ def xlsx(date, category_id, print_length):
                 }).style = td_left
                 worksheet.cell('A%(row)s' % {
                     'row': row,
-                }).value = iterable[0]
+                }).value = '%(string)s (%(score).2f)' % {
+                    'score': iterable[0][1],
+                    'string': iterable[0][0],
+                }
                 if iterable[1]:
                     worksheet.cell('B%(row)s' % {
                         'row': row,
