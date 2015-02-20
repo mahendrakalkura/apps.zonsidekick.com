@@ -2161,9 +2161,14 @@ $application
     '/keyword-suggester/free/{email}',
     function (Request $request, $email) use ($application) {
         $email = urldecode_dot($email);
+        $query = <<<EOD
+SELECT *
+FROM `apps_keyword_suggester`
+WHERE `email` = ? AND `strings` IS NOT NULL
+ORDER BY `timestamp` DESC
+EOD;
         $records = $application['db']->fetchAll(
-            'SELECT * FROM `apps_keyword_suggester` WHERE `email` = ?',
-            array(urldecode($email))
+            $query, array(urldecode($email))
         );
         foreach ($records as $key => $value) {
             if (!empty($records[$key]['strings'])) {
