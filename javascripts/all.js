@@ -1178,11 +1178,8 @@ application.controller('keyword_suggester_free', [
 ]);
 
 application.controller('keyword_suggester_free_email', [
-    '$attrs',
-    '$http',
     '$scope',
-    '$timeout',
-    function ($attrs, $http, $scope, $timeout) {
+    function ($scope) {
         $scope.status = false;
     }
 ]);
