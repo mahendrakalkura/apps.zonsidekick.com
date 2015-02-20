@@ -821,6 +821,14 @@ function is_valid($password, $hash) {
     return false;
 }
 
+function urlencode_dot ($email) {
+    $email = urlencode($email);
+    $email = str_replace('.', '%2E', $email);
+    $email = str_replace('-', '%2D', $email);
+
+    return $email;
+}
+
 if (php_sapi_name() === 'cli-server') {
     if (is_file(sprintf(
         '%s/%s',
@@ -960,6 +968,9 @@ $application->before(function (Request $request) use ($application) {
     $application['twig']
         ->addGlobal('is_paying_customer', $is_paying_customer);
     $application['twig']->addGlobal('user', $user);
+    $application['twig']->addFilter(
+        new Twig_SimpleFilter('urlencode_dot', 'urlencode_dot')
+    );
 });
 
 $before_statistics = function () use ($application) {
@@ -1995,6 +2006,9 @@ Hi,
 Your request has been successfully queued. You can view the progress in the
 following URL: %s
 
+You can view your personalized history page in the
+following URL: %s
+
 Note: This URL will be active for 7 days.
 
 If you have any questions at all please don't hesitate to contact
@@ -2007,6 +2021,16 @@ EOD;
                             'keyword_suggester_free_id',
                             array(
                                 'id' => $id,
+                            )
+                        )
+                    ),
+                    $request->getUriForPath(
+                        $application['url_generator']->generate(
+                            'keyword_suggester_free_email',
+                            array(
+                                'email' => urlencode_dot(
+                                    $request->get('email')
+                                ),
                             )
                         )
                     )
@@ -2093,15 +2117,48 @@ $application
 ->match(
     '/keyword-suggester/free/{id}',
     function (Request $request, $id) use ($application) {
+        $query = <<<EOD
+SELECT `email` FROM `apps_keyword_suggester` WHERE `id` = ?
+EOD;
+        $record = $application['db']->fetchAssoc($query, array($id));
         return $application['twig']->render(
             'views/keyword_suggester_free_id.twig',
             array(
+                'email' => $record['email'],
                 'id' => $id,
             )
         );
     }
 )
+->assert('id', '\d+')
 ->bind('keyword_suggester_free_id')
+->method('GET');
+
+$application
+->match(
+    '/keyword-suggester/free/{email}',
+    function (Request $request, $email) use ($application) {
+        $query = <<<EOD
+SELECT * FROM `apps_keyword_suggester` WHERE `email` = ?
+EOD;
+        $records = $application['db']->fetchAll(
+            $query, array(urldecode($email))
+        );
+        foreach ($records as $index => $record) {
+            $records[$index]['strings'] = (
+                $records[$index]['strings'] == null
+            )? '': json_decode($records[$index]['strings']);
+        }
+        return $application['twig']->render(
+            'views/keyword_suggester_free_email.twig',
+            array(
+                'records' => $records,
+            )
+        );
+    }
+)
+->assert('email', '.*%40.*.*')
+->bind('keyword_suggester_free_email')
 ->method('GET');
 
 $application

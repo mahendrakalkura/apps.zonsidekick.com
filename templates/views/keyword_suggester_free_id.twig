@@ -25,6 +25,28 @@
     </div>
 </div>
 {% include 'slots/alerts.twig' %}
+
+{% if email %}
+    <div class="row">
+        <div
+            class="col-xs-12 col-sm-12 col-md-12 col-xs-12"
+            >
+            <div class="panel">
+                <div class="panel-body">
+                    <p>
+                        You can view your personalized history page
+                        <a
+                            href="{{ url('keyword_suggester_free_email', {'email': email|urlencode_dot}) }}"
+                            target="_blank"
+                            >
+                            here.
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
 <div
     data-url-xhr="{{ url('keyword_suggester_free_id_xhr', {id: id}) }}"
     ng-controller="keyword_suggester_free"

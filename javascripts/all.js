@@ -1177,6 +1177,16 @@ application.controller('keyword_suggester_free', [
     }
 ]);
 
+application.controller('keyword_suggester_free_email', [
+    '$attrs',
+    '$http',
+    '$scope',
+    '$timeout',
+    function ($attrs, $http, $scope, $timeout) {
+        $scope.status = false;
+    }
+]);
+
 application.controller('modal', [
     '$attrs',
     '$element',

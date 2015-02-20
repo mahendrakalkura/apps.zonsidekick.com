@@ -23,6 +23,7 @@
         </h1>
     </div>
 </div>
+
 <div class="row">
     <div class="col-xs-12 col-sm-12 col-md-12 col-xs-12">
         <form
@@ -78,19 +79,48 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label class="control-label" for="email">
-                            Email
-                        </label>
-                        <input
-                            class="form-control"
-                            id="email"
-                            name="email"
-                            placeholder="Email"
-                            type="email"
-                            value="{{ email }}"
-                            >
-                    </div>
+                    {% if email|length %}
+                        <div ng-controller="keyword_suggester_free_email">
+                            <p ng-show="!status">
+                                We will send you (<strong>{{ email }}</strong>) a personalized link to this request.
+                                You may view your personalized history page <a href="{{ url('keyword_suggester_free_email', {'email': email|urlencode_dot}) }}" target="_blank">here</a>.
+                            </p>
+                            <p ng-show="!status">
+                                Would you like to send this to another email address?
+                                Click <a ng-click="status = true">here</a> to change it.
+                                 Note: You will receive a new personalized history page once you change
+                                your email address.
+                            <p>
+                            <div class="form-group" ng-show="status">
+                                <label class="control-label" for="email">
+                                    Email
+                                </label>
+                                <input
+                                    class="form-control"
+                                    id="email"
+                                    name="email"
+                                    placeholder="Email"
+                                    type="text"
+                                    value="{{ email }}"
+                                    ng-show="status"
+                                >
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="form-group">
+                            <label class="control-label" for="email">
+                                Email
+                            </label>
+                            <input
+                                class="form-control"
+                                id="email"
+                                name="email"
+                                placeholder="Email"
+                                type="email"
+                                value="{{ email }}"
+                                >
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="clearfix panel-footer text-right">
                     <button class="btn btn-success pull-right" type="submit">
