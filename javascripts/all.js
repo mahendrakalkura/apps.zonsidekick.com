@@ -25,7 +25,6 @@ var application = angular.module('application', [
     'anotherpit/angular-rollbar', 'duScroll', 'ngQueue', 'rt.encodeuri',
 ]);
 
-
 application.config(
     function ($httpProvider, $interpolateProvider, $rollbarProvider) {
         $httpProvider.defaults.headers.post[
