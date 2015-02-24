@@ -30,6 +30,7 @@ environment.register('javascripts', Bundle(
     'vendor/angular-queue/angular-queue.js',
     'vendor/angular-rollbar/angular-rollbar.js',
     'vendor/angular-scroll/angular-scroll.min.js',
+    'vendor/floatThead/dist/jquery.floatThead.js',
     'vendor/highcharts/highcharts.src.js',
     'vendor/lodash/dist/lodash.min.js',
     'vendor/moment/min/moment-with-locales.min.js',

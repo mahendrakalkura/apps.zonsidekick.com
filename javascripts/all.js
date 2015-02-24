@@ -1594,6 +1594,7 @@ jQuery(function () {
     jQuery('select.select2').select2({
         placeholder: 'Select an option...'
     });
+    jQuery('.floatThead').floatThead();
     jQuery('.got-it').click(function () {
         jQuery.cookie(jQuery(this).parents('.modal').attr('id'), 'Yes');
     });

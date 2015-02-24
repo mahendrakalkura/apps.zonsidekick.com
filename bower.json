@@ -6,6 +6,7 @@
         "angular-rollbar": "0.1.0",
         "angular-scroll": "0.6.2",
         "bootstrap": "3.3.0",
+        "floatThead": "~1.2.11",
         "font-awesome": "4.2.0",
         "highcharts": "4.0.4",
         "jquery": "2.1.1",
