@@ -935,6 +935,8 @@ $application->before(function (Request $request) use ($application) {
             &&
             $request->get('_route') != 'keyword_suggester_free_id_xhr'
             &&
+            $request->get('_route') != 'keyword_suggester_free_email'
+            &&
             $request->get('_route') != 'sign_in'
         ) {
             return $application->redirect(
@@ -949,6 +951,8 @@ $application->before(function (Request $request) use ($application) {
         $request->get('_route') != 'keyword_suggester_free_id'
         &&
         $request->get('_route') != 'keyword_suggester_free_id_xhr'
+        &&
+        $request->get('_route') != 'keyword_suggester_free_email'
         &&
         $request->get('_route') != 'sign_in'
     ) {
