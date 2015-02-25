@@ -89,14 +89,14 @@
             </button>
         </div>
     </div>
+    {% if record.email %}
+        <p class="text-center" ng-show="record.strings.length">
+            You can view your personalized history page
+            <a href="{{ url('keyword_suggester_free_email', {'email': record.email|urlencode_dot}) }}">
+                here.
+            </a>
+        </p>
+    {% endif %}
 </div>
-{% if record.email %}
-    <p class="text-center">
-        You can view your personalized history page
-        <a href="{{ url('keyword_suggester_free_email', {'email': record.email|urlencode_dot}) }}">
-            here.
-        </a>
-    </p>
-{% endif %}
 {% include 'slots/keyword_suggester.twig' %}
 {% endblock %}
