@@ -51,6 +51,12 @@
             <td class="narrow text-right">[! count !]</td>
         </tr>
     </table>
+    <p ng-show="spinner">
+        We're grabbing your suggested keywords now, this should only take a
+        moment. Once we're done, you'll see them here. If you've entered your
+        email we've also sent you a page that you may return to at any point to
+        review all of your searches
+    </p>
     <div class="panel" ng-show="record.strings.length">
         <div class="panel-body">
             <div class="form-group">
