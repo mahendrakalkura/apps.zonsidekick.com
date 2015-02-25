@@ -75,6 +75,11 @@
                         </option>
                     {% endfor %}
                 </select>
+                <div class="help-block text-info">
+                    You may choose to return suggestions for specific
+                    departments by changing this setting. For example, the
+                    Kindle Store.
+                </div>
             </div>
             {% if email %}
                 <div ng-controller="keyword_suggester_free_email">
@@ -103,7 +108,7 @@
                             value="{{ email }}"
                             ng-show="status"
                         >
-                        <div class="help-block">
+                        <div class="help-block text-info">
                             If you enter your email address, we will send you a
                             personalized link to this request. We will also
                             send you a personalized history page which will
@@ -124,7 +129,7 @@
                         type="email"
                         value="{{ email }}"
                         >
-                    <div class="help-block">
+                    <div class="help-block text-info">
                         If you enter your email address, we will send you a
                         personalized link to this request. We will also send
                         you a personalized history page which will list all of
