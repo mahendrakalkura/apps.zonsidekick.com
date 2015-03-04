@@ -458,6 +458,7 @@ application.controller('book_tracker', [
         $scope.count = 7;
 
         $scope.errors = {
+            keywords: false,
             title: false,
             url: false,
         }
@@ -476,10 +477,7 @@ application.controller('book_tracker', [
             if ($scope.errors['url']) {
                 return true;
             }
-            if ($scope.count < 0) {
-                return true;
-            }
-            if (!$scope.keywords.length) {
+            if ($scope.errors['keywords']) {
                 return true;
             }
             return false;
@@ -488,18 +486,25 @@ application.controller('book_tracker', [
         $scope.$watch('keywords', function (new_value, old_value) {
             $scope.count = 7;
             if (typeof(new_value) == 'undefined') {
+                $scope.errors['keywords'] = true;
                 return;
             }
-            new_value = $.trim(new_value);
+            new_value = jQuery.trim(new_value);
             if (new_value == '') {
+                $scope.errors['keywords'] = true;
                 return;
             }
             new_value = new_value.split(/\r|\n|\r\n/g);
             for (var index = 0; index < new_value.length; index ++) {
-                if ($.trim(new_value[index]) != '') {
+                if (jQuery.trim(new_value[index]) != '') {
                     $scope.count -= 1;
                 }
             }
+            if ($scope.count < 0 || $scope.count > 7) {
+                $scope.errors['keywords'] = true;
+                return true;
+            }
+            $scope.errors['keywords'] = false;
         }, true);
 
         $scope.$watch('title', function (new_value, old_value) {
@@ -507,7 +512,7 @@ application.controller('book_tracker', [
                 $scope.errors['title'] = true;
                 return;
             }
-            new_value = $.trim(new_value);
+            new_value = jQuery.trim(new_value);
             if (new_value == '') {
                 $scope.errors['title'] = true;
                 return;
@@ -520,7 +525,7 @@ application.controller('book_tracker', [
                 $scope.errors['url'] = true;
                 return;
             }
-            new_value = $.trim(new_value);
+            new_value = jQuery.trim(new_value);
             if (new_value == '') {
                 $scope.errors['url'] = true;
                 return;
@@ -728,7 +733,7 @@ application.controller('keyword_analyzer_multiple_add', [
                 $scope.count = 500;
                 return;
             }
-            new_value = $.trim(new_value);
+            new_value = jQuery.trim(new_value);
             if (new_value == '') {
                 $scope.count = 500;
                 return;

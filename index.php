@@ -1283,9 +1283,7 @@ EOD;
                             $record['number']
                         );
                     } else {
-                        if (
-                            ($k > 0) && ($chart_2_series[$key]['data'][$k-1])
-                        ) {
+                        if ($k > 0 && $chart_2_series[$key]['data'][$k-1]) {
                             $chart_2_series[$key]['data'][
                                 $k
                             ] = $chart_2_series[$key]['data'][$k-1];
