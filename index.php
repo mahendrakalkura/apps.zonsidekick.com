@@ -2104,6 +2104,11 @@ EOD;
                             $exception->message,
                             'Subscriber already subscribed'
                         ) === false
+                        AND
+                        strpos(
+                            $exception->message,
+                            'The API is temporarily unavailable'
+                        ) === false
                     ) {
                         Rollbar::report_exception($exception);
                     }
