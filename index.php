@@ -1283,7 +1283,9 @@ EOD;
                             $record['number']
                         );
                     } else {
-                        if ($chart_2_series[$key]['data'][$k-1]) {
+                        if (
+                            ($k > 0) && ($chart_2_series[$key]['data'][$k-1])
+                        ) {
                             $chart_2_series[$key]['data'][
                                 $k
                             ] = $chart_2_series[$key]['data'][$k-1];
@@ -2376,7 +2378,7 @@ $application
     '/logos/preview',
     function (Request $request) use ($application) {
         $user = $application['session']->get('user');
-        $stream = function () use ($application, $report, $user) {
+        $stream = function () use ($application, $report, $request, $user) {
             readfile(sprintf(
                 '%s/%s',
                 get_path($application, $user, 'logos'),

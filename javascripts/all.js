@@ -479,20 +479,27 @@ application.controller('book_tracker', [
             if ($scope.count < 0) {
                 return true;
             }
+            if (!$scope.keywords.length) {
+                return true;
+            }
             return false;
         };
 
         $scope.$watch('keywords', function (new_value, old_value) {
+            $scope.count = 7;
             if (typeof(new_value) == 'undefined') {
-                $scope.count = 7;
                 return;
             }
             new_value = $.trim(new_value);
             if (new_value == '') {
-                $scope.count = 7;
                 return;
             }
-            $scope.count = 7 - new_value.split(/\r|\n|\r\n/g).length;
+            new_value = new_value.split(/\r|\n|\r\n/g);
+            for (var index = 0; index < new_value.length; index ++) {
+                if ($.trim(new_value[index]) != '') {
+                    $scope.count -= 1;
+                }
+            }
         }, true);
 
         $scope.$watch('title', function (new_value, old_value) {
