@@ -150,7 +150,7 @@ def get_book_rank(url):
 
 
 def get_keyword_rank(string, url):
-    asin = url.split('/')[-1]
+    asin = get_asin(url)
     page = 0
     while True:
         page += 1
