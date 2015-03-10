@@ -1170,9 +1170,8 @@ def xlsx(date, category_id, print_length):
         for cell in row:
             cell.value = None
     with closing(get_mysql_session()()) as session:
-        group_count = 1
-        number = 0
         row = 0
+        group_number = 0
         for group in session.query(
             step_7_group,
         ).filter(
@@ -1186,12 +1185,11 @@ def xlsx(date, category_id, print_length):
         ):
             if not group.suggested_keywords.count() > 1:
                 continue
-            serial_number = 0
-            number += 1
             row += 1
+            group_number += 1
             worksheet.cell('D%(row)s' % {
                 'row': row,
-            }).value = 'xxxx'
+            }).value = 'xxxxx'
             row += 1
             worksheet.cell('A%(row)s' % {
                 'row': row,
@@ -1204,8 +1202,8 @@ def xlsx(date, category_id, print_length):
             }).style = th_left
             worksheet.cell('B%(row)s' % {
                 'row': row,
-            }).value = 'GROUP %(number)s' % {
-                'number': number,
+            }).value = 'Group %(number)s' % {
+                'number': group_number,
             }
             worksheet.cell('C%(row)s' % {
                 'row': row,
@@ -1277,7 +1275,7 @@ def xlsx(date, category_id, print_length):
                 for suggested_keyword in suggested_keywords[1:]
                 for item in loads(suggested_keyword[2])
             ]
-
+            serial_number = 0
             for iterable in izip_longest(
                 [
                     (suggested_keyword[0], suggested_keyword[1], )
@@ -1346,8 +1344,6 @@ def xlsx(date, category_id, print_length):
                     'row': row,
                 }).value = ''
                 row += 1
-            row = (50 * group_count) + (row % 50) - 1
-            group_count += 1
     worksheet.column_dimensions['A'].width = 25
     worksheet.column_dimensions['B'].width = 25
     worksheet.column_dimensions['C'].width = 50
@@ -1362,6 +1358,7 @@ def xlsx(date, category_id, print_length):
             'print_length': arguments.print_length,
         }
     )
+
     print 'Done'
 
 
