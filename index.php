@@ -1283,9 +1283,7 @@ EOD;
                             $record['number']
                         );
                     } else {
-                        if (
-                            ($k > 0) && ($chart_2_series[$key]['data'][$k-1])
-                        ) {
+                        if ($k > 0 && $chart_2_series[$key]['data'][$k-1]) {
                             $chart_2_series[$key]['data'][
                                 $k
                             ] = $chart_2_series[$key]['data'][$k-1];
@@ -2105,6 +2103,11 @@ EOD;
                         strpos(
                             $exception->message,
                             'Subscriber already subscribed'
+                        ) === false
+                        AND
+                        strpos(
+                            $exception->message,
+                            'The API is temporarily unavailable'
                         ) === false
                     ) {
                         Rollbar::report_exception($exception);

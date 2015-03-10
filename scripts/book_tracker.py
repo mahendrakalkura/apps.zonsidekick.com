@@ -126,9 +126,9 @@ def main():
 
 
 def get_asin(url):
-    match = compile('/(dp|gp)/([^/]*)/').search(url)
+    match = compile('B[0-9]{2}[0-9A-Z]{7}|[0-9]{9}(X|0-9])').search(url)
     if match:
-        return match.group(2)
+        return match.group(0)
 
 
 def get_book_rank(url):
@@ -150,7 +150,7 @@ def get_book_rank(url):
 
 
 def get_keyword_rank(string, url):
-    asin = url.split('/')[-1]
+    asin = get_asin(url)
     page = 0
     while True:
         page += 1

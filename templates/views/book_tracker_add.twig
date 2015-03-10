@@ -83,6 +83,12 @@
                     <div class="help-block" ng-class="get_class()">
                         [! count !] keywords remaining (one per line)
                     </div>
+                    <div
+                        class="help-block text-danger"
+                        ng-show="errors.keywords"
+                        >
+                        Invalid Keywords
+                    </div>
                 </div>
             </div>
             <div class="clearfix panel-footer text-right">
