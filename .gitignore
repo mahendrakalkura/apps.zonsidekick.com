@@ -7,6 +7,7 @@ files/*
 scripts/*.pyc
 tmp/*
 !tmp/.htaccess
+!tmp/template.xlsx
 vendor/*
 !vendor/pixeladmin
 !vendor/class-phpass.php
