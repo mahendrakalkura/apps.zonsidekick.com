@@ -32,7 +32,7 @@ kombu==3.0.24
 lxml==3.3.5
 nltk==3.0.1
 numpy==1.8.1
-openpyxl==2.1.4
+openpyxl==2.2.0-b1
 orderedmultidict==0.7.3
 pyOpenSSL==0.14
 pyasn1==0.1.7
