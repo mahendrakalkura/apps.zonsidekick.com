@@ -1187,16 +1187,31 @@ def xlsx(date, category_id, print_length):
                 continue
             row += 1
             group_number += 1
+            worksheet.cell('A%(row)s' % {
+                'row': row,
+            }).style = td_left
+            worksheet.cell('B%(row)s' % {
+                'row': row,
+            }).style = td_left
+            worksheet.cell('C%(row)s' % {
+                'row': row,
+            }).style = td_left
+            worksheet.cell('D%(row)s' % {
+                'row': row,
+            }).style = td_left
             worksheet.cell('D%(row)s' % {
                 'row': row,
             }).value = 'xxxxx'
+            worksheet.cell('E%(row)s' % {
+                'row': row,
+            }).style = td_left
             row += 1
             worksheet.cell('A%(row)s' % {
                 'row': row,
-            }).style = th_center
+            }).style = th_right
             worksheet.cell('A%(row)s' % {
                 'row': row,
-            }).value = 'Serial Number'
+            }).value = ''
             worksheet.cell('B%(row)s' % {
                 'row': row,
             }).style = th_left
@@ -1207,52 +1222,19 @@ def xlsx(date, category_id, print_length):
             }
             worksheet.cell('C%(row)s' % {
                 'row': row,
-            }).style = Style(
-                alignment=Alignment(
-                    horizontal='left',
-                    indent=0,
-                    shrink_to_fit=False,
-                    text_rotation=0,
-                    vertical='center',
-                    wrap_text=False,
-                ),
-                font=Font(
-                    bold=True,
-                    italic=False,
-                    name='Calibri',
-                    size=10,
-                    strike=False,
-                    underline='none',
-                    vertAlign=None,
-                ),
-            )
+            }).style = th_left
             worksheet.cell('C%(row)s' % {
                 'row': row,
             }).value = 'Suggested Keywords'
             worksheet.cell('D%(row)s' % {
                 'row': row,
-            }).style = Style(
-                alignment=Alignment(
-                    horizontal='left',
-                    indent=0,
-                    shrink_to_fit=False,
-                    text_rotation=0,
-                    vertical='center',
-                    wrap_text=False,
-                ),
-                font=Font(
-                    bold=True,
-                    italic=False,
-                    name='Calibri',
-                    size=10,
-                    strike=False,
-                    underline='none',
-                    vertAlign=None,
-                ),
-            )
+            }).style = th_left
             worksheet.cell('D%(row)s' % {
                 'row': row,
             }).value = 'Books'
+            worksheet.cell('E%(row)s' % {
+                'row': row,
+            }).style = th_left
             worksheet.cell('E%(row)s' % {
                 'row': row,
             }).value = 'Hyperlinks'
@@ -1291,24 +1273,33 @@ def xlsx(date, category_id, print_length):
                 serial_number += 1
                 worksheet.cell('A%(row)s' % {
                     'row': row,
-                }).style = td_center
+                }).style = td_right
                 worksheet.cell('A%(row)s' % {
                     'row': row,
                 }).value = serial_number
+                worksheet.cell('B%(row)s' % {
+                    'row': row,
+                }).style = td_left
+                worksheet.cell('B%(row)s' % {
+                    'row': row,
+                }).value = ''
+                worksheet.cell('C%(row)s' % {
+                    'row': row,
+                }).style = td_left
                 if iterable[0]:
-                    worksheet.cell('C%(row)s' % {
-                        'row': row,
-                    }).style = td_left
                     worksheet.cell('C%(row)s' % {
                         'row': row,
                     }).value = '%(string)s (%(score).2f)' % {
                         'score': iterable[0][1],
                         'string': iterable[0][0],
                     }
+                worksheet.cell('D%(row)s' % {
+                    'row': row,
+                }).style = td_left
+                worksheet.cell('E%(row)s' % {
+                    'row': row,
+                }).style = td_left
                 if iterable[1]:
-                    worksheet.cell('D%(row)s' % {
-                        'row': row,
-                    }).style = td_left
                     worksheet.cell('D%(row)s' % {
                         'row': row,
                     }).hyperlink = iterable[1][1]
@@ -1317,34 +1308,43 @@ def xlsx(date, category_id, print_length):
                     }).value = iterable[1][0]
                     worksheet.cell('E%(row)s' % {
                         'row': row,
-                    }).style = td_center
-                    worksheet.cell('E%(row)s' % {
-                        'row': row,
                     }).hyperlink = iterable[1][1]
                     worksheet.cell('E%(row)s' % {
                         'row': row,
                     }).value = iterable[1][1]
-            for serial_number in range(serial_number, 51):
+            for serial_number in range(serial_number + 1, 51):
+                row += 1
                 worksheet.cell('A%(row)s' % {
                     'row': row,
-                }).style = td_center
+                }).style = td_right
                 worksheet.cell('A%(row)s' % {
                     'row': row,
                 }).value = serial_number
                 worksheet.cell('B%(row)s' % {
                     'row': row,
+                }).style = td_left
+                worksheet.cell('B%(row)s' % {
+                    'row': row,
                 }).value = ''
+                worksheet.cell('C%(row)s' % {
+                    'row': row,
+                }).style = td_left
                 worksheet.cell('C%(row)s' % {
                     'row': row,
                 }).value = ''
                 worksheet.cell('D%(row)s' % {
                     'row': row,
+                }).style = td_left
+                worksheet.cell('D%(row)s' % {
+                    'row': row,
                 }).value = ''
                 worksheet.cell('E%(row)s' % {
                     'row': row,
+                }).style = td_left
+                worksheet.cell('E%(row)s' % {
+                    'row': row,
                 }).value = ''
-                row += 1
-    worksheet.column_dimensions['A'].width = 25
+    worksheet.column_dimensions['A'].width = 10
     worksheet.column_dimensions['B'].width = 25
     worksheet.column_dimensions['C'].width = 50
     worksheet.column_dimensions['C'].width = 50
