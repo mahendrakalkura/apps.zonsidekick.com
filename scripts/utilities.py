@@ -349,7 +349,7 @@ def get_popularity(keyword):
     trb = 0
     spr = 0
     length = len(keyword)
-    for index in range(0, length):
+    for index in range(0, 5):
         keywords = {
             'premium': [],
             'non-premium': [],
