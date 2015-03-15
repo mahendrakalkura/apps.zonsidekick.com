@@ -10,6 +10,7 @@ from collections import Counter
 from csv import QUOTE_ALL, reader
 from datetime import date, datetime
 from locale import LC_ALL, format, setlocale
+from logging import CRITICAL, getLogger
 from math import sqrt
 from os.path import dirname, join
 from re import compile, sub
@@ -31,7 +32,11 @@ from utilities import (
     get_sales,
     get_url as get_url_,
     get_words,
+    timer,
 )
+
+getLogger('gevent').setLevel(CRITICAL)
+getLogger('requests').setLevel(CRITICAL)
 
 setlocale(LC_ALL, 'en_US.UTF-8')
 
@@ -300,14 +305,115 @@ def get_competition(items):
 
 
 def get_contents(keyword, country):
-    responses = get_responses([
-        get_url(country, keyword, page) for page in ['1', '2', '3']
-    ])
-    if None in responses:
-        return
-    breadcrumb = ''
-    for response in responses[0:1]:
-        if '"noResultsTitle"' in response.text:
+    with timer('Step 1'):
+        responses = get_responses([
+            get_url(country, keyword, page) for page in ['1', '2', '3']
+        ])
+        if None in responses:
+            return
+    with timer('Step 2'):
+        breadcrumb = ''
+        for response in responses[0:1]:
+            if '"noResultsTitle"' in response.text:
+                return {
+                    'average_length': [-1, 'N/A'],
+                    'average_price': [-1, 'N/A'],
+                    'buyer_behavior': [-1, 'N/A'],
+                    'competition': [-1, 'N/A'],
+                    'count': [0, '0'],
+                    'items': [],
+                    'matches': [0, 0],
+                    'optimization': [-1, 'N/A'],
+                    'popularity': (-1, 'N/A'),
+                    'score': [-1, 'N/A'],
+                    'spend': [[-1, 'N/A'], 'N/A'],
+                    'words': [],
+                }
+            try:
+                breadcrumb = Selector(text=response.text).xpath(
+                    '//h2[@id="s-result-count"]/a/text()'
+                ).extract()[0]
+            except IndexError:
+                try:
+                    breadcrumb = Selector(text=response.text).xpath(
+                        '//h2[@id="s-result-count"]/span/a/text()'
+                    ).extract()[0]
+                except IndexError:
+                    pass
+    with timer('Step 3'):
+        count = 0
+        if (
+            breadcrumb == 'Kindle Store'
+            or
+            (country == 'co.jp' and 'Kindle' in breadcrumb)
+            or
+            (country == 'de' and breadcrumb == 'Kindle-Shop')
+        ):
+            for response in responses:
+                if not count:
+                    try:
+                        count = int(
+                            Selector(
+                                text=response.text
+                            ).xpath(
+                                '//h2[@id="s-result-count"]'
+                            ).xpath(
+                                'string()'
+                            ).extract()[0].strip().split(
+                                ' '
+                            )[0].replace(
+                                '.', ''
+                            ).replace(
+                                ',', ''
+                            ).replace(
+                                u'件中', ''
+                            )
+                        )
+                    except (IndexError, ValueError):
+                        pass
+                if not count:
+                    try:
+                        count = int(
+                            Selector(
+                                text=response.text
+                            ).xpath(
+                                '//h2[@id="s-result-count"]'
+                            ).xpath(
+                                'string()'
+                            ).extract()[0].strip().split(
+                                ' '
+                            )[1].replace(
+                                '.', ''
+                            ).replace(
+                                ',', ''
+                            ).replace(
+                                u'件中', ''
+                            )
+                        )
+                    except (IndexError, ValueError):
+                        pass
+                if not count:
+                    try:
+                        count = int(
+                            Selector(
+                                text=response.text
+                            ).xpath(
+                                '//h2[@id="s-result-count"]'
+                            ).xpath(
+                                'string()'
+                            ).extract()[0].strip().split(
+                                ' '
+                            )[2].replace(
+                                '.', ''
+                            ).replace(
+                                ',', ''
+                            ).replace(
+                                u'件中', ''
+                            )
+                        )
+                    except (IndexError, ValueError):
+                        pass
+        if not count:
             return {
                 'average_length': [-1, 'N/A'],
                 'average_price': [-1, 'N/A'],
@@ -322,301 +428,188 @@ def get_contents(keyword, country):
                 'spend': [[-1, 'N/A'], 'N/A'],
                 'words': [],
             }
-        try:
-            breadcrumb = Selector(text=response.text).xpath(
-                '//h2[@id="s-result-count"]/a/text()'
-            ).extract()[0]
-        except IndexError:
+    with timer('Step 4'):
+        count = (count, get_int(count))
+        urls = []
+        if (
+            breadcrumb == 'Kindle Store'
+            or
+            (country == 'co.jp' and 'Kindle' in breadcrumb)
+            or
+            (country == 'de' and breadcrumb == 'Kindle-Shop')
+        ):
+            for response in responses:
+                for href in Selector(
+                    text=response.text
+                ).xpath(
+                    '//a[normalize-space(@class)="'
+                    'a-link-normal s-access-detail-page a-text-normal'
+                    '"]/@href'
+                ).extract():
+                    if not href.startswith('http'):
+                        href = 'http://www.amazon.%(country)s%(href)s' % {
+                            'country': country,
+                            'href': href,
+                        }
+                    urls.append(href)
+        if not urls:
+            return {
+                'average_length': [-1, 'N/A'],
+                'average_price': [-1, 'N/A'],
+                'buyer_behavior': [-1, 'N/A'],
+                'competition': [-1, 'N/A'],
+                'count': [0, '0'],
+                'items': [],
+                'matches': [0, 0],
+                'optimization': [-1, 'N/A'],
+                'popularity': (-1, 'N/A'),
+                'score': [-1, 'N/A'],
+                'spend': [[-1, 'N/A'], 'N/A'],
+                'words': [],
+            }
+    with timer('Step 5'):
+        responses = get_responses(urls[0:48])
+        if not responses:
+            return
+    with timer('Step 6'):
+        items = []
+        index = 0
+        for response in responses:
+            if not response:
+                continue
+            index += 1
             try:
-                breadcrumb = Selector(text=response.text).xpath(
-                    '//h2[@id="s-result-count"]/span/a/text()'
-                ).extract()[0]
+                selector = Selector(text=response.text)
+            except AttributeError:
+                continue
+            asin = ''
+            try:
+                asin = get_string(
+                    selector.xpath(
+                        '//input[@name="ASIN.0"]/@value'
+                    ).extract()[0]
+                )
             except IndexError:
                 pass
-    count = 0
-    if (
-        breadcrumb == 'Kindle Store'
-        or
-        (country == 'co.jp' and 'Kindle' in breadcrumb)
-        or
-        (country == 'de' and breadcrumb == 'Kindle-Shop')
-    ):
-        for response in responses:
-            if not count:
-                try:
-                    count = int(
-                        Selector(
-                            text=response.text
-                        ).xpath(
-                            '//h2[@id="s-result-count"]'
-                        ).xpath(
-                            'string()'
-                        ).extract()[0].strip().split(
-                            ' '
-                        )[0].replace(
-                            '.', ''
-                        ).replace(
-                            ',', ''
-                        ).replace(
-                            u'件中', ''
-                        )
-                    )
-                except (IndexError, ValueError):
-                    pass
-            if not count:
-                try:
-                    count = int(
-                        Selector(
-                            text=response.text
-                        ).xpath(
-                            '//h2[@id="s-result-count"]'
-                        ).xpath(
-                            'string()'
-                        ).extract()[0].strip().split(
-                            ' '
-                        )[1].replace(
-                            '.', ''
-                        ).replace(
-                            ',', ''
-                        ).replace(
-                            u'件中', ''
-                        )
-                    )
-                except (IndexError, ValueError):
-                    pass
-            if not count:
-                try:
-                    count = int(
-                        Selector(
-                            text=response.text
-                        ).xpath(
-                            '//h2[@id="s-result-count"]'
-                        ).xpath(
-                            'string()'
-                        ).extract()[0].strip().split(
-                            ' '
-                        )[2].replace(
-                            '.', ''
-                        ).replace(
-                            ',', ''
-                        ).replace(
-                            u'件中', ''
-                        )
-                    )
-                except (IndexError, ValueError):
-                    pass
-    if not count:
-        return {
-            'average_length': [-1, 'N/A'],
-            'average_price': [-1, 'N/A'],
-            'buyer_behavior': [-1, 'N/A'],
-            'competition': [-1, 'N/A'],
-            'count': [0, '0'],
-            'items': [],
-            'matches': [0, 0],
-            'optimization': [-1, 'N/A'],
-            'popularity': (-1, 'N/A'),
-            'score': [-1, 'N/A'],
-            'spend': [[-1, 'N/A'], 'N/A'],
-            'words': [],
-        }
-    count = (count, get_int(count))
-    urls = []
-    if (
-        breadcrumb == 'Kindle Store'
-        or
-        (country == 'co.jp' and 'Kindle' in breadcrumb)
-        or
-        (country == 'de' and breadcrumb == 'Kindle-Shop')
-    ):
-        for response in responses:
-            for href in Selector(
-                text=response.text
-            ).xpath(
-                '//a[normalize-space(@class)="'
-                'a-link-normal s-access-detail-page a-text-normal'
-                '"]/@href'
-            ).extract():
-                if not href.startswith('http'):
-                    href = 'http://www.amazon.%(country)s%(href)s' % {
-                        'country': country,
-                        'href': href,
-                    }
-                urls.append(href)
-    if not urls:
-        return {
-            'average_length': [-1, 'N/A'],
-            'average_price': [-1, 'N/A'],
-            'buyer_behavior': [-1, 'N/A'],
-            'competition': [-1, 'N/A'],
-            'count': [0, '0'],
-            'items': [],
-            'matches': [0, 0],
-            'optimization': [-1, 'N/A'],
-            'popularity': (-1, 'N/A'),
-            'score': [-1, 'N/A'],
-            'spend': [[-1, 'N/A'], 'N/A'],
-            'words': [],
-        }
-    responses = get_responses(urls[0:48])
-    if not responses:
-        return
-    items = []
-    index = 0
-    for response in responses:
-        if not response:
-            continue
-        index += 1
-        try:
-            selector = Selector(text=response.text)
-        except AttributeError:
-            continue
-        asin = ''
-        try:
-            asin = get_string(
-                selector.xpath('//input[@name="ASIN.0"]/@value').extract()[0]
-            )
-        except IndexError:
-            pass
-        author = {
-            'name': '',
-            'url': '',
-        }
-        try:
-            author['name'] = get_string(selector.xpath(
-                '//span[@class="contributorNameTrigger"]/a/text()'
-            ).extract()[0])
-        except IndexError:
+            author = {
+                'name': '',
+                'url': '',
+            }
             try:
                 author['name'] = get_string(selector.xpath(
-                    '//h1[normalize-space(@class)="parseasinTitle"]/'
-                    'following-sibling::span/a/text()'
+                    '//span[@class="contributorNameTrigger"]/a/text()'
                 ).extract()[0])
             except IndexError:
-                pass
-        try:
-            author['url'] = get_url_(get_string(selector.xpath(
-                '//span[@class="contributorNameTrigger"]/a/@href'
-            ).extract()[0]))
-        except IndexError:
+                try:
+                    author['name'] = get_string(selector.xpath(
+                        '//h1[normalize-space(@class)="parseasinTitle"]/'
+                        'following-sibling::span/a/text()'
+                    ).extract()[0])
+                except IndexError:
+                    pass
             try:
-                author['url'] = get_url_(get_string(
-                    'http://www.amazon.%(country)s/%(href)s' % {
-                        'country': country,
-                        'href': selector.xpath(
-                            '//h1[normalize-space(@class)="parseasinTitle"]/'
-                            'following-sibling::span/a/@href'
-                        ).extract()[0]
-                    }
-                ))
+                author['url'] = get_url_(get_string(selector.xpath(
+                    '//span[@class="contributorNameTrigger"]/a/@href'
+                ).extract()[0]))
             except IndexError:
-                pass
-        best_sellers_rank = 0
-        try:
-            best_sellers_rank = int(
-                get_string(
-                    selector.xpath(
-                        '//li[@id="SalesRank"]/text()'
-                    ).extract()[1]
-                ).split(
-                    ' '
-                )[0].replace(
-                    '#', ''
-                ).replace(
-                    ',', ''
-                ).replace(
-                    '.', ''
-                )
-            )
-        except (IndexError, ValueError):
+                try:
+                    author['url'] = get_url_(get_string(
+                        'http://www.amazon.%(country)s/%(href)s' % {
+                            'country': country,
+                            'href': selector.xpath(
+                                '//h1'
+                                '[normalize-space(@class)="parseasinTitle"]/'
+                                'following-sibling::span/a/@href'
+                            ).extract()[0]
+                        }
+                    ))
+                except IndexError:
+                    pass
+            best_sellers_rank = 0
             try:
                 best_sellers_rank = int(
                     get_string(
                         selector.xpath(
-                            '//span[@class="zg_hrsr_rank"]/text()'
-                        ).extract()[0]
-                    ).replace(
-                        u'\u4f4d', ''
+                            '//li[@id="SalesRank"]/text()'
+                        ).extract()[1]
+                    ).split(
+                        ' '
+                    )[0].replace(
+                        '#', ''
                     ).replace(
                         ',', ''
                     ).replace(
-                        '#', ''
+                        '.', ''
                     )
                 )
             except (IndexError, ValueError):
-                pass
+                try:
+                    best_sellers_rank = int(
+                        get_string(
+                            selector.xpath(
+                                '//span[@class="zg_hrsr_rank"]/text()'
+                            ).extract()[0]
+                        ).replace(
+                            u'\u4f4d', ''
+                        ).replace(
+                            ',', ''
+                        ).replace(
+                            '#', ''
+                        )
+                    )
+                except (IndexError, ValueError):
+                    pass
 
-        best_sellers_rank = (best_sellers_rank, get_int(best_sellers_rank))
-        description = ''
-        try:
-            description = get_string(
-                selector.xpath(
-                    '//div[@id="postBodyPS"]'
-                ).xpath('string()').extract()[0]
-            )
-        except IndexError:
+            best_sellers_rank = (best_sellers_rank, get_int(best_sellers_rank))
+            description = ''
             try:
                 description = get_string(
                     selector.xpath(
-                        '//div[@class="productDescriptionWrapper"]'
-                    ).xpath('string()').extract()[1]
+                        '//div[@id="postBodyPS"]'
+                    ).xpath('string()').extract()[0]
                 )
             except IndexError:
                 try:
                     description = get_string(
                         selector.xpath(
                             '//div[@class="productDescriptionWrapper"]'
-                        ).xpath('string()').extract()[0]
+                        ).xpath('string()').extract()[1]
                     )
                 except IndexError:
-                    pass
-        pages = 0
-        try:
-            pages = int(get_string(
-                selector.xpath(
-                    '//b[contains(text(), "Print Length:")]/../text()'
-                ).extract()[0]
-            ).split(' ')[0].replace(',', ''))
-        except (IndexError, ValueError):
+                    try:
+                        description = get_string(
+                            selector.xpath(
+                                '//div[@class="productDescriptionWrapper"]'
+                            ).xpath('string()').extract()[0]
+                        )
+                    except IndexError:
+                        pass
+            pages = 0
             try:
-                pages = int(
-                    compile(r'(\d+)').search(
-                        get_string(selector.xpath(
-                            '//a[@id="pageCountAvailable"]/span/text()'
-                        ).extract()[0])
-                    ).group(1)
-                )
-            except (IndexError, TypeError, ValueError):
-                pass
-        pages = (pages, get_int(pages))
-        price = 0.00
-        if country != 'co.jp':
-            try:
-                price = float(
-                    get_string(
-                        selector.xpath(
-                            '//b[@class="priceLarge"]/text()'
-                        ).extract()[0]
-                    ).replace(
-                        '$', ''
-                    ).replace(
-                        'Rs. ', ''
-                    ).replace(
-                        ',', ''
-                    ).encode(
-                        'utf-8'
-                    ).replace(
-                        '\xc2\xa3', ''
-                    ).replace(
-                        'EUR', ''
-                    )
-                )
+                pages = int(get_string(
+                    selector.xpath(
+                        '//b[contains(text(), "Print Length:")]/../text()'
+                    ).extract()[0]
+                ).split(' ')[0].replace(',', ''))
             except (IndexError, ValueError):
+                try:
+                    pages = int(
+                        compile(r'(\d+)').search(
+                            get_string(selector.xpath(
+                                '//a[@id="pageCountAvailable"]/span/text()'
+                            ).extract()[0])
+                        ).group(1)
+                    )
+                except (IndexError, TypeError, ValueError):
+                    pass
+            pages = (pages, get_int(pages))
+            price = 0.00
+            if country != 'co.jp':
                 try:
                     price = float(
                         get_string(
                             selector.xpath(
-                                '//span[@class="priceLarge"]/text()'
+                                '//b[@class="priceLarge"]/text()'
                             ).extract()[0]
                         ).replace(
                             '$', ''
@@ -633,205 +626,231 @@ def get_contents(keyword, country):
                         )
                     )
                 except (IndexError, ValueError):
-                    pass
-        else:
-            try:
-                price = float(get_string(selector.xpath(
-                    '//b[@class="priceLarge"]/text()'
-                ).extract()[0]).replace(',', '').replace(u'\uffe5', ''))
-            except IndexError:
-                pass
-            if not price:
-                try:
-                    price = float(
-                        get_string(
-                            selector.xpath(
-                                '//span[@class="priceLarge"]/text()'
-                            ).extract()[0]
-                        ).replace(
-                            ',', ''
-                        ).replace(
-                            u'\uffe5', ''
+                    try:
+                        price = float(
+                            get_string(
+                                selector.xpath(
+                                    '//span[@class="priceLarge"]/text()'
+                                ).extract()[0]
+                            ).replace(
+                                '$', ''
+                            ).replace(
+                                'Rs. ', ''
+                            ).replace(
+                                ',', ''
+                            ).encode(
+                                'utf-8'
+                            ).replace(
+                                '\xc2\xa3', ''
+                            ).replace(
+                                'EUR', ''
+                            )
                         )
-                    )
+                    except (IndexError, ValueError):
+                        pass
+            else:
+                try:
+                    price = float(get_string(selector.xpath(
+                        '//b[@class="priceLarge"]/text()'
+                    ).extract()[0]).replace(',', '').replace(u'\uffe5', ''))
                 except IndexError:
                     pass
-        price = (price, get_float(price))
-        publication_date = ''
-        try:
-            publication_date = get_string(
-                selector.xpath(
-                    '//input[@id="pubdate"]/@value'
-                ).extract()[0][0:10]
-            )
-        except IndexError:
-            pass
-        age = ''
-        if publication_date:
+                if not price:
+                    try:
+                        price = float(
+                            get_string(
+                                selector.xpath(
+                                    '//span[@class="priceLarge"]/text()'
+                                ).extract()[0]
+                            ).replace(
+                                ',', ''
+                            ).replace(
+                                u'\uffe5', ''
+                            )
+                        )
+                    except IndexError:
+                        pass
+            price = (price, get_float(price))
+            publication_date = ''
             try:
-                age = get_int(get_age(
-                    date.today(),
-                    date(*tuple(map(int, publication_date.split('-'))))
-                ))
+                publication_date = get_string(
+                    selector.xpath(
+                        '//input[@id="pubdate"]/@value'
+                    ).extract()[0][0:10]
+                )
             except IndexError:
                 pass
-        else:
-            try:
-                publication_date = parse(compile('\((.*?)\)').search(
-                    get_string(
-                        selector.xpath(
-                            '//b[contains(text(), "Publisher")]/../text()'
-                        ).extract()[0]
-                    )
-                ).group(1)).date()
-                age = get_int(get_age(date.today(), publication_date))
-                publication_date = publication_date.isoformat()
-            except (AttributeError, IndexError, TypeError, ValueError):
+            age = ''
+            if publication_date:
+                try:
+                    age = get_int(get_age(
+                        date.today(),
+                        date(*tuple(map(int, publication_date.split('-'))))
+                    ))
+                except IndexError:
+                    pass
+            else:
                 try:
                     publication_date = parse(compile('\((.*?)\)').search(
-                        get_string(selector.xpath(
-                            '//div[@class="content"]/ul/li[4]/text()'
-                        ).extract()[0])
+                        get_string(
+                            selector.xpath(
+                                '//b[contains(text(), "Publisher")]/../text()'
+                            ).extract()[0]
+                        )
                     ).group(1)).date()
                     age = get_int(get_age(date.today(), publication_date))
                     publication_date = publication_date.isoformat()
                 except (AttributeError, IndexError, TypeError, ValueError):
                     try:
-                        publication_date = compile('\((.*?)\)').search(
+                        publication_date = parse(compile('\((.*?)\)').search(
                             get_string(selector.xpath(
-                                '//b[contains(text(), "Verlag")]/../text()'
+                                '//div[@class="content"]/ul/li[4]/text()'
                             ).extract()[0])
-                        ).group(1)
-                        publication_date = sub(
-                            '[jJ]anuar', 'January', publication_date
-                        )
-                        publication_date = sub(
-                            '[fF]ebruar', 'February', publication_date
-                        )
-                        publication_date = sub(
-                            '[mM].rz', 'March', publication_date
-                        )
-                        publication_date = sub(
-                            '[mM]ai', 'May', publication_date
-                        )
-                        publication_date = sub(
-                            '[jJ]uni', 'June', publication_date
-                        )
-                        publication_date = sub(
-                            '[jJ]uli', 'July', publication_date
-                        )
-                        publication_date = sub(
-                            '[oO]ktober', 'October', publication_date
-                        )
-                        publication_date = sub(
-                            '[dD]ezember', 'December', publication_date
-                        )
-                        publication_date = parse(publication_date).date()
-                        age = get_int(get_age(
-                            date.today(), publication_date
-                        ))
+                        ).group(1)).date()
+                        age = get_int(get_age(date.today(), publication_date))
                         publication_date = publication_date.isoformat()
-                    except IndexError:
-                        pass
-        rank = (index, get_int(index))
-        related_items = ''
-        try:
-            related_items = get_string(selector.xpath(
-                '//div[@id="purchaseData"]/text()'
-            ).extract()[0]).split(',')
-        except IndexError:
-            pass
-        spend = 0.00
-        if best_sellers_rank[0] and price[0]:
-            spend = get_sales(best_sellers_rank[0]) * price[0]
-        spend = (spend, get_float(spend))
-        stars = 0.0
-        try:
-            stars = float(
-                get_string(
-                    selector.xpath(
-                        '//div[@class="gry txtnormal acrRating"]/text()'
-                    ).extract()[0]
-                ).split(' ')[0].replace(',', '').replace(u'つ星のうち', '')
-            )
-        except IndexError:
+                    except (AttributeError, IndexError, TypeError, ValueError):
+                        try:
+                            publication_date = compile('\((.*?)\)').search(
+                                get_string(selector.xpath(
+                                    '//b[contains(text(), "Verlag")]/../text()'
+                                ).extract()[0])
+                            ).group(1)
+                            publication_date = sub(
+                                '[jJ]anuar', 'January', publication_date
+                            )
+                            publication_date = sub(
+                                '[fF]ebruar', 'February', publication_date
+                            )
+                            publication_date = sub(
+                                '[mM].rz', 'March', publication_date
+                            )
+                            publication_date = sub(
+                                '[mM]ai', 'May', publication_date
+                            )
+                            publication_date = sub(
+                                '[jJ]uni', 'June', publication_date
+                            )
+                            publication_date = sub(
+                                '[jJ]uli', 'July', publication_date
+                            )
+                            publication_date = sub(
+                                '[oO]ktober', 'October', publication_date
+                            )
+                            publication_date = sub(
+                                '[dD]ezember', 'December', publication_date
+                            )
+                            publication_date = parse(publication_date).date()
+                            age = get_int(get_age(
+                                date.today(), publication_date
+                            ))
+                            publication_date = publication_date.isoformat()
+                        except IndexError:
+                            pass
+            rank = (index, get_int(index))
+            related_items = ''
             try:
-                stars = float(get_string(
-                    selector.xpath(
-                        '//span[contains(@class, "swSprite")]/@title'
-                    ).extract()[0][-3:]
-                ))
-            except (IndexError, ValueError):
+                related_items = get_string(selector.xpath(
+                    '//div[@id="purchaseData"]/text()'
+                ).extract()[0]).split(',')
+            except IndexError:
+                pass
+            spend = 0.00
+            if best_sellers_rank[0] and price[0]:
+                spend = get_sales(best_sellers_rank[0]) * price[0]
+            spend = (spend, get_float(spend))
+            stars = 0.0
+            try:
+                stars = float(
+                    get_string(
+                        selector.xpath(
+                            '//div[@class="gry txtnormal acrRating"]/text()'
+                        ).extract()[0]
+                    ).split(' ')[0].replace(',', '').replace(u'つ星のうち', '')
+                )
+            except IndexError:
                 try:
-                    stars = float(get_string(selector.xpath(
-                        '//span[contains(@class, "swSprite")]/@title'
-                    ).extract()[1])[0:3])
+                    stars = float(get_string(
+                        selector.xpath(
+                            '//span[contains(@class, "swSprite")]/@title'
+                        ).extract()[0][-3:]
+                    ))
                 except (IndexError, ValueError):
-                    pass
-        stars = (stars, get_float(stars))
-        title_1 = ''
-        try:
-            title_1 = get_string(
-                selector.xpath('//span[@id="btAsinTitle"]/text()').extract()[0]
-            )
-        except IndexError:
-            pass
-        if not title_1:
+                    try:
+                        stars = float(get_string(selector.xpath(
+                            '//span[contains(@class, "swSprite")]/@title'
+                        ).extract()[1])[0:3])
+                    except (IndexError, ValueError):
+                        pass
+            stars = (stars, get_float(stars))
+            title_1 = ''
             try:
                 title_1 = get_string(
                     selector.xpath(
-                        '//span[@id="btAsinTitle"]/span/text()'
+                        '//span[@id="btAsinTitle"]/text()'
                     ).extract()[0]
                 )
             except IndexError:
                 pass
-        title_2 = 'Partial'
-        if keyword.lower() in title_1.lower():
-            title_2 = 'Exact'
-        if description and title_1:
-            items.append({
-                'age': age,
-                'asin': asin,
-                'author': author,
-                'best_sellers_rank': best_sellers_rank,
-                'description': description,
-                'pages': pages,
-                'price': price,
-                'publication_date': publication_date,
-                'rank': rank,
-                'related_items': related_items,
-                'spend': spend,
-                'stars': stars,
-                'title': [title_1, title_2],
-                'url': response.url,
-            })
-    if not items:
-        return {
-            'average_length': [-1, 'N/A'],
-            'average_price': [-1, 'N/A'],
-            'buyer_behavior': [-1, 'N/A'],
-            'competition': [-1, 'N/A'],
-            'count': [0, '0'],
-            'items': [],
-            'matches': [0, 0],
-            'optimization': [-1, 'N/A'],
-            'popularity': (-1, 'N/A'),
-            'score': [-1, 'N/A'],
-            'spend': [[-1, 'N/A'], 'N/A'],
-            'words': [],
-        }
-    price = sum([item['price'][0] for item in items])
-    average_length = mean([
-        item['pages'][0] for item in items if item['pages'][0]
-    ] or [0.00])
-    average_price = mean([
-        item['price'][0] for item in items if item['price'][0]
-    ] or [0.00])
-    buyer_behavior = get_buyer_behavior(items) if price else (-1, 'N/A')
-    competition = get_competition(items) if price else (-1, 'N/A')
-    optimization = get_optimization(keyword, items) if price else (-1, 'N/A')
-    spend = get_spend(items) if price else ((-1, 'N/A'), 'N/A')
-    popularity = get_popularity(keyword) if price else (-1, 'N/A')
+            if not title_1:
+                try:
+                    title_1 = get_string(
+                        selector.xpath(
+                            '//span[@id="btAsinTitle"]/span/text()'
+                        ).extract()[0]
+                    )
+                except IndexError:
+                    pass
+            title_2 = 'Partial'
+            if keyword.lower() in title_1.lower():
+                title_2 = 'Exact'
+            if description and title_1:
+                items.append({
+                    'age': age,
+                    'asin': asin,
+                    'author': author,
+                    'best_sellers_rank': best_sellers_rank,
+                    'description': description,
+                    'pages': pages,
+                    'price': price,
+                    'publication_date': publication_date,
+                    'rank': rank,
+                    'related_items': related_items,
+                    'spend': spend,
+                    'stars': stars,
+                    'title': [title_1, title_2],
+                    'url': response.url,
+                })
+        if not items:
+            return {
+                'average_length': [-1, 'N/A'],
+                'average_price': [-1, 'N/A'],
+                'buyer_behavior': [-1, 'N/A'],
+                'competition': [-1, 'N/A'],
+                'count': [0, '0'],
+                'items': [],
+                'matches': [0, 0],
+                'optimization': [-1, 'N/A'],
+                'popularity': (-1, 'N/A'),
+                'score': [-1, 'N/A'],
+                'spend': [[-1, 'N/A'], 'N/A'],
+                'words': [],
+            }
+    with timer('Step 7'):
+        price = sum([item['price'][0] for item in items])
+        average_length = mean([
+            item['pages'][0] for item in items if item['pages'][0]
+        ] or [0.00])
+        average_price = mean([
+            item['price'][0] for item in items if item['price'][0]
+        ] or [0.00])
+        buyer_behavior = get_buyer_behavior(items) if price else (-1, 'N/A')
+        competition = get_competition(items) if price else (-1, 'N/A')
+        optimization = get_optimization(
+            keyword, items
+        ) if price else (-1, 'N/A')
+        spend = get_spend(items) if price else ((-1, 'N/A'), 'N/A')
+        popularity = get_popularity(keyword) if price else (-1, 'N/A')
     return {
         'average_length': (
             average_length, get_float(average_length)

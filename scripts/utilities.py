@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
 from collections import Counter, OrderedDict
+from contextlib import contextmanager
 from datetime import date, timedelta
 from furl import furl
 from os.path import abspath, dirname, join
 from random import choice, randint
 from re import compile, sub
 from socket import timeout
+from time import time
 from urlparse import urlparse
 
 from grequests import get as get_, map as map_
@@ -107,6 +109,18 @@ class mutators_list(Mutable, list):
     def __setitem__(self, key, value):
         list.__setitem__(self, key, value)
         self.changed()
+
+
+@contextmanager
+def timer(name):
+    start = time()
+    yield
+    stop = time()
+    print '{name}: {seconds:>6.2f}'.format(name=name, seconds=stop - start)
+
+
+def exception_handler(one, two):
+    pass
 
 
 def get_amazon_best_sellers_rank(selector):
@@ -424,7 +438,7 @@ def get_response(url):
     index = 0
     while True:
         index += 1
-        if index > 5:
+        if index > 3:
             return ''
         try:
             response = get(
@@ -455,20 +469,26 @@ def get_responses(urls):
     index = 0
     while True:
         keys = [key for key in responses if not responses[key]]
-        if not keys:
+        if not keys or ((len(keys) * 1.00) / len(urls)) <= 0.20:
             return responses.values()
         index += 1
-        if index >= 5:
+        if index > 5:
             return responses.values()
         try:
-            for response in map_(get_(
-                key,
-                allow_redirects=True,
-                headers=get_headers(key),
-                proxies=get_proxies(),
-                timeout=get_timeout(),
-                verify=False,
-            ) for key in keys):
+            for response in map_(
+                (
+                    get_(
+                        key,
+                        allow_redirects=True,
+                        headers=get_headers(key),
+                        proxies=get_proxies(),
+                        timeout=get_timeout(),
+                        verify=False,
+                    )
+                    for key in keys
+                ),
+                exception_handler=exception_handler,
+            ):
                 if (
                     response
                     and
@@ -532,7 +552,7 @@ def get_string(string):
 
 
 def get_timeout():
-    return 60
+    return 15
 
 
 def get_url(url):
