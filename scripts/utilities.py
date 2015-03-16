@@ -425,10 +425,10 @@ def get_proxies():
     if is_development():
         return {}
     return {
-        'http': 'http://72.52.91.120:%(port_number)s' % {
+        'http': 'http://127.0.0.1:%(port_number)s' % {
             'port_number': 9150 + randint(1, 50),
         },
-        'https': 'http://72.52.91.120:%(port_number)s' % {
+        'https': 'http://127.0.0.1:%(port_number)s' % {
             'port_number': 9150 + randint(1, 50),
         },
     }
