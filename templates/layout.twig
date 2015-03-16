@@ -255,6 +255,19 @@
                                     </span>
                                 </a>
                             </li>
+                            {% if has_statistics %}
+                                <li class="{% if nav == 'hot_keywords' %}active{% endif %}">
+                                    <a href="{{ url('hot_keywords') }}">
+                                        <i class="menu-icon fa fa-fw fa-fire"></i>
+                                        <span class="mm-text">
+                                            Hot Keywords
+                                            <span class="label label-primary">
+                                                NEW
+                                            </span>
+                                        </span>
+                                    </a>
+                                </li>
+                            {% endif %}
                             <li class="{% if nav == 'popular_searches' %}active{% endif %}">
                                 <a href="{{ url('popular_searches') }}">
                                     <i class="menu-icon fa fa-fw fa-search">

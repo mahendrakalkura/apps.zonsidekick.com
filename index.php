@@ -1443,6 +1443,56 @@ $application
 
 $application
 ->match(
+    '/hot-keywords',
+    function () use ($application) {
+        $user = $application['session']->get('user');
+        $dates = array();
+        $query = <<<EOD
+SELECT DISTINCT `date` AS `date`
+FROM `apps_hot_keywords_step_2_keywords`
+ORDER BY `date` DESC
+EOD;
+        $records = $application['db']->fetchAll($query);
+        foreach ($records as $record) {
+            $dates[] = $record['date'];
+        }
+
+        return $application['twig']->render(
+            'views/hot_keywords.twig',
+            array(
+                'dates' => $dates,
+            )
+        );
+    }
+)
+->bind('hot_keywords')
+->method('GET');
+
+$application
+->match(
+    '/hot-keywords/xhr',
+    function (Request $request) use ($application) {
+        $query = <<<EOD
+SELECT *
+FROM `apps_hot_keywords_step_2_keywords`
+WHERE `date` = ?
+ORDER BY `score` DESC
+LIMIT 10
+EOD;
+        $keywords = $application['db']->fetchAll(
+            $query, array($request->get('date'))
+        );
+
+        return new Response(json_encode(array(
+            'keywords' => $keywords,
+        )));
+    }
+)
+->bind('hot_keywords_xhr')
+->method('POST');
+
+$application
+->match(
     '/keyword-analyzer/multiple',
     function () use ($application) {
         $user = $application['session']->get('user');

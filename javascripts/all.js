@@ -693,6 +693,41 @@ application.controller('download', [
     }
 ]);
 
+application.controller('hot_keywords', [
+    '$attrs',
+    '$http',
+    '$rootScope',
+    '$scope',
+    function ($attrs, $http, $rootScope, $scope) {
+        $scope.dates = jQuery.parseJSON($attrs.dates);
+        $scope.date = $scope.dates[0];
+        $scope.spinner = false;
+        $scope.keywords = [];
+
+        $scope.process = function () {
+            $scope.spinner = true;
+            $http({
+                data: jQuery.param({
+                    date: $scope.date
+                }),
+                method: 'POST',
+                url: $attrs.url
+            }).
+            error(function (data, status, headers, config) {
+                $scope.process();
+            }).
+            success(function (data, status, headers, config) {
+                $scope.spinner = false;
+                $scope.keywords = data.keywords;
+            });
+
+            return;
+        };
+
+        $scope.process();
+    }
+]);
+
 application.controller('keyword_analyzer_multiple_add', [
     '$attrs',
     '$rootScope',
