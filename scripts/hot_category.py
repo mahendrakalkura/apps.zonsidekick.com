@@ -12,7 +12,6 @@ from unicodedata import normalize
 from celery import Celery
 from nltk.tokenize import word_tokenize
 from openpyxl import load_workbook
-from openpyxl.styles import Alignment, Font, Style
 from sqlalchemy.orm import backref, relationship
 from ujson import dumps, loads
 
@@ -119,16 +118,16 @@ class step_7_group_suggested_keyword(base):
 
 def get_number(string):
     if string == 'Very Low':
-        return 1
+        return '1 - Very Low'
     if string == 'Low':
-        return 2
+        return '2 - Low'
     if string == 'Medium':
-        return 3
+        return '3 - Medium'
     if string == 'High':
-        return 4
+        return '4 - High'
     if string == 'Very High':
-        return 5
-    return 0
+        return '5 - Very High'
+    return '1 - Very Low'
 
 
 def get_titles(category_id, print_length):
@@ -710,128 +709,19 @@ def step_7(date, category_id, print_length):
 
 def xlsx(date, category_id, print_length):
     print 'XLSX'
-    th_center = Style(
-        alignment=Alignment(
-            horizontal='center',
-            indent=0,
-            shrink_to_fit=False,
-            text_rotation=0,
-            vertical='center',
-            wrap_text=False,
-        ),
-        font=Font(
-            bold=True,
-            italic=False,
-            name='Calibri',
-            size=12,
-            strike=False,
-            underline='none',
-            vertAlign=None,
-        ),
-    )
-    th_left = Style(
-        alignment=Alignment(
-            horizontal='left',
-            indent=0,
-            shrink_to_fit=False,
-            text_rotation=0,
-            vertical='center',
-            wrap_text=False,
-        ),
-        font=Font(
-            bold=True,
-            italic=False,
-            name='Calibri',
-            size=12,
-            strike=False,
-            underline='none',
-            vertAlign=None,
-        ),
-    )
-    th_right = Style(
-        alignment=Alignment(
-            horizontal='right',
-            indent=0,
-            shrink_to_fit=False,
-            text_rotation=0,
-            vertical='center',
-            wrap_text=False,
-        ),
-        font=Font(
-            bold=True,
-            italic=False,
-            name='Calibri',
-            size=12,
-            strike=False,
-            underline='none',
-            vertAlign=None,
-        ),
-    )
-    td_center = Style(
-        alignment=Alignment(
-            horizontal='center',
-            indent=0,
-            shrink_to_fit=False,
-            text_rotation=0,
-            vertical='center',
-            wrap_text=False,
-        ),
-        font=Font(
-            bold=False,
-            italic=False,
-            name='Calibri',
-            size=10,
-            strike=False,
-            underline='none',
-            vertAlign=None,
-        ),
-    )
-    td_left = Style(
-        alignment=Alignment(
-            horizontal='left',
-            indent=0,
-            shrink_to_fit=False,
-            text_rotation=0,
-            vertical='center',
-            wrap_text=False,
-        ),
-        font=Font(
-            bold=False,
-            italic=False,
-            name='Calibri',
-            size=10,
-            strike=False,
-            underline='none',
-            vertAlign=None,
-        ),
-    )
-    td_right = Style(
-        alignment=Alignment(
-            horizontal='right',
-            indent=0,
-            shrink_to_fit=False,
-            text_rotation=0,
-            vertical='center',
-            wrap_text=False,
-        ),
-        font=Font(
-            bold=False,
-            italic=False,
-            name='Calibri',
-            size=10,
-            strike=False,
-            underline='none',
-            vertAlign=None,
-        ),
-    )
 
     workbook = load_workbook('../tmp/template.xlsx')
 
-    worksheet = workbook.get_sheet_by_name('Step 1 - Data')
+    workbook.get_sheet_by_name('Overview').cell('B5').value = (
+        'www.zonsidekick.com | %(date)s' % {
+            'date': date.isoformat(),
+        }
+    )
+
+    worksheet = workbook.get_sheet_by_name('DataStep1')
     for row in worksheet.iter_rows('A2:A21'):
         for cell in row:
             cell.value = None
-    worksheet.cell('A1').style = th_left
     worksheet.cell('A1').value = 'String'
     with closing(get_mysql_session()()) as session:
         row = 1
@@ -850,16 +740,11 @@ def xlsx(date, category_id, print_length):
             worksheet.cell('A%(row)s' % {
                 'row': row,
             }).value = word.string
-            worksheet.cell('A%(row)s' % {
-                'row': row,
-            }).style = td_left
-    worksheet.column_dimensions['A'].width = 50
 
-    worksheet = workbook.get_sheet_by_name('Step 2 - Data')
-    for row in worksheet.iter_rows('A2:A3503'):
+    worksheet = workbook.get_sheet_by_name('DataStep2')
+    for row in worksheet.iter_rows('A2:A3487'):
         for cell in row:
             cell.value = None
-    worksheet.cell('A1').style = th_left
     worksheet.cell('A1').value = 'String'
     with closing(get_mysql_session()()) as session:
         row = 1
@@ -878,35 +763,11 @@ def xlsx(date, category_id, print_length):
             worksheet.cell('A%(row)s' % {
                 'row': row,
             }).value = keyword.string
-            worksheet.cell('A%(row)s' % {
-                'row': row,
-            }).style = td_left
-    worksheet.column_dimensions['A'].width = 50
 
-    worksheet = workbook.get_sheet_by_name('Step 3 - Data')
+    worksheet = workbook.get_sheet_by_name('DataStep3')
     for row in worksheet.iter_rows('A2:J2875'):
         for cell in row:
             cell.value = None
-    worksheet.cell('A1').style = th_left
-    worksheet.cell('A1').value = 'String'
-    worksheet.cell('B1').style = th_right
-    worksheet.cell('B1').value = 'Count'
-    worksheet.cell('C1').style = th_center
-    worksheet.cell('C1').value = 'Buyer Behavior'
-    worksheet.cell('D1').style = th_center
-    worksheet.cell('D1').value = 'Competition'
-    worksheet.cell('E1').style = th_center
-    worksheet.cell('E1').value = 'Optimization'
-    worksheet.cell('F1').style = th_center
-    worksheet.cell('F1').value = 'Popularity'
-    worksheet.cell('G1').style = th_right
-    worksheet.cell('G1').value = 'Spend'
-    worksheet.cell('H1').style = th_right
-    worksheet.cell('H1').value = 'Average Price'
-    worksheet.cell('I1').style = th_right
-    worksheet.cell('I1').value = 'Average Print Length'
-    worksheet.cell('J1').style = th_right
-    worksheet.cell('J1').value = 'Score'
     with closing(get_mysql_session()()) as session:
         row = 1
         for suggested_keyword in session.query(
@@ -923,84 +784,39 @@ def xlsx(date, category_id, print_length):
             row += 1
             worksheet.cell('A%(row)s' % {
                 'row': row,
-            }).style = td_left
-            worksheet.cell('A%(row)s' % {
-                'row': row,
             }).value = suggested_keyword.string
             worksheet.cell('B%(row)s' % {
                 'row': row,
-            }).style = td_right
-            worksheet.cell('B%(row)s' % {
-                'row': row,
-            }).value = format('%d', suggested_keyword.count, grouping=True)
-            worksheet.cell('C%(row)s' % {
-                'row': row,
-            }).style = td_center
+            }).value = suggested_keyword.count
             worksheet.cell('C%(row)s' % {
                 'row': row,
             }).value = get_number(suggested_keyword.buyer_behavior)
             worksheet.cell('D%(row)s' % {
                 'row': row,
-            }).style = td_center
-            worksheet.cell('D%(row)s' % {
-                'row': row,
             }).value = get_number(suggested_keyword.competition)
-            worksheet.cell('E%(row)s' % {
-                'row': row,
-            }).style = td_center
             worksheet.cell('E%(row)s' % {
                 'row': row,
             }).value = get_number(suggested_keyword.optimization)
             worksheet.cell('F%(row)s' % {
                 'row': row,
-            }).style = td_center
-            worksheet.cell('F%(row)s' % {
-                'row': row,
             }).value = get_number(suggested_keyword.popularity)
             worksheet.cell('G%(row)s' % {
                 'row': row,
-            }).style = td_right
-            worksheet.cell('G%(row)s' % {
-                'row': row,
-            }).value = format('%.2f', suggested_keyword.spend, grouping=True)
+            }).value = suggested_keyword.spend
             worksheet.cell('H%(row)s' % {
                 'row': row,
-            }).style = td_right
-            worksheet.cell('H%(row)s' % {
-                'row': row,
-            }).value = format(
-                '%.2f', suggested_keyword.average_price, grouping=True,
-            )
+            }).value = suggested_keyword.average_price
             worksheet.cell('I%(row)s' % {
                 'row': row,
-            }).style = td_right
-            worksheet.cell('I%(row)s' % {
-                'row': row,
-            }).value = format(
-                '%.2f', suggested_keyword.average_print_length, grouping=True,
-            )
+            }).value = suggested_keyword.average_print_length
             worksheet.cell('J%(row)s' % {
                 'row': row,
-            }).style = td_right
-            worksheet.cell('J%(row)s' % {
-                'row': row,
-            }).value = format('%.2f', suggested_keyword.score, grouping=True)
-    worksheet.column_dimensions['A'].width = 50
-    worksheet.column_dimensions['B'].width = 15
-    worksheet.column_dimensions['C'].width = 15
-    worksheet.column_dimensions['D'].width = 15
-    worksheet.column_dimensions['E'].width = 15
-    worksheet.column_dimensions['F'].width = 15
-    worksheet.column_dimensions['G'].width = 15
-    worksheet.column_dimensions['H'].width = 15
-    worksheet.column_dimensions['I'].width = 15
-    worksheet.column_dimensions['J'].width = 15
+            }).value = suggested_keyword.score
 
-    worksheet = workbook.get_sheet_by_name('Step 4 - Data')
+    worksheet = workbook.get_sheet_by_name('DataStep4')
     for row in worksheet.iter_rows('A2:A21'):
         for cell in row:
             cell.value = None
-    worksheet.cell('A1').style = th_left
     worksheet.cell('A1').value = 'String'
     with closing(get_mysql_session()()) as session:
         row = 1
@@ -1019,16 +835,11 @@ def xlsx(date, category_id, print_length):
             worksheet.cell('A%(row)s' % {
                 'row': row,
             }).value = word.string
-            worksheet.cell('A%(row)s' % {
-                'row': row,
-            }).style = td_left
-    worksheet.column_dimensions['A'].width = 50
 
-    worksheet = workbook.get_sheet_by_name('Step 5 - Data')
+    worksheet = workbook.get_sheet_by_name('DataStep5')
     for row in worksheet.iter_rows('A2:A3402'):
         for cell in row:
             cell.value = None
-    worksheet.cell('A1').style = th_left
     worksheet.cell('A1').value = 'String'
     with closing(get_mysql_session()()) as session:
         row = 1
@@ -1047,34 +858,20 @@ def xlsx(date, category_id, print_length):
             worksheet.cell('A%(row)s' % {
                 'row': row,
             }).value = keyword.string
-            worksheet.cell('A%(row)s' % {
-                'row': row,
-            }).style = td_left
-    worksheet.column_dimensions['A'].width = 50
 
-    worksheet = workbook.get_sheet_by_name('Step 6 - Data')
+    worksheet = workbook.get_sheet_by_name('DataStep6')
     for row in worksheet.iter_rows('A2:J3435'):
         for cell in row:
             cell.value = None
-    worksheet.cell('A1').style = th_left
     worksheet.cell('A1').value = 'String'
-    worksheet.cell('B1').style = th_right
     worksheet.cell('B1').value = 'Count'
-    worksheet.cell('C1').style = th_center
     worksheet.cell('C1').value = 'Buyer Behavior'
-    worksheet.cell('D1').style = th_center
     worksheet.cell('D1').value = 'Competition'
-    worksheet.cell('E1').style = th_center
     worksheet.cell('E1').value = 'Optimization'
-    worksheet.cell('F1').style = th_center
     worksheet.cell('F1').value = 'Popularity'
-    worksheet.cell('G1').style = th_right
     worksheet.cell('G1').value = 'Spend'
-    worksheet.cell('H1').style = th_right
     worksheet.cell('H1').value = 'Average Price'
-    worksheet.cell('I1').style = th_right
     worksheet.cell('I1').value = 'Average Print Length'
-    worksheet.cell('J1').style = th_right
     worksheet.cell('J1').value = 'Score'
     with closing(get_mysql_session()()) as session:
         row = 1
@@ -1092,81 +889,37 @@ def xlsx(date, category_id, print_length):
             row += 1
             worksheet.cell('A%(row)s' % {
                 'row': row,
-            }).style = td_left
-            worksheet.cell('A%(row)s' % {
-                'row': row,
             }).value = suggested_keyword.string
             worksheet.cell('B%(row)s' % {
                 'row': row,
-            }).style = td_right
-            worksheet.cell('B%(row)s' % {
-                'row': row,
-            }).value = format('%d', suggested_keyword.count, grouping=True)
-            worksheet.cell('C%(row)s' % {
-                'row': row,
-            }).style = td_center
+            }).value = suggested_keyword.count
             worksheet.cell('C%(row)s' % {
                 'row': row,
             }).value = get_number(suggested_keyword.buyer_behavior)
             worksheet.cell('D%(row)s' % {
                 'row': row,
-            }).style = td_center
-            worksheet.cell('D%(row)s' % {
-                'row': row,
             }).value = get_number(suggested_keyword.competition)
-            worksheet.cell('E%(row)s' % {
-                'row': row,
-            }).style = td_center
             worksheet.cell('E%(row)s' % {
                 'row': row,
             }).value = get_number(suggested_keyword.optimization)
             worksheet.cell('F%(row)s' % {
                 'row': row,
-            }).style = td_center
-            worksheet.cell('F%(row)s' % {
-                'row': row,
             }).value = get_number(suggested_keyword.popularity)
             worksheet.cell('G%(row)s' % {
                 'row': row,
-            }).style = td_right
-            worksheet.cell('G%(row)s' % {
-                'row': row,
-            }).value = format('%.2f', suggested_keyword.spend, grouping=True)
+            }).value = suggested_keyword.spend
             worksheet.cell('H%(row)s' % {
                 'row': row,
-            }).style = td_right
-            worksheet.cell('H%(row)s' % {
-                'row': row,
-            }).value = format(
-                '%.2f', suggested_keyword.average_price, grouping=True,
-            )
+            }).value = suggested_keyword.average_price
             worksheet.cell('I%(row)s' % {
                 'row': row,
-            }).style = td_right
-            worksheet.cell('I%(row)s' % {
-                'row': row,
-            }).value = format(
-                '%.2f', suggested_keyword.average_print_length, grouping=True,
-            )
+            }).value = suggested_keyword.average_print_length
             worksheet.cell('J%(row)s' % {
                 'row': row,
-            }).style = td_right
-            worksheet.cell('J%(row)s' % {
-                'row': row,
-            }).value = format('%.2f', suggested_keyword.score, grouping=True)
-    worksheet.column_dimensions['A'].width = 50
-    worksheet.column_dimensions['B'].width = 15
-    worksheet.column_dimensions['C'].width = 15
-    worksheet.column_dimensions['D'].width = 15
-    worksheet.column_dimensions['E'].width = 15
-    worksheet.column_dimensions['F'].width = 15
-    worksheet.column_dimensions['G'].width = 15
-    worksheet.column_dimensions['H'].width = 15
-    worksheet.column_dimensions['I'].width = 15
-    worksheet.column_dimensions['J'].width = 15
+            }).value = suggested_keyword.score
 
-    worksheet = workbook.get_sheet_by_name('Step 7 - Data')
-    for row in worksheet.iter_rows('A2:E2150'):
+    worksheet = workbook.get_sheet_by_name('DataStep7')
+    for row in worksheet.iter_rows('A1:E2066'):
         for cell in row:
             cell.value = None
     with closing(get_mysql_session()()) as session:
@@ -1189,55 +942,15 @@ def xlsx(date, category_id, print_length):
             group_number += 1
             worksheet.cell('A%(row)s' % {
                 'row': row,
-            }).style = td_left
-            worksheet.cell('B%(row)s' % {
-                'row': row,
-            }).style = td_left
-            worksheet.cell('C%(row)s' % {
-                'row': row,
-            }).style = td_left
-            worksheet.cell('D%(row)s' % {
-                'row': row,
-            }).style = td_left
-            worksheet.cell('D%(row)s' % {
-                'row': row,
-            }).value = 'xxxxx'
-            worksheet.cell('E%(row)s' % {
-                'row': row,
-            }).style = td_left
-            row += 1
-            worksheet.cell('A%(row)s' % {
-                'row': row,
-            }).style = th_right
-            worksheet.cell('A%(row)s' % {
-                'row': row,
-            }).value = ''
-            worksheet.cell('B%(row)s' % {
-                'row': row,
-            }).style = th_left
-            worksheet.cell('B%(row)s' % {
-                'row': row,
             }).value = 'Group %(number)s' % {
                 'number': group_number,
             }
-            worksheet.cell('C%(row)s' % {
-                'row': row,
-            }).style = th_left
-            worksheet.cell('C%(row)s' % {
+            worksheet.cell('B%(row)s' % {
                 'row': row,
             }).value = 'Suggested Keywords'
             worksheet.cell('D%(row)s' % {
                 'row': row,
-            }).style = th_left
-            worksheet.cell('D%(row)s' % {
-                'row': row,
             }).value = 'Books'
-            worksheet.cell('E%(row)s' % {
-                'row': row,
-            }).style = th_left
-            worksheet.cell('E%(row)s' % {
-                'row': row,
-            }).value = 'Hyperlinks'
             suggested_keywords = [
                 (
                     suggested_keyword.string,
@@ -1257,7 +970,6 @@ def xlsx(date, category_id, print_length):
                 for suggested_keyword in suggested_keywords[1:]
                 for item in loads(suggested_keyword[2])
             ]
-            serial_number = 0
             for iterable in izip_longest(
                 [
                     (suggested_keyword[0], suggested_keyword[1], )
@@ -1270,86 +982,36 @@ def xlsx(date, category_id, print_length):
                 ]
             ):
                 row += 1
-                serial_number += 1
                 worksheet.cell('A%(row)s' % {
                     'row': row,
-                }).style = td_right
-                worksheet.cell('A%(row)s' % {
-                    'row': row,
-                }).value = serial_number
-                worksheet.cell('B%(row)s' % {
-                    'row': row,
-                }).style = td_left
+                }).value = ''
                 worksheet.cell('B%(row)s' % {
                     'row': row,
                 }).value = ''
-                worksheet.cell('C%(row)s' % {
-                    'row': row,
-                }).style = td_left
                 if iterable[0]:
-                    worksheet.cell('C%(row)s' % {
+                    worksheet.cell('B%(row)s' % {
                         'row': row,
                     }).value = '%(string)s (%(score).2f)' % {
                         'score': iterable[0][1],
                         'string': iterable[0][0],
                     }
-                worksheet.cell('D%(row)s' % {
-                    'row': row,
-                }).style = td_left
-                worksheet.cell('E%(row)s' % {
-                    'row': row,
-                }).style = td_left
                 if iterable[1]:
-                    worksheet.cell('D%(row)s' % {
-                        'row': row,
-                    }).hyperlink = iterable[1][1]
-                    worksheet.cell('D%(row)s' % {
+                    worksheet.cell('C%(row)s' % {
                         'row': row,
                     }).value = iterable[1][0]
-                    worksheet.cell('E%(row)s' % {
+                    worksheet.cell('C%(row)s' % {
                         'row': row,
                     }).hyperlink = iterable[1][1]
-                    worksheet.cell('E%(row)s' % {
-                        'row': row,
-                    }).value = iterable[1][1]
-            for serial_number in range(serial_number + 1, 51):
-                row += 1
-                worksheet.cell('A%(row)s' % {
-                    'row': row,
-                }).style = td_right
-                worksheet.cell('A%(row)s' % {
-                    'row': row,
-                }).value = serial_number
-                worksheet.cell('B%(row)s' % {
-                    'row': row,
-                }).style = td_left
-                worksheet.cell('B%(row)s' % {
-                    'row': row,
-                }).value = ''
-                worksheet.cell('C%(row)s' % {
-                    'row': row,
-                }).style = td_left
-                worksheet.cell('C%(row)s' % {
-                    'row': row,
-                }).value = ''
-                worksheet.cell('D%(row)s' % {
-                    'row': row,
-                }).style = td_left
-                worksheet.cell('D%(row)s' % {
-                    'row': row,
-                }).value = ''
-                worksheet.cell('E%(row)s' % {
-                    'row': row,
-                }).style = td_left
-                worksheet.cell('E%(row)s' % {
-                    'row': row,
-                }).value = ''
-    worksheet.column_dimensions['A'].width = 10
-    worksheet.column_dimensions['B'].width = 25
-    worksheet.column_dimensions['C'].width = 50
-    worksheet.column_dimensions['C'].width = 50
-    worksheet.column_dimensions['D'].width = 50
-    worksheet.column_dimensions['E'].width = 50
+            row += 1
+            worksheet.cell('A%(row)s' % {
+                'row': row,
+            }).value = ''
+            worksheet.cell('B%(row)s' % {
+                'row': row,
+            }).value = ''
+            worksheet.cell('D%(row)s' % {
+                'row': row,
+            }).value = ''
 
     workbook.save(
         '../tmp/%(date)s-%(category_id)s-%(print_length)s-report.xlsx' % {
