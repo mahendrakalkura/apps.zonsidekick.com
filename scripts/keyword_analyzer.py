@@ -307,7 +307,7 @@ def get_competition(items):
 def get_contents(keyword, country):
     with timer('Step 1'):
         responses = get_responses([
-            get_url(country, keyword, page) for page in ['1', '2', '3']
+            get_url(country, keyword, page) for page in ['1']
         ])
         if None in responses:
             return
