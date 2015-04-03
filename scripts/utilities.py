@@ -116,7 +116,7 @@ def timer(name):
     start = time()
     yield
     stop = time()
-    print '{name}: {seconds:>6.2f}'.format(name=name, seconds=stop - start)
+    # print '{name}: {seconds:>6.2f}'.format(name=name, seconds=stop - start)
 
 
 def exception_handler(one, two):
