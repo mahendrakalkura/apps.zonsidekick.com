@@ -116,7 +116,7 @@ def timer(name):
     start = time()
     yield
     stop = time()
-    print '{name}: {seconds:>6.2f}'.format(name=name, seconds=stop - start)
+    # print '{name}: {seconds:>6.2f}'.format(name=name, seconds=stop - start)
 
 
 def exception_handler(one, two):
@@ -363,7 +363,7 @@ def get_popularity(keyword):
     trb = 0
     spr = 0
     length = len(keyword)
-    for index in range(0, 5):
+    for index in range(0, length):
         keywords = {
             'premium': [],
             'non-premium': [],

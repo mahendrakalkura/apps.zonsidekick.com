@@ -103,7 +103,7 @@ if __name__ == '__main__':
             url = ''
             try:
                 url = get_url(selector.xpath(
-                    '//a[@class="'
+                    '//a[normalize-space(@class)="'
                     'a-link-normal s-access-detail-page a-text-normal'
                     '"]/@href'
                 ).extract()[0])
