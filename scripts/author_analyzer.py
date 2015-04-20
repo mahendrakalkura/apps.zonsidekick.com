@@ -115,7 +115,7 @@ def get_author(url):
     except IndexError:
         pass
     urls = []
-    url = ''
+    url = response.url.replace('http://www.amazon.com', '')
     try:
         url = selector.xpath(
             '//div[@class="wwRefinements"]/ul/li'
