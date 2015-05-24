@@ -198,12 +198,13 @@ if __name__ == '__main__':
         variables['smtp']['username'], variables['smtp']['password']
     )
     message = MIMEText(body)
+    message['Bcc'] = 'mahendra@kalkura.com'
     message['From'] = '"Perfect Sidekick" <support@perfectsidekick.com>'
     message['Subject'] = 'tests.py'
     message['To'] = 'mahendrakalkura@gmail.com,ncroan@gmail.com'
     resource.sendmail(
         message['From'],
-        'mahendrakalkura@gmail.com,ncroan@gmail.com',
+        'ncroan@gmail.com',
         message.as_string()
     )
     resource.quit()
