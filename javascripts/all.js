@@ -802,8 +802,6 @@ application.controller('keyword_analyzer_multiple_simple', [
         ];
         $scope.counts = _.range(48, 0, -12);
 
-        $scope.user_email = $attrs.userEmail;
-
         $scope.statuses = {};
 
         $scope.email = function (email) {
