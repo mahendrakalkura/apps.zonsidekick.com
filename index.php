@@ -934,6 +934,8 @@ $application->before(function (Request $request) use ($application) {
             $request->get('_route') != 'keyword_suggester_free_email'
             &&
             $request->get('_route') != 'sign_in'
+            &&
+            $request->get('_route') != 'welcome'
         ) {
             return $application->redirect(
                 $application['url_generator']->generate('sign_in')
@@ -951,6 +953,8 @@ $application->before(function (Request $request) use ($application) {
         $request->get('_route') != 'keyword_suggester_free_email'
         &&
         $request->get('_route') != 'sign_in'
+        &&
+        $request->get('_route') != 'welcome'
     ) {
         if ($is_paying_customer) {
             if ($request->get('_route') == '403') {
@@ -3141,6 +3145,69 @@ EOD;
 )
 ->bind('top_100_explorer_xhr')
 ->method('POST');
+
+$application
+->match(
+    '/welcome',
+    function (Request $request) use ($application) {
+        $error_1 = false;
+        $error_2 = '';
+        $email = $request->get('email');
+        $name = $request->get('name');
+
+        $record = $application['db']->fetchAssoc(
+            'SELECT * FROM `wp_users` WHERE `user_email` = ?',
+            array($email)
+        );
+        if (!$record OR $record['user_pass']) {
+            $error_1 = true;
+        } else {
+            if ($request->isMethod('POST')) {
+                $password_1 = $request->get('password_2');
+                $password_2 = $request->get('password_2');
+                if (
+                    !empty($password_1)
+                    AND
+                    !empty($password_2)
+                    AND
+                    $password_1 == $password_2
+                ) {
+                    $query = <<<EOD
+UPDATE `wp_users` SET `user_pass` = ? WHERE `user_email` = ?
+EOD;
+                    $application['db']->executeUpdate(
+                        $query,
+                        array(md5($password_1), $email)
+                    );
+                    $application['session']->set('user', array(
+                        'email' => $record['user_email'],
+                        'id' => $record['ID'],
+                        'name' => $record['display_name'],
+                    ));
+                    $application['session']->getFlashBag()->add(
+                        'success',
+                        array('Your password was updated successfully.')
+                    );
+
+                    return $application->redirect(
+                        $application['url_generator']->generate('dashboard')
+                    );
+                } else {
+                    $error_2 = 'Invalid Password';
+                }
+            }
+        }
+
+        return $application['twig']->render('views/welcome.twig', array(
+            'email' => $email,
+            'error_1' => $error_1,
+            'error_2' => $error_2,
+            'name' => $name,
+        ));
+    }
+)
+->bind('welcome')
+->method('GET|POST');
 
 $user = get_user($application);
 
