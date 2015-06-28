@@ -247,7 +247,7 @@ def get_book(response):
         price = float(get_number(get_string(selector.xpath(
             '//span[@class="price"]//text()'
         ).extract()[0])))
-    except IndexError:
+    except (IndexError, ValueError):
         try:
             price = float(get_number(get_string(selector.xpath(
                 '//td[contains(text(), "Kindle Price")]/'
