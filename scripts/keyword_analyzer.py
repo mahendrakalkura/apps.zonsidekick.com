@@ -470,7 +470,20 @@ def get_contents(keyword, country):
     with timer('Step 5'):
         responses = get_responses(urls[0:48])
         if not responses:
-            return
+            return {
+                'average_length': [-1, 'N/A'],
+                'average_price': [-1, 'N/A'],
+                'buyer_behavior': [-1, 'N/A'],
+                'competition': [-1, 'N/A'],
+                'count': [0, '0'],
+                'items': [],
+                'matches': [0, 0],
+                'optimization': [-1, 'N/A'],
+                'popularity': (-1, 'N/A'),
+                'score': [-1, 'N/A'],
+                'spend': [[-1, 'N/A'], 'N/A'],
+                'words': [],
+            }
     with timer('Step 6'):
         items = []
         index = 0
@@ -801,10 +814,19 @@ def get_contents(keyword, country):
                     )
                 except IndexError:
                     pass
+            if not title_1:
+                try:
+                    title_1 = get_string(
+                        selector.xpath(
+                            '//span[@id="productTitle"]/text()'
+                        ).extract()[0]
+                    )
+                except IndexError:
+                    pass
             title_2 = 'Partial'
             if keyword.lower() in title_1.lower():
                 title_2 = 'Exact'
-            if description and title_1:
+            if title_1:
                 items.append({
                     'age': age,
                     'asin': asin,
