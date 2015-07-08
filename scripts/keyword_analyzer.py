@@ -596,7 +596,26 @@ def get_contents(keyword, country):
                             ).xpath('string()').extract()[0]
                         )
                     except IndexError:
-                        pass
+                        try:
+                            description = get_string(
+                                selector.xpath(
+                                    '//span[contains('
+                                    '@class, "detail-description-text"'
+                                    ')]'
+                                ).xpath('string()').extract()[0]
+                            )
+                        except IndexError:
+                            pass
+            if not description:
+                try:
+                    description = get_string(' '.join(
+                        selector.xpath(
+                            '//div[contains(@id, "postBodyPS")]/../'
+                            'preceding-sibling::noscript'
+                        ).xpath('string()').extract()
+                    ))
+                except IndexError:
+                    pass
             pages = 0
             try:
                 pages = int(get_string(
@@ -704,13 +723,63 @@ def get_contents(keyword, country):
                     pass
             else:
                 try:
-                    publication_date = parse(compile('\((.*?)\)').search(
+                    publication_date = parse(get_string(selector.xpath(
+                        '//b[contains(text(), "Publication Date")]/../text()'
+                    ).extract()[0])).date()
+                    age = get_int(get_age(date.today(), publication_date))
+                    publication_date = publication_date.isoformat()
+                except IndexError:
+                    pass
+            if not publication_date:
+                try:
+                    publication_date = compile('\((.*?)\)').search(
                         get_string(
                             selector.xpath(
-                                '//b[contains(text(), "Publisher")]/../text()'
+                                '//b[contains(text(), "Publisher")'
+                                'or '
+                                'contains(text(), "Editore")]/../text()'
                             ).extract()[0]
                         )
-                    ).group(1)).date()
+                    ).group(1)
+                    publication_date = sub(
+                        '[gG]ennaio', 'January', publication_date
+                    )
+                    publication_date = sub(
+                        '[fF]ebbraio', 'February', publication_date
+                    )
+                    publication_date = sub(
+                        '[mM]arzo', 'March', publication_date
+                    )
+                    publication_date = sub(
+                        '[aA]prile', 'April', publication_date
+                    )
+                    publication_date = sub(
+                        '[mM]aggio', 'May', publication_date
+                    )
+                    publication_date = sub(
+                        '[gG]iugno', 'June', publication_date
+                    )
+                    publication_date = sub(
+                        '[lL]uglio', 'July', publication_date
+                    )
+                    publication_date = sub(
+                        '[aA]gosto', 'August', publication_date
+                    )
+                    publication_date = sub(
+                        '[sS]ettembre', 'September', publication_date
+                    )
+                    publication_date = sub(
+                        '[oO]ttobre', 'October', publication_date
+                    )
+                    publication_date = sub(
+                        '[nN]ovembre', 'November', publication_date
+                    )
+                    publication_date = sub(
+                        '[dD]icembre', 'December', publication_date
+                    )
+                    publication_date = parse(
+                        publication_date
+                    ).date()
                     age = get_int(get_age(date.today(), publication_date))
                     publication_date = publication_date.isoformat()
                 except (AttributeError, IndexError, TypeError, ValueError):
@@ -722,44 +791,62 @@ def get_contents(keyword, country):
                         ).group(1)).date()
                         age = get_int(get_age(date.today(), publication_date))
                         publication_date = publication_date.isoformat()
-                    except (AttributeError, IndexError, TypeError, ValueError):
+                    except (AttributeError, IndexError, TypeError):
                         try:
-                            publication_date = compile('\((.*?)\)').search(
+                            publication_date = parse(compile(
+                                '\((.*?)\)'
+                            ).search(
                                 get_string(selector.xpath(
-                                    '//b[contains(text(), "Verlag")]/../text()'
+                                    '//div[@class="content"]/ul/li[5]/text()'
                                 ).extract()[0])
-                            ).group(1)
-                            publication_date = sub(
-                                '[jJ]anuar', 'January', publication_date
-                            )
-                            publication_date = sub(
-                                '[fF]ebruar', 'February', publication_date
-                            )
-                            publication_date = sub(
-                                '[mM].rz', 'March', publication_date
-                            )
-                            publication_date = sub(
-                                '[mM]ai', 'May', publication_date
-                            )
-                            publication_date = sub(
-                                '[jJ]uni', 'June', publication_date
-                            )
-                            publication_date = sub(
-                                '[jJ]uli', 'July', publication_date
-                            )
-                            publication_date = sub(
-                                '[oO]ktober', 'October', publication_date
-                            )
-                            publication_date = sub(
-                                '[dD]ezember', 'December', publication_date
-                            )
-                            publication_date = parse(publication_date).date()
+                            ).group(1)).date()
                             age = get_int(get_age(
                                 date.today(), publication_date
                             ))
                             publication_date = publication_date.isoformat()
-                        except IndexError:
-                            pass
+                        except (
+                            AttributeError, IndexError, TypeError, ValueError
+                        ):
+                            try:
+                                publication_date = compile('\((.*?)\)').search(
+                                    get_string(selector.xpath(
+                                        '//b[contains(text(), "Verlag")]/../'
+                                        'text()'
+                                    ).extract()[0])
+                                ).group(1)
+                                publication_date = sub(
+                                    '[jJ]anuar', 'January', publication_date
+                                )
+                                publication_date = sub(
+                                    '[fF]ebruar', 'February', publication_date
+                                )
+                                publication_date = sub(
+                                    '[mM].rz', 'March', publication_date
+                                )
+                                publication_date = sub(
+                                    '[mM]ai', 'May', publication_date
+                                )
+                                publication_date = sub(
+                                    '[jJ]uni', 'June', publication_date
+                                )
+                                publication_date = sub(
+                                    '[jJ]uli', 'July', publication_date
+                                )
+                                publication_date = sub(
+                                    '[oO]ktober', 'October', publication_date
+                                )
+                                publication_date = sub(
+                                    '[dD]ezember', 'December', publication_date
+                                )
+                                publication_date = parse(
+                                    publication_date
+                                ).date()
+                                age = get_int(get_age(
+                                    date.today(), publication_date
+                                ))
+                                publication_date = publication_date.isoformat()
+                            except (AttributeError, IndexError, TypeError):
+                                pass
             rank = (index, get_int(index))
             related_items = ''
             try:
