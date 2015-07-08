@@ -508,11 +508,14 @@ def get_contents(keyword, country):
                 'name': '',
                 'url': '',
             }
-            try:
-                author['name'] = get_string(selector.xpath(
-                    '//span[@class="contributorNameTrigger"]/a/text()'
-                ).extract()[0])
-            except IndexError:
+            if not author['name']:
+                try:
+                    author['name'] = get_string(selector.xpath(
+                        '//span[@class="contributorNameTrigger"]/a/text()'
+                    ).extract()[0])
+                except IndexError:
+                    pass
+            if not author['name']:
                 try:
                     author['name'] = get_string(selector.xpath(
                         '//h1[normalize-space(@class)="parseasinTitle"]/'
@@ -520,11 +523,21 @@ def get_contents(keyword, country):
                     ).extract()[0])
                 except IndexError:
                     pass
-            try:
-                author['url'] = get_url_(get_string(selector.xpath(
-                    '//span[@class="contributorNameTrigger"]/a/@href'
-                ).extract()[0]))
-            except IndexError:
+            if not author['name']:
+                try:
+                    author['name'] = get_string(selector.xpath(
+                        '//span[contains(@class, "author")]/a/text()'
+                    ).extract()[0])
+                except IndexError:
+                    pass
+            if not author['url']:
+                try:
+                    author['url'] = get_url_(get_string(selector.xpath(
+                        '//span[@class="contributorNameTrigger"]/a/@href'
+                    ).extract()[0]))
+                except IndexError:
+                    pass
+            if not author['url']:
                 try:
                     author['url'] = get_url_(get_string(
                         'http://www.amazon.%(country)s/%(href)s' % {
@@ -536,6 +549,13 @@ def get_contents(keyword, country):
                             ).extract()[0]
                         }
                     ))
+                except IndexError:
+                    pass
+            if not author['url']:
+                try:
+                    author['url'] = get_string(selector.xpath(
+                        '//span[contains(@class, "author")]/a/@href'
+                    ).extract()[0])
                 except IndexError:
                     pass
             best_sellers_rank = 0
@@ -637,27 +657,30 @@ def get_contents(keyword, country):
             pages = (pages, get_int(pages))
             price = 0.00
             if country != 'co.jp':
-                try:
-                    price = float(
-                        get_string(
-                            selector.xpath(
-                                '//b[@class="priceLarge"]/text()'
-                            ).extract()[0]
-                        ).replace(
-                            '$', ''
-                        ).replace(
-                            'Rs. ', ''
-                        ).replace(
-                            ',', ''
-                        ).encode(
-                            'utf-8'
-                        ).replace(
-                            '\xc2\xa3', ''
-                        ).replace(
-                            'EUR', ''
+                if not price:
+                    try:
+                        price = float(
+                            get_string(
+                                selector.xpath(
+                                    '//b[@class="priceLarge"]/text()'
+                                ).extract()[0]
+                            ).replace(
+                                '$', ''
+                            ).replace(
+                                'Rs. ', ''
+                            ).replace(
+                                ',', ''
+                            ).encode(
+                                'utf-8'
+                            ).replace(
+                                '\xc2\xa3', ''
+                            ).replace(
+                                'EUR', ''
+                            )
                         )
-                    )
-                except (IndexError, ValueError):
+                    except (IndexError, ValueError):
+                        pass
+                if not price:
                     try:
                         price = float(
                             get_string(
@@ -681,12 +704,13 @@ def get_contents(keyword, country):
                     except (IndexError, ValueError):
                         pass
             else:
-                try:
-                    price = float(get_string(selector.xpath(
-                        '//b[@class="priceLarge"]/text()'
-                    ).extract()[0]).replace(',', '').replace(u'\uffe5', ''))
-                except IndexError:
-                    pass
+                if not price:
+                    try:
+                        price = float(get_string(selector.xpath(
+                            '//b[@class="priceLarge"]/text()'
+                        ).extract()[0]).replace(',', '').replace(u'\uffe5', ''))
+                    except IndexError:
+                        pass
                 if not price:
                     try:
                         price = float(
@@ -702,6 +726,30 @@ def get_contents(keyword, country):
                         )
                     except IndexError:
                         pass
+            if not price:
+                try:
+                    price = float(
+                        get_string(
+                            selector.xpath(
+                                '//span[contains(@class, "a-color-price")]/'
+                                'text()'
+                            ).extract()[0]
+                        ).replace(
+                            '$', ''
+                        ).replace(
+                            'Rs. ', ''
+                        ).replace(
+                            ',', ''
+                        ).encode(
+                            'utf-8'
+                        ).replace(
+                            '\xc2\xa3', ''
+                        ).replace(
+                            'EUR', ''
+                        )
+                    )
+                except (IndexError, ValueError):
+                    pass
             price = (price, get_float(price))
             publication_date = ''
             try:
