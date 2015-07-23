@@ -3,6 +3,7 @@
 from datetime import datetime
 from re import compile, sub
 
+from dateutil.parser import parse
 from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
 from scrapy.contrib.spiders import CrawlSpider, Rule
 from scrapy.http import Request
@@ -360,7 +361,12 @@ class Spider(CrawlSpider):
                 '//span[@id="btAsinTitle"]/text()'
             ).extract()[0])
         except IndexError:
-            pass
+            try:
+                title = get_string(selector.xpath(
+                    '//span[@id="productTitle"]/text()'
+                ).extract()[0])
+            except IndexError:
+                pass
         try:
             author_name = get_string(selector.xpath(
                 '//span[@class="contributorNameTrigger"]/a/text()'
@@ -372,7 +378,17 @@ class Spider(CrawlSpider):
                     'following-sibling::span/a/text()'
                 ).extract()[0])
             except IndexError:
-                pass
+                try:
+                    author_name = get_string(selector.xpath(
+                        '//a[@class="a-link-normal contributorNameID"]/text()'
+                    ).extract()[0])
+                except IndexError:
+                    try:
+                        author_name = get_string(selector.xpath(
+                            '//span[@class="author notFaded"]/a/text()'
+                        ).extract()[0])
+                    except IndexError:
+                        pass
         try:
             author_url = get_string(selector.xpath(
                 '//span[@class="contributorNameTrigger"]/a/@href'
@@ -384,20 +400,59 @@ class Spider(CrawlSpider):
                     'following-sibling::span/a/@href'
                 ).extract()[0])
             except IndexError:
-                pass
+                try:
+                    author_url = get_string(selector.xpath(
+                        '//a[@class="a-link-normal contributorNameID"]/@href'
+                    ).extract()[0])
+                except IndexError:
+                    pass
         try:
             price = float(get_number(get_string(selector.xpath(
                 '//td[contains(text(), "Kindle Price")]/following-sibling::td/'
                 'b/text()'
             ).extract()[0])))
         except IndexError:
-            pass
+            try:
+                price = float(get_number(get_string(selector.xpath(
+                    '//td[contains(text(), "Kindle Price")]/'
+                    'following-sibling::td/text()'
+                ).extract()[0])))
+            except IndexError:
+                pass
         try:
             publication_date = get_string(selector.xpath(
                 '//input[@id="pubdate"]/@value'
             ).extract()[0][0:10])
         except IndexError:
-            pass
+            try:
+                publication_date = parse(get_string(selector.xpath(
+                    '//b[contains(text(), "Publication Date")]/../text()'
+                ).extract()[0])).date()
+                publication_date = publication_date.isoformat()
+            except (AttributeError, IndexError, TypeError):
+                try:
+                    publication_date = parse(compile(
+                        '\((.*?)\)'
+                    ).search(
+                        get_string(selector.xpath(
+                            '//div[@class="content"]/ul/li[4]/text()'
+                        ).extract()[0])
+                    ).group(1)).date()
+                    publication_date = publication_date.isoformat()
+                except (
+                    AttributeError, IndexError, TypeError, ValueError
+                ):
+                    try:
+                        publication_date = parse(compile('\((.*?)\)').search(
+                            get_string(selector.xpath(
+                                '//div[@class="content"]/ul/li[5]/text()'
+                            ).extract()[0])
+                        ).group(1)).date()
+                        publication_date = publication_date.isoformat()
+                    except (
+                        AttributeError, IndexError, TypeError, ValueError
+                    ):
+                        pass
         try:
             print_length = int(get_number(get_string(selector.xpath(
                 '//b[contains(text(), "Print Length")]/../text()'
@@ -425,13 +480,25 @@ class Spider(CrawlSpider):
                 ).extract()[0]).group(1)
             )))
         except (AttributeError, IndexError):
-            pass
+            try:
+                total_number_of_reviews = int(get_number(get_string(
+                    selector.xpath('//div[@id="summaryStars"]/a').xpath(
+                        'string()'
+                    ).extract()[0]
+                )))
+            except IndexError:
+                pass
         try:
             review_average = float(get_number(get_string(selector.xpath(
                 '//div[@class="gry txtnormal acrRating"]/text()'
             ).extract()[0].split(' ')[0])))
         except IndexError:
-            pass
+            try:
+                review_average = float(get_number(get_string(selector.xpath(
+                    '//div[@id="avgRating"]/span/a/span/text()'
+                ).extract()[0])[0:3]))
+            except IndexError:
+                pass
         if url:
             book = {
                 'amazon_best_sellers_rank': amazon_best_sellers_rank,
