@@ -358,15 +358,10 @@ class Spider(CrawlSpider):
         selector = Selector(response)
         try:
             title = get_string(selector.xpath(
-                '//span[@id="btAsinTitle"]/text()'
+                '//span[@id="btAsinTitle" or @id="productTitle"]/text()'
             ).extract()[0])
         except IndexError:
-            try:
-                title = get_string(selector.xpath(
-                    '//span[@id="productTitle"]/text()'
-                ).extract()[0])
-            except IndexError:
-                pass
+            pass
         try:
             author_name = get_string(selector.xpath(
                 '//span[@class="contributorNameTrigger"]/a/text()'
@@ -381,17 +376,16 @@ class Spider(CrawlSpider):
                 try:
                     author_name = get_string(selector.xpath(
                         '//a[@class="a-link-normal contributorNameID"]/text()'
+                        '|'
+                        '//span[@class="author notFaded"]/a/text()'
                     ).extract()[0])
                 except IndexError:
-                    try:
-                        author_name = get_string(selector.xpath(
-                            '//span[@class="author notFaded"]/a/text()'
-                        ).extract()[0])
-                    except IndexError:
-                        pass
+                    pass
         try:
             author_url = get_string(selector.xpath(
                 '//span[@class="contributorNameTrigger"]/a/@href'
+                '|'
+                '//a[@class="a-link-normal contributorNameID"]/@href'
             ).extract()[0])
         except IndexError:
             try:
@@ -400,25 +394,17 @@ class Spider(CrawlSpider):
                     'following-sibling::span/a/@href'
                 ).extract()[0])
             except IndexError:
-                try:
-                    author_url = get_string(selector.xpath(
-                        '//a[@class="a-link-normal contributorNameID"]/@href'
-                    ).extract()[0])
-                except IndexError:
-                    pass
+                pass
         try:
             price = float(get_number(get_string(selector.xpath(
                 '//td[contains(text(), "Kindle Price")]/following-sibling::td/'
                 'b/text()'
+                '|'
+                '//td[contains(text(), "Kindle Price")]/'
+                'following-sibling::td/text()'
             ).extract()[0])))
         except IndexError:
-            try:
-                price = float(get_number(get_string(selector.xpath(
-                    '//td[contains(text(), "Kindle Price")]/'
-                    'following-sibling::td/text()'
-                ).extract()[0])))
-            except IndexError:
-                pass
+            pass
         try:
             publication_date = get_string(selector.xpath(
                 '//input[@id="pubdate"]/@value'
@@ -435,24 +421,14 @@ class Spider(CrawlSpider):
                         '\((.*?)\)'
                     ).search(
                         get_string(selector.xpath(
-                            '//div[@class="content"]/ul/li[4]/text()'
+                            '//b[contains(text(), "Publisher")]/../text()'
                         ).extract()[0])
                     ).group(1)).date()
                     publication_date = publication_date.isoformat()
                 except (
                     AttributeError, IndexError, TypeError, ValueError
                 ):
-                    try:
-                        publication_date = parse(compile('\((.*?)\)').search(
-                            get_string(selector.xpath(
-                                '//div[@class="content"]/ul/li[5]/text()'
-                            ).extract()[0])
-                        ).group(1)).date()
-                        publication_date = publication_date.isoformat()
-                    except (
-                        AttributeError, IndexError, TypeError, ValueError
-                    ):
-                        pass
+                    pass
         try:
             print_length = int(get_number(get_string(selector.xpath(
                 '//b[contains(text(), "Print Length")]/../text()'
