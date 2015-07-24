@@ -162,7 +162,9 @@ def get_amazon_best_sellers_rank(selector):
                 ).replace(
                     'Paid Kindle Store', 'Paid in Kindle Store'
                 )
-            )] = int(get_number(get_string(text[0].replace(',', '').replace('#', '').replace('.', '').replace(u'有料タイトル - ', '').replace(u'位', ''))))
+            )] = int(get_number(get_string(text[0].replace(',', '').replace('#', '').replace('.', '').replace(
+                u'有料タイトル - ', ''
+            ).replace(u'位', ''))))
         except (IndexError, ValueError, UnboundLocalError):
             pass
     try:
@@ -195,7 +197,9 @@ def get_amazon_best_sellers_rank(selector):
                 )
             )] = int(get_number(get_string(li.xpath(
                 './/span[@class="zg_hrsr_rank"]/text()'
-            ).extract()[0]).replace(',', '').replace('#', '').replace('.', '').replace(u'有料タイトル - ', '').replace(u'位', '')))
+            ).extract()[0]).replace(',', '').replace('#', '').replace('.', '').replace(
+                u'有料タイトル - ', ''
+            ).replace(u'位', '')))
     except IndexError:
         pass
     return amazon_best_sellers_rank
