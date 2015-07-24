@@ -364,37 +364,28 @@ class Spider(CrawlSpider):
             pass
         try:
             author_name = get_string(selector.xpath(
-                '//span[@class="contributorNameTrigger"]/a/text()'
+                '//span[@class="contributorNameTrigger"'
+                'or'
+                '@class="author notFaded"]/a/text()'
+                '|'
+                '//a[@class="a-link-normal contributorNameID"]/text()'
+                '|'
+                '//h1[normalize-space(@class)="parseasinTitle"]/'
+                'following-sibling::span/a/text()'
             ).extract()[0])
         except IndexError:
-            try:
-                author_name = get_string(selector.xpath(
-                    '//h1[normalize-space(@class)="parseasinTitle"]/'
-                    'following-sibling::span/a/text()'
-                ).extract()[0])
-            except IndexError:
-                try:
-                    author_name = get_string(selector.xpath(
-                        '//a[@class="a-link-normal contributorNameID"]/text()'
-                        '|'
-                        '//span[@class="author notFaded"]/a/text()'
-                    ).extract()[0])
-                except IndexError:
-                    pass
+            pass
         try:
             author_url = get_string(selector.xpath(
                 '//span[@class="contributorNameTrigger"]/a/@href'
                 '|'
                 '//a[@class="a-link-normal contributorNameID"]/@href'
+                '|'
+                '//h1[normalize-space(@class)="parseasinTitle"]/'
+                'following-sibling::span/a/@href'
             ).extract()[0])
         except IndexError:
-            try:
-                author_url = get_string(selector.xpath(
-                    '//h1[normalize-space(@class)="parseasinTitle"]/'
-                    'following-sibling::span/a/@href'
-                ).extract()[0])
-            except IndexError:
-                pass
+            pass
         try:
             price = float(get_number(get_string(selector.xpath(
                 '//td[contains(text(), "Kindle Price")]/following-sibling::td/'
@@ -432,14 +423,11 @@ class Spider(CrawlSpider):
         try:
             print_length = int(get_number(get_string(selector.xpath(
                 '//b[contains(text(), "Print Length")]/../text()'
+                '|'
+                '//li[contains(text(), "Length")]/a/span/text()'
             ).extract()[0])))
         except IndexError:
-            try:
-                print_length = int(get_number(get_string(selector.xpath(
-                    '//li[contains(text(), "Length")]/a/span/text()'
-                ).extract()[0])))
-            except IndexError:
-                pass
+            pass
         amazon_best_sellers_rank = get_amazon_best_sellers_rank(selector)
         if amazon_best_sellers_rank:
             try:
