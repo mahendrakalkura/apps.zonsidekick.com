@@ -162,9 +162,17 @@ def get_amazon_best_sellers_rank(selector):
                 ).replace(
                     'Paid Kindle Store', 'Paid in Kindle Store'
                 )
-            )] = int(get_number(get_string(text[0].replace(',', '').replace('#', '').replace('.', '').replace(
+            )] = int(get_number(get_string(text[0].replace(
+                ',', ''
+            ).replace(
+                '#', ''
+            ).replace(
+                '.', ''
+            ).replace(
                 u'有料タイトル - ', ''
-            ).replace(u'位', ''))))
+            ).replace(
+                u'位', ''
+            ))))
         except (IndexError, ValueError, UnboundLocalError):
             pass
     try:
@@ -197,9 +205,17 @@ def get_amazon_best_sellers_rank(selector):
                 )
             )] = int(get_number(get_string(li.xpath(
                 './/span[@class="zg_hrsr_rank"]/text()'
-            ).extract()[0]).replace(',', '').replace('#', '').replace('.', '').replace(
+            ).extract()[0]).replace(
+                ',', ''
+            ).replace(
+                '#', ''
+            ).replace(
+                '.', ''
+            ).replace(
                 u'有料タイトル - ', ''
-            ).replace(u'位', '')))
+            ).replace(
+                u'位', ''
+            )))
     except IndexError:
         pass
     return amazon_best_sellers_rank
@@ -257,7 +273,9 @@ def get_book(response):
             pass
     try:
         author['name'] = get_string(selector.xpath(
-            '//span[@class="contributorNameTrigger" or @class="author notFaded"]/a/text()'
+            '//span[@class="contributorNameTrigger"'
+            'or'
+            '@class="author notFaded"]/a/text()'
             '|'
             '//div[@class="buying"]/a/text()'
             '|'
@@ -273,7 +291,9 @@ def get_book(response):
             pass
     try:
         author['url'] = get_url(selector.xpath(
-            '//span[@class="contributorNameTrigger" or @class="contributorNameTrigger"]/a/@href'
+            '//span[@class="contributorNameTrigger"'
+            'or'
+            '@class="contributorNameTrigger"]/a/@href'
             '|'
             '//a[@class="a-link-normal contributorNameID"]/@href'
         ).extract()[0])
