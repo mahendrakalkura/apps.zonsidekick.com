@@ -11,6 +11,7 @@ from socket import timeout
 from time import time
 from urlparse import urlparse
 
+from dateutil.parser import parse
 from grequests import get as get_, map as map_
 from MySQLdb import connect
 from MySQLdb.cursors import DictCursor
@@ -143,9 +144,37 @@ def get_amazon_best_sellers_rank(selector):
             ).replace(
                 'Paid Kindle Store', 'Paid in Kindle Store'
             )
-        )] = int(get_number(get_string(text[0])))
-    except IndexError:
-        pass
+        )] = int(get_number(get_string(text[0].replace(',', '').replace('#', '').replace('.', ''))))
+    except (IndexError, ValueError):
+        try:
+            text[0], text[1] = text[1], text[0]
+            amazon_best_sellers_rank[get_string(
+                text[1].replace(
+                    u'in ', ''
+                ).replace(
+                    u'in\xa0', ''
+                ).replace(
+                    '(', ''
+                ).replace(
+                    ')', ''
+                ).replace(
+                    'Free Kindle Store', 'Free in Kindle Store'
+                ).replace(
+                    'Paid Kindle Store', 'Paid in Kindle Store'
+                )
+            )] = int(get_number(get_string(text[0].replace(
+                ',', ''
+            ).replace(
+                '#', ''
+            ).replace(
+                '.', ''
+            ).replace(
+                u'有料タイトル - ', ''
+            ).replace(
+                u'位', ''
+            ))))
+        except (IndexError, ValueError, UnboundLocalError):
+            pass
     try:
         for li in selector.xpath(
             '//ul[@class="zg_hrsr"]/li[@class="zg_hrsr_item"]'
@@ -162,7 +191,13 @@ def get_amazon_best_sellers_rank(selector):
                 ).replace(
                     '(', ''
                 ).replace(
+                    '#', ''
+                ).replace(
                     ')', ''
+                ).replace(
+                    ',', ''
+                ).replace(
+                    '.', ''
                 ).replace(
                     'Free Kindle Store', 'Free in Kindle Store'
                 ).replace(
@@ -170,7 +205,17 @@ def get_amazon_best_sellers_rank(selector):
                 )
             )] = int(get_number(get_string(li.xpath(
                 './/span[@class="zg_hrsr_rank"]/text()'
-            ).extract()[0])))
+            ).extract()[0]).replace(
+                ',', ''
+            ).replace(
+                '#', ''
+            ).replace(
+                '.', ''
+            ).replace(
+                u'有料タイトル - ', ''
+            ).replace(
+                u'位', ''
+            )))
     except IndexError:
         pass
     return amazon_best_sellers_rank
@@ -219,9 +264,22 @@ def get_book(response):
         ).extract()[0])
     except IndexError:
         pass
+    if not title:
+        try:
+            title = get_string(selector.xpath(
+                '//span[@id="btAsinTitle"]/span/text()'
+            ).extract()[0])
+        except IndexError:
+            pass
     try:
         author['name'] = get_string(selector.xpath(
-            '//span[@class="contributorNameTrigger"]/a/text()'
+            '//span[@class="contributorNameTrigger"'
+            'or'
+            '@class="author notFaded"]/a/text()'
+            '|'
+            '//div[@class="buying"]/a/text()'
+            '|'
+            '//a[@class="a-link-normal contributorNameID"]/text()'
         ).extract()[0])
     except IndexError:
         try:
@@ -233,7 +291,11 @@ def get_book(response):
             pass
     try:
         author['url'] = get_url(selector.xpath(
-            '//span[@class="contributorNameTrigger"]/a/@href'
+            '//span[@class="contributorNameTrigger"'
+            'or'
+            '@class="contributorNameTrigger"]/a/@href'
+            '|'
+            '//a[@class="a-link-normal contributorNameID"]/@href'
         ).extract()[0])
     except IndexError:
         try:
@@ -244,23 +306,137 @@ def get_book(response):
         except IndexError:
             pass
     try:
-        price = float(get_number(get_string(selector.xpath(
-            '//span[@class="price"]//text()'
-        ).extract()[0])))
+        price = float(get_number(get_string(
+            selector.xpath(
+                '//b[@class="priceLarge"]/text()'
+            ).extract()[0]
+        )))
     except (IndexError, ValueError):
         try:
             price = float(get_number(get_string(selector.xpath(
-                '//td[contains(text(), "Kindle Price")]/'
-                'following-sibling::td/b/text()'
+            '//span[@class="price"]//text()'
+            '|'
+            '//tr[@class="kindle-price"]//text()'
             ).extract()[0])))
-        except IndexError:
-            pass
+        except (IndexError, ValueError):
+            try:
+                price = float(get_number(get_string(selector.xpath(
+                    '//td[contains(text(), "Kindle Price")]/'
+                    'following-sibling::td/text()'
+                ).extract()[0])))
+            except (IndexError, ValueError):
+                pass
     try:
         publication_date = get_string(selector.xpath(
             '//input[@id="pubdate"]/@value'
         ).extract()[0][0:10])
     except IndexError:
-        pass
+        try:
+            publication_date = parse(get_string(selector.xpath(
+                '//b[contains(text(), "Publication Date")]/../text()'
+                '|'
+                u'//b[contains(text(), "発売日")]/../text()'
+            ).extract()[0])).date()
+            publication_date = publication_date.isoformat()
+        except (AttributeError, IndexError, TypeError):
+            try:
+                publication_date = parse(compile(
+                    '\((.*?)\)'
+                ).search(
+                    get_string(selector.xpath(
+                        '//b[contains(text(), "Publisher")]/../text()'
+                        '|'
+                        u'//b[contains(text(), "出版社")]/../text()'
+                    ).extract()[0])
+                ).group(1)).date()
+                publication_date = publication_date.isoformat()
+            except (
+                AttributeError, IndexError, TypeError, ValueError
+            ):
+                try:
+                    publication_date = compile('\((.*?)\)').search(
+                        get_string(selector.xpath(
+                            '//b[contains(text(), "Verlag")]/../'
+                            'text()'
+                        ).extract()[0])
+                    ).group(1)
+                    publication_date = sub(
+                        '[jJ]anuar', 'January', publication_date
+                    )
+                    publication_date = sub(
+                        '[fF]ebruar', 'February', publication_date
+                    )
+                    publication_date = sub(
+                        '[mM].rz', 'March', publication_date
+                    )
+                    publication_date = sub(
+                        '[mM]ai', 'May', publication_date
+                    )
+                    publication_date = sub(
+                        '[jJ]uni', 'June', publication_date
+                    )
+                    publication_date = sub(
+                        '[jJ]uli', 'July', publication_date
+                    )
+                    publication_date = sub(
+                        '[oO]ktober', 'October', publication_date
+                    )
+                    publication_date = sub(
+                        '[dD]ezember', 'December', publication_date
+                    )
+                    publication_date = parse(publication_date).date()
+                    publication_date = publication_date.isoformat()
+                except (AttributeError, IndexError, TypeError):
+                    try:
+                        publication_date = compile('\((.*?)\)').search(
+                            get_string(
+                                selector.xpath(
+                                    '//b[contains(text(), "Publisher")'
+                                    'or '
+                                    'contains(text(), "Editore")]/../text()'
+                                ).extract()[0]
+                            )
+                        ).group(1)
+                        publication_date = sub(
+                            '[gG]ennaio', 'January', publication_date
+                        )
+                        publication_date = sub(
+                            '[fF]ebbraio', 'February', publication_date
+                        )
+                        publication_date = sub(
+                            '[mM]arzo', 'March', publication_date
+                        )
+                        publication_date = sub(
+                            '[aA]prile', 'April', publication_date
+                        )
+                        publication_date = sub(
+                            '[mM]aggio', 'May', publication_date
+                        )
+                        publication_date = sub(
+                            '[gG]iugno', 'June', publication_date
+                        )
+                        publication_date = sub(
+                            '[lL]uglio', 'July', publication_date
+                        )
+                        publication_date = sub(
+                            '[aA]gosto', 'August', publication_date
+                        )
+                        publication_date = sub(
+                            '[sS]ettembre', 'September', publication_date
+                        )
+                        publication_date = sub(
+                            '[oO]ttobre', 'October', publication_date
+                        )
+                        publication_date = sub(
+                            '[nN]ovembre', 'November', publication_date
+                        )
+                        publication_date = sub(
+                            '[dD]icembre', 'December', publication_date
+                        )
+                        publication_date = parse(publication_date).date()
+                        publication_date = publication_date.isoformat()
+                    except (AttributeError, IndexError, TypeError, ValueError):
+                        pass
     try:
         print_length = int(get_number(get_string(selector.xpath(
             '//b[contains(text(), "Print Length")]/../text()'
@@ -286,13 +462,25 @@ def get_book(response):
             '//span[@class="crAvgStars"]/a/text()'
         ).extract()[0])))
     except IndexError:
-        pass
+        try:
+            total_number_of_reviews = int(get_number(get_string(
+                selector.xpath(
+                    '//div[@id="summaryStars"]/a'
+                ).xpath('string()').extract()[0]
+            )))
+        except IndexError:
+            pass
     try:
         review_average = float(get_number(get_string(selector.xpath(
             '//div[@class="gry txtnormal acrRating"]/text()'
         ).extract()[0].split(' ')[0])))
     except IndexError:
-        pass
+        try:
+            review_average = float(get_string(selector.xpath(
+                '//div[@id="avgRating"]/span/a/span/text()'
+            ).extract()[0])[0:3])
+        except (IndexError, ValueError):
+            pass
     return {
         'amazon_best_sellers_rank': amazon_best_sellers_rank,
         'author': author,
