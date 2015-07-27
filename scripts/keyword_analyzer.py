@@ -909,25 +909,27 @@ def get_contents(keyword, country):
             spend = (spend, get_float(spend))
             stars = 0.0
             try:
-                stars = float(
-                    get_string(
-                        selector.xpath(
-                            '//div[@class="gry txtnormal acrRating"]/text()'
-                        ).extract()[0]
-                    ).split(' ')[0].replace(',', '').replace(u'つ星のうち', '')
+                stars = float(get_string(
+                    selector.xpath(
+                        '//div[@id="revSum"]/div/div/div/span/span/text()'
+                        '|'
+                        '//div[@id="avgRating"]/span/a/span/text()'
+                    ).extract()[0])[0:3]
                 )
-            except IndexError:
+            except (IndexError, ValueError):
                 try:
                     stars = float(get_string(
                         selector.xpath(
-                            '//span[contains(@class, "swSprite")]/@title'
-                        ).extract()[0][-3:]
-                    ))
+                            '//div[@id="avgRating"]/span/text()'
+                        ).extract()[0])[0:3]
+                    )
                 except (IndexError, ValueError):
                     try:
-                        stars = float(get_string(selector.xpath(
-                            '//span[contains(@class, "swSprite")]/@title'
-                        ).extract()[1])[0:3])
+                        stars = float(get_string(
+                            selector.xpath(
+                                '//div[@id="revSum"]/div/div/div/text()'
+                            ).extract()[-1].replace(u'つ星のうち', '').split()[1]
+                        ))
                     except (IndexError, ValueError):
                         pass
             stars = (stars, get_float(stars))
