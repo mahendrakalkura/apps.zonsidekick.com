@@ -384,6 +384,10 @@ class Spider(CrawlSpider):
                 '//h1[normalize-space(@class)="parseasinTitle"]/'
                 'following-sibling::span/a/@href'
             ).extract()[0])
+            if author_url.startswith('/'):
+                author_url = 'http://www.amazon.com%(author_url)s' % {
+                    'author_url': author_url
+                }
         except IndexError:
             pass
         try:
