@@ -527,6 +527,13 @@ def get_contents(keyword, country):
                 try:
                     author['name'] = get_string(selector.xpath(
                         '//span[contains(@class, "author")]/a/text()'
+                        '|'
+                        '//a'
+                        '[contains(@class, "a-link-normal contributorNameID")]/'
+                        'text()'
+                        '|'
+                        '//h1[normalize-space(@class)="parseasinTitle"]/'
+                        'following-sibling::a/text()'
                     ).extract()[0])
                 except IndexError:
                     pass
@@ -555,7 +562,18 @@ def get_contents(keyword, country):
                 try:
                     author['url'] = get_string(selector.xpath(
                         '//span[contains(@class, "author")]/a/@href'
+                        '|'
+                        '//a'
+                        '[contains(@class, "a-link-normal contributorNameID")]/'
+                        '@href'
+                        '|'
+                        '//h1[normalize-space(@class)="parseasinTitle"]/'
+                        'following-sibling::a/@href'
                     ).extract()[0])
+                    if author['url'].startswith('/'):
+                        author['url'] = 'http://www.amazon.com%(author_url)s' % {
+                            'author_url': author['url']
+                        }
                 except IndexError:
                     pass
             best_sellers_rank = 0
