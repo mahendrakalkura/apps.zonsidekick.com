@@ -6,6 +6,7 @@ from furl import furl
 from rollbar import report_message
 from scrapy.selector import Selector
 from simplejson import dumps
+from urlparse import urlparse
 
 from utilities import (
     get_book, get_response, get_responses, get_number, get_string, get_url,
@@ -47,6 +48,7 @@ def get_authors(keyword):
 
 
 def get_author(url):
+    country = urlparse(url).netloc.replace('www.amazon.', '')
     name = ''
     description = ''
     photo = ''
@@ -115,7 +117,9 @@ def get_author(url):
     except IndexError:
         pass
     urls = []
-    url = response.url.replace('http://www.amazon.com', '')
+    url = response.url.replace('http://www.amazon.%(country)s', '' % {
+        'country': country,
+    })
     try:
         url = selector.xpath(
             '//div[@class="wwRefinements"]/ul/li'
@@ -128,14 +132,19 @@ def get_author(url):
         index += 1
         if index >= 2:
             break
-        response = get_response('http://www.amazon.com%(url)s' % {
-            'url': url,
-        })
+        if url.startswith('/'):
+            url = 'http://www.amazon.%(country)s%(url)s' % {
+                'country': country,
+                'url': url,
+            }
+        response = get_response(url)
         if not response:
             break
         selector = Selector(text=response.text)
         for href in selector.xpath(
             '//h3[@class="title"]/a[@class="title"]/@href'
+            '|'
+            '//h3[@class="newaps"]/a/@href'
         ).extract():
             urls.append(href)
         url = ''

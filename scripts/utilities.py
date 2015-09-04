@@ -305,6 +305,10 @@ def get_book(response):
             ).extract()[0])
         except IndexError:
             pass
+    if author['url'].startswith('/'):
+        author['url'] = 'http://www.amazon.com%(author_url)s' % {
+            'author_url': author['url']
+        }
     try:
         price = float(get_number(get_string(
             selector.xpath(
@@ -314,9 +318,9 @@ def get_book(response):
     except (IndexError, ValueError):
         try:
             price = float(get_number(get_string(selector.xpath(
-            '//span[@class="price"]//text()'
-            '|'
-            '//tr[@class="kindle-price"]//text()'
+                '//span[@class="price"]//text()'
+                '|'
+                '//tr[@class="kindle-price"]//text()'
             ).extract()[0])))
         except (IndexError, ValueError):
             try:
